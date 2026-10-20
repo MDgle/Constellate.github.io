@@ -1,0 +1,161 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Constellate</title>
+<style>
+:root{--bg:#eef3f6;--panel:#fff;--ink:#14212b;--mut:#5c6f7d;--grid:#8fa6b5;--sec:#35505f;--line:#cfdbe3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d141b;--panel:#18222c;--ink:#e8eef3;--mut:#93a5b3;--grid:#33444f;--sec:#6d8799;--line:#2a3945}}
+:root[data-theme="dark"]{--bg:#0d141b;--panel:#18222c;--ink:#e8eef3;--mut:#93a5b3;--grid:#33444f;--sec:#6d8799;--line:#2a3945}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:15px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#top{padding:8px 10px 6px;background:var(--panel);border-bottom:1px solid var(--line)}
+#info{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;font-size:14px}
+#info b{font-size:17px}
+#chips{display:flex;gap:6px;margin-top:6px}
+.chip{flex:1;border:2px solid var(--line);border-radius:8px;padding:3px 7px;font-size:13px;display:flex;align-items:center;gap:6px;min-width:0}
+.chip i{width:11px;height:11px;border-radius:50%;background:var(--c);flex:none}
+.chip small{color:var(--mut);margin-left:auto}
+.chip.on{border-color:var(--c)}.chip.dead{opacity:.4;text-decoration:line-through}
+#modes{display:flex;gap:6px;margin-top:6px}#modes button{flex:1;min-height:38px;padding:0 6px}#modes .act{background:var(--ink);color:var(--bg);font-weight:600}
+#st{flex:1;position:relative;min-height:0;overflow:hidden}
+svg{width:100%;height:100%;display:block;touch-action:none}
+svg .t{display:none}svg[data-z="1"] .t{display:block}
+#msg{position:absolute;left:8px;right:8px;bottom:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;pointer-events:none}
+#msg:empty{display:none}
+#bar{display:flex;gap:6px;padding:8px 10px;background:var(--panel);border-top:1px solid var(--line)}
+button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:0 12px}
+#en{flex:1;background:var(--ink);color:var(--bg);font-weight:600}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+#ov>div{background:var(--panel);border-radius:12px;padding:20px;max-width:340px;width:100%}
+#ov h1{margin:0 0 6px;font-size:26px}#ov p{color:var(--mut);margin:0 0 14px}
+#ov .r{display:flex;gap:8px}#ov .r button{flex:1;font-weight:600}
+</style></head><body>
+<div id="top"><div id="info"></div><div id="chips"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button id="cc">Concede</button></div></div>
+<div id="st"><svg id="svg"><g id="w"></g></svg><div id="msg"></div></div>
+<div id="bar"><button id="un">Undo</button><button id="sv">Save</button><button id="en">End turn</button><button id="zo" aria-label="Zoom out">−</button><button id="zi" aria-label="Zoom in">+</button><button id="fi">Fit</button></div>
+<div id="ov"></div>
+<script>
+const COL=['#ff3b3b','#8a4dff','#34b4ff','#ffa63d'],NM=['Red','Purple','Blue','Orange'],KEY='constellate-save';
+const $=i=>document.getElementById(i),st=$('st'),svg=$('svg'),W=$('w');
+let hl=[],mode='s',mvN=1,pend=null,G=null,sel=null,undo=[],view={k:18,x:0,y:0,min:18};
+const acts=r=>r<=15?r:31-r,cur=()=>G.order[G.ti];
+const say=t=>{$('msg').textContent=t||''};
+function ov(h){$('ov').innerHTML='<div>'+h+'</div>';$('ov').style.display='flex'}
+function menu(){let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}
+ ov('<h1>Constellate</h1><p>Tap one of your Stars, then tap a target. Pinch or scroll to zoom, drag to pan.</p><div class="r"><button onclick="start(2)">2 players</button><button onclick="start(4)">4 players</button></div>'+(sv?'<div class="r" style="margin-top:8px"><button onclick="cont()">Continue saved game</button></div>':''))}
+function start(n){const pl=n==2?[0,2]:[0,1,2,3],caps=n==2?{0:[19,1],2:[1,19]}:{0:[10,1],1:[1,10],2:[19,10],3:[10,19]};
+ G={pl,caps,alive:{},stars:[],conns:[],round:1,order:[...pl],ti:0,ap:1,used:[],score:{},nid:1,over:null};
+ pl.forEach(c=>{G.alive[c]=true;G.stars.push({id:G.nid++,x:caps[c][0]+.5,y:caps[c][1]+.5,o:c,cap:1,co:c})});
+ mode='s';beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');render()}
+const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
+const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
+function beginTurn(){G.used=[];G.ap=acts(G.round);mode='s';G.pool=1+G.pl.filter(c=>G.alive[c]&&(G.score[c]||0)>(G.score[cur()]||0)).length;G.stars.forEach(s=>s.fm=0);const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
+function placeable(){const me=cur(),cp=capStar(me);if(!cp||cp.o!=me)return[];if(G.capOnly)return[cp];const seen=new Set([cp.id]),q=[cp];while(q.length){const s=q.pop();G.conns.forEach(c=>{if(c[0]==s.id||c[1]==s.id){const t=by(c[0]==s.id?c[1]:c[0]);if(t.o==me&&!seen.has(t.id)){seen.add(t.id);q.push(t)}}})}return G.stars.filter(s=>seen.has(s.id))}
+function placeF(t){if(G.pool<1)return say('No Fleets left to place.');const ok=placeable();if(!t||!ok.includes(t))return say(!ok.length?'Retake your Capital to place Fleets.':G.capOnly?'After a Capital loss you can only place on your Capital.':'Place Fleets on a Star connected to your Capital.');undo.push(JSON.stringify(G));t.f=(t.f||0)+1;G.pool--;say(G.pool+' Fleets left to place.');render()}
+function moveF(t){const me=cur();
+ if(!sel){if(!t||t.o!=me)return say('Tap one of your Stars that has Fleets.');const fr=(t.f||0)-(t.fm||0);if(fr<1)return say('No free Fleets here.');
+  if(fr==1){sel=t.id;mvN=1;say('Tap a Star within 1 Connection.');return render()}
+  return ov(`<h1>Move how many Fleets?</h1><p>A group of n travels up to n Connections.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr)].map((_,i)=>`<button onclick="pickN(${t.id},${i+1})">${i+1}</button>`).join('')}</div>`)}
+ const a=by(sel);if(!t||t===a||t.o!=me){sel=null;say('');return render()}
+ const d=new Map([[a.id,0]]),q=[a];while(q.length){const x=q.shift();if(d.get(x.id)>=mvN)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u.o==me&&!d.has(u.id)){d.set(u.id,d.get(x.id)+1);q.push(u)}}})}
+ if(!d.has(t.id))return say('Out of reach. '+mvN+' Fleet'+(mvN>1?'s travel':' travels')+' up to '+mvN+' Connection'+(mvN>1?'s':'')+' along your network.');
+ undo.push(JSON.stringify(G));a.f-=mvN;t.f=(t.f||0)+mvN;t.fm=(t.fm||0)+mvN;sel=null;say('Moved '+mvN+'.');render()}
+function pickN(id,n){$('ov').style.display='none';sel=id;mvN=n;say('Tap a Star within '+n+' Connection'+(n>1?'s':''));render()}
+function resolve(A){$('ov').style.display='none';const a=by(pend.a),b=by(pend.b),D=b.f||0,def=b.o,nb=G.conns.filter(q=>q.includes(b.id)).map(q=>by(q[0]==b.id?q[1]:q[0])).filter(x=>x.o==def&&x!==b);pend.A=A;pend.nb=nb.map(x=>x.id);
+ if(D>0&&A>0&&nb.length){const mx=Math.min(D,A);return ov(`<h1>${NM[def]}: Hold or Retreat?</h1><p>${D} Fleet${D>1?'s':''} defend against ${A}. Each Fleet that Holds destroys one attacker and is lost. The rest Retreat.</p><div class="r" style="flex-wrap:wrap">${[...Array(mx+1)].map((_,h)=>`<button onclick="fin(${h})">Hold ${h}</button>`).join('')}</div>`)}
+ fin(nb.length?0:D)}
+const lbl=s=>'ABCDEFG'[Math.floor(s.x/3)]+(Math.floor(s.y/3)+1)+'-'+'abc'[Math.floor(s.x)%3]+'abc'[Math.floor(s.y)%3];
+function fin(h,dest){const {a:ai,b:bi,A,c,nb}=pend,b=by(bi),D=b.f||0;
+ if(nb.length>1&&D-h>0&&dest==null){hl=nb;render();return ov(`<h1>${NM[b.o]}: Retreat where?</h1><p>${D-h} Fleet${D-h>1?'s':''} retreat. Choose a Star (ringed on the board).</p>${nb.map(i=>`<div class="r" style="margin-top:6px"><button onclick="fin(${h},${i})">${lbl(by(i))}, strength ${str(by(i))}</button></div>`).join('')}`)}
+ hl=[];$('ov').style.display='none';const a=by(ai),me=cur();pend=null;undo.push(JSON.stringify(G));
+ const surv=A-Math.min(h,A),ret=nb.length?D-h:0;
+ if(ret){const d=by(dest!=null?dest:nb[0]);d.f=(d.f||0)+ret}
+ a.f=(a.f||0)-A;G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;G.conns.push([a.id,b.id]);G.used.push(a.id,b.id);G.ap-=c;sel=null;
+ const m=elim();say('Star taken for '+c+'.'+(D?' '+ret+' Fleet'+(ret==1?'':'s')+' retreated, '+(D-ret)+' lost.':'')+m);render()}
+function kill(c){G.alive[c]=false;G.conns=G.conns.filter(q=>by(q[0]).o!=c);G.stars.forEach(s=>{if(s.o==c)s.f=0})}
+function deficit(vp){const al=G.pl.filter(c=>G.alive[c]),t=[...new Set(al.map(c=>vp[c]))].sort((a,b)=>a-b);
+ for(let i=0;i+1<t.length;i++)if(t[i+1]-t[i]>3){const v=al.filter(c=>vp[c]==t[i]);v.forEach(kill);return ' '+v.map(c=>NM[c]).join(' and ')+' eliminated by deficit.'}return ''}
+function conc(){if(!G||G.over)return;ov(`<h1>${NM[cur()]} concedes?</h1><p>You are eliminated immediately.</p><div class="r"><button onclick="doConc()">Concede</button><button onclick="$('ov').style.display='none'">Cancel</button></div>`)}
+function doConc(){$('ov').style.display='none';const c=cur();kill(c);G.order=G.order.filter(x=>G.alive[x]);if(G.pl.filter(x=>G.alive[x]).length<2)return finish();G.ti--;endTurn();say(NM[c]+' conceded. '+NM[cur()]+' to move.')}
+const cost=(a,b)=>Math.abs(Math.floor(a.x)-Math.floor(b.x))+Math.abs(Math.floor(a.y)-Math.floor(b.y));
+function dseg(p,a,b){const dx=b.x-a.x,dy=b.y-a.y;let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy)}
+const clear=(a,b)=>G.stars.every(s=>s===a||s===b||dseg(s,a,b)>.2);
+function calc(){const ctl=[...Array(7)].map(()=>Array(7).fill(-1)),vp=[0,0,0,0];
+ for(let y=0;y<7;y++)for(let x=0;x<7;x++){const n=[0,0,0,0];G.stars.forEach(s=>{if(Math.floor(s.x/3)==x&&Math.floor(s.y/3)==y)n[s.o]++});const t=n[0]+n[1]+n[2]+n[3];n.forEach((v,c)=>{if(v*2>t)ctl[y][x]=c})}
+ ctl.forEach((r,y)=>r.forEach((c,x)=>{if(c>=0)vp[c]+=(x==3&&y==3)?3:1}));
+ for(let i=0;i<7;i++){const r=ctl[i][0];if(r>=0&&ctl[i].every(v=>v==r))vp[r]++;const c=ctl[0][i];if(c>=0&&ctl.every(q=>q[i]==c))vp[c]++}
+ G.pl.forEach(c=>{if(!G.alive[c])vp[c]=0});return{ctl,vp}}
+function elim(){const c0=cur();let m='';G.pl.forEach(c=>{if(G.alive[c]&&!G.stars.some(s=>s.o==c)){kill(c);m+=' '+NM[c]+' is eliminated.'}});
+ G.order=G.order.filter(c=>G.alive[c]);G.ti=Math.max(0,G.order.indexOf(c0));if(G.pl.filter(c=>G.alive[c]).length<2)finish();return m}
+function finish(){const {vp}=calc();G.score=vp;const al=G.pl.filter(c=>G.alive[c]),sys=c=>G.stars.filter(s=>s.o==c).length;
+ let top=al.filter(c=>vp[c]==Math.max(...al.map(x=>vp[x])));
+ if(top.length>1){const b=Math.max(...top.map(c=>vp[c]+sys(c)));top=top.filter(c=>vp[c]+sys(c)==b)}
+ G.over=top;render();ov('<h1>'+(top.length==1?NM[top[0]]+' wins':'Tied')+'</h1><p>'+G.pl.map(c=>NM[c]+' '+vp[c]+' VP, '+sys(c)+' systems').join('<br>')+(top.length>1?'<br>Overtime is not built yet.':'')+'</p><div class="r"><button onclick="menu()">New game</button></div>')}
+function tap(bx,by){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
+ if(cx<0||cy<0||cx>20||cy>20){sel=null;say('');return render()}
+ const t=sysStar(cx,cy),me=cur();if(mode=='p')return placeF(t);if(mode=='m')return moveF(t);
+ if(!sel){if(t&&t.o==me){if(G.used.includes(t.id))say('That Star already acted, or is new, this turn.');else{sel=t.id;say('Tap an empty system to set a Star, your Star to connect, or an enemy Star to take.')}}else say('Tap one of your Stars to start a move.');return render()}
+ const a=G.stars.find(s=>s.id==sel);if(t===a){sel=null;say('');return render()}
+ let kind,b;if(!t){kind='set';b={x:Math.min(cx+.88,Math.max(cx+.12,bx)),y:Math.min(cy+.88,Math.max(cy+.12,by))}}else{b=t;kind=t.o==me?'conn':'take'}
+ const c=cost(a,b);
+ if(c>G.ap)return say('That costs '+c+' Actions. You have '+G.ap+'.');
+ if(!clear(a,b))return say('The line passes too close to another Star.');
+ if(kind=='conn'&&G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id)))return say('Those Stars are already connected.');
+ if(kind=='take'){const cb=str(b),fr=(a.f||0)-(a.fm||0),m=Math.max(0,cb+1-cs(a));if(m>fr)return say('Too weak. You need strength '+(cb+1)+'. You have '+cs(a)+' plus '+fr+' free Fleet'+(fr==1?'':'s')+'.');
+  pend={a:a.id,b:b.id,c};if(fr==0||m==fr)return resolve(m);
+  return ov(`<h1>Use Fleets in the attack?</h1><p>Used Fleets move onto the Star if you win.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr-m+1)].map((_,i)=>`<button onclick="resolve(${m+i})">Use ${m+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';pend=null">Cancel</button></div>`)}
+ undo.push(JSON.stringify(G));
+ if(kind=='set'){const n={id:G.nid++,x:b.x,y:b.y,o:me};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id)}
+ else if(kind=='conn'){G.conns.push([a.id,b.id]);G.used.push(a.id)}
+
+ G.ap-=c;sel=null;const m=elim();say((kind=='set'?'Star set':'Connected')+' for '+c+'.'+m);render()}
+function endTurn(){if(!G||G.over)return;let em='';sel=null;undo=[];G.used=[];
+ if(G.ti<G.order.length-1)G.ti++;
+ else{const {vp}=calc();G.score=vp;if(G.round>=30)return finish();em=deficit(vp);if(G.pl.filter(c=>G.alive[c]).length<2)return finish();const ref=G.order[0];
+  G.order=G.pl.filter(c=>G.alive[c]).sort((a,b)=>vp[b]-vp[a]||((a-ref+3)%4)-((b-ref+3)%4));G.round++;G.ti=0}
+ beginTurn();say(NM[cur()]+' to move'+em);render()}
+const sp=(x,y,R,r)=>[...Array(14)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/7,q=i%2?r:R;return(x+q*Math.cos(a)).toFixed(2)+','+(y+q*Math.sin(a)).toFixed(2)}).join(' ');
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
+function render(){if(!G)return;persist();const {ctl,vp}=calc(),me=cur();let s='';
+ ctl.forEach((r,y)=>r.forEach((c,x)=>{if(c>=0)s+=`<rect x="${x*3}" y="${y*3}" width="3" height="3" fill="${COL[c]}" opacity=".14"/>`}));
+ for(let i=0;i<=21;i++){const th=i%3==0,a=`stroke="${th?'var(--sec)':'var(--grid)'}" stroke-width="${th?2:1}" ${th?'':'stroke-dasharray="3 4"'} vector-effect="non-scaling-stroke"`;s+=`<line x1="${i}" y1="0" x2="${i}" y2="21" ${a}/><line x1="0" y1="${i}" x2="21" y2="${i}" ${a}/>`}
+ const by=id=>G.stars.find(q=>q.id==id);
+ G.conns.forEach(([p,q])=>{const a=by(p),b=by(q);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${COL[a.o]}" stroke-width=".1" stroke-linecap="round"/>`});
+ G.stars.forEach(q=>{const op=q.o==me&&G.used.includes(q.id)?.5:1,f=`fill="${COL[q.o]}" stroke="var(--ink)" stroke-width=".04" opacity="${op}"`;
+  s+=q.cap?`<polygon points="${sp(q.x,q.y,.4,.22)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r=".18" ${f}/>`;
+  if(q.f)s+=`<rect x="${q.x+.12}" y="${q.y+.04}" width=".52" height=".34" rx=".08" fill="${COL[q.o]}" stroke="var(--ink)" stroke-width=".04"/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${q.f}</text>`;
+  s+=`<text class="t" x="${q.x+.3}" y="${q.y-.22}" font-size=".3" font-weight="700" fill="var(--ink)">${str(q)}</text>`;
+  if(hl.includes(q.id))s+=`<circle cx="${q.x}" cy="${q.y}" r=".6" fill="none" stroke="var(--ink)" stroke-width=".1"/>`;
+  if(q.id==sel)s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".18 .12"/>`});
+ W.innerHTML=s;document.querySelectorAll('#modes [data-m]').forEach(b=>{b.classList.toggle('act',b.dataset.m==mode);if(b.dataset.m=='p')b.textContent='Place '+(G.pool||0)});
+ $('info').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b><span>Round ${G.round} of 30</span><span>Actions ${G.ap}</span>`;
+ $('chips').innerHTML=G.pl.map(c=>`<div class="chip ${c==me&&!G.over?'on':''} ${G.alive[c]?'':'dead'}" style="--c:${COL[c]}"><i></i>${vp[c]} VP<small>${G.stars.filter(q=>q.o==c).length} stars</small></div>`).join('')}
+function apply(){W.setAttribute('transform',`translate(${view.x} ${view.y}) scale(${view.k})`);svg.dataset.z=view.k>38?1:0}
+function fit(){const r=st.getBoundingClientRect();view.k=view.min=Math.min(r.width,r.height)/21.6;view.x=(r.width-21*view.k)/2;view.y=(r.height-21*view.k)/2;apply()}
+function zoomAt(f,px,py){const nk=Math.max(view.min*.9,Math.min(90,view.k*f)),r=nk/view.k;view.x=px-(px-view.x)*r;view.y=py-(py-view.y)*r;view.k=nk;apply()}
+const P=new Map();let moved=0,multi=0,last=null;
+const gest=()=>{const v=[...P.values()],a=v[0],b=v[1]||v[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
+svg.addEventListener('pointerdown',e=>{svg.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size==1){moved=0;multi=0}else{multi=1;moved=99}last=gest()});
+svg.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+ if(P.size==1){moved+=Math.abs(dx)+Math.abs(dy);if(moved>8){view.x+=dx;view.y+=dy;apply()}}
+ else if(P.size==2){const g=gest(),r=st.getBoundingClientRect();view.x+=g.cx-last.cx;view.y+=g.cy-last.cy;zoomAt(g.d/last.d,g.cx-r.left,g.cy-r.top);last=g}});
+const up=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);
+ if(P.size==0&&!multi&&moved<=8&&e.type=='pointerup'){const r=st.getBoundingClientRect();tap((e.clientX-r.left-view.x)/view.k,(e.clientY-r.top-view.y)/view.k)}
+ if(P.size==1)last=gest()};
+svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
+svg.addEventListener('wheel',e=>{e.preventDefault();const r=st.getBoundingClientRect();zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+const mid=f=>{const r=st.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)};
+$('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=fit;$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over){mode=m;sel=null;say('');render()}};$('cc').onclick=conc;
+$('en').onclick=()=>{if(G&&!G.over&&G.pool>0&&placeable().length)ov('<h1>Unplaced Fleets</h1><p>'+G.pool+' Fleet'+(G.pool>1?'s':'')+' left to place. They are lost if you end your turn.</p><div class="r"><button onclick="$(\'ov\').style.display=\'none\';endTurn()">End turn</button><button onclick="$(\'ov\').style.display=\'none\'">Keep playing</button></div>');else endTurn()};
+$('un').onclick=()=>{if(G&&!G.over&&undo.length){G=JSON.parse(undo.pop());sel=null;say('Undone');render()}};
+let dl=null;try{window.claude&&claude.use('downloads').then(d=>{dl=d}).catch(()=>{})}catch(e){}
+function loadObj(o){if(!o||!o.pl||!o.stars||!o.conns||!o.order||!o.caps)throw 0;G=o;G.pool=G.pool||0;G.capOnly=!!G.capOnly;G.stars.forEach(s=>{if(s.cap&&s.co==null)s.co=s.o});mode='s';sel=null;undo=[];$('ov').style.display='none';fit();say('Game loaded');render()}
+function cont(){try{loadObj(JSON.parse(localStorage.getItem(KEY)))}catch(e){say('Could not load that save.');menu()}}
+function fromText(){try{loadObj(JSON.parse($('sc').value))}catch(e){$('sc').style.outline='2px solid #ff3b3b'}}
+function fromFile(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadObj(JSON.parse(r.result))}catch(e){say('That file is not a Constellate save.');$('ov').style.display='none'}};r.readAsText(f)}
+async function toFile(){try{await dl.save({filename:'constellate-round-'+G.round+'.json',data:JSON.stringify(G)});say('Save file offered.')}catch(e){say('Save cancelled.')}$('ov').style.display='none'}
+function copySave(){const t=$('sc');t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Copied.'),()=>document.execCommand('copy'))}catch(e){try{document.execCommand('copy')}catch(_){}}}
+function saveUI(){if(!G)return;ov(`<h1>Save or load</h1><p>The game also autosaves in this browser.</p><div class="r" style="margin-bottom:8px">${dl?'<button onclick="toFile()">Save file</button>':''}<button onclick="$('lf').click()">Load file</button></div><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="4" style="width:100%;box-sizing:border-box;font:12px monospace">${JSON.stringify(G)}</textarea><div class="r" style="margin-top:8px"><button onclick="copySave()">Copy code</button><button onclick="fromText()">Load code</button><button onclick="$('ov').style.display='none'">Close</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Dev: set round</span><input id="dr" type="number" min="1" max="30" value="${G.round}" style="width:64px;font:inherit;min-height:44px;box-sizing:border-box"><button onclick="setRound()">Set</button></div>`)}
+function setRound(){if(!G||G.over)return;const n=Math.max(1,Math.min(30,parseInt($('dr').value)||1));G.round=n;G.ap=acts(n);G.used=[];sel=null;undo=[];$('ov').style.display='none';say('Dev: round set to '+n+'. Actions: '+G.ap+'.');render()}
+$('sv').onclick=saveUI;
+addEventListener('resize',fit);fit();menu();
+</script></body></html>

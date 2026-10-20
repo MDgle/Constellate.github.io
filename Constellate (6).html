@@ -1,0 +1,397 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Constellate</title>
+<!-- Head: page title and character set above, mobile viewport above. Next comes the CSS (how things LOOK), then the HTML (what is ON the page), then the JavaScript (what it DOES). -->
+<style>
+/* :root holds color "variables" (--name) reused everywhere below; these are the light-theme values. The padding keeps content clear of phone notches. */
+:root{--bg:#eef3f6;--panel:#fff;--ink:#14212b;--mut:#5c6f7d;--grid:#8fa6b5;--sec:#35505f;--line:#cfdbe3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Dark theme: the same variables with dark values, used when the device is in dark mode. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d141b;--panel:#18222c;--ink:#e8eef3;--mut:#93a5b3;--grid:#33444f;--sec:#6d8799;--line:#2a3945}}
+/* Same dark values, used if the page is forced dark. */
+:root[data-theme="dark"]{--bg:#0d141b;--panel:#18222c;--ink:#e8eef3;--mut:#93a5b3;--grid:#33444f;--sec:#6d8799;--line:#2a3945}
+/* html: fill the full height of the screen. */
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+/* body: no margin; stack children vertically (top panel, board, bottom bar); base font and colors; stop pull-to-refresh bounce and text selection. */
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:15px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+/* #top: the panel across the top that holds round info, player chips and mode buttons. */
+#top{padding:8px 10px 6px;background:var(--panel);border-bottom:1px solid var(--line)}
+/* #info: the row showing whose turn, the round and Actions left. */
+#info{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;font-size:14px}
+/* #info b: the current player's name is bigger. */
+#info b{font-size:17px}
+/* #chips: the row of player score boxes. */
+#chips{display:flex;gap:6px;margin-top:6px}
+/* .chip: one player's box (border, rounded corners, layout). */
+.chip{flex:1;border:2px solid var(--line);border-radius:8px;padding:3px 7px;font-size:13px;display:flex;align-items:center;gap:6px;min-width:0}
+/* .chip i: the small colored dot inside a chip. */
+.chip i{width:11px;height:11px;border-radius:50%;background:var(--c);flex:none}
+/* .chip small: the star count text, pushed to the right and dimmed. */
+.chip small{color:var(--mut);margin-left:auto}
+/* .chip.on: outline in the player's color for whoever's turn it is; .chip.dead: faded and crossed out when eliminated. */
+.chip.on{border-color:var(--c)}.chip.dead{opacity:.4;text-decoration:line-through}
+/* #modes: the row of three mode buttons (Stars, Place, Move); .act marks the selected one. */
+#modes{display:flex;gap:6px;margin-top:6px}#modes button{flex:1;min-height:38px;padding:0 6px}#modes .act{background:var(--ink);color:var(--bg);font-weight:600}
+/* #st: the board area stretches to fill leftover space; position:relative lets overlays be placed inside it. */
+#st{flex:1;position:relative;min-height:0;overflow:hidden}
+/* svg: the drawing surface fills its area; touch-action:none lets our code handle finger drags and pinches. */
+svg{width:100%;height:100%;display:block;touch-action:none}
+/* Strength numbers (class t) are hidden unless zoomed in (data-z is 1). */
+svg .t{display:none}svg[data-z="1"] .t{display:block}
+/* #msg: the message toast along the bottom of the board. */
+#msg{position:absolute;left:8px;right:8px;bottom:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;pointer-events:none}
+/* Hide the toast when it has no text. */
+#msg:empty{display:none}
+/* #bar: the bottom button bar. */
+#bar{display:flex;gap:6px;padding:8px 10px;background:var(--panel);border-top:1px solid var(--line)}
+/* button: the shared look for all buttons, at least 44px so they are easy to tap. */
+button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:0 12px}
+/* #en: the End turn button takes the spare width and is dark. */
+#en{flex:1;background:var(--ink);color:var(--bg);font-weight:600}
+/* #ov: full-screen dim backdrop that centers pop-up dialogs (hidden until JS shows it). */
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+/* #ov>div: the dialog box itself. */
+#ov>div{background:var(--panel);border-radius:12px;padding:20px;max-width:340px;width:100%}
+/* Dialog heading and paragraph text. */
+#ov h1{margin:0 0 6px;font-size:26px}#ov p{color:var(--mut);margin:0 0 14px}
+/* .r: rows of buttons inside dialogs. */
+#ov .r{display:flex;gap:8px}#ov .r button{flex:1;font-weight:600}
+/* #zoom: the zoom buttons floating at the top right of the board; also lets tall dialogs scroll. */
+#zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px}#zoom button{background:var(--panel)}#ov>div{max-height:92%;overflow:auto}
+/* #hold: the Hold button, hidden until the defender has a Hold to choose. */
+#hold{display:none;font-weight:600}
+</style></head><body>
+<!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
+<div id="top"><div id="info"></div><div id="chips"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button id="cc">Concede</button></div></div>
+<!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
+<div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button></div><div id="msg"></div></div>
+<!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
+<div id="bar"><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="en">End turn</button></div>
+<!-- Empty dialog backdrop that JavaScript fills when it needs a pop-up. -->
+<div id="ov"></div>
+<script>
+/*
+A quick JavaScript glossary for reading this file:
+const x = 5;     makes a value that never gets reassigned.   let x = 5;   makes one you can change later.
+function f(a){}  is a named block of code you run by writing f(1).   (a)=>a+1   is a short anonymous version (an arrow function).
+{ }              groups statements. Inside {} after a name: value pairs it is an object, like {x:1,y:2}. [ ] is a list (array).
+a==b  equal.  a!=b  not equal.  a&&b  both true.  a||b  either true (also used as 'or use this default').  !a  not.
+cond ? x : y     gives x if cond is true, else y.
+x.y              the thing called y that belongs to x.   x[0]  the first item of a list.
+`text ${v}`      a template string: ${v} is replaced by the value of v.
+return           ends the function and hands back a value.   if/else, for and forEach repeat or choose.
+Lines are packed tightly, so one physical line often holds several statements separated by ;  The comment above a line explains them in order.
+*/
+// Constants. COL = player colors by number (0 red, 1 purple, 2 blue, 3 orange). NM = player names. KEY = the name the autosave is stored under in the browser.
+const COL=['#ff3b3b','#8a4dff','#34b4ff','#ffa63d'],NM=['Red','Purple','Blue','Orange'],KEY='constellate-save';
+// $ is a shortcut for finding an HTML element by its id. st, svg and W grab the board area, the drawing surface and the group that holds everything drawn.
+const $=i=>document.getElementById(i),st=$('st'),svg=$('svg'),W=$('w');
+// CWP = turn-order position of each color (red, blue, orange, purple). Then variables that change while playing: hl (stars to ring), mode (s=stars, p=place, m=move), mvN (size of the fleet group being moved), pend (an attack waiting on a choice), G (the whole game state), sel (selected star id), undo (stack of saved states), view (pan and zoom).
+const CWP={0:0,2:1,3:2,1:3};let hl=[],mode='s',mvN=1,pend=null,G=null,sel=null,undo=[],view={k:18,x:0,y:0,min:18};
+// acts(r) = Actions available in round r (rises to 15, then falls by 1 per round). cur() = the color number of whoever's turn it is.
+const acts=r=>r<=15?r:31-r,cur=()=>G.order[G.ti];
+// say(t) shows message t in the toast at the bottom of the board; empty text hides it.
+const say=t=>{$('msg').textContent=t||''};
+// ov(h) shows a pop-up dialog containing the HTML text h.
+function ov(h){$('ov').innerHTML='<div>'+h+'</div>';$('ov').style.display='flex'}
+// menu() builds the start screen. First it looks for an autosave in the browser (try/catch so a blocked browser does not crash it).
+function menu(){let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}
+// The start dialog: buttons for 2 or 4 players, plus Continue if a save was found.
+ ov('<h1>Constellate</h1><p>Tap one of your Stars, then tap a target. Pinch or scroll to zoom, drag to pan.</p><div class="r"><button onclick="start(2)">2 players</button><button onclick="start(4)">4 players</button></div>'+(sv?'<div class="r" style="margin-top:8px"><button onclick="cont()">Continue saved game</button></div>':''))}
+// start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
+function start(n){const pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[19,1],2:[1,19]}:{0:[10,1],1:[1,10],2:[19,10],3:[10,19]};
+// Creates the game state G: players, capitals, who is alive, stars, connections, round 1, turn order, whose turn, Action points, used stars, scores, next star id.
+ G={pl,caps,alive:{},stars:[],conns:[],round:1,order:[...pl],ti:0,ap:1,used:[],score:{},nid:1,over:null};
+// For each player, add a capital star in the middle of its system (the +.5) with a unique id. cap marks it a capital, co remembers who it originally belonged to.
+ pl.forEach(c=>{G.alive[c]=true;G.stars.push({id:G.nid++,x:caps[c][0]+.5,y:caps[c][1]+.5,o:c,cap:1,co:c})});
+// Start the first turn, clear selection and undo, hide the dialog, fit the board to the screen, announce the first player, draw.
+ mode='s';pend=null;hl=[];$('hold').style.display='';G.rank=rankSnap({});beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');render();roundPop()}
+// sysStar(x,y) finds the star in system column x, row y (or nothing).
+const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
+// Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
+const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
+// beginTurn() resets per-turn things: used stars, Actions, mode. pool = Fleets to place = 1 + the number of players with a higher score than you (your rank). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
+function beginTurn(){G.used=[];G.ap=acts(G.round);mode='s';G.pool=G.rank[cur()]||1;G.stars.forEach(s=>s.fm=0);const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
+// placeable() lists stars that can receive Fleets: none if your capital is lost, only the capital if capOnly, otherwise every own star reachable from the capital by walking your own connections (a flood-fill search).
+function placeable(){const me=cur(),cp=capStar(me);if(!cp||cp.o!=me)return[];if(G.capOnly)return[cp];const seen=new Set([cp.id]),q=[cp];while(q.length){const s=q.pop();G.conns.forEach(c=>{if(c[0]==s.id||c[1]==s.id){const t=by(c[0]==s.id?c[1]:c[0]);if(t.o==me&&!seen.has(t.id)){seen.add(t.id);q.push(t)}}})}return G.stars.filter(s=>seen.has(s.id))}
+// placeF(t) places one Fleet on star t if allowed, otherwise explains why. It saves an undo snapshot first.
+function placeF(t){if(G.pool<1)return say('No Fleets left to place.');const ok=placeable();if(!t||!ok.includes(t))return say(!ok.length?'Retake your Capital to place Fleets.':G.capOnly?'After a Capital loss you can only place on your Capital.':'Place Fleets on a Star connected to your Capital.');undo.push(JSON.stringify(G));t.f=(t.f||0)+1;G.pool--;say(G.pool+' Fleets left to place.');render()}
+// moveF(t) handles taps while in Move mode.
+function moveF(t){const me=cur();
+// First tap: must be your own star with free (not yet moved) Fleets. fr = how many are free.
+ if(!sel){if(!t||t.o!=me)return say('Tap one of your Stars that has Fleets.');const fr=(t.f||0)-(t.fm||0);if(fr<1)return say('No free Fleets here.');
+// If only 1 Fleet is free, select the star and wait for a destination.
+  if(fr==1){sel=t.id;mvN=1;say('Tap a Star within 1 Connection.');return render()}
+// Otherwise show a dialog with buttons 1 to fr to choose the group size.
+  return ov(`<h1>Move how many Fleets?</h1><p>A group of n travels up to n Connections.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr)].map((_,i)=>`<button onclick="pickN(${t.id},${i+1})">${i+1}</button>`).join('')}</div>`)}
+// Second tap: a = the selected star. Tapping empty space, the same star or an enemy cancels.
+ const a=by(sel);if(!t||t===a||t.o!=me){sel=null;say('');return render()}
+// Breadth-first search: from a, walk along your own connections up to mvN steps, recording each star's distance in d.
+ const d=new Map([[a.id,0]]),q=[a];while(q.length){const x=q.shift();if(d.get(x.id)>=mvN)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u.o==me&&!d.has(u.id)){d.set(u.id,d.get(x.id)+1);q.push(u)}}})}
+// If the target star was not reached within range, explain.
+ if(!d.has(t.id))return say('Out of reach. '+mvN+' Fleet'+(mvN>1?'s travel':' travels')+' up to '+mvN+' Connection'+(mvN>1?'s':'')+' along your network.');
+// Valid move: save undo, take Fleets from a, add them to t, mark them moved (fm), clear selection, say so.
+ undo.push(JSON.stringify(G));a.f-=mvN;t.f=(t.f||0)+mvN;t.fm=(t.fm||0)+mvN;sel=null;say('Moved '+mvN+'.');render()}
+// pickN(id,n) runs when a size button is tapped: remember the star and group size, then wait for a destination tap.
+function pickN(id,n){$('ov').style.display='none';sel=id;mvN=n;say('Tap a Star within '+n+' Connection'+(n>1?'s':''));render()}
+// resolve(A) runs once an attack is paid for with A committed Fleets. It now only gathers facts, then hands the defender's Fleets to the choice loop (defNext) below. Nothing on the board changes yet.
+function resolve(A){$('ov').style.display='none';
+// b = the target star, D = its defending Fleets, def = the defender's color, nb = retreat spots: the defender's other stars joined to the target by a connection.
+const b=by(pend.b),D=b.f||0,def=b.o,nb=G.conns.filter(q=>q.includes(b.id)).map(q=>by(q[0]==b.id?q[1]:q[0])).filter(x=>x.o==def&&x!==b);
+// Store on pend: A attackers, nb retreat spot ids, D defenders, dec = the decision for each defending Fleet so far, hold = Holds so far, ph = 1 marks that the defender is mid-decision (other input is blocked).
+pend.A=A;pend.nb=nb.map(x=>x.id);pend.D=D;pend.dec=[];pend.hold=0;pend.ph=1;
+// Start stepping through the defending Fleets (finishes straight away if there are none).
+defNext()}
+// defNext() walks through the defending Fleets one at a time. It decides by itself only when there is no real choice; otherwise it stops and waits for the defender.
+function defNext(){
+// Keep going until every defending Fleet has a decision.
+while(pend.dec.length<pend.D){
+// hOK: an attacking Fleet is still left to pair off, so Hold is allowed. rOK: at least one retreat spot exists.
+const hOK=pend.hold<pend.A,rOK=pend.nb.length>0;
+// Neither option exists: this Fleet is destroyed ('X').
+if(!hOK&&!rOK){pend.dec.push('X');continue}
+// Only Hold exists: it is forced ('H') and destroys one attacker.
+if(hOK&&!rOK){pend.dec.push('H');pend.hold++;continue}
+// A real choice: remember whether Hold is allowed, ring the retreat spots, show the Hold button only if allowed, and put the instruction in the bottom message area.
+pend.hOK=hOK;hl=pend.nb;$('hold').style.display=hOK?'block':'';
+say(NM[by(pend.b).o]+': Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+(hOK?', or press Hold.':'.'));
+// Redraw (to show the rings) and wait for a tap or the Hold button.
+return render()}
+// Every Fleet has a decision, so apply the whole attack at once.
+fin()}
+// defTap(t) handles a board tap while the defender is choosing: a ringed star sends the current Fleet there.
+function defTap(t){
+// Anything that is not a ringed star is rejected with a hint.
+if(!t||!pend.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+(pend.hOK?', or press Hold.':'.'));
+// Record this Fleet's destination (the star id) and move on to the next Fleet.
+pend.dec.push(t.id);defNext()}
+// defHold() is the Hold button: only valid mid-decision and only when Hold is allowed. It records a Hold and moves on.
+function defHold(){if(pend&&pend.ph&&pend.hOK){pend.dec.push('H');pend.hold++;defNext()}}
+// lbl(s) makes a coordinate label like D4-bb: sector letter and row, then the position inside the sector.
+const lbl=s=>'ABCDEFG'[Math.floor(s.x/3)]+(Math.floor(s.y/3)+1)+'-'+'abc'[Math.floor(s.x)%3]+'abc'[Math.floor(s.y)%3];
+// fin() applies the finished attack in one go: capture the star, settle every defending Fleet from pend.dec, spend the Actions.
+function fin(){const {a:ai,b:bi,A,c,dec}=pend,b=by(bi),D=b.f||0;
+// Clear the rings and hide the Hold button, remember the attacker a and current player me, end the pending state, and save ONE undo snapshot so a single Undo reverses the whole attack.
+hl=[];$('hold').style.display='';const a=by(ai),me=cur();pend=null;undo.push(JSON.stringify(G));
+// Count outcomes: holds (each destroys one attacker), lost (no option left), rets (the destination star ids of retreating Fleets); surv = attacking Fleets that survive.
+const holds=dec.filter(x=>x=='H').length,lost=dec.filter(x=>x=='X').length,rets=dec.filter(x=>typeof x=='number'),surv=A-holds;
+// Each retreating Fleet joins the star the defender chose for it.
+rets.forEach(id=>{const d=by(id);d.f=(d.f||0)+1});
+// The capture (unchanged): take the committed Fleets off a, erase the target's connections, change its owner, set the surviving attackers on it (marked moved), connect a to it, mark both used, spend the Actions, clear selection.
+a.f=(a.f||0)-A;G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;G.conns.push([a.id,b.id]);G.used.push(a.id,b.id);G.ap-=c;sel=null;
+// Check eliminations, report the outcome in the message area, redraw.
+const m=elim();say('Star taken for '+c+'.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
+// kill(c) eliminates player c: remove their connections and Fleets (their stars stay on the board).
+function kill(c){G.alive[c]=false;G.conns=G.conns.filter(q=>by(q[0]).o!=c);G.stars.forEach(s=>{if(s.o==c)s.f=0})}
+// deficit(vp): al = alive players; t = the distinct scores sorted low to high.
+function deficit(vp){const al=G.pl.filter(c=>G.alive[c]),t=[...new Set(al.map(c=>vp[c]))].sort((a,b)=>a-b);
+// Walk up the gaps between scores; at the first gap bigger than 3, eliminate everyone at the lower score and return a message; otherwise return nothing.
+ for(let i=0;i+1<t.length;i++)if(t[i+1]-t[i]>3){const v=al.filter(c=>vp[c]==t[i]);v.forEach(kill);return ' '+v.map(c=>NM[c]).join(' and ')+' eliminated by deficit.'}return ''}
+// conc() asks the current player to confirm conceding.
+function conc(){if(!G||G.over)return;if(pend&&pend.ph)return say('Finish the Hold or Retreat choices first.');ov(`<h1>${NM[cur()]} concedes?</h1><p>You are eliminated immediately.</p><div class="r"><button onclick="doConc()">Concede</button><button onclick="$('ov').style.display='none'">Cancel</button></div>`)}
+// doConc() eliminates the current player and fixes the turn order. If fewer than 2 players remain the game ends; otherwise step back one and end the turn so the next player starts.
+function doConc(){$('ov').style.display='none';const c=cur();kill(c);G.order=G.order.filter(x=>G.alive[x]);if(G.pl.filter(x=>G.alive[x]).length<2)return finish();G.ti--;endTurn();say(NM[c]+' conceded. '+NM[cur()]+' to move.')}
+// cost(a,b) = Actions a line costs = system borders crossed = column difference plus row difference.
+const cost=(a,b)=>Math.abs(Math.floor(a.x)-Math.floor(b.x))+Math.abs(Math.floor(a.y)-Math.floor(b.y));
+// dseg(p,a,b) = shortest distance from point p to the line segment a-b (geometry).
+function dseg(p,a,b){const dx=b.x-a.x,dy=b.y-a.y;let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy)}
+// clear(a,b) is true when no other star sits within 0.2 of the line a-b.
+const clear=(a,b)=>G.stars.every(s=>s===a||s===b||dseg(s,a,b)>.2);
+// calc() does the scoring. ctl = a 7x7 grid of who controls each sector (-1 = nobody). vp = Victory Points per color.
+function calc(){const ctl=[...Array(7)].map(()=>Array(7).fill(-1)),vp=[0,0,0,0];
+// For each sector count each color's stars (n) and the total t. A color controls the sector if it has more than half.
+ for(let y=0;y<7;y++)for(let x=0;x<7;x++){const n=[0,0,0,0];G.stars.forEach(s=>{if(Math.floor(s.x/3)==x&&Math.floor(s.y/3)==y)n[s.o]++});const t=n[0]+n[1]+n[2]+n[3];n.forEach((v,c)=>{if(v*2>t)ctl[y][x]=c})}
+// Add VP for every controlled sector: 3 for the center, 1 otherwise.
+ ctl.forEach((r,y)=>r.forEach((c,x)=>{if(c>=0)vp[c]+=(x==3&&y==3)?3:1}));
+// Add 1 for every full row and every full column controlled by one color.
+ for(let i=0;i<7;i++){const r=ctl[i][0];if(r>=0&&ctl[i].every(v=>v==r))vp[r]++;const c=ctl[0][i];if(c>=0&&ctl.every(q=>q[i]==c))vp[c]++}
+// Eliminated players score 0. Return both results.
+ G.pl.forEach(c=>{if(!G.alive[c])vp[c]=0});return{ctl,vp}}
+// elim() checks eliminations. c0 remembers whose turn it is. Anyone alive with no stars is killed and noted in a message.
+function elim(){const c0=cur();let m='';G.pl.forEach(c=>{if(G.alive[c]&&!G.stars.some(s=>s.o==c)){kill(c);m+=' '+NM[c]+' is eliminated.'}});
+// Remove the dead from the turn order, keep the turn pointer on the same player, finish the game if fewer than 2 remain, return the message.
+ G.order=G.order.filter(c=>G.alive[c]);G.ti=Math.max(0,G.order.indexOf(c0));if(G.pl.filter(c=>G.alive[c]).length<2)finish();return m}
+// finish() does final scoring. al = alive players. sys(c) = how many stars (systems) color c has.
+function finish(){const {vp}=calc();G.score=vp;const al=G.pl.filter(c=>G.alive[c]),sys=c=>G.stars.filter(s=>s.o==c).length;
+// top = the players with the highest VP.
+ let top=al.filter(c=>vp[c]==Math.max(...al.map(x=>vp[x])));
+// Tiebreaker: if tied, add systems controlled to VP and keep only the highest.
+ if(top.length>1){const b=Math.max(...top.map(c=>vp[c]+sys(c)));top=top.filter(c=>vp[c]+sys(c)==b)}
+// Store the winners, redraw, and show the end dialog with everyone's scores.
+ G.over=top;render();ov('<h1>'+(top.length==1?NM[top[0]]+' wins':'Tied')+'</h1><p>'+G.pl.map(c=>NM[c]+' '+vp[c]+' VP, '+sys(c)+' systems').join('<br>')+(top.length>1?'<br>Overtime is not built yet.':'')+'</p><div class="r"><button onclick="menu()">New game</button></div>')}
+// tap(bx,by) runs when the board is tapped, in board units. cx,cy = the system column and row. Do nothing without a game or after it ends.
+function tap(bx,by){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
+// (new) While the defender is choosing Hold or Retreat, every board tap goes to defTap instead (a tap outside the board counts as no star).
+  if(pend&&pend.ph)return defTap(cx>=0&&cy>=0&&cx<=20&&cy<=20?sysStar(cx,cy):null);
+// A tap outside the board clears the selection.
+ if(cx<0||cy<0||cx>20||cy>20){sel=null;say('');return render()}
+// t = the star in the tapped system, me = the current player. Place mode goes to placeF, Move mode goes to moveF.
+ const t=sysStar(cx,cy),me=cur();if(mode=='p')return placeF(t);if(mode=='m')return moveF(t);
+// Nothing selected yet: tapping your own unused star selects it; anything else shows a hint.
+ if(!sel){if(t&&t.o==me){if(G.used.includes(t.id))say('That Star already acted, or is new, this turn.');else{sel=t.id;say('Tap an empty system to set a Star, your Star to connect, or an enemy Star to take.')}}else say('Tap one of your Stars to start a move.');return render()}
+// a = the selected star. Tapping it again deselects.
+ const a=G.stars.find(s=>s.id==sel);if(t===a){sel=null;say('');return render()}
+// Decide the kind of move. Empty system: 'set' (new star, position kept inside the system by clamping between .12 and .88). Own star: 'conn'. Enemy star: 'take'.
+ let kind,b;if(!t){kind='set';b={x:Math.min(cx+.88,Math.max(cx+.12,bx)),y:Math.min(cy+.88,Math.max(cy+.12,by))}}else{b=t;kind=t.o==me?'conn':'take'}
+// c = the Action cost of this move.
+ const c=cost(a,b);
+// Not enough Actions: say so and stop.
+ if(c>G.ap)return say('That costs '+c+' Actions. You have '+G.ap+'.');
+// Line too close to another star: say so and stop.
+ if(!clear(a,b))return say('The line passes too close to another Star.');
+// Connecting two stars that are already connected is not allowed.
+ if(kind=='conn'&&G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id)))return say('Those Stars are already connected.');
+// Taking a star: cb = target strength, fr = your free Fleets, m = Fleets you must commit to win. If you cannot win, say so.
+ if(kind=='take'){const cb=str(b),fr=(a.f||0)-(a.fm||0),m=Math.max(0,cb+1-cs(a));if(m>fr)return say('Too weak. You need strength '+(cb+1)+'. You have '+cs(a)+' plus '+fr+' free Fleet'+(fr==1?'':'s')+'.');
+// Remember the attack in pend. If you have no free Fleets or exactly the needed number, resolve at once.
+  pend={a:a.id,b:b.id,c};if(fr==0||m==fr)return resolve(m);
+// Otherwise ask how many Fleets to commit (from the minimum m up to all free ones).
+  return ov(`<h1>Use Fleets in the attack?</h1><p>Used Fleets move onto the Star if you win.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr-m+1)].map((_,i)=>`<button onclick="resolve(${m+i})">Use ${m+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';pend=null">Cancel</button></div>`)}
+// Set and connect moves: save an undo snapshot.
+ undo.push(JSON.stringify(G));
+// Set: create a new star with a fresh id, connect it to the origin, mark both used.
+ if(kind=='set'){const n={id:G.nid++,x:b.x,y:b.y,o:me};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id)}
+// Connect: add a connection between the two stars, mark the origin used.
+ else if(kind=='conn'){G.conns.push([a.id,b.id]);G.used.push(a.id)}
+
+// Spend the Actions, clear selection, check eliminations, show a message, redraw.
+ G.ap-=c;sel=null;const m=elim();say((kind=='set'?'Star set':'Connected')+' for '+c+'.'+m);render()}
+// (new) rankSnap(sc) turns a score table into DENSE ranks among alive players: the best score is rank 1 and each lower distinct score is the next rank (7/4/4/4 gives 1/2/2/2, and two tied leaders give 1/1/2/3).
+function rankSnap(sc){
+// al = alive players; d = their distinct scores, highest first; r = the result table (color to rank).
+const al=G.pl.filter(c=>G.alive[c]),d=[...new Set(al.map(c=>sc[c]||0))].sort((a,b)=>b-a),r={};
+// A player's rank is the position of their score in that list, counted from 1.
+al.forEach(c=>{r[c]=d.indexOf(sc[c]||0)+1});return r}
+// (new) turnOrder(ref) builds next round's order from the rank snapshot, one place at a time. ref = the first player of the round that just ended.
+function turnOrder(ref){
+// rem = players still to place, out = the order being built, last = whoever just went (starts as ref), n = number of players in the list.
+const rem=G.pl.filter(c=>G.alive[c]),out=[],n=G.pl.length;let last=ref;
+// Repeat until everyone is placed.
+while(rem.length){
+// best = the best rank still waiting; tied = everyone holding it.
+const best=Math.min(...rem.map(c=>G.rank[c])),tied=rem.filter(c=>G.rank[c]==best);
+// dist(c) = how many steps "to the left" (next down the player list, wrapping) c is from last; last itself counts as farthest.
+const dist=c=>(G.pl.indexOf(c)-G.pl.indexOf(last)+n-1)%n;
+// Of the tied players the nearest one to the left of last goes next (so a single player is simply picked).
+tied.sort((a,b)=>dist(a)-dist(b));const pick=tied[0];
+// Add them to the order, remove them from the waiting list, and make them the reference for the next place.
+out.push(pick);rem.splice(rem.indexOf(pick),1);last=pick}
+return out}
+// (new) roundPop() shows the round-start popup: round number, Actions this round, and each player's snapshot rank and score (X for eliminated players).
+function roundPop(){
+// row(c) builds one player's line: color dot, name, rank, score.
+const row=c=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0"><i style="width:12px;height:12px;border-radius:50%;background:${COL[c]};flex:none"></i><b>${NM[c]}</b><span style="margin-left:auto">Rank ${G.alive[c]?G.rank[c]:'X'}</span><span style="min-width:56px;text-align:right">${G.alive[c]?(G.score[c]||0)+' VP':'X'}</span></div>`;
+// Show the dialog: alive players in turn order first, then eliminated players.
+ov(`<h1>Round ${G.round}</h1><p>Actions this round: <b>${acts(G.round)}</b></p>${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}<p style="margin:12px 0 0;text-align:center">Tap to start the round</p>`);
+// A tap anywhere (the backdrop or the box) dismisses it.
+$('ov').onclick=closeRound}
+// closeRound() hides the popup and removes its tap handler so other dialogs are not affected.
+function closeRound(){$('ov').style.display='none';$('ov').onclick=null}
+// endTurn() ends the current turn. em holds an extra message. Clear selection, undo history and used stars.
+function endTurn(){if(!G||G.over)return;let em='',newRound=false;sel=null;undo=[];G.used=[];
+// If more players remain this round, move the turn pointer on.
+ if(G.ti<G.order.length-1)G.ti++;
+// Otherwise the round is over: score it, end the game after round 30, apply deficit elimination, end the game if one player is left, and ref = last round's first player.
+ else{const {vp}=calc();G.score=vp;if(G.round>=30)return finish();em=deficit(vp);if(G.pl.filter(c=>G.alive[c]).length<2)return finish();const ref=G.order[0];
+// Build the new turn order: highest VP first, ties broken by position after ref in the player list. Then round+1 and pointer to 0.
+  // (changed) Take the new rank snapshot from the round-end scores, build the turn order from it with the rulebook tie rules, move to the next round, and remember to show the popup.
+G.rank=rankSnap(vp);G.order=turnOrder(ref);G.round++;G.ti=0;newRound=true}
+// Start the next turn and announce who is up.
+ beginTurn();say(NM[cur()]+' to move'+em);render();
+// (new) At a round rollover show the round-start popup.
+if(newRound)roundPop()}
+// sp(...) builds the corner points of a 7-pointed star polygon by alternating a big and small radius around a circle.
+const sp=(x,y,R,r)=>[...Array(14)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/7,q=i%2?r:R;return(x+q*Math.cos(a)).toFixed(2)+','+(y+q*Math.sin(a)).toFixed(2)}).join(' ');
+// persist() autosaves the game in the browser (silently ignores errors).
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
+// render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
+function render(){if(!G)return;persist();const {ctl,vp}=calc(),me=cur();let s='';
+// Tint each controlled sector in its owner's color.
+ ctl.forEach((r,y)=>r.forEach((c,x)=>{if(c>=0)s+=`<rect x="${x*3}" y="${y*3}" width="3" height="3" fill="${COL[c]}" opacity=".14"/>`}));
+// Grid lines for 0 to 21: every third line is thick (sector border), the rest thin and dashed (system border).
+ for(let i=0;i<=21;i++){const th=i%3==0,a=`stroke="${th?'var(--sec)':'var(--grid)'}" stroke-width="${th?2:1}" ${th?'':'stroke-dasharray="3 4"'} vector-effect="non-scaling-stroke"`;s+=`<line x1="${i}" y1="0" x2="${i}" y2="21" ${a}/><line x1="0" y1="${i}" x2="21" y2="${i}" ${a}/>`}
+// A local helper to find a star by id.
+ const by=id=>G.stars.find(q=>q.id==id);
+// Draw each connection as a colored line between its two stars.
+ G.conns.forEach(([p,q])=>{const a=by(p),b=by(q);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${COL[a.o]}" stroke-width=".1" stroke-linecap="round"/>`});
+// For each star: op = opacity (dimmed if it already acted this turn), f = the shared style text.
+ G.stars.forEach(q=>{const op=q.o==me&&G.used.includes(q.id)?.5:1,f=`fill="${COL[q.o]}" stroke="var(--ink)" stroke-width=".04" opacity="${op}"`;
+// Capitals are drawn as a star shape, normal stars as circles.
+  s+=q.cap?`<polygon points="${sp(q.x,q.y,.4,.22)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r=".18" ${f}/>`;
+// If the star holds Fleets, draw a small badge showing the number.
+  if(q.f)s+=`<rect x="${q.x+.12}" y="${q.y+.04}" width=".52" height=".34" rx=".08" fill="${COL[q.o]}" stroke="var(--ink)" stroke-width=".04"/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${q.f}</text>`;
+// Draw the strength number (visible only when zoomed in).
+  s+=`<text class="t" x="${q.x+.3}" y="${q.y-.22}" font-size=".3" font-weight="700" fill="var(--ink)">${str(q)}</text>`;
+// If the star is in the highlight list, ring it.
+  if(hl.includes(q.id))s+=`<circle cx="${q.x}" cy="${q.y}" r=".6" fill="none" stroke="var(--ink)" stroke-width=".1"/>`;
+// If it is the selected star, draw a dashed ring.
+  if(q.id==sel)s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".18 .12"/>`});
+// Put all the shapes into the page, then highlight the active mode button and update the Place label.
+ W.innerHTML=s;document.querySelectorAll('#modes [data-m]').forEach(b=>{b.classList.toggle('act',b.dataset.m==mode);if(b.dataset.m=='p')b.textContent='Place '+(G.pool||0)});
+// Fill the info row: player name, round, Actions left.
+ $('info').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b><span>Round ${G.round} of 30</span><span>Actions ${G.ap}</span>`;
+// Fill the score chips: one per player with VP and star count.
+ $('chips').innerHTML=G.pl.map(c=>`<div class="chip ${c==me&&!G.over?'on':''} ${G.alive[c]?'':'dead'}" style="--c:${COL[c]}"><i></i>${vp[c]} VP<small>${G.alive[c]?'Rank '+G.rank[c]:'X'}</small></div>`).join('')}
+// apply() applies the current pan and zoom to the drawing and records the zoom level for CSS.
+function apply(){W.setAttribute('transform',`translate(${view.x} ${view.y}) scale(${view.k})`);svg.dataset.z=view.k>38?1:0}
+// fit() sizes the whole board to the screen and centers it.
+function fit(){const r=st.getBoundingClientRect();view.k=view.min=Math.min(r.width,r.height)/21.6;view.x=(r.width-21*view.k)/2;view.y=(r.height-21*view.k)/2;apply()}
+// zoomAt(f,px,py) zooms by factor f while keeping point (px,py) still, within zoom limits.
+function zoomAt(f,px,py){const nk=Math.max(view.min*.9,Math.min(90,view.k*f)),r=nk/view.k;view.x=px-(px-view.x)*r;view.y=py-(py-view.y)*r;view.k=nk;apply()}
+// P keeps track of fingers touching the screen. moved = distance dragged, multi = a second finger was used, last = previous gesture.
+const P=new Map();let moved=0,multi=0,last=null;
+// gest() reports the center and spread of the current finger or fingers.
+const gest=()=>{const v=[...P.values()],a=v[0],b=v[1]||v[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
+// Finger down: capture it, record it. The first finger resets moved and multi; extra fingers set multi. Save the gesture.
+svg.addEventListener('pointerdown',e=>{svg.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size==1){moved=0;multi=0}else{multi=1;moved=99}last=gest()});
+// Finger moves: update its stored position and work out how far it moved (dx,dy).
+svg.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+// One finger: once it has moved more than 8px it counts as a drag and pans the board.
+ if(P.size==1){moved+=Math.abs(dx)+Math.abs(dy);if(moved>8){view.x+=dx;view.y+=dy;apply()}}
+// Two fingers: pan by how the center moved and zoom by how the spread changed.
+ else if(P.size==2){const g=gest(),r=st.getBoundingClientRect();view.x+=g.cx-last.cx;view.y+=g.cy-last.cy;zoomAt(g.d/last.d,g.cx-r.left,g.cy-r.top);last=g}});
+// Finger up: forget it.
+const up=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);
+// If it was a single quick press with no drag, convert screen position to board position and call tap.
+ if(P.size==0&&!multi&&moved<=8&&e.type=='pointerup'){const r=st.getBoundingClientRect();tap((e.clientX-r.left-view.x)/view.k,(e.clientY-r.top-view.y)/view.k)}
+// If one finger remains, refresh the gesture baseline.
+ if(P.size==1)last=gest()};
+// Hook up the finger-lifted and cancel events.
+svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
+// Mouse wheel zooms around the pointer.
+svg.addEventListener('wheel',e=>{e.preventDefault();const r=st.getBoundingClientRect();zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+// mid(f) zooms around the center of the board area.
+const mid=f=>{const r=st.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)};
+// Hook up the + and - zoom buttons, Fit, the mode buttons (via data-m) and the Concede button.
+// (changed) The mode buttons are ignored while the defender is choosing (see the !(pend&&pend.ph) test).
+$('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=fit;$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over&&!(pend&&pend.ph)){mode=m;sel=null;say('');render()}};$('cc').onclick=conc;
+// End turn button: if Fleets are unplaced and could be placed, warn before ending; otherwise end the turn.
+// (changed) End turn is blocked while the defender is choosing.
+$('en').onclick=()=>{if(pend&&pend.ph)return say('Finish the Hold or Retreat choices first.');if(G&&!G.over&&G.pool>0&&placeable().length)ov('<h1>Unplaced Fleets</h1><p>'+G.pool+' Fleet'+(G.pool>1?'s':'')+' left to place. They are lost if you end your turn.</p><div class="r"><button onclick="$(\'ov\').style.display=\'none\';endTurn()">End turn</button><button onclick="$(\'ov\').style.display=\'none\'">Keep playing</button></div>');else endTurn()};
+// Undo button: restore the last saved state.
+// (changed) Undo first checks for a half-finished attack: it just cancels it (nothing was applied or paid yet). Otherwise it restores the last snapshot as before.
+$('un').onclick=()=>{if(pend&&pend.ph){pend=null;hl=[];$('hold').style.display='';sel=null;say('Attack cancelled. Nothing was changed.');return render()}if(G&&!G.over&&undo.length){G=JSON.parse(undo.pop());sel=null;say('Undone');render()}};
+// dl: the download helper, used by Save file when the page allows it.
+let dl=null;try{window.claude&&claude.use('downloads').then(d=>{dl=d}).catch(()=>{})}catch(e){}
+// loadObj(o) loads a saved game: check it looks valid, make it the current game, fill in defaults for older saves, reset the interface.
+function loadObj(o){if(!o||!o.pl||!o.stars||!o.conns||!o.order||!o.caps)throw 0;G=o;G.rank=G.rank||rankSnap(G.score||{});G.pool=G.pool||0;G.capOnly=!!G.capOnly;G.stars.forEach(s=>{if(s.cap&&s.co==null)s.co=s.o});mode='s';pend=null;hl=[];$('hold').style.display='';sel=null;undo=[];$('ov').style.display='none';fit();say('Game loaded');render()}
+// cont() loads the autosave from the browser.
+function cont(){try{loadObj(JSON.parse(localStorage.getItem(KEY)))}catch(e){say('Could not load that save.');menu()}}
+// fromText() loads a game pasted into the text box.
+function fromText(){try{loadObj(JSON.parse($('sc').value))}catch(e){$('sc').style.outline='2px solid #ff3b3b'}}
+// fromFile(i) reads a chosen save file and loads it.
+function fromFile(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadObj(JSON.parse(r.result))}catch(e){say('That file is not a Constellate save.');$('ov').style.display='none'}};r.readAsText(f)}
+// toFile() offers the save as a downloaded file.
+async function toFile(){try{await dl.save({filename:'constellate-round-'+G.round+'.json',data:JSON.stringify(G)});say('Save file offered.')}catch(e){say('Save cancelled.')}$('ov').style.display='none'}
+// copySave() copies the save text to the clipboard.
+function copySave(){const t=$('sc');t.select();try{navigator.clipboard.writeText(t.value).then(()=>say('Copied.'),()=>document.execCommand('copy'))}catch(e){try{document.execCommand('copy')}catch(_){}}}
+// saveUI() builds the Menu dialog: save and load options, the dev round setter and Concede.
+function saveUI(){if(!G)return;if(pend&&pend.ph)return say('Finish the Hold or Retreat choices first.');ov(`<h1>Menu</h1><p>The game also autosaves in this browser.</p><div class="r" style="margin-bottom:8px">${dl?'<button onclick="toFile()">Save file</button>':''}<button onclick="$('lf').click()">Load file</button></div><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="4" style="width:100%;box-sizing:border-box;font:12px monospace">${JSON.stringify(G)}</textarea><div class="r" style="margin-top:8px"><button onclick="copySave()">Copy code</button><button onclick="fromText()">Load code</button><button onclick="$('ov').style.display='none'">Close</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Dev: set round</span><input id="dr" type="number" min="1" max="30" value="${G.round}" style="width:64px;font:inherit;min-height:44px;box-sizing:border-box"><button onclick="setRound()">Set</button></div>`)}
+// setRound() is the dev tool: sets the round (1 to 30), refreshes Actions, clears used stars and undo.
+function setRound(){if(!G||G.over)return;const n=Math.max(1,Math.min(30,parseInt($('dr').value)||1));G.round=n;G.ap=acts(n);G.used=[];sel=null;undo=[];$('ov').style.display='none';say('Dev: round set to '+n+'. Actions: '+G.ap+'.');render()}
+// Hook up the Menu button.
+// (new) Hook up the Hold button.
+$('hold').onclick=defHold;
+$('sv').onclick=saveUI;
+// On window resize refit the board, fit it now, and show the start menu.
+addEventListener('resize',fit);fit();menu();
+</script></body></html>
