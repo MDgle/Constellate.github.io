@@ -36,7 +36,7 @@ def play(pg, sc, lv, seed):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(); ap.add_argument('cmd'); ap.add_argument('name'); ap.add_argument('--levels', default='3'); ap.add_argument('--seeds', type=int, default=8)
-    ap.add_argument('--set', action='append', default=[]); ap.add_argument('--pc', action='append', default=[]); ap.add_argument('--html', default='constellate.html'); ap.add_argument('-v', action='store_true')
+    ap.add_argument('--set', action='append', default=[]); ap.add_argument('--pc', action='append', default=[]); ap.add_argument('--html', default='index.html'); ap.add_argument('-v', action='store_true')
     a = ap.parse_args(); sc = SCEN[a.name]
     with sync_playwright() as p:
         b = p.chromium.launch(); pg = b.new_page(); pg.goto('file://' + os.path.abspath(a.html)); pg.wait_for_timeout(300); pg.evaluate(H.HOOK)

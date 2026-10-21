@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """CPU self-play harness for Constellate (headless Chromium).
 
-Plays CPU-vs-CPU games on a build of constellate.html and appends one JSON line per game to a results file.
+Plays CPU-vs-CPU games on a build of the game (index.html) and appends one JSON line per game to a results file.
 Resumable: re-running with the same --out skips game numbers already in the file.
 
-  python tools/harness.py --html constellate.html --n 4 --levels 3,3,2,2 --games 40 --out res/h_vs_m.jsonl
+  python tools/harness.py --html index.html --n 4 --levels 3,3,2,2 --games 40 --out res/h_vs_m.jsonl
   python tools/harness.py --summary res/h_vs_m.jsonl
 
 --levels gives one CPU level per seat (1 Easy, 2 Medium, 3 Hard = planner + step 4 terms, 4 Hard (legacy) = the old greedy Hard, 5 Hard+F = test level, Hard that also plans Fleets). The seat assignment rotates every game
 so seat order / first-move advantage averages out. --set LEVEL:KEY=VALUE (repeatable) overrides one value of the CPU parameter table for the run, e.g. --set 4:apCost=1.
 --seed0 + game number seeds the CPU's random wobble.
 
-  python tools/harness.py --html constellate.html --check --n 2 --levels 3,2 --games 40
+  python tools/harness.py --html index.html --check --n 2 --levels 3,2 --games 40
     = scoring self-test: after every turn it compares the fast tally (cpuInc / incPot1 / incPot2) with the slow originals
     (calc / cpuPot / cpuPot2) and the new evaluator incEval with an independent slow rewrite (slowEval, in this file) on the real position and on random multi-step changes, then undoes them. Prints any mismatch.
 """
@@ -242,7 +242,7 @@ def summary(path):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('--html', default='constellate.html'); ap.add_argument('--n', type=int, default=4)
+    ap.add_argument('--html', default='index.html'); ap.add_argument('--n', type=int, default=4)
     ap.add_argument('--levels', default='3,3,3,3'); ap.add_argument('--games', type=int, default=20)
     ap.add_argument('--size', type=int, default=7); ap.add_argument('--seed0', type=int, default=1000)
     ap.add_argument('--out', default='res/run.jsonl'); ap.add_argument('--summary'); ap.add_argument('--check', action='store_true'); ap.add_argument('--set', action='append', default=[]); ap.add_argument('--verbose', action='store_true'); ap.add_argument('--planchk', action='store_true'); ap.add_argument('--plan', action='append', default=[]); ap.add_argument('--pc', action='append', default=[]); ap.add_argument('--fleet', action='append', default=[]); ap.add_argument('--pc6', action='append', default=[])
