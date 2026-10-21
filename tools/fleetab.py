@@ -4,7 +4,7 @@
 # usage: python3 tools/fleetab.py --games 12 --reps 2 [--pc fMove=0] [--minround 3]
 import argparse, json, os, statistics as st
 from playwright.sync_api import sync_playwright
-ap = argparse.ArgumentParser(); ap.add_argument('--html', default='constellate.html'); ap.add_argument('--games', type=int, default=12)
+ap = argparse.ArgumentParser(); ap.add_argument('--html', default='index.html'); ap.add_argument('--games', type=int, default=12)
 ap.add_argument('--reps', type=int, default=2); ap.add_argument('--every', type=int, default=2); ap.add_argument('--minround', type=int, default=3)
 ap.add_argument('--pc', action='append', default=[]); ap.add_argument('--seed0', type=int, default=3000); ap.add_argument('--levels', default='5,4')
 a = ap.parse_args()
