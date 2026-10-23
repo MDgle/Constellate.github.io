@@ -7,7 +7,7 @@ Shmorden directs the work and is not a programmer: explain changes in plain word
 ## Layout
 - `index.html`: the game. Everything (HTML, CSS, JavaScript) is in this one file. It is the ONLY live build; edit it in place.
 - `tools/`: Python test tools that drive the game in headless Chromium (Playwright). Run them from the repo root.
-- `docs/`: project records (CPU project history, plans).
+- `docs/`: project records (CPU project history, `ROADMAP-repo.md` for Basic and 1.0 scope, `TEAM_MODE_RULES.md`, `PLACEHOLDERS.md`). `docs/archive/` is history, never rules.
 - `archive/`: two old builds kept for posterity (the oldest build, and the last tiiny.site build). Never edit or test these.
 - `res/`: harness output, git-ignored.
 
@@ -51,10 +51,22 @@ Old builds are NOT kept as copies. Git history is the archive; milestones get a 
 - No "New game" button in the in-game Menu; Concede covers it.
 - Free placement is the default; fixed positions are an option.
 - The Hold / Retreat choice is called the "Defence call" in the interface (buttons still say Hold and Retreat).
-- Online play is live-only and player-hosted (peer to peer).
+- Live peer-to-peer play stays in Basic as best effort. 1.0 adds a server as an add-on, with an automatic fallback chain (server → peer-to-peer → pasted codes → same Wi-Fi → sharing files). Basic must never depend on anything recurring.
+- The vocabulary is Star and Fuel.
+- Full Fuel is a rule: you can't end your turn while a legal Move remains.
+- Order within a turn is free.
+- Board sizes are 7x7, 5x5 and 3x3, not "practice".
+- New modes are human-only first, with the CPU after.
+- A rule change isn't done until the CPU handles it.
+- Every default Claude picks (text, style) is a placeholder; keep a list of them.
+- One rules source per feature. Team mode rules come only from `docs/TEAM_MODE_RULES.md`. Files in `docs/archive/` are history, never rules. If two documents disagree, stop and ask instead of picking one.
 - Hard CPU strength work is its own project: don't start it unless asked.
 
+## Placeholders
+Defaults Claude picks (labels, text, style) are placeholders, not decisions. List each one in `docs/PLACEHOLDERS.md`.
+
 ## Team mode (in progress)
-Team code exists in `index.html` (search `Team mode`) but is half-integrated. Rules and the step plan live in
-`docs/` (TEAM_MODE_PLAN_v2.md once added). Goal: finish team mode, then CPUs that play against teams, then CPUs on teams,
+Team code exists in `index.html` (search `Team mode`) but is half-integrated. The rules are in `docs/TEAM_MODE_RULES.md`
+(the only rules source). `docs/archive/TEAM_MODE_PROJECT-5.md` is the old build log: use it for function names, test scripts
+and history only. Goal: finish team mode, then CPUs that play against teams, then CPUs on teams,
 without changing any game with teams OFF (prove it with `cmp.py`).
