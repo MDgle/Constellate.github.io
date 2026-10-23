@@ -6,6 +6,7 @@ This is the only source of team mode rules. If anything else disagrees, this fil
 - Custom-game option: turn teams on, then each player picks team 1, 2 or 3.
 - Teams need exactly 4 players, not Solo. At least 2 different teams; 3v1 is allowed.
 - CPUs may join only as the sole member of their team, until CPU teamwork is built.
+- Solo (you against computers) has no teams yet. Teams in Solo, and CPUs on and against teams there, will be added once CPUs can handle teams.
 
 **Scores and winning**
 - Scores stay individual. Turn order, Fleet placement (rank) and Deficit Elimination all use individual VP.
@@ -33,6 +34,7 @@ This is the only source of team mode rules. If anything else disagrees, this fil
 **Fleet gifts**
 - In Move mode, Fleets can be given to a teammate's Star in the same Sector, or one directly linked by a Connect link even outside the Sector. Other Stars are out of range.
 - Giving Fleets costs no Fuel. The group must not have moved yet; the gifted Fleets arrive already moved.
+- At the start of the recipient's turn the gifted Fleets count as not moved and can move normally.
 - A dead teammate's Star is not a Fleet gift target.
 
 **Defence call**
