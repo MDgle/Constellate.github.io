@@ -1,15 +1,7 @@
 # Constellate
-Digital Edition of the game Constellate created by Matthew Douglas Yglesias 
 
-Code is being written by Claude under the direction of Matthew Douglas Yglesias. 
+An abstract strategy board game by Matthew Douglas Yglesias (Shmorden).
 
-If you would like to contribute to this project becoming 100% human made please reach out.
+Play it here: https://mdgle.github.io/Constellate.github.io/.
 
-Please understand that while I would prefer to avoid using ai tools in this project, coding at this level is far beyond my capability, and the digital version of Constellate is allowing me to bring this game to others in a way that would otherwise be impossible.
-
-## What's in this repository
-- `index.html`: the game (this is what the website serves)
-- `tools/`: test tools for the computer players (Python + Playwright)
-- `docs/`: design and development records
-- `archive/`: the oldest surviving build and the last build from the tiiny.site era, kept for posterity
-- `CLAUDE.md`: working instructions for Claude
+This repository holds only the finished web page (`index.html`). The source code is private. Builds are copied here automatically; please don't edit this repository by hand.
