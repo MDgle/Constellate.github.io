@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-24-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-24-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -224,8 +224,10 @@ const MARG=outerR(null)+BORDER_HALF+PAD;
 const $=i=>document.getElementById(i),st=$('st'),svg=$('svg'),W=$('w');
 // CWP = turn-order position of each color (red, blue, orange, purple). Then variables that change while playing: hl (stars to ring), mode (s=stars, p=place, m=move), flow (the move group chosen so far, or nothing), pend (an attack waiting on a choice), G (the whole game state), sel (selected star id), undo (stack of saved states), view (pan and zoom).
 const CWP={0:0,2:1,3:2,1:3};let hl=[],mode='s',flow=null,multi=null,pend=null,G=null,sel=null,undo=[],view={k:18,x:0,y:0,min:18},pvSel=null;
-// acts(r) = Fuel available in round r (rises to 15, then falls by 1 per round). cur() = the color number of whoever's turn it is.
-const acts=r=>r<=15?r:31-r,cur=()=>G.order[G.ti];
+// acts(r) = Fuel available in round r (rises to 15, then falls by 1 per round). (T4) Rounds past 30 are overtime (RULES.md 8.3): the same 30-round ramp repeats with no limit, so round 31 = 1 Fuel, round 45 = 15, round 60 = 1, round 61 = 1 again. cur() = the color number of whoever's turn it is.
+const acts=r=>{const k=(r-1)%30+1;return k<=15?k:31-k},cur=()=>G.order[G.ti];
+// (T4) RMAX = the highest round number a save, history or move log may carry (overtime has no limit in the rules; this only stops nonsense data). rdName(r) = how a round is shown to players: 'Round 12' in the main game, 'Overtime 1 · Round 5' after it. G.round keeps counting up (31 = overtime 1 round 1, 61 = overtime 2 round 1); only the display splits it.
+const RMAX=9999,rdName=r=>r<=30?'Round '+r:'Overtime '+(Math.floor((r-31)/30)+1)+' · Round '+((r-31)%30+1);
 // (new) Board size. G.sz = sectors per side: 7 standard, 5 medium, 3 small (a standard game has no sz field, and older saves are standard). Every sector is 3 by 3 systems, so NSYS(S) = systems per side (21, 15 or 9).
 const NSYS=S=>((S&&S.sz)||7)*3;
 // say(t) shows message t in the toast at the bottom of the board; empty text hides it.
@@ -309,7 +311,7 @@ overHidden=false;H=newHist();histSnap('s');histSave();render();roundPop()}
 const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
 const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
-// beginTurn() resets per-turn things: used stars, Fuel, mode. pool = Fleets to place = 1 + the number of players with a higher score than you (your rank). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
+// beginTurn() resets per-turn things: used stars, Fuel, mode. pool = Fleets to place = your rank from the round-start snapshot (G.rank): 1 + the number of distinct scores higher than yours, so tied players share a rank (dense ranks, RULES.md 2.2). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
 function beginTurn(){delete G.pv;if(!cpuOf(cur())&&(!net.on||net.my.includes(cur())))buzz(220);G.used=[];G.ap=acts(G.round);mode='s';G.pool=G.rank[cur()]||1;G.stars.forEach(s=>{s.fm=0;delete s.fa});const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
 // placeable() lists stars that can receive Fleets: none if your capital is lost, only the capital if capOnly, otherwise every own star reachable from the capital by walking your own connections (a flood-fill search).
 function placeable(){const me=cur(),cp=capStar(me);if(!cp||cp.o!=me)return[];if(G.capOnly)return[cp];const seen=new Set([cp.id]),q=[cp];while(q.length){const s=q.pop();G.conns.forEach(c=>{if(c[0]==s.id||c[1]==s.id){const t=by(c[0]==s.id?c[1]:c[0]);if(t.o==me&&!seen.has(t.id)){seen.add(t.id);q.push(t)}}})}return G.stars.filter(s=>seen.has(s.id))}
@@ -608,19 +610,22 @@ function calc(S){S=S||G;const Z=S.sz||7,mid=(Z-1)/2,ctl=[...Array(Z)].map(()=>Ar
 function elim(){const c0=cur();let m='';G.pl.forEach(c=>{if(G.alive[c]&&!G.stars.some(s=>s.o==c)){kill(c);m+=' '+NM[c]+' is eliminated.'}});
 // Remove the dead from the turn order, keep the turn pointer on the same player, finish the game if fewer than 2 remain, return the message.
  G.order=G.order.filter(c=>G.alive[c]);G.ti=Math.max(0,G.order.indexOf(c0));if(sidesLeft()<2)finish();return m}
-// finish() does final scoring. al = alive players. sys(c) = how many stars (systems) color c has.
-function finish(){const {vp}=calc();G.score=vp;const al=G.pl.filter(c=>G.alive[c]),sys=c=>G.stars.filter(s=>s.o==c).length;
+// (T4) winners(vp) = who wins if the game ends now with the scores vp (RULES.md 8.1, 8.2, 9.2), without changing anything, so the end of round 30 and of every overtime round can ask it first (see endTurn). al = alive players. sys(c) = how many stars (systems) color c has.
+function winners(vp){const al=G.pl.filter(c=>G.alive[c]),sys=c=>G.stars.filter(s=>s.o==c).length;
 // top = the players with the highest VP.
  let top;
-// (step 6) Team game: if only one team has living players it wins whatever the scores (rule 3); otherwise (round 30) the teams compare the combined VP of all their members, eliminated members counting 0 (rule 4), and a tie goes to the Systems tiebreaker (see below). G.over then lists ALL members (alive or not) of the winning team, or of every tied team: more than one team in the list = Tie Game (see overDlg).
+// (step 6) Team game: if only one team has living players it wins whatever the scores (rule 3); otherwise (round 30) the teams compare the combined VP of all their members, eliminated members counting 0 (rule 4), and a tie goes to the Systems tiebreaker (see below). The result lists ALL members (alive or not) of the winning team, or of every tied team: more than one team in the list = still tied (see clearWin).
  if(teamsOn()){if(sidesLeft()<2){const w=teamOf(al[0]);top=G.pl.filter(c=>teamOf(c)==w)}else{const tv=t=>teamVp(t,vp),ts=t=>al.filter(c=>teamOf(c)==t).reduce((a,c)=>a+sys(c),0),m=Math.max(...G.pl.map(c=>tv(teamOf(c))));top=G.pl.filter(c=>tv(teamOf(c))==m);
-// (T3) Tied teams: add each team's combined Systems (Stars of its LIVING members) to its combined VP and keep the highest. A tie that is still left stays a Tie Game until overtime is built.
+// (T3) Tied teams: add each team's combined Systems (Stars of its LIVING members) to its combined VP and keep the highest. A tie that is still left goes to overtime (T4, see endTurn).
  if(new Set(top.map(teamOf)).size>1){const b=Math.max(...top.map(c=>tv(teamOf(c))+ts(teamOf(c))));top=top.filter(c=>tv(teamOf(c))+ts(teamOf(c))==b)}}}else{
  top=al.filter(c=>vp[c]==Math.max(...al.map(x=>vp[x])));
 // Tiebreaker: if tied, add systems controlled to VP and keep only the highest.
  if(top.length>1){const b=Math.max(...top.map(c=>vp[c]+sys(c)));top=top.filter(c=>vp[c]+sys(c)==b)}}
-// Store the winners, redraw, and show the end dialog with everyone's scores.
- G.over=top;histSnap('f');histSave();render();overDlg()}
+return top}
+// (T4) clearWin(top) = true when a winners() list is one winner: one player, or in a team game members of one team only.
+const clearWin=top=>teamsOn()?new Set(top.map(teamOf)).size==1:top.length==1;
+// finish() does final scoring: store the winners (still a tie only when End game stops a tied game), redraw, and show the end dialog with everyone's scores.
+function finish(){const {vp}=calc();G.score=vp;G.over=winners(vp);histSnap('f');histSave();render();overDlg()}
 // (new) overDlg() shows the end-of-game dialog (winner and final scores; step 6: or the team result). It is its own function so online players who only RECEIVE the final position can show it too.
 let overHidden=false;
 // (new) overDlg() also clears overHidden (the end screen is showing). Hide closes it but keeps the finished board visible; the Menu button and the End game button (the End turn button relabelled) bring it back (see overHide, saveUI, the End turn handler and render).
@@ -636,7 +641,7 @@ L.push('CONSTELLATE - GAME TRANSCRIPTION','Date: '+new Date().toISOString().slic
 'How to read it: a spot is sector (letter column, number row), system (letter column, number row inside the sector) and spot on the 5x5 lattice: S = space, L = line, V = vertex. D4·b2·S5 is the middle of system b2 in sector D4.','Set = new Star, Connect = connection between two of your Stars, Take = capture (x), [n Fuel] = Fuel spent.','');
 if(!H||!H.snaps.length||H.snaps[0].k=='l'||(mv.length&&mv[0].r>1))L.push('(Moves before this game was loaded were not recorded, so this transcription starts later than round 1.)','');
 let r=0,w=-1,n=0;
-mv.forEach(m=>{if(m.r!=r){r=m.r;w=-1;if(L.length&&L[L.length-1]!=='')L.push('');L.push('ROUND '+r+' ('+acts(r)+' Fuel)');const sc=H.snaps.find(x=>x.k=='s'&&x.r==r&&x.vp);if(sc&&r>1)L.push('Scores: '+G.pl.map(c=>NM[c]+' '+sc.vp[c]).join(', '))}
+mv.forEach(m=>{if(m.r!=r){r=m.r;w=-1;if(L.length&&L[L.length-1]!=='')L.push('');L.push(rdName(r).toUpperCase()+' ('+acts(r)+' Fuel)');const sc=H.snaps.find(x=>x.k=='s'&&x.r==r&&x.vp);if(sc&&r>1)L.push('Scores: '+G.pl.map(c=>NM[c]+' '+sc.vp[c]).join(', '))}
 if(m.w!=w){w=m.w;n=0;L.push(NM[w]+':')}L.push('  '+(++n)+'. '+mvText(m))});
 const vp=calc().vp;L.push('','RESULT','Final scores: '+G.pl.map(c=>NM[c]+' '+vp[c]+(G.alive[c]?'':' (eliminated)')).join(', '));
 if(G.over){const top=G.over;L.push(teamsOn()?(new Set(top.map(teamOf)).size>1?'Tie game.':'Winner: Team '+teamOf(top[0])+' ('+top.map(c=>NM[c]).join(', ')+')'):(top.length>1?'Tied: ':'Winner: ')+top.map(c=>NM[c]).join(', '))}
@@ -646,11 +651,12 @@ function transDlg(){transTxt=transcript();ov('<h1>Transcription</h1><p style="ma
 async function transCopy(){lm(await copyText(transTxt)?'Copied.':'Copying is blocked here. Select the text and copy it by hand.',0)}
 async function transSave(btn){const name='constellate-transcription-'+(G.gid||'game')+'.txt';try{if(dl){await dl.save({filename:name,data:transTxt})}else{const u=URL.createObjectURL(new Blob([transTxt],{type:'text/plain'})),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}btn.textContent='Saved'}catch(e){btn.textContent='Save failed'}}
 function overDlg(){overHidden=false;const {vp}=calc(),top=G.over,sys=c=>{const n=G.stars.filter(s=>s.o==c).length;return n+(n==1?' system':' systems')};let head,sub='',body;const btn='</p>'+(!net.on||net.role=='host'?'<div class="r" style="margin-bottom:8px"><button onclick="rematch()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Instant rematch</button></div>':'')+'<div class="r"><button onclick="saveFile(this)">Save file</button><button onclick="newGame()">New game</button><button onclick="hvOpen()">History</button></div><div class="r" style="margin-top:8px">'+(G.pm=='fixed'?'<button onclick="transDlg()">Transcribe Game</button>':'')+'<button onclick="overHide()">Hide this screen</button></div>';
-// (step 6) Team game: 'Team N wins' (with its members and why), or 'Tie Game' with 'Time for a Rematch!' under it; the scores are grouped by team, each team with its combined VP.
+// (step 6) Team game: 'Team N wins' (with its members and why); the scores are grouped by team, each team with its combined VP. (T4) A tie no longer ends a game (overtime does), so 'Tied' shows only after End game stopped a tied game. A game won in overtime says in which round.
 if(teamsOn()){const wt=[...new Set(top.map(teamOf))],ts=[...new Set(G.pl.map(teamOf))].sort((a,b)=>teamVp(b,vp)-teamVp(a,vp)||a-b),nm=l=>l.map(c=>NM[c]).join(' and ');
-if(wt.length>1){head='Tie Game';sub='<p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Time for a Rematch!</p>'}else{head='Team '+wt[0]+' wins';sub='<p style="margin:0 0 8px">'+nm(top)+(sidesLeft()<2?' (the only team left).':'.')+'</p>'}
+if(wt.length>1){head='Tied';sub='<p style="margin:0 0 8px">The game was ended before the tie was broken.</p>'}else{head='Team '+wt[0]+' wins';sub='<p style="margin:0 0 8px">'+nm(top)+(sidesLeft()<2?' (the only team left).':'.')+'</p>'}
 body=ts.map(t=>'<b style="color:var(--ink)">Team '+t+': '+teamVp(t,vp)+' VP</b><br>'+G.pl.filter(c=>teamOf(c)==t).map(c=>'&nbsp;&nbsp;'+dotH(c,16)+' '+NM[c]+' '+vp[c]+' VP, '+sys(c)+(G.alive[c]?'':' (eliminated)')).join('<br>')).join('<br>')}
-else{head=top.length==1?NM[top[0]]+' wins':'Tied';body=G.pl.map(c=>NM[c]+' '+vp[c]+' VP, '+sys(c)).join('<br>')+(top.length>1?'<br>Overtime is not built yet.':'')}
+else{head=top.length==1?NM[top[0]]+' wins':'Tied';body=G.pl.map(c=>NM[c]+' '+vp[c]+' VP, '+sys(c)).join('<br>')+(top.length>1?'<br>The game was ended before the tie was broken.':'')}
+if(G.round>30&&clearWin(top))sub+='<p style="margin:0 0 8px">Decided in '+rdName(G.round)+'.</p>';
 ov('<h1>'+head+'</h1>'+sub+'<p>'+body+btn)}
 // tap(bx,by) runs when the board is tapped, in board units. cx,cy = the system column and row. Do nothing without a game or after it ends.
 function tap(bx,by){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
@@ -749,7 +755,7 @@ if(allCpu())return;
 // row(c) builds one player's line: color dot, name, rank, score.
 const row=c=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0">${dotH(c,teamsOn()?18:12)}<b>${NM[c]}</b><span style="margin-left:auto">Rank ${G.alive[c]?G.rank[c]:'X'}</span><span style="min-width:56px;text-align:right">${G.alive[c]?(G.score[c]||0)+' VP':'X'}</span></div>`;
 // Show the dialog: alive players in turn order first, then eliminated players.
-ov(`<h1>Round ${G.round}</h1><p>Fuel this round: <b>${acts(G.round)}</b></p>${G.sz?`<p>Custom board: ${G.sz} by ${G.sz} sectors</p>`:''}${G.pm?`<p>Placement: ${G.pm=='fixed'?'fixed positions only':'free placement only'}</p>`:''}${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}${teamsOn()?'<p style="margin:8px 0 0;color:var(--ink);font-weight:600">'+teamLine(G.score)+'</p>':''}<div class="r" style="margin-top:10px"><button onclick="event.stopPropagation();saveFile(this)">Save file</button></div><p style="margin:12px 0 0;text-align:center">Tap to start the round</p>`);
+ov(`<h1>${rdName(G.round)}</h1>${G.round>30?'<p>The scores are tied, so the game goes on. The first round that ends with a clear winner ends the game.</p>':''}<p>Fuel this round: <b>${acts(G.round)}</b></p>${G.sz?`<p>Custom board: ${G.sz} by ${G.sz} sectors</p>`:''}${G.pm?`<p>Placement: ${G.pm=='fixed'?'fixed positions only':'free placement only'}</p>`:''}${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}${teamsOn()?'<p style="margin:8px 0 0;color:var(--ink);font-weight:600">'+teamLine(G.score)+'</p>':''}<div class="r" style="margin-top:10px"><button onclick="event.stopPropagation();saveFile(this)">Save file</button></div><p style="margin:12px 0 0;text-align:center">Tap to start the round</p>`);
 // A tap anywhere (the backdrop or the box) dismisses it.
 $('ov').onclick=closeRound}
 // closeRound() hides the popup and removes its tap handler so other dialogs are not affected.
@@ -762,7 +768,8 @@ if(!histMute)histSnap('t',cur());let em='',newRound=false;resetFlow();undo=[];G.
 // If more players remain this round, move the turn pointer on.
  if(G.ti<G.order.length-1)G.ti++;
 // Otherwise the round is over: score it, end the game after round 30, apply deficit elimination, end the game if one player is left, and ref = last round's first player.
- else{const {vp}=calc();G.score=vp;if(G.round>=30)return finish();em=deficit(vp);if(sidesLeft()<2)return finish();const ref=G.first;
+// (T4) After round 30 and after every overtime round, score as if it were the last round, Systems tiebreaker included (RULES.md 8.3): a clear winner ends the game; a tie plays on into the next (overtime) round. A tied round still runs the normal deficit check, like any round that does not end the game (Shmorden, 2026-10-24).
+ else{const {vp}=calc();G.score=vp;if(G.round>=30){if(clearWin(winners(vp)))return finish();em=G.round==30?' Scores tied, so the game goes to overtime.':' Still tied, so overtime goes on.'}em+=deficit(vp);if(sidesLeft()<2)return finish();const ref=G.first;
 // Build the new turn order: highest VP first, ties broken by position after ref in the player list. Then round+1 and pointer to 0.
   // (changed) Take the new rank snapshot from the round-end scores, build the turn order from it with the rulebook tie rules, move to the next round, and remember to show the popup.
 G.rank=rankSnap(vp);G.order=turnOrder(ref);G.first=G.order[0];G.round++;G.ti=0;newRound=true}
@@ -819,7 +826,7 @@ function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur();
 W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';document.querySelectorAll('#modes [data-m]').forEach(b=>{b.classList.toggle('act',b.dataset.m==mode);if(b.dataset.m=='p')b.textContent='Place '+(G.pool||0)});
 // Fill the info row: player name, round, Fuel left.
- $('info').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>Round ${G.round} of 30</span><span>Fuel ${G.ap}</span>${net.on?`<span style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;
+ $('info').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span><span>Fuel ${G.ap}</span>${net.on?`<span style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;
 // Fill the score chips: one per player with VP and star count.
  $('chips').innerHTML=G.pl.map(c=>`<div class="chip ${c==me&&!G.over?'on':''} ${G.alive[c]?'':'dead'} ${net.on&&!seatUp(c)?'off':''}" style="--c:${COL[c]}">${chipIn(c,vp[c],G.alive[c],G.rank[c])}</div>`).join('');
 // (new) Online: after every redraw, send changes to the other players if this device is in charge of the turn. Then, if a computer player has the turn here, schedule its next move.
@@ -962,7 +969,7 @@ if(!Array.isArray(n.conns)||n.conns.some(q=>!Array.isArray(q)||q.length!=2||q[0]
 // (step 8) A connection may join stars of two different players only in a team game and only between teammates (a Connect or a Gift). Capture, Gift and elimination all remove every other kind, so a file that has one was edited or damaged.
 {const ow={};n.stars.forEach(t=>{ow[t.id]=t.o});n.conns.forEach(q=>{const a=ow[q[0]],b=ow[q[1]];if(a!==b&&!(n.team&&n.team[a]===n.team[b]))bad('A connection joins stars of two players who are not teammates.')})}
 if(!n.alive||n.pl.some(c=>typeof n.alive[c]!='boolean'))bad('The player status is invalid.');
-if(!I(n.round,1,30))bad('The round number is invalid.');
+if(!I(n.round,1,RMAX))bad('The round number is invalid.');
 if(!Array.isArray(n.order)||!n.order.length||new Set(n.order).size!=n.order.length||n.order.some(c=>!n.pl.includes(c)))bad('The turn order is invalid.');
 // (new) A FINISHED game saved by an older build can have the turn pointer one past the end of the order (the last player conceded); pull it back so the file loads.
 if(n.over&&Number.isInteger(n.ti))n.ti=Math.max(0,Math.min(n.ti,n.order.length-1));
@@ -1029,7 +1036,7 @@ function mvRec(info,before){if(!G||!H||H.gid!==G.gid)return;if(!H.mv)H.mv=[];if(
 function mvUndo(){if(!H||!H.mv)return;const q=H.snaps.length?H.snaps[H.snaps.length-1].m:0;if(H.mv.length>(q||0))H.mv.pop()}
 // mvClean(list) checks a list of move records from a save, link or online message and returns clean copies; one bad record drops the whole list (the viewer then simply has no move data).
 function mvClean(a){const out=[];if(!Array.isArray(a))return out;const I=(x,lo,hi)=>Number.isInteger(x)&&x>=lo&&x<=hi,P=p=>Array.isArray(p)&&p.length==2&&p.every(v=>typeof v=='number'&&isFinite(v)&&v>=0&&v<=30),Q=p=>Array.isArray(p)&&p.length==2&&p.every(v=>I(v,0,1e7));
-for(const q of a){if(out.length>=MV_MAX)break;if(!q||!I(q.r,1,30)||!I(q.w,0,3)||!['p','f','s','c','a','m','x','e'].includes(q.k)||!q.d||!Array.isArray(q.d.s)||!Array.isArray(q.d.a)||!Array.isArray(q.d.r)||q.d.s.length>400||q.d.a.length>400||q.d.r.length>400)return [];
+for(const q of a){if(out.length>=MV_MAX)break;if(!q||!I(q.r,1,RMAX)||!I(q.w,0,3)||!['p','f','s','c','a','m','x','e'].includes(q.k)||!q.d||!Array.isArray(q.d.s)||!Array.isArray(q.d.a)||!Array.isArray(q.d.r)||q.d.s.length>400||q.d.a.length>400||q.d.r.length>400)return [];
 if(!q.d.s.every(v=>Array.isArray(v)&&v.length==6&&v.every(x=>typeof x=='number'&&isFinite(x)))||!q.d.a.every(Q)||!q.d.r.every(Q))return [];
 const o={r:q.r,w:q.w,k:q.k,d:{s:q.d.s,a:q.d.a,r:q.d.r}};
 if(q.a!=null){if(!P(q.a))return [];o.a=q.a}if(q.b!=null){if(!P(q.b))return [];o.b=q.b}
@@ -1057,7 +1064,7 @@ async function histRead(){try{const v=localStorage.getItem(HIST_KEY);if(!v)retur
 function prepHist(h){if(!h||typeof h!='object'||h.v!==1||typeof h.gid!='string'||h.gid.length>40||!Array.isArray(h.snaps)||h.snaps.length>400||!Array.isArray(h.pl)||h.pl.length>4)return null;
 const I=(x,a,b)=>Number.isInteger(x)&&x>=a&&x<=b,F=x=>typeof x=='number'&&isFinite(x),C=a=>Array.isArray(a)&&a.length<=4&&a.every(c=>I(c,0,3));
 if(!C(h.pl))return null;
-const ok=h.snaps.every(q=>q&&['s','t','c','f','l'].includes(q.k)&&I(q.r,1,30)&&(q.m===undefined||I(q.m,0,20000))&&(q.w===null||I(q.w,0,3))&&C(q.o)&&C(q.al)&&Array.isArray(q.vp)&&q.vp.length==4&&q.vp.every(F)&&q.rk&&typeof q.rk=='object'&&F(q.ap)&&Array.isArray(q.st)&&q.st.length<=2000&&q.st.every(a=>Array.isArray(a)&&a.length==6&&a.every(F))&&Array.isArray(q.cn)&&q.cn.length<=4000&&q.cn.every(a=>Array.isArray(a)&&a.length==2&&a.every(F)));
+const ok=h.snaps.every(q=>q&&['s','t','c','f','l'].includes(q.k)&&I(q.r,1,RMAX)&&(q.m===undefined||I(q.m,0,20000))&&(q.w===null||I(q.w,0,3))&&C(q.o)&&C(q.al)&&Array.isArray(q.vp)&&q.vp.length==4&&q.vp.every(F)&&q.rk&&typeof q.rk=='object'&&F(q.ap)&&Array.isArray(q.st)&&q.st.length<=2000&&q.st.every(a=>Array.isArray(a)&&a.length==6&&a.every(F))&&Array.isArray(q.cn)&&q.cn.length<=4000&&q.cn.every(a=>Array.isArray(a)&&a.length==2&&a.every(F)));
 return ok?{v:1,gid:h.gid,pl:h.pl.slice(),snaps:h.snaps,mv:mvClean(h.mv)}:null}
 // adoptHistory(raw) runs when a game is loaded (file, code, link, autosave): keep the history that came with it if it is valid and belongs to this game; otherwise start a new history that begins at this point.
 function adoptHistory(raw){const h=prepHist(raw);
@@ -1081,7 +1088,7 @@ function hvClose(){hvEl.classList.remove('on')}
 // hvRounds() lists the rounds that have snapshots (skipped rounds simply do not appear).
 const hvRounds=()=>[...new Set(hv.snaps.map(q=>q.r))].sort((a,b)=>a-b);
 // hvLabel(q) names a snapshot: "Round 3, after Red's turn", "Round 4, start of round", and so on.
-function hvLabel(q){const n=q.w==null?'':NM[q.w];return q.k=='t'?'Round '+q.r+", after "+n+"'s turn":q.k=='c'?'Round '+q.r+', after '+n+' conceded':q.k=='f'?'Final position, round '+q.r:q.k=='l'?'Round '+q.r+', where this game was loaded':q.r==1&&hv.snaps.indexOf(q)==0?'Round 1, game start':'Round '+q.r+', start of round'}
+function hvLabel(q){const n=q.w==null?'':NM[q.w];const R=rdName(q.r);return q.k=='t'?R+", after "+n+"'s turn":q.k=='c'?R+', after '+n+' conceded':q.k=='f'?'Final position, '+R:q.k=='l'?R+', where this game was loaded':q.r==1&&hv.snaps.indexOf(q)==0?'Round 1, game start':R+', start of round'}
 // hvMoveState(f) = the board after move f.j: the snapshot before it with every move since applied (each move's delta replaces the stars it changed and adds / removes its connections).
 function hvMoveState(f){const q=hv.snaps[f.i],S=snapState(q),mv=H.mv,st=new Map(S.stars.map(x=>[x.id,x]));let cn=S.conns.map(c=>[c[0],c[1]]);
 for(let j=q.m;j<=f.j;j++){const d=mv[j].d;d.s.forEach(a=>{st.set(a[0],{id:a[0],x:a[1],y:a[2],o:a[3],f:a[4],cap:a[5]?1:0})});d.r.forEach(p=>{cn=cn.filter(c=>!((c[0]==p[0]&&c[1]==p[1])||(c[0]==p[1]&&c[1]==p[0])))});d.a.forEach(p=>cn.push([p[0],p[1]]))}
@@ -1108,7 +1115,7 @@ const notes=[],miss=[];if(sn[0].k=='l'||sn[0].r>1)notes.push('History before rou
 for(let r=rs[0];r<=rs[rs.length-1];r++)if(!rs.includes(r))miss.push(r);if(miss.length)notes.push('No snapshots for round'+(miss.length>1?'s ':' ')+miss.join(', ')+' (skipped).');
 if(hv.mode=='move'&&!hv.fl.some(f=>f.j!==null))notes.push('No move-by-move record exists for this game (it was saved by an older version).');
 if(teamsOn())notes.unshift(teamLine(vp));
-if(G)notes.push('Live game: round '+G.round+(G.over?', finished.':', '+NM[cur()]+' to move.'));$('hvm').textContent=notes.join(' ')}
+if(G)notes.push('Live game: '+rdName(G.round)+(G.over?', finished.':', '+NM[cur()]+' to move.'));$('hvm').textContent=notes.join(' ')}
 // hvSet(i) selects snapshot i (in move mode, the frame that is that snapshot itself).
 function hvSet(i){hv.idx=i;if(hv.mode=='move')hv.fr=Math.max(0,hvFi(i));hvDraw()}
 // The big arrows: hvArrow(d) steps one round, one turn or one move (by the mode). The small arrows and the slider above them always step by round.
@@ -1193,9 +1200,9 @@ let host=SHARE_BASE;try{host=new URL(SHARE_BASE).host}catch(e){}
 const shareBtn=navigator.share?'<button onclick="shareLink()">Share link</button>':'';prepCodes();
 return `<p style="margin:0 0 8px;color:var(--mut)">Links open ${esc(host)}.</p><div class="r"><button onclick="toFile()">Save file</button><button onclick="$('lf').click()">Load file</button></div><div class="r" style="margin-top:8px">${shareBtn}<button onclick="copyOut('link')">Copy link</button><button onclick="copyOut('code')">Copy code</button></div><label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="ih" onchange="prepCodes()" style="width:22px;height:22px;flex:none"><span>Include history in link and code <small id="hl2" style="color:var(--mut)"></small></span></label><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="3" placeholder="Paste a save code, a share link or save JSON here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>`}
 // devPage() = Dev page: developer tools. Add new tools here.
-function devPage(){return '<p style="margin:0 0 8px;color:var(--mut)">Developer tools. More will be added here.</p><div class="r" style="align-items:center"><span style="flex:1">Set round</span><input id="dr" type="number" min="1" max="30" value="'+G.round+'" style="width:64px;font:inherit;min-height:44px;box-sizing:border-box"><button onclick="setRound()">Set</button></div><div class="r" style="margin-top:8px"><button onclick="cpuDlg(null,\'menu\')">CPU Designer</button></div>'}
-// setRound() is the dev tool: sets the round (1 to 30), refreshes Fuel, clears used stars and undo.
-function setRound(){if(!G||G.over)return;const n=Math.max(1,Math.min(30,parseInt($('dr').value)||1));G.round=n;G.ap=acts(n);G.used=[];delete G.pv;sel=null;undo=[];$('ov').style.display='none';say('Dev: round set to '+n+'. Fuel: '+G.ap+'.');render()}
+function devPage(){return '<p style="margin:0 0 8px;color:var(--mut)">Developer tools. More will be added here.</p><div class="r" style="align-items:center"><span style="flex:1">Set round</span><input id="dr" type="number" min="1" max="'+RMAX+'" value="'+G.round+'" style="width:64px;font:inherit;min-height:44px;box-sizing:border-box"><button onclick="setRound()">Set</button></div><div class="r" style="margin-top:8px"><button onclick="cpuDlg(null,\'menu\')">CPU Designer</button></div>'}
+// setRound() is the dev tool: sets the round (1 to RMAX; past 30 is overtime, T4), refreshes Fuel, clears used stars and undo.
+function setRound(){if(!G||G.over)return;const n=Math.max(1,Math.min(RMAX,parseInt($('dr').value)||1));G.round=n;G.ap=acts(n);G.used=[];delete G.pv;sel=null;undo=[];$('ov').style.display='none';say('Dev: '+rdName(n)+'. Fuel: '+G.ap+'.');render()}
 // Hook up the Menu button.
 // (new) Hook up the Hold button.
 $('hold').onclick=holdBtn;
@@ -1405,7 +1412,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-24-a';
+const BUILD='2026-10-24-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1549,7 +1556,7 @@ function soundToggle(b){soundOn=!soundOn;try{localStorage.setItem(SKEY2,soundOn?
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=10,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=11,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
@@ -1782,7 +1789,7 @@ const cpuFeat={center:1,rows:1,threat:1,conn:1,place:1,move:1,def:1,attack:1,rea
 let cpuDanger=false,cpuNew=[];
 function cpuDangerCheck(me){const vp=calc(G).vp,alive=G.pl.filter(c=>G.alive[c]);if(alive.some(c=>c!=me&&vp[c]<vp[me]))return false;const higher=alive.filter(c=>vp[c]>vp[me]).map(c=>vp[c]);return !!higher.length&&Math.min(...higher)-vp[me]>=2}
 // cpuOppAp() = the Fuel an opponent will have on their next turn (this round's or next round's, whichever is more).
-const cpuOppAp=()=>Math.max(1,Math.min(15,Math.max(acts(Math.min(30,G.round)),acts(Math.min(30,G.round+1)))));
+const cpuOppAp=()=>Math.max(1,Math.min(15,Math.max(acts(G.round),acts(G.round+1))));
 // cpuThreatened(pos,tStr,me,ign) = could some live opponent star take a star at pos that has strength tStr, spending no more Fuel than the opponent will have? (ign = a star to leave out, such as the one being captured right now.)
 function cpuThreatened(pos,tStr,me,ign){const ap=Math.min(cpuOppAp(),cpuFeat.reach);return G.stars.some(A=>A!==ign&&A.o!=me&&G.alive[A.o]&&cost(A,pos)<=ap&&cStr(A)>tStr)}
 // (reference only, see incPot2) cpuPot2(S,me,danger) = Medium's board value for color me: 10 per Victory Point, but the center sector counts as 1 point not 3 (it costs too much to defend) unless danger; a small reward for leading each non-center sector; and progress toward full rows and columns of sectors that no one else has broken into (a rival's open line is subtracted, so blocking it counts).
@@ -2133,7 +2140,7 @@ function cpuAfterShare(me){const o=G.order.filter(c=>c!=me&&G.alive[c]);if(!o.le
 function cpuPlanLeaf(s,X){const me=X.me,e=cpuPlanEn(s,me),tw=cpuPlanCfg.thr*(X.hard?cpuPlanCfg.thrLast+(1-cpuPlanCfg.thrLast)*X.after:1);let v=incEval(s.T,me,X.P,X.danger)+s.bonus;
 for(let i=0;i<s.n;i++)if(s.o[i]==me&&cpuPlanThr(e,X.reach,s.cx[i],s.cy[i],s.adj[i].length+s.f[i],-1))v-=tw*cpuPlanLoss(s,e,X,i)+(s.cap[i]?cpuPlanCfg.capPen:0);return v}
 // cpuPlanNext(s,X) = what my NEXT turn could add on the board turn s leaves behind: every star is rested, Fuel = next round's, and one deterministic rollout (alpha 1) is played with the opponents standing still; the result is the board value gained plus its bonuses. Credits turns that leave stars where cheap points are waiting (without it, a one-Fuel claim and a two-Fuel claim to the same sector tie, and the planner ignores which leaves the better next move).
-function cpuPlanNext(s,X){const t=cpuPlanClone(s);t.u=t.u.map(()=>0);t.fm=t.fm.map(()=>0);t.touched=[];t.bonus=0;t.ap=acts(Math.min(30,G.round+1));const v0=incEval(t.T,X.me,X.P,X.danger);
+function cpuPlanNext(s,X){const t=cpuPlanClone(s);t.u=t.u.map(()=>0);t.fm=t.fm.map(()=>0);t.touched=[];t.bonus=0;t.ap=acts(G.round+1);const v0=incEval(t.T,X.me,X.P,X.danger);
 for(let step=0;step<40&&(t.ap>0||X.fmv);step++){let c=cpuPlanGen(t,X,Math.min(3,t.ap));if(!c.length&&t.ap>3)c=cpuPlanGen(t,X,t.ap);if(!c.length)break;let best=null,bs=-1e18;for(const m of c){const cw=Math.max(m.c,.3),w=m.d>=0?m.d/cw:m.d*cw;if(w>bs){bs=w;best=m}}cpuPlanApply(t,best)}
 return incEval(t.T,X.me,X.P,X.danger)-v0+t.bonus}
 // cpuPlanRoll(base,X,alpha,tau) = build one whole turn from the copy `base` (see the block comment): returns {s: the finished copy, moves, val: its leaf value}. tau > 0 adds random noise (Gumbel, scaled by X.spread) to the choice.
