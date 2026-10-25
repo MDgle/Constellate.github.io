@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-24-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-25-f",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -47,6 +47,14 @@ body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg
 #info{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;font-size:14px}
 /* #info b: the current player's name is bigger. */
 #info b{font-size:17px}
+/* (new) #inft holds the text that render() rewrites (name, team, round, online status); display:contents lets its spans sit in the #info row directly, so the Fuel gauge beside them is never rebuilt and can animate. .onl = the online status, kept at the end of the row. */
+#inft{display:contents}#info .onl{order:2}
+/* (new) Fuel gauge (see fuelUi): "Fuel X" in the warning color, then a bar that fills the rest of the row. #ffill = the Fuel left, flat-ended. Two shapes in the same color sit under it and only show while it moves (fuelGo): #fcres = a crescent whose hollow (8 px deep) faces right, its tips at the right end of the element; #fcap = a rounded cap. At rest both end where #ffill ends, so the edge is straight. #fdiv = one dashed line per Fuel step, under the fill, so a line shows only once no Fuel is over it. */
+#fuel{order:1;flex:1;min-width:130px;display:flex;align-items:center;gap:8px}#info #fueln{font-size:16px;color:var(--warn);white-space:nowrap}
+#fbar{flex:1;position:relative;height:16px;border-radius:8px;overflow:hidden}#fbar::after{content:'';position:absolute;inset:0;border:2px solid var(--warn);border-radius:8px;pointer-events:none}
+#fdiv{position:absolute;inset:2px 0}#fdiv i{position:absolute;top:0;bottom:0;width:2px;background:repeating-linear-gradient(var(--warn) 0 2px,transparent 2px 4px)}
+#ffill,#fcres,#fcap{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--warn)}#fcap{border-radius:0 999px 999px 0}
+#fcres{-webkit-mask-image:radial-gradient(circle 6.25px at calc(100% - 1.75px) 50%,transparent 97%,#000 100%);mask-image:radial-gradient(circle 6.25px at calc(100% - 1.75px) 50%,transparent 97%,#000 100%)}
 /* #chips: the row of player score boxes. */
 #chips{display:flex;gap:6px;margin-top:6px}
 /* .chip: one player's box (border, rounded corners, layout). */
@@ -83,6 +91,16 @@ button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;bor
 /* Pressed comes AFTER hover and has equal weight so it wins while the button is held down, even with a mouse. */
 #en:active:not(:disabled),#mcf:active:not(:disabled){background:var(--acc-press)}#modes .act:active:not(:disabled){background:var(--sel-press)}
 #en:disabled,#mcf:disabled,#modes button:disabled{background:var(--dis);color:var(--dis-ink);border-color:var(--line);cursor:not-allowed}
+/* (new) #en.nogo: End turn while the turn cannot end yet (see endBlock): faded, with darker diagonal stripes over the button color. It stays tappable so a tap can say why and point at what is left (endHint). */
+#en.nogo,#en.nogo:hover,#en.nogo:active,#mcf.nogo,#mcf.nogo:hover,#mcf.nogo:active{background:var(--acc) repeating-linear-gradient(135deg,transparent 0 7px,rgba(0,0,0,.32) 7px 11px);opacity:.6}
+/* (new) .flick: a refused End turn or multi-attack Confirm flickers dark a few times. */
+@keyframes flk{50%{filter:brightness(.3)}}.flick{animation:flk .15s ease-in-out 4}
+/* (new) #mbar: during a multi-attack the mode row is swapped for two boxes shaped like the mode buttons (see uiMulti). #mbt = the target's Strength, in its owner's color; #mba = the attackers' combined Strength, in the attacker's color, dimmed until it beats the target, then bright with a ring (.win). Empty boxes are dulled. */
+#mbar{display:none;gap:6px;margin-top:6px}#mbar>div{flex:1;min-height:38px;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;background:var(--dis);opacity:.55;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;text-shadow:0 0 3px #000,0 0 2px #000}
+#mbar>div.on{background:var(--c);opacity:1}#mba.on{filter:brightness(.7)}#mba.win{filter:brightness(1.2);border:2px solid var(--ink)}
+:root[data-theme="cgreen"] #mbar>div,:root[data-theme="ccyan"] #mbar>div,:root[data-theme="corange"] #mbar>div{border-radius:0}
+/* (new) svg .hint: the dashed rings End turn puts on Stars that can still use Fuel; they stay for 1 second, then fade out. */
+svg .hint{animation:hintf 1.4s linear forwards}@keyframes hintf{0%,71%{opacity:1}100%{opacity:0}}@media(prefers-reduced-motion:reduce){svg .hint{animation:none}}
 button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #ov: full-screen dim backdrop that centers pop-up dialogs (hidden until JS shows it). */
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -167,7 +185,7 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
 </style></head><body>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
-<div id="top"><div id="info"></div><div id="chips"></div><div id="tvp"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button data-m="x">Multi</button></div></div>
+<div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button data-m="x">Multi</button></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
@@ -223,7 +241,7 @@ const MARG=outerR(null)+BORDER_HALF+PAD;
 // $ is a shortcut for finding an HTML element by its id. st, svg and W grab the board area, the drawing surface and the group that holds everything drawn.
 const $=i=>document.getElementById(i),st=$('st'),svg=$('svg'),W=$('w');
 // CWP = turn-order position of each color (red, blue, orange, purple). Then variables that change while playing: hl (stars to ring), mode (s=stars, p=place, m=move), flow (the move group chosen so far, or nothing), pend (an attack waiting on a choice), G (the whole game state), sel (selected star id), undo (stack of saved states), view (pan and zoom).
-const CWP={0:0,2:1,3:2,1:3};let hl=[],mode='s',flow=null,multi=null,pend=null,G=null,sel=null,undo=[],view={k:18,x:0,y:0,min:18},pvSel=null;
+const CWP={0:0,2:1,3:2,1:3};let hl=[],mode='s',flow=null,multi=null,pend=null,G=null,sel=null,undo=[],view={k:18,x:0,y:0,min:18},pvSel=null,hint=null;
 // acts(r) = Fuel available in round r (rises to 15, then falls by 1 per round). (T4) Rounds past 30 are overtime (RULES.md 8.3): the same 30-round ramp repeats with no limit, so round 31 = 1 Fuel, round 45 = 15, round 60 = 1, round 61 = 1 again. cur() = the color number of whoever's turn it is.
 const acts=r=>{const k=(r-1)%30+1;return k<=15?k:31-k},cur=()=>G.order[G.ti];
 // (T4) RMAX = the highest round number a save, history or move log may carry (overtime has no limit in the rules; this only stops nonsense data). rdName(r) = how a round is shown to players: 'Round 12' in the main game, 'Overtime 1 · Round 5' after it. G.round keeps counting up (31 = overtime 1 round 1, 61 = overtime 2 round 1); only the display splits it.
@@ -429,8 +447,9 @@ function mcUse(id,n){$('ov').style.display='none';const x=multi.att.find(q=>q.id
 // mcRemove(id) removes an attacker from the multi-attack.
 function mcRemove(id){$('ov').style.display='none';multi.att=multi.att.filter(q=>q.id!=id);say(multiMsg('Removed.'));render()}
 // multiGo() is the Confirm button. Needs 2+ attackers. If their strength with the Fleets chosen does not beat the target it only shows a message (no popup): add more Stars or Fleets, or Cancel. Otherwise the attack starts.
-function multiGo(){if(!multi||multi.t==null||pend)return;if(isAlly(by(multi.t).o))return say('That Star belongs to a teammate. Cancel the multi-attack.');if(multi.att.length<2)return say('Add at least 2 attackers.');const st=multiStats();
-if(st.sCom<=st.cb)return say('Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'. Add more Stars or Fleets, or Cancel.');
+// (new) A Confirm that can't go yet flickers dark (flickB) and blinks the box that needs something: the target box with no target or not enough Strength, the attackers' box with fewer than 2 attackers.
+function multiGo(){if(!multi||pend)return;if(multi.t==null){flickB($('mcf'));blinkB($('mbt'));return say('Tap an enemy Star as the target.')}if(isAlly(by(multi.t).o))return say('That Star belongs to a teammate. Cancel the multi-attack.');if(multi.att.length<2){flickB($('mcf'));blinkB($('mba'));return say('Add at least 2 attackers.')}const st=multiStats();
+if(st.sCom<=st.cb){flickB($('mcf'));blinkB($('mbt'));return say('Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'. Add more Stars or Fleets, or Cancel.')}
 multiStart()}
 // multiStart() re-checks everything, builds pend (a list of attackers with their own committed Fleets and line cost) and hands over to resolve, exactly like a single attack.
 function multiStart(){const b=by(multi.t),att=multi.att.map(x=>({a:x.id,use:x.use||0,c:cost(by(x.id),b)})),c=att.reduce((t,x)=>t+x.c,0),tot=att.reduce((t,x)=>t+cs(by(x.a))+x.use,0);
@@ -438,9 +457,13 @@ if(tot<=str(b)){multi.step='sel';return say('Not enough strength.')}if(c>G.ap){m
 $('ov').style.display='none';multi.step='defend';pend={b:b.id,att};resolve()}
 // multiCancel() is the Cancel button (and the Esc key): clear everything, leave Multi mode, nothing was spent or changed.
 function multiCancel(){if(!multi||pend)return;resetFlow();mode='s';say('Multi-attack cancelled. Nothing was changed.');render()}
-// uiMulti() shows Cancel and Confirm (and hides End turn) while attackers are being chosen; Confirm is enabled only when it could win.
+// uiMulti() shows Cancel and Confirm (and hides End turn) while attackers are being chosen. (changed) Confirm stays tappable but gets the striped "not yet" look (nogo) until the attack could win (2+ attackers, stronger than the target); a tap then explains why (multiGo). (new) While a multi-attack exists the mode row is replaced by the two Strength boxes (#mbar): the target's Strength in its owner's color, and the attackers' combined Strength (connections + Fleets chosen) in the attacker's color, bright (.win) once it beats the target. Cancel is then the way out of Multi.
 function uiMulti(){const on=!!multi&&!pend;$('mcx').style.display=on?'block':'';$('mcf').style.display=on?'block':'';$('en').style.display=on?'none':'';
-if(on){const ok=multi.t!=null&&multi.att.length>=2;$('mcf').disabled=!ok}}
+const t=multi&&multi.t!=null?by(multi.t):null,st=t?multiStats():null;
+if(on){$('mcf').disabled=false;$('mcf').classList.toggle('nogo',!(st&&multi.att.length>=2&&st.sCom>st.cb))}
+$('modes').style.display=multi?'none':'';$('mbar').style.display=multi?'flex':'';if(!multi)return;
+const T=$('mbt'),A=$('mba'),has=!!t&&multi.att.length>0;T.className=t?'on':'';T.style.setProperty('--c',t?COL[t.o]:'transparent');T.textContent=t?'Strength '+st.cb:'';
+A.className=has?'on'+(st.sCom>st.cb?' win':''):'';A.style.setProperty('--c',COL[cur()]);A.textContent=has?'Strength '+st.sCom:''}
 // resolve(A) runs once an attack is paid for with A committed Fleets. It now only gathers facts, then hands the defender's Fleets to the choice loop (defNext) below. Nothing on the board changes yet.
 function resolve(A){$('ov').style.display='none';
 // b = the target star, D = its defending Fleets, def = the defender's color, nb = retreat spots: the defender's other stars joined to the target by a connection, plus (team game, T3) a living teammate's star joined to it by a Connect link.
@@ -721,11 +744,27 @@ const cb=str(b),fr=a.f||0,m=Math.max(0,cb+1-cs(a));if(str(a)<=cb)return say('Too
 
 // Spend the Fuel, clear selection, check eliminations, show a message, redraw.
  G.ap-=c;sel=null;mvRec({k:kind=='set'?'s':'c',a:mvPos(a),b:mvPos(b),c});const m=elim();say((kind=='set'?'Star set':'Connected')+' for '+c+' Fuel.'+m);render()}
-// (new) Turn-ending rules. endBlock() says why the current player may NOT end the turn yet (empty text = they may): (1) every Fleet must be placed, unless the Capital is lost (then placeable() is empty); (2) every Fuel must be used, unless no Star that has not yet acted can make any move with the Fuel left. Doing nothing is never better than a legal move, so it is not offered.
+// (new) Turn-ending rules. endBlock() says why the current player may NOT end the turn yet (empty text = they may): (1) every Fuel must be used, unless no Star that has not yet acted can make any move with the Fuel left; (2) every Fleet must be placed, unless the Capital is lost (then placeable() is empty). Fuel is asked about first (Shmorden, 2026-10-25). Doing nothing is never better than a legal move, so it is not offered.
 function endBlock(){if(!G||G.over)return '';
 if(G.pv&&G.pv.length)return 'You have move previews waiting. Tap each dashed move and Confirm or Cancel it first.';
-if(G.pool>0&&placeable().length)return 'Place all your Fleets first: '+G.pool+' left. Use Place mode.';
-if(G.ap>0&&moveAvail())return 'You still have '+G.ap+' Fuel and a Star that can use '+(G.ap>1?'them':'it')+'. Use all your Fuel first.'+(G.pm!='fixed'&&G.pm!='free'&&useFixed()?' If nothing fits, try Placement: Free on the Menu.':'');return ''}
+if(G.ap>0&&moveAvail())return 'You still have '+G.ap+' Fuel and a Star that can use '+(G.ap>1?'them':'it')+'. Use all your Fuel first.'+(G.pm!='fixed'&&G.pm!='free'&&useFixed()?' If nothing fits, try Placement: Free on the Menu.':'');
+if(G.pool>0&&placeable().length)return 'Place all your Fleets first: '+G.pool+' left. Use Place mode.';return ''}
+// (new) endBlockC() = endBlock() remembered for the board it was last asked about, so render can ask it on every redraw without repeating the move search (moveAvail can take up to 400 ms when no move exists).
+let ebKey=null,ebVal='';
+function endBlockC(){const k=JSON.stringify([G.round,G.ti,G.ap,G.pool,G.used,G.stars,G.conns,G.pv||0,G.pm||0]);if(k!==ebKey){ebKey=k;ebVal=endBlock()}return ebVal}
+// (new) endHint() runs when End turn is refused, in the same order as endBlock: with Fuel left it switches to Stars mode (dropping any selection) and blinks the Stars button, puts a fading dashed ring on every Star that can still use the Fuel (moveStars, see HINT_MS and CSS .hint) and flickers End turn dark; otherwise, with Fleets left to place, it switches to Place mode and blinks the Place button. Pending move previews only get the message.
+// fxB(b,c) restarts effect class c on button b and takes it off again when the effect ends (or is cut short by the button being hidden). Left on, the browser would replay it every time the button reappears (End turn after Multi or a preview, the Stars button after Multi).
+const HINT_MS=1400,fxB=(b,c)=>{if(!b)return;b.classList.remove(c);void b.offsetWidth;b.classList.add(c);const off=()=>{b.classList.remove(c);b.removeEventListener('animationend',off);b.removeEventListener('animationcancel',off)};b.addEventListener('animationend',off);b.addEventListener('animationcancel',off)},blinkB=b=>fxB(b,'blink'),flickB=b=>fxB(b,'flick');
+function endHint(){if(G.pv&&G.pv.length)return;const ids=G.ap>0?moveStars():[];
+if(ids.length){if(mode!='s'){mode='s';resetFlow()}else sel=null;const h={ids,t:Date.now()};hint=h;blinkB(document.querySelector('#modes [data-m="s"]'));flickB($('en'));render();return setTimeout(()=>{if(hint===h){hint=null;render()}},HINT_MS)}
+if(G.pool>0&&placeable().length){if(mode!='p'){mode='p';resetFlow()}blinkB(document.querySelector('#modes [data-m="p"]'));return render()}}
+// (new) moveStars() = the ids of the current player's Stars that can still make a move costing Fuel, for the End turn hint. Same checks as moveAvail, but star by star: take, connect, one of two Stars in a two-Star multi-attack, claim an empty system. Gives up after 400 ms and returns what it found so far.
+function moveStars(){if(!G||G.ap<1)return [];const me=cur(),mine=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id)),out=new Set(),t0=Date.now(),linked=(a,b)=>G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id));
+for(const a of mine)for(const b of G.stars){if(b===a)continue;const c=cost(a,b);if(c>G.ap||!clear(a,b))continue;if(b.o==me||isAlly(b.o)?!linked(a,b):str(a)>str(b)){out.add(a.id);break}}
+for(const b of G.stars){if(b.o==me||isAlly(b.o))continue;const cand=mine.filter(a=>clear(a,b)&&cost(a,b)<=G.ap);for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++){if(cost(cand[i],b)+cost(cand[j],b)<=G.ap&&cs(cand[i])+(cand[i].f||0)+cs(cand[j])+(cand[j].f||0)>str(b)){out.add(cand[i].id);out.add(cand[j].id)}}}
+const N=NSYS(G),occ=new Set(G.stars.map(q=>Math.floor(q.x)+','+Math.floor(q.y)));(G.pv||[]).forEach(q=>{if(q.k=='s')occ.add(Math.floor(q.x)+','+Math.floor(q.y))});
+for(const a of mine){if(out.has(a.id))continue;const ax=Math.floor(a.x),ay=Math.floor(a.y);sys:for(let cy=0;cy<N;cy++)for(let cx=0;cx<N;cx++){const c=Math.abs(cx-ax)+Math.abs(cy-ay);if(c<1||c>G.ap||occ.has(cx+','+cy))continue;if(Date.now()-t0>400)return [...out];if(fxLegal(a,cx,cy).length||(G.pm!='fixed'&&roomIn(cx,cy,a))){out.add(a.id);break sys}}}
+return [...out]}
 // (new) moveAvail() = can the current player still make at least one move that costs Fuel, with the Fuel left, from a Star that has not acted this turn? It uses the same legality checks as the real moves, so a "yes" is always a real move (a "no" can only be missed in odd cases, which never traps anyone). Looked for, in order: take an enemy Star (never a living teammate's), connect two of your Stars (or one of yours to a living teammate's Star: Connect is always harmless; a Gift is NOT counted, so nobody is ever forced to give a Star away), a two-Star multi-attack, claim an empty system (any legal spot; in a fixed-positions-only game only the fixed spots count). It gives up after 400 ms and says no, so it can never lock a player in. Fleet moves cost no Fuel, so they do not count.
 function moveAvail(){if(!G||G.ap<1)return false;const me=cur(),mine=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id));if(!mine.length)return false;const t0=Date.now(),linked=(a,b)=>G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id));
 for(const a of mine)for(const b of G.stars){if(b===a)continue;const c=cost(a,b);if(c>G.ap||!clear(a,b))continue;if(b.o==me||isAlly(b.o)){if(!linked(a,b))return true}else if(str(a)>str(b))return true}
@@ -793,6 +832,10 @@ function boardSVG(S,ctl,L){let s='';
  ctl.forEach((r,y)=>r.forEach((c,x)=>{if(c>=0)s+=`<rect x="${x*3}" y="${y*3}" width="3" height="3" fill="${COL[c]}" opacity=".14"/>`}));
 // Grid lines for 0 to the board size (21, 15 or 9): every third line is thick (sector border), the rest thin and dashed (system border).
  const NS=NSYS(S);for(let i=0;i<=NS;i++){const th=i%3==0,a=`stroke="${th?'var(--sec)':'var(--grid)'}" stroke-width="${th?2:1}" ${th?'':'stroke-dasharray="3 4" stroke-opacity="'+GRID_DIM+'"'} vector-effect="non-scaling-stroke"`;s+=`<line x1="${i}" y1="0" x2="${i}" y2="${NS}" ${a}/><line x1="0" y1="${i}" x2="${NS}" y2="${i}" ${a}/>`}
+// (new) Range border (live board only, L.rng = {x,y: the selected Star's system, n: Fuel left}): a dashed white line along the outer edges of every system the Fuel left can reach. Fuel cost is columns plus rows apart (see cost), so the shape is a stepped diamond, cut off at the board edge. A dark line under the white keeps it visible on light themes.
+ if(L&&L.rng){const {x:ax,y:ay,n}=L.rng,inR=(cx,cy)=>cx>=0&&cy>=0&&cx<NS&&cy<NS&&Math.abs(cx-ax)+Math.abs(cy-ay)<=n;let d='';
+  for(let cy=0;cy<NS;cy++)for(let cx=0;cx<NS;cx++){if(!inR(cx,cy))continue;if(!inR(cx,cy-1))d+=`M${cx} ${cy}h1`;if(!inR(cx,cy+1))d+=`M${cx} ${cy+1}h1`;if(!inR(cx-1,cy))d+=`M${cx} ${cy}v1`;if(!inR(cx+1,cy))d+=`M${cx+1} ${cy}v1`}
+  if(d)s+=`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="3.5" vector-effect="non-scaling-stroke"/><path d="${d}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"/>`}
 // A local helper to find a star by id.
  const by=id=>S.stars.find(q=>q.id==id);
 // Draw each connection as a colored line between its two stars. (step 7) (step 7d) Every link is one line in the color of its FIRST end, i.e. the player who made it; a link between teammates gets no stripe or gradient.
@@ -815,6 +858,8 @@ function boardSVG(S,ctl,L){let s='';
   // (new) Move mode with a group chosen: every Star the group can end on (any distance up to its range) gets a dashed ring.
   if(L&&L.fr&&L.fr.includes(q.id))s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`;
   if(L&&L.hl.includes(q.id))s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".1"/>`;
+  // (new) End turn hint (L.hint = {ids, age in ms}): a dashed ring on each Star that can still use Fuel, fading out (CSS .hint); the negative delay keeps the fade going across redraws.
+  if(L&&L.hint&&L.hint.ids.includes(q.id))s+=`<circle class="hint" style="animation-delay:-${L.hint.age}ms" cx="${q.x}" cy="${q.y}" r=".55" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`;
 // If it is the selected star, draw a dashed ring.
   if(L&&q.id==L.sel)s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".18 .12"/>`});
 // (new) Move previews: a dashed line in the player's color from the origin to the new spot (with a ghost Star in the player's color at half strength, full-strength dashed border) or to the target of a capture; the selected one gets a dashed ring.
@@ -826,13 +871,31 @@ function boardSVG(S,ctl,L){let s='';
  if(L&&L.atk&&Array.isArray(L.atk.att)){const tg=by(L.atk.b);if(tg){L.atk.att.forEach(id=>{const a=by(id);if(!a)return;s+=`<line x1="${a.x}" y1="${a.y}" x2="${tg.x}" y2="${tg.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/><circle cx="${a.x}" cy="${a.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09"/>`});s+=`<circle cx="${tg.x}" cy="${tg.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`}}
 // Put all the shapes into the page, then highlight the active mode button and update the Place label.
  return s}
+// (new) fuelUi(n) = the Fuel gauge in the info row: "Fuel n" and the bar, filled n out of this round's Fuel (acts), so it starts full and empties as Fuel is spent. n is the Fuel left after any multi-attack lines being chosen, so the bar also drops while a multi-attack is set up, and rises again on Cancel, Undo or a cancelled preview. The dashed step lines are rebuilt only when the round's Fuel changes. The fill slides at the Animations speed (animMs; none when Animations are off or reduced motion is on), see fuelGo.
+let fuelTot=-1,fuelPct=-1,fuelPos=null,fuelRaf=0;
+// (new) fuelGo(to,ms) slides the Fuel bar to fraction `to` of its width in ms. x = the flat end of the bar (#ffill), c = the end of the crescent or cap. Fuel dropping: the flat end leads; the crescent stays put until the flat end reaches the bottom of its hollow (D = 8 px), then is pulled along with its hollow at the flat end; when the flat end stops, the crescent keeps going until it is hidden under the bar again. Fuel rising: the rounded cap leads, up to D ahead of the flat end, which catches up after the cap stops. ms = 0 jumps straight there. A change while sliding starts from where the bar is.
+function fuelGo(to,ms){cancelAnimationFrame(fuelRaf);const F=$('ffill'),C=$('fcres'),K=$('fcap'),draw=(x,c,dir)=>{F.style.width=x*100+'%';C.style.width=(dir=='dn'?c:0)*100+'%';K.style.width=(dir=='up'?c:0)*100+'%'};
+const p=fuelPos;if(!p||ms<=0){fuelPos={x:to,c:to,dir:''};return draw(to,to,'')}
+const x0=p.dir=='up'?Math.max(p.x,p.c):p.x,dir=to<x0?'dn':'up',c0=dir=='dn'&&p.dir=='dn'?p.c:x0,t0=performance.now(),cm=Math.max(120,ms*.5),ease=t=>t<.5?2*t*t:1-Math.pow(2-2*t,2)/2,out=t=>1-(1-t)*(1-t);
+let x=x0,c=c0,s=null;
+const step=now=>{const D=8/($('fbar').clientWidth||100),t=Math.min(1,(now-t0)/ms),lead=x0+(to-x0)*ease(t);
+if(dir=='dn'){if(t<1){x=lead;c=Math.min(c,x+D)}else{x=to;if(s==null)s=Math.min(c,to+D);c=s+(to-s)*out(Math.min(1,(now-t0-ms)/cm))}}
+else{if(t<1){c=lead;x=Math.max(x,c-D)}else{c=to;if(s==null)s=Math.max(x,to-D);x=s+(to-s)*out(Math.min(1,(now-t0-ms)/cm))}}
+fuelPos={x,c,dir};draw(x,c,dir);if(now-t0<ms+cm)fuelRaf=requestAnimationFrame(step);else{fuelPos={x:to,c:to,dir:''};draw(to,to,'')}};
+fuelRaf=requestAnimationFrame(step)}
+function fuelUi(n){const tot=Math.max(1,acts(G.round),n),pct=Math.max(0,Math.min(100,n/tot*100));$('fueln').textContent='Fuel '+n;$('fuel').style.visibility='';
+if(tot!=fuelTot){fuelTot=tot;let h='';for(let k=1;k<tot;k++)h+='<i style="left:'+(k/tot*100)+'%"></i>';$('fdiv').innerHTML=h}
+if(pct==fuelPct)return;const ms=fuelPct<0||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)?0:animMs();fuelPct=pct;fuelGo(pct/100,ms)}
 // persist() autosaves the game in the browser (silently ignores errors).
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 // render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
-function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur();
-W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';document.querySelectorAll('#modes [data-m]').forEach(b=>{b.classList.toggle('act',b.dataset.m==mode);if(b.dataset.m=='p')b.textContent='Place '+(G.pool||0)});
-// Fill the info row: player name, round, Fuel left.
- $('info').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span><span>Fuel ${G.ap}</span>${net.on?`<span style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;
+// (new) rs = the selected Star in Stars mode (its Fuel range is outlined). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
+function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null&&!pend?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
+if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;
+$('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
+W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';document.querySelectorAll('#modes [data-m]').forEach(b=>{b.classList.toggle('act',b.dataset.m==mode);if(b.dataset.m=='p')b.textContent='Place '+(G.pool||0)});
+// Fill the info row: player name, round (and online status); Fuel left goes to the gauge (fuelUi).
+ $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(fl);
 // Fill the score chips: one per player with VP and star count.
  $('chips').innerHTML=G.pl.map(c=>`<div class="chip ${c==me&&!G.over?'on':''} ${G.alive[c]?'':'dead'} ${net.on&&!seatUp(c)?'off':''}" style="--c:${COL[c]}">${chipIn(c,vp[c],G.alive[c],G.rank[c])}</div>`).join('');
 // (new) Online: after every redraw, send changes to the other players if this device is in charge of the turn. Then, if a computer player has the turn here, schedule its next move.
@@ -901,8 +964,8 @@ $('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=fit;
 mode=m;resetFlow();if(m=='x'){multi={t:null,att:[],step:'target'};say('Multi-attack: tap an enemy Star as the target.')}else say('');render()}};
 // End turn button: if Fleets are unplaced and could be placed, warn before ending; otherwise end the turn.
 // (changed) End turn is blocked while the defender is choosing.
-// (changed) End turn is refused while the turn is unfinished (see endBlock): every Fleet must be placed and every Fuel used, whenever that is still possible.
-$('en').onclick=()=>{if(G&&G.over)return overDlg();if(lock())return;if(pend&&pend.ph)return say('Finish the Defence call first.');const e=endBlock();if(e)return say(e);endTurn()};
+// (changed) End turn is refused while the turn is unfinished (see endBlock): every Fleet must be placed and every Fuel used, whenever that is still possible. (new) A refused tap also points at what is left (endHint).
+$('en').onclick=()=>{if(G&&G.over)return overDlg();if(lock())return;if(pend&&pend.ph)return say('Finish the Defence call first.');const e=endBlock();if(e){say(e);return endHint()}endTurn()};
 // Undo button: restore the last saved state.
 // (changed) Undo first checks for a half-finished attack: it just cancels it (nothing was applied or paid yet). Otherwise it restores the last snapshot as before.
 $('un').onclick=()=>{if(lock())return;
@@ -1418,7 +1481,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-24-c';
+const BUILD='2026-10-25-f';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
