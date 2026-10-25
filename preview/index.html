@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-25-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-25-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -84,7 +84,13 @@ button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;bor
 #en:active:not(:disabled),#mcf:active:not(:disabled){background:var(--acc-press)}#modes .act:active:not(:disabled){background:var(--sel-press)}
 #en:disabled,#mcf:disabled,#modes button:disabled{background:var(--dis);color:var(--dis-ink);border-color:var(--line);cursor:not-allowed}
 /* (new) #en.nogo: End turn while the turn cannot end yet (see endBlock): faded, with darker diagonal stripes over the button color. It stays tappable so a tap can say why and point at what is left (endHint). */
-#en.nogo,#en.nogo:hover,#en.nogo:active{background:var(--acc) repeating-linear-gradient(135deg,transparent 0 7px,rgba(0,0,0,.32) 7px 11px);opacity:.6}
+#en.nogo,#en.nogo:hover,#en.nogo:active,#mcf.nogo,#mcf.nogo:hover,#mcf.nogo:active{background:var(--acc) repeating-linear-gradient(135deg,transparent 0 7px,rgba(0,0,0,.32) 7px 11px);opacity:.6}
+/* (new) .flick: a refused End turn or multi-attack Confirm flickers dark a few times. */
+@keyframes flk{50%{filter:brightness(.3)}}.flick{animation:flk .15s ease-in-out 4}
+/* (new) #mbar: during a multi-attack the mode row is swapped for two boxes shaped like the mode buttons (see uiMulti). #mbt = the target's Strength, in its owner's color; #mba = the attackers' combined Strength, in the attacker's color, dimmed until it beats the target, then bright with a ring (.win). Empty boxes are dulled. */
+#mbar{display:none;gap:6px;margin-top:6px}#mbar>div{flex:1;min-height:38px;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;background:var(--dis);opacity:.55;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;text-shadow:0 0 3px #000,0 0 2px #000}
+#mbar>div.on{background:var(--c);opacity:1}#mba.on{filter:brightness(.7)}#mba.win{filter:brightness(1.2);border:2px solid var(--ink)}
+:root[data-theme="cgreen"] #mbar>div,:root[data-theme="ccyan"] #mbar>div,:root[data-theme="corange"] #mbar>div{border-radius:0}
 /* (new) svg .hint: the dashed rings End turn puts on Stars that can still use Fuel; they stay for 1 second, then fade out. */
 svg .hint{animation:hintf 1.4s linear forwards}@keyframes hintf{0%,71%{opacity:1}100%{opacity:0}}@media(prefers-reduced-motion:reduce){svg .hint{animation:none}}
 button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
@@ -171,7 +177,7 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
 </style></head><body>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
-<div id="top"><div id="info"></div><div id="chips"></div><div id="tvp"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button data-m="x">Multi</button></div></div>
+<div id="top"><div id="info"></div><div id="chips"></div><div id="tvp"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button data-m="x">Multi</button></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
@@ -433,8 +439,9 @@ function mcUse(id,n){$('ov').style.display='none';const x=multi.att.find(q=>q.id
 // mcRemove(id) removes an attacker from the multi-attack.
 function mcRemove(id){$('ov').style.display='none';multi.att=multi.att.filter(q=>q.id!=id);say(multiMsg('Removed.'));render()}
 // multiGo() is the Confirm button. Needs 2+ attackers. If their strength with the Fleets chosen does not beat the target it only shows a message (no popup): add more Stars or Fleets, or Cancel. Otherwise the attack starts.
-function multiGo(){if(!multi||multi.t==null||pend)return;if(isAlly(by(multi.t).o))return say('That Star belongs to a teammate. Cancel the multi-attack.');if(multi.att.length<2)return say('Add at least 2 attackers.');const st=multiStats();
-if(st.sCom<=st.cb)return say('Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'. Add more Stars or Fleets, or Cancel.');
+// (new) A Confirm that can't go yet flickers dark (flickB) and blinks the box that needs something: the target box with no target or not enough Strength, the attackers' box with fewer than 2 attackers.
+function multiGo(){if(!multi||pend)return;if(multi.t==null){flickB($('mcf'));blinkB($('mbt'));return say('Tap an enemy Star as the target.')}if(isAlly(by(multi.t).o))return say('That Star belongs to a teammate. Cancel the multi-attack.');if(multi.att.length<2){flickB($('mcf'));blinkB($('mba'));return say('Add at least 2 attackers.')}const st=multiStats();
+if(st.sCom<=st.cb){flickB($('mcf'));blinkB($('mbt'));return say('Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'. Add more Stars or Fleets, or Cancel.')}
 multiStart()}
 // multiStart() re-checks everything, builds pend (a list of attackers with their own committed Fleets and line cost) and hands over to resolve, exactly like a single attack.
 function multiStart(){const b=by(multi.t),att=multi.att.map(x=>({a:x.id,use:x.use||0,c:cost(by(x.id),b)})),c=att.reduce((t,x)=>t+x.c,0),tot=att.reduce((t,x)=>t+cs(by(x.a))+x.use,0);
@@ -442,9 +449,13 @@ if(tot<=str(b)){multi.step='sel';return say('Not enough strength.')}if(c>G.ap){m
 $('ov').style.display='none';multi.step='defend';pend={b:b.id,att};resolve()}
 // multiCancel() is the Cancel button (and the Esc key): clear everything, leave Multi mode, nothing was spent or changed.
 function multiCancel(){if(!multi||pend)return;resetFlow();mode='s';say('Multi-attack cancelled. Nothing was changed.');render()}
-// uiMulti() shows Cancel and Confirm (and hides End turn) while attackers are being chosen; Confirm is enabled only when it could win.
+// uiMulti() shows Cancel and Confirm (and hides End turn) while attackers are being chosen. (changed) Confirm stays tappable but gets the striped "not yet" look (nogo) until the attack could win (2+ attackers, stronger than the target); a tap then explains why (multiGo). (new) While a multi-attack exists the mode row is replaced by the two Strength boxes (#mbar): the target's Strength in its owner's color, and the attackers' combined Strength (connections + Fleets chosen) in the attacker's color, bright (.win) once it beats the target. Cancel is then the way out of Multi.
 function uiMulti(){const on=!!multi&&!pend;$('mcx').style.display=on?'block':'';$('mcf').style.display=on?'block':'';$('en').style.display=on?'none':'';
-if(on){const ok=multi.t!=null&&multi.att.length>=2;$('mcf').disabled=!ok}}
+const t=multi&&multi.t!=null?by(multi.t):null,st=t?multiStats():null;
+if(on){$('mcf').disabled=false;$('mcf').classList.toggle('nogo',!(st&&multi.att.length>=2&&st.sCom>st.cb))}
+$('modes').style.display=multi?'none':'';$('mbar').style.display=multi?'flex':'';if(!multi)return;
+const T=$('mbt'),A=$('mba'),has=!!t&&multi.att.length>0;T.className=t?'on':'';T.style.setProperty('--c',t?COL[t.o]:'transparent');T.textContent=t?'Strength '+st.cb:'';
+A.className=has?'on'+(st.sCom>st.cb?' win':''):'';A.style.setProperty('--c',COL[cur()]);A.textContent=has?'Strength '+st.sCom:''}
 // resolve(A) runs once an attack is paid for with A committed Fleets. It now only gathers facts, then hands the defender's Fleets to the choice loop (defNext) below. Nothing on the board changes yet.
 function resolve(A){$('ov').style.display='none';
 // b = the target star, D = its defending Fleets, def = the defender's color, nb = retreat spots: the defender's other stars joined to the target by a connection, plus (team game, T3) a living teammate's star joined to it by a Connect link.
@@ -733,10 +744,10 @@ if(G.pool>0&&placeable().length)return 'Place all your Fleets first: '+G.pool+' 
 // (new) endBlockC() = endBlock() remembered for the board it was last asked about, so render can ask it on every redraw without repeating the move search (moveAvail can take up to 400 ms when no move exists).
 let ebKey=null,ebVal='';
 function endBlockC(){const k=JSON.stringify([G.round,G.ti,G.ap,G.pool,G.used,G.stars,G.conns,G.pv||0,G.pm||0]);if(k!==ebKey){ebKey=k;ebVal=endBlock()}return ebVal}
-// (new) endHint() runs when End turn is refused, in the same order as endBlock: with Fuel left it switches to Stars mode (dropping any selection) and blinks the Stars button, puts a fading dashed ring on every Star that can still use the Fuel (moveStars, see HINT_MS and CSS .hint) and blinks End turn; otherwise, with Fleets left to place, it switches to Place mode and blinks the Place button. Pending move previews only get the message.
-const HINT_MS=1400,blinkB=b=>{if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}};
+// (new) endHint() runs when End turn is refused, in the same order as endBlock: with Fuel left it switches to Stars mode (dropping any selection) and blinks the Stars button, puts a fading dashed ring on every Star that can still use the Fuel (moveStars, see HINT_MS and CSS .hint) and flickers End turn dark; otherwise, with Fleets left to place, it switches to Place mode and blinks the Place button. Pending move previews only get the message.
+const HINT_MS=1400,blinkB=b=>{if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}},flickB=b=>{if(b){b.classList.remove('flick');void b.offsetWidth;b.classList.add('flick')}};
 function endHint(){if(G.pv&&G.pv.length)return;const ids=G.ap>0?moveStars():[];
-if(ids.length){if(mode!='s'){mode='s';resetFlow()}else sel=null;const h={ids,t:Date.now()};hint=h;blinkB(document.querySelector('#modes [data-m="s"]'));blinkB($('en'));render();return setTimeout(()=>{if(hint===h){hint=null;render()}},HINT_MS)}
+if(ids.length){if(mode!='s'){mode='s';resetFlow()}else sel=null;const h={ids,t:Date.now()};hint=h;blinkB(document.querySelector('#modes [data-m="s"]'));flickB($('en'));render();return setTimeout(()=>{if(hint===h){hint=null;render()}},HINT_MS)}
 if(G.pool>0&&placeable().length){if(mode!='p'){mode='p';resetFlow()}blinkB(document.querySelector('#modes [data-m="p"]'));return render()}}
 // (new) moveStars() = the ids of the current player's Stars that can still make a move costing Fuel, for the End turn hint. Same checks as moveAvail, but star by star: take, connect, one of two Stars in a two-Star multi-attack, claim an empty system. Gives up after 400 ms and returns what it found so far.
 function moveStars(){if(!G||G.ap<1)return [];const me=cur(),mine=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id)),out=new Set(),t0=Date.now(),linked=(a,b)=>G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id));
@@ -1446,7 +1457,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-25-b';
+const BUILD='2026-10-25-c';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
