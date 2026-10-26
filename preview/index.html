@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-26-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-26-e",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -57,15 +57,15 @@ body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg
 #fcres{-webkit-mask-image:radial-gradient(circle 6.25px at calc(100% - 1.75px) 50%,transparent 97%,#000 100%);mask-image:radial-gradient(circle 6.25px at calc(100% - 1.75px) 50%,transparent 97%,#000 100%)}
 /* #chips: the row of player score boxes. */
 #chips{display:flex;gap:6px;margin-top:6px}
-/* .chip: one player's box (border, rounded corners, layout). */
-.chip{flex:1;border:2px solid var(--line);border-radius:8px;padding:3px 6px;font-size:11.5px;line-height:1.25;display:flex;align-items:center;gap:5px;min-width:0}
+/* .chip: one player's box (border, rounded corners, layout). (new) Its background is a dull tint of the player's color (10% over the panel) with the theme border; the active player's chip (.on) gets the round-screen chip look: 22% tint and a border in the player's color (see .pchip). */
+.chip{flex:1;border:2px solid var(--line);border-radius:8px;padding:3px 6px;font-size:11.5px;line-height:1.25;display:flex;align-items:center;gap:5px;min-width:0;background:color-mix(in srgb,var(--c) 10%,var(--panel))}
 .chip .ct{display:flex;flex-direction:column;min-width:0;flex:1}.chip .ct span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chip .ct span+span{color:var(--mut)}
 /* .chip i: the small colored dot inside a chip. */
 .chip i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
 /* .chip small: the star count text, pushed to the right and dimmed. */
 .chip small{color:var(--mut);margin-left:auto}
 /* .chip.on: outline in the player's color for whoever's turn it is; .chip.dead: faded and crossed out when eliminated. */
-.chip.on{border-color:var(--c)}.chip.dead{opacity:.4;text-decoration:line-through}
+.chip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,var(--panel))}.chip.dead{opacity:.4;text-decoration:line-through}
 /* (step 7) #tvp: the team totals line under the player chips (team games only; empty = hidden). */
 #tvp{font-size:12px;color:var(--mut);margin-top:4px}#tvp:empty{display:none}
 /* #modes: the row of three mode buttons (Stars, Place, Move); .act marks the selected one. */
@@ -122,7 +122,7 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* (new) Reveals (round and end screens): #ov.rvh hides the dialog layer while it waits for the board to zoom out. .scr = a number being scrambled: its real digits are see-through and data-s is drawn over them, right-aligned. */
 #ov.rvh{opacity:0}
 /* (new) .pchip: a player line on the round and end screens drawn as a player chip: a border in the player's color (--c) around a dull tint of it (22% of the color over the panel; plain panel on browsers without color-mix). Placeholder look, the place for chip cosmetics later. */
-.pchip{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;border:2px solid var(--c);border-radius:8px;background:var(--panel);background:color-mix(in srgb,var(--c) 22%,var(--panel));color:var(--ink)}
+.ord{min-width:30px;font-weight:700}.pchip{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;border:2px solid var(--c);border-radius:8px;background:var(--panel);background:color-mix(in srgb,var(--c) 22%,var(--panel));color:var(--ink)}
 :root[data-theme="cgreen"] .pchip,:root[data-theme="ccyan"] .pchip,:root[data-theme="corange"] .pchip{border-radius:0}.scr{position:relative;color:transparent}.scr::after{content:attr(data-s);position:absolute;right:0;top:0;color:var(--ink)}
 /* (new) #ov2: a second dialog layer drawn ON TOP of #ov. The color picker and the name box open here, so the page that opened them stays underneath (dimmed) and is not replaced. It copies the look of #ov and its box. */
 #ov2{position:fixed;inset:0;z-index:6;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
@@ -636,8 +636,8 @@ function calc(S){S=S||G;const Z=S.sz||7,mid=(Z-1)/2,ctl=[...Array(Z)].map(()=>Ar
  for(let i=0;i<Z;i++){const r=ctl[i][0];if(r>=0&&ctl[i].every(v=>v==r))vp[r]++;const c=ctl[0][i];if(c>=0&&ctl.every(q=>q[i]==c))vp[c]++}
 // Eliminated players score 0. Return both results.
  S.pl.forEach(c=>{if(!S.alive[c])vp[c]=0});return{ctl,vp}}
-// elim() checks eliminations. c0 remembers whose turn it is. Anyone alive with no stars is killed and noted in a message.
-function elim(){const c0=cur();let m='';G.pl.forEach(c=>{if(G.alive[c]&&!G.stars.some(s=>s.o==c)){kill(c);m+=' '+NM[c]+' is eliminated.'}});
+// elim() checks eliminations. c0 remembers whose turn it is. Anyone alive with no stars is killed and noted in a message. (new) c0 took their last Star (only the player whose turn it is can take Stars), so it is recorded as G.out[c].by and named ('Orange is eliminated by Blue.'); kept for personal-elimination stats later. A player who gives their own last Star away (team Gift) has no by.
+function elim(){const c0=cur();let m='';G.pl.forEach(c=>{if(G.alive[c]&&!G.stars.some(s=>s.o==c)){kill(c);if(c0!=c)G.out[c].by=c0;m+=' '+NM[c]+' is eliminated'+(c0!=c?' by '+NM[c0]:'')+'.'}});
 // Remove the dead from the turn order, keep the turn pointer on the same player, finish the game if fewer than 2 remain, return the message.
  G.order=G.order.filter(c=>G.alive[c]);G.ti=Math.max(0,G.order.indexOf(c0));if(sidesLeft()<2)finish();return m}
 // (T4) winners(vp) = who wins if the game ends now with the scores vp (RULES.md 8.1, 8.2, 9.2), without changing anything, so the end of round 30 and of every overtime round can ask it first (see endTurn). al = alive players. sys(c) = how many stars (systems) color c has.
@@ -685,18 +685,19 @@ async function transCopy(){lm(await copyText(transTxt)?'Copied.':'Copying is blo
 async function transSave(btn){const name='constellate-transcription-'+(G.gid||'game')+'.txt';try{if(dl){await dl.save({filename:name,data:transTxt})}else{const u=URL.createObjectURL(new Blob([transTxt],{type:'text/plain'})),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}btn.textContent='Saved'}catch(e){btn.textContent='Save failed'}}
 // (changed, turn and round transitions) overDlg(anim): anim = the game has just ended (finish, or the final position arriving online), so the screen plays its reveal (endSeq): it waits for the board to zoom out, opens at the size of the result and the player lines, shows the result, writes the player lines downward one at a time (color dot first, in the button text color), then grows downward to show the buttons. Opened again later (Menu, a loaded finished game, Back from Transcribe) it simply appears. Each player who is out shows X and why (outX).
 function overDlg(anim){overHidden=false;const {vp}=calc(),top=G.over,sys=c=>starsTxt(nStars(c));let head,sub='',body;
-// (new) erow(c,t,ind) = one player line on the end screen, as a player chip (pchip): color dot, text t, why when out; ind = indented under a team line. trow(t) = a team's line.
-const erow=(c,t,ind)=>'<div class="erow pchip" style="'+pchipS(c)+(ind?';margin-left:14px':'')+'">'+dotH(c,12)+'<span>'+t+'</span>'+(G.alive[c]?'':outX(c))+'</div>',trow=t=>'<div class="erow" style="margin:8px 0 2px;color:var(--ink);font-weight:700">'+t+'</div>';
+// (new) erow(c,t,ind,r) = one player line on the end screen, as a player chip (pchip): rank r (1st, 2nd; '–' when out; none for a team member, the team line has it), color dot, text t, why when out; ind = indented under a team line. trow(t) = a team's line.
+const erow=(c,t,ind,r)=>'<div class="erow pchip" style="'+pchipS(c)+(ind?';margin-left:14px':'')+'">'+(ind?'':ordH(r))+dotH(c,12)+'<span>'+t+'</span>'+(G.alive[c]?'':outX(c))+'</div>',trow=t=>'<div class="erow" style="margin:8px 0 2px;color:var(--ink);font-weight:700">'+t+'</div>';
 const btn='<div class="ovft" style="margin-top:14px">'+(!net.on||net.role=='host'?'<div class="r" style="margin-bottom:8px"><button onclick="rematch()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Instant rematch</button></div>':'')+'<div class="r"><button onclick="saveFile(this)">Save file</button><button onclick="newGame()">New game</button><button onclick="hvOpen()">History</button></div><div class="r" style="margin-top:8px">'+(G.pm=='fixed'?'<button onclick="transDlg()">Transcribe Game</button>':'')+'<button onclick="overHide()">Hide this screen</button></div></div>';
 // (step 6) Team game: 'Team N wins' (with its members and why); the scores are grouped by team, each team with its combined VP and Stars. (T4) via = the leaders were tied on VP and the Stars tiebreaker decided: the title says 'wins via Stars'. A tie that is left after the tiebreaker is a 'Perfect Tie!' (Stars equal); it can end a game only through End game, since otherwise overtime follows. A game won in overtime says in which round.
 const tie='<p style="margin:0 0 8px">The game was ended before the tie was broken.</p>';
-if(teamsOn()){const wt=[...new Set(top.map(teamOf))],ts=[...new Set(G.pl.map(teamOf))].sort((a,b)=>teamVp(b,vp)-teamVp(a,vp)||a-b),nm=l=>l.map(c=>NM[c]).join(' and '),m=Math.max(...ts.map(t=>teamVp(t,vp))),via=wt.length==1&&sidesLeft()>1&&ts.filter(t=>teamVp(t,vp)==m).length>1;
+if(teamsOn()){const wt=[...new Set(top.map(teamOf))],tk=t=>(wt.includes(t)?1e6:0)+teamVp(t,vp)*100+teamStars(t),ts=[...new Set(G.pl.map(teamOf))].sort((a,b)=>tk(b)-tk(a)||a-b),nm=l=>l.map(c=>NM[c]).join(' and '),m=Math.max(...ts.map(t=>teamVp(t,vp))),via=wt.length==1&&sidesLeft()>1&&ts.filter(t=>teamVp(t,vp)==m).length>1;
 if(wt.length>1){head='Perfect Tie!';sub='<p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p>'+tie}else{head='Team '+wt[0]+' wins'+(via?' via Stars':'');sub='<p style="margin:0 0 8px">'+nm(top)+(sidesLeft()<2?' (the only team left).':'.')+(via?' Tied on combined VP, so the combined Stars of living players broke the tie.':'')+'</p>'}
-body=ts.map(t=>trow('Team '+t+': '+teamVp(t,vp)+' VP, '+starsTxt(teamStars(t)))+G.pl.filter(c=>teamOf(c)==t).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c),1)).join('')).join('')}
+body=ts.map(t=>trow(ordTxt(1+ts.filter(u=>tk(u)>tk(t)).length)+' Team '+t+': '+teamVp(t,vp)+' VP, '+starsTxt(teamStars(t)))+G.pl.filter(c=>teamOf(c)==t).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c),1)).join('')).join('')}
 else{const al=G.pl.filter(c=>G.alive[c]),m=Math.max(...al.map(c=>vp[c])),via=top.length==1&&al.filter(c=>vp[c]==m).length>1;
 head=top.length==1?NM[top[0]]+' wins'+(via?' via Stars':''):'Perfect Tie!';if(top.length>1)sub='<p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p>'+tie;else if(via)sub='<p style="margin:0 0 8px">Tied on VP, so the Stars each player controls broke the tie.</p>';
 // (changed) Players are listed best first: winners, then the others by VP and Stars, then those who are out.
-const rk=c=>(G.alive[c]?0:1e6)-(top.includes(c)?1e5:0)-vp[c]*100-nStars(c);body=G.pl.slice().sort((a,b)=>rk(a)-rk(b)).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c))).join('')}
+// (new) Each line starts with the final rank: 1 + the living players placed strictly above (tied players share a rank).
+const rk=c=>(G.alive[c]?0:1e6)-(top.includes(c)?1e5:0)-vp[c]*100-nStars(c);body=G.pl.slice().sort((a,b)=>rk(a)-rk(b)).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c),0,G.alive[c]?1+G.pl.filter(d=>G.alive[d]&&rk(d)<rk(c)).length:0)).join('')}
 if(G.round>30&&clearWin(top))sub+='<p style="margin:0 0 8px">Decided in '+rdName(G.round)+'.</p>';
 ov('<h1>'+head+'</h1>'+sub+'<div class="erl">'+body+'</div>'+btn);if(anim)endSeq()}
 // tap(bx,by) runs when the board is tapped, in board units. cx,cy = the system column and row. Do nothing without a game or after it ends.
@@ -810,8 +811,8 @@ return out}
 function roundPop(){
 // (new) When only computer players are left in the game there is nobody to tap the popup, so the next round just begins.
 if(allCpu())return;
-// row(c) builds one player's line as a player chip (pchip), left-aligned like the end screen: color dot, name, rank, "VP:" and score (the score is a .scr number, see rpSeq), or why a player is out (outX). (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
-const ot=G.round>30,row=c=>`<div class="rrow pchip" data-c="${c}" style="${pchipS(c)}">${dotH(c,teamsOn()?18:12)}<b>${NM[c]}</b>${G.alive[c]?`<span class="rk">Rank ${G.rank[c]}</span><span>VP: <span class="scr" data-s="">${G.score[c]||0}</span></span>${ot?`<span>${starsTxt(nStars(c))}</span>`:''}`:outX(c)}</div>`;
+// row(c) builds one player's line as a player chip (pchip), left-aligned like the end screen: rank (1st, 2nd; it fades in as the lines slide), color dot, name, "VP:" and score (the score is a .scr number, see rpSeq), or why a player is out (outX). (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
+const ot=G.round>30,row=c=>`<div class="rrow pchip" data-c="${c}" style="${pchipS(c)}"><span class="rk">${ordH(G.alive[c]&&G.rank[c])}</span>${dotH(c,teamsOn()?18:12)}<b>${NM[c]}</b>${G.alive[c]?`<span>VP: <span class="scr" data-s="">${G.score[c]||0}</span></span>${ot?`<span>${starsTxt(nStars(c))}</span>`:''}`:outX(c)}</div>`;
 // (new) notes = one warning line under the players for everyone eliminated in the round that just ended (outWhy).
 const notes=G.pl.filter(c=>!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==G.round-1).map(c=>'<p class="rnote" style="color:var(--warn);font-weight:600;margin:8px 0 0">'+outWhy(c)+'</p>').join('');
 // Show the dialog: alive players in turn order first, then eliminated players. (T4) An overtime round only starts after a round that ended in a Perfect Tie (VP and Stars equal), so its popup says so and explains the tiebreak (otRules) under the round name. (new) .ovft = the part the window uncovers last.
@@ -1076,9 +1077,9 @@ if(n.pl.some(c=>n.alive[c]&&!I(n.rank[c],1,4)))bad('The ranks are invalid.');
 if(!n.pl.includes(n.first))n.first=n.order[0];
 // history is a separate optional field: it is checked by prepHist and kept outside the game state; a game id must be a short text.
 delete n.history;if(n.gid!=null&&(typeof n.gid!='string'||n.gid.length>40))delete n.gid;
-// (new) Turn and round transitions: po / lo = the turn order this round / the last round started with, out = {color: {w: why ('d' Deficit, 'z' no Stars left, 'c' conceded), r: round}} for eliminated players. They only change what the round and end screens show, so a bad value is dropped instead of refusing the file (older saves have none).
+// (new) Turn and round transitions: po / lo = the turn order this round / the last round started with, out = {color: {w: why ('d' Deficit, 'z' no Stars left, 'c' conceded), r: round, by: who took the last Star (only with 'z')}} for eliminated players. They only change what the round and end screens show, so a bad value is dropped instead of refusing the file (older saves have none).
 ['po','lo'].forEach(f=>{if(n[f]!=null&&(!Array.isArray(n[f])||n[f].length>4||new Set(n[f]).size!=n[f].length||n[f].some(c=>!n.pl.includes(c))))delete n[f]});
-if(n.out!=null){const o={};if(typeof n.out=='object'&&!Array.isArray(n.out))n.pl.forEach(c=>{const e=n.out[c];if(e&&typeof e=='object'&&['d','z','c'].includes(e.w)&&I(e.r,1,RMAX)&&!n.alive[c])o[c]={w:e.w,r:e.r}});if(Object.keys(o).length)n.out=o;else delete n.out}
+if(n.out!=null){const o={};if(typeof n.out=='object'&&!Array.isArray(n.out))n.pl.forEach(c=>{const e=n.out[c];if(e&&typeof e=='object'&&['d','z','c'].includes(e.w)&&I(e.r,1,RMAX)&&!n.alive[c]){o[c]={w:e.w,r:e.r};if(e.w=='z'&&n.pl.includes(e.by)&&e.by!==c)o[c].by=e.by}});if(Object.keys(o).length)n.out=o;else delete n.out}
 return n}
 // loadObj(o) loads a game: validate first (prepG), then replace the live game and reset every half-finished interaction.
 function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='s';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';camKey=null;fit();say('Game loaded');render();
@@ -1506,7 +1507,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-26-d';
+const BUILD='2026-10-26-e';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1678,12 +1679,14 @@ camStop();const F=camFit();view.min=F.min;camGo(F,camMs(),()=>{if(G&&!G.over)cam
 // camIn() zooms in on the player whose turn it is (camBox); not for a computer while CPU speed is Instant (its turn is over before the camera would arrive).
 function camIn(){camWait=false;if(!G||G.over||calm())return;const c=cur();if(cpuOf(c)&&cpuMs==0)return;const t=camBox(c);if(t)camGo(t,camMs())}
 // ----- Why a player is out (round and end screens) -----
-// outX(c) = why player c is out, in the warning color: Deficit, No Stars (lost every Star) or Conceded (Shmorden's words, 2026-10-26; G.out, see kill). A game saved before build 2026-10-26-c has no reason and shows Out (placeholder).
+// outX(c) = why player c is out, in the warning color: Deficit, Eliminated (lost every Star; 'Eliminated by Blue' when Blue took the last one) or Conceded (Shmorden's words, 2026-10-26; G.out, see kill). A game saved before build 2026-10-26-c has no reason and shows Out (placeholder).
 // pchipS(c) = the style that makes a line a player chip (class pchip: a border in the player's color around a dull tint of it); one place, so chip cosmetics can be added later.
 const pchipS=c=>'--c:'+COL[c];
-const outX=c=>{const o=G.out&&G.out[c];return '<b style="color:var(--warn)">'+(o?{d:'Deficit',z:'No Stars',c:'Conceded'}[o.w]:'Out')+'</b>'};
+// ordTxt(n) = 1st, 2nd, 3rd, 4th: the rank at the start of each line on the round and end screens (.ord keeps the column the same width; '–' for a player who is out).
+const ordTxt=n=>n+(n==1?'st':n==2?'nd':n==3?'rd':'th'),ordH=n=>'<span class="ord">'+(n?ordTxt(n):'–')+'</span>';
+const outX=c=>{const o=G.out&&G.out[c];return '<b style="color:var(--warn)">'+(o?{d:'Deficit',z:'Eliminated',c:'Conceded'}[o.w]+(o.by!=null?' by '+NM[o.by]:''):'Out')+'</b>'};
 // outWhy(c) = the sentence the round screen shows under the players in the round c went out (wording from RULES.md 7.2, 7.4, 7.5; placeholder).
-const outWhy=c=>{const w=G.out&&G.out[c]&&G.out[c].w;return NM[c]+(w=='d'?' eliminated by Deficit Elimination: more than 3 VP behind the next score above.':w=='c'?' conceded and is eliminated.':' eliminated: no Stars left.')};
+const outWhy=c=>{const w=G.out&&G.out[c]&&G.out[c].w;return NM[c]+(w=='d'?' eliminated by Deficit Elimination: more than 3 VP behind the next score above.':w=='c'?' conceded and is eliminated.':G.out[c].by!=null?' eliminated by '+NM[G.out[c].by]+', who took their last Star.':' eliminated: no Stars left.')};
 // ----- Reveals: a dialog whose parts appear one after another -----
 // seq = the reveal playing now: t = its timers, left = steps not yet run, a = its animations, x = stop functions (number scrambles), skip = jumping to the end. seqRun(steps) plays steps = [{at: ms from now, fn(s)}]. seqSkip() jumps a playing reveal to its end (a tap, a new dialog, closing it) and says whether there was one: the steps left run at once with s.skip set (so they only set their final look) and every animation stops; each part's final look is its plain style, so nothing is left half done.
 let seq=null;
