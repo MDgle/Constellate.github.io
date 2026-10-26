@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-26-h",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-26-i",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -333,7 +333,7 @@ if(team&&!teamErr(pl,team,cpu)){G.team={};pl.forEach(c=>{G.team[c]=team[c]})}
 // Start the first turn, clear selection and undo, hide the dialog, fit the board to the screen, announce the first player, draw.
  mode='s';resetFlow();G.rank=rankSnap({});G.po=G.order.slice();beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');
 // (new) A new game starts a fresh history with its first snapshot (round 1, before any turn).
-overHidden=false;H=newHist();histSnap('s');histSave();camKey=null;render();camWait=true;roundPop()}
+overHidden=false;H=newHist();histSnap('s');histSave();camKey=null;camSnap=null;render();camWait=true;roundPop()}
 // sysStar(x,y) finds the star in system column x, row y (or nothing).
 const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
@@ -921,7 +921,7 @@ W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Ma
 // (new) Online: after every redraw, send changes to the other players if this device is in charge of the turn. Then, if a computer player has the turn here, schedule its next move.
 $('tvp').innerHTML=teamLine(vp);
 // (new) Start the turn transition if the turn has changed (camTurn).
- camTurn();camDef();netTick();cpuSched()}
+ camTurn();camDef();camFollow();netTick();cpuSched()}
 // apply() applies the current pan and zoom to the drawing and records the zoom level for CSS.
 // (changed) apply() now batches updates to one per screen frame in touch mode (smoother on iPhone); applyNow() does the real work.
 let rafId=0;function apply(){if(useTouch()&&typeof requestAnimationFrame=='function'){if(!rafId)rafId=requestAnimationFrame(()=>{rafId=0;applyNow()})}else applyNow()}
@@ -1084,7 +1084,7 @@ delete n.history;if(n.gid!=null&&(typeof n.gid!='string'||n.gid.length>40))delet
 if(n.out!=null){const o={};if(typeof n.out=='object'&&!Array.isArray(n.out))n.pl.forEach(c=>{const e=n.out[c];if(e&&typeof e=='object'&&['d','z','c'].includes(e.w)&&I(e.r,1,RMAX)&&!n.alive[c]){o[c]={w:e.w,r:e.r};if(e.w=='z'&&n.pl.includes(e.by)&&e.by!==c)o[c].by=e.by}});if(Object.keys(o).length)n.out=o;else delete n.out}
 return n}
 // loadObj(o) loads a game: validate first (prepG), then replace the live game and reset every half-finished interaction.
-function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='s';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';camKey=null;fit();say('Game loaded');render();
+function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='s';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';camKey=null;camSnap=null;fit();say('Game loaded');render();
 // (new) A finished game opens on its end screen (Save file, New game, History).
 if(G.over)overDlg()}
 // lm(t,err) shows a status line inside the Menu dialog (or the bottom message if the Menu is closed).
@@ -1511,7 +1511,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-26-h';
+const BUILD='2026-10-26-i';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1690,6 +1690,18 @@ let hx=4.5,hy=4.5;P.forEach(q=>{const sx=Math.floor(q.x/3)*3,sy=Math.floor(q.y/3
 const k=Math.max(F.min,Math.min(90,r.width/(2*hx+.2),r.height/(2*hy+.2)));return{k,x:camAx(cx,k,r.width),y:camAx(cy,k,r.height)}}
 // camDef() runs after every redraw (render): when a Defence call is waiting (here or on the defender's device, the same test as the dashed attack lines in render) and it is a new one, the board pans and zooms to camDefView. Once per attack, not per Fleet. Not with Animations off.
 let camDefKey=null;
+// camSnap = what the board looked like at the last redraw: {k: the turn, g: game id, s: Map star id -> owner:Fleets, c: Set of connections}. camFollow() compares it with the board now.
+let camSnap=null;
+// camFollow() runs after every redraw (render): when a computer has just changed the board during its own turn (a Star taken or claimed, Fleets placed or moved, a connection made) and any sector that changed is not fully on screen, the board zooms out (and pans) just enough to bring all of those sectors and what was already on screen into view; it never zooms in. Not at CPU speed Instant, not with Animations off, and not for a change that comes with a turn change (an elimination). The computer waits for it like for any camera move (camBusy).
+function camFollow(){if(!G||G.over){camSnap=null;return}
+const k=G.round+'/'+G.ti+'/'+cur(),sm=new Map(G.stars.map(q=>[q.id,q.o+':'+(q.f||0)])),cs=new Set(G.conns.map(q=>q[0]<q[1]?q[0]+'-'+q[1]:q[1]+'-'+q[0])),old=camSnap;camSnap={k,g:G.gid,s:sm,c:cs};
+if(!old||old.k!=k||old.g!==G.gid||!cpuOf(cur())||cpuMs==0||calm()||camBusy())return;
+const ids=new Set();sm.forEach((v,id)=>{if(old.s.get(id)!==v)ids.add(id)});cs.forEach(x=>{if(!old.c.has(x))x.split('-').forEach(i=>ids.add(+i))});
+const secs=[...ids].map(by).filter(Boolean).map(q=>[Math.floor(q.x/3)*3,Math.floor(q.y/3)*3]);if(!secs.length)return;
+const r=st.getBoundingClientRect(),N=NSYS(G),vx0=Math.max(0,-view.x/view.k),vy0=Math.max(0,-view.y/view.k),vx1=Math.min(N,(r.width-view.x)/view.k),vy1=Math.min(N,(r.height-view.y)/view.k),e=.05;
+if(secs.every(([x,y])=>x>=vx0-e&&y>=vy0-e&&x+3<=vx1+e&&y+3<=vy1+e))return;
+const x0=Math.min(vx0,...secs.map(q=>q[0])),y0=Math.min(vy0,...secs.map(q=>q[1])),x1=Math.max(vx1,...secs.map(q=>q[0]+3)),y1=Math.max(vy1,...secs.map(q=>q[1]+3)),F=camFit(),kk=Math.max(F.min,Math.min(view.k,r.width/(x1-x0+.2),r.height/(y1-y0+.2)));
+camStop();camGo({k:kk,x:camAx((x0+x1)/2,kk,r.width),y:camAx((y0+y1)/2,kk,r.height)},camMs())}
 function camDef(){const a=(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null;if(!a){camDefKey=null;return}
 const k=a.b+'/'+a.att.join(',')+'/'+G.round+'/'+G.ti;if(k==camDefKey)return;camDefKey=k;if(calm())return;const v=camDefView(a);if(!v)return;camStop();camGo(v,camMs())}
 // camIn() zooms in on the player whose turn it is (camBox); not for a computer while CPU speed is Instant or the Dev switch camCpu is off (it then only zooms out).
@@ -1812,7 +1824,7 @@ if(G.round>oldR&&!G.over)roundPop();if(G.over&&!wasOver)overDlg(1);return ok}
 // applyFull(m) takes a complete copy of the game and history (new game, rejoin, repair).
 function applyFull(m){let g;try{g=prepG(JSON.parse(m.g))}catch(e){return nsend(net.conn,{t:'need'})}
 ov2Close(1);G=g;adoptHistory(m.h);if(m.seats)net.seats=m.seats;net.started=true;net.lobby=false;net.rq=null;net.acting=false;netClearFlow();net.lastG=JSON.stringify(G);net.hsent=H?H.snaps.length:0;
-$('ov').onclick=null;$('ov').style.display='none';camKey=null;fit();if(m.start)camWait=true;say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
+$('ov').onclick=null;$('ov').style.display='none';camKey=null;camSnap=null;fit();if(m.start)camWait=true;say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
 // netAsk(m) arrives on the DEFENDER's device: show the ringed Retreat spots and Hold button, or clear them.
 function netAsk(m){if(!net.my.includes(m.def))return;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,sent:false}:null;
 if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display=net.rq.hOK?'block':'';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX))}else{hl=[];$('hold').style.display='';say('')}render()}
