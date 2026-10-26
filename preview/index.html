@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-26-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-26-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -119,6 +119,8 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* (new) .pop: a dialog opening grows vertically from its middle (scaleY 0 to 1) while fading in. Added by ov() only when the dialog was not already open. */
 #ov>div.pop{transform-origin:50% 50%;animation:ovpop .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes ovpop{from{transform:scaleY(.05);opacity:0}to{transform:scaleY(1);opacity:1}}
+/* (new) Reveals (round and end screens): #ov.rvh hides the dialog layer while it waits for the board to zoom out. .scr = a number being scrambled: its real digits are see-through and data-s is drawn over them, right-aligned. */
+#ov.rvh{opacity:0}.scr{position:relative;color:transparent}.scr::after{content:attr(data-s);position:absolute;right:0;top:0;color:var(--ink)}
 /* (new) #ov2: a second dialog layer drawn ON TOP of #ov. The color picker and the name box open here, so the page that opened them stays underneath (dimmed) and is not replaced. It copies the look of #ov and its box. */
 #ov2{position:fixed;inset:0;z-index:6;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
 #ov2>div{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:20px;max-width:340px;width:100%;max-height:92%;overflow:auto;box-shadow:0 6px 28px rgba(0,0,0,.6)}
@@ -252,10 +254,10 @@ const RMAX=9999,rdName=r=>r<=30?'Round '+r:'Overtime '+(Math.floor((r-31)/30)+1)
 const NSYS=S=>((S&&S.sz)||7)*3;
 // say(t) shows message t in the toast at the bottom of the board; empty text hides it.
 const say=t=>{$('msg').textContent=t||''};
-// ov(h) shows a pop-up dialog containing the HTML text h.
+// ov(h) shows a pop-up dialog containing the HTML text h. (new) It first ends a reveal that is still playing (seqSkip) and unhides the layer (rvh), see Turn and round transitions.
 // (new) ovDir = which way the NEXT ov() call should slide its content in when a dialog that is already open changes page: 1 = from the right (forward / next page), -1 = from the left (back), 0 = no slide. Callers set it just before calling ov(); ov() reads it once and clears it.
 let ovDir=0,ovClosing=null,ovWasClosing=false,ovPrev='';
-function ov(h){const o=$('ov');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=o.firstChild.scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
+function ov(h){const o=$('ov');seqSkip();o.classList.remove('rvh');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=o.firstChild.scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
 o.innerHTML='<div>'+h+'</div>';o.style.display='flex';if(o.dataset)o.dataset.page='';
 // (new) Redrawing the SAME dialog (a tap that changes a choice) keeps its scroll position instead of jumping to the top; a different dialog starts at the top.
 try{const n=o.firstChild;if(top&&was&&n&&n.querySelector&&((n.querySelector('h1')||{}).textContent||'')==was)n.scrollTop=top}catch(e){}
@@ -324,9 +326,9 @@ if(team&&!teamErr(pl,team,cpu)){G.team={};pl.forEach(c=>{G.team[c]=team[c]})}
 // For each player, add a capital star in the middle of its system (the +.5) with a unique id. cap marks it a capital, co remembers who it originally belonged to.
  pl.forEach(c=>{G.alive[c]=true;G.stars.push({id:G.nid++,x:caps[c][0]+.5,y:caps[c][1]+.5,o:c,cap:1,co:c,f:0})});
 // Start the first turn, clear selection and undo, hide the dialog, fit the board to the screen, announce the first player, draw.
- mode='s';resetFlow();G.rank=rankSnap({});beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');
+ mode='s';resetFlow();G.rank=rankSnap({});G.po=G.order.slice();beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');
 // (new) A new game starts a fresh history with its first snapshot (round 1, before any turn).
-overHidden=false;H=newHist();histSnap('s');histSave();render();roundPop()}
+overHidden=false;H=newHist();histSnap('s');histSave();camKey=null;render();camWait=true;roundPop()}
 // sysStar(x,y) finds the star in system column x, row y (or nothing).
 const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
@@ -550,12 +552,12 @@ function teamErr(pl,team,cpu){if(pl.length!=4)return 'Teams need 4 players.';
 if(!team||typeof team!='object'||pl.some(c=>!Number.isInteger(team[c])||team[c]<1||team[c]>3))return 'Every player needs a team from 1 to 3.';
 if(new Set(pl.map(c=>team[c])).size<2)return 'Put the players on at least 2 different teams.';
 if(cpu&&pl.some(c=>cpu[c]&&pl.some(d=>d!=c&&team[d]==team[c])))return 'A computer player has to be alone on its team.';return ''}
-// kill(c,also) eliminates player c: remove their connections and Fleets (their stars stay on the board as leftovers anyone may capture). In a team game, first every star of c that is linked to a star of a LIVING teammate passes to that teammate with its Fleets and its link (a Capital too); a star linked to two teammates goes to the earlier connection in G.conns. Owners are read before anything changes, so a chain of c's stars does not pass along: only a star with a direct link counts. also = players eliminated in the same moment (deficit can drop two at once): they cannot receive gifts. Returns the gifts as [{id, to}] (nothing without teams). Fix: a connection is removed when EITHER end belongs to c (it used to look at the first end only).
+// kill(c,also) eliminates player c: remove their connections and Fleets (their stars stay on the board as leftovers anyone may capture). In a team game, first every star of c that is linked to a star of a LIVING teammate passes to that teammate with its Fleets and its link (a Capital too); a star linked to two teammates goes to the earlier connection in G.conns. Owners are read before anything changes, so a chain of c's stars does not pass along: only a star with a direct link counts. also = players eliminated in the same moment (deficit can drop two at once): they cannot receive gifts. Returns the gifts as [{id, to}] (nothing without teams). Fix: a connection is removed when EITHER end belongs to c (it used to look at the first end only). (new) It also records why and when in G.out[c] = {w, r}: w = 'z' (no Stars left) here; deficit() changes it to 'd' and a concession (doConc) to 'c'; r = the round. The round and end screens show it.
 function kill(c,also){const gifts=[];
 if(teamsOn()){const own=new Map(G.stars.map(s=>[s.id,s.o]));
 G.stars.forEach(s=>{if(s.o!=c)return;for(const q of G.conns){const oid=q[0]==s.id?q[1]:q[1]==s.id?q[0]:null;if(oid==null)continue;const t=own.get(oid);if(t!=c&&G.alive[t]&&!(also&&also.includes(t))&&sameTeam(t,c)){gifts.push({s,to:t});break}}});
 gifts.forEach(g=>{g.s.o=g.to})}
-G.alive[c]=false;G.conns=G.conns.filter(q=>by(q[0]).o!=c&&by(q[1]).o!=c);G.stars.forEach(s=>{if(s.o==c)s.f=0});
+G.alive[c]=false;(G.out=G.out||{})[c]={w:'z',r:G.round};G.conns=G.conns.filter(q=>by(q[0]).o!=c&&by(q[1]).o!=c);G.stars.forEach(s=>{if(s.o==c)s.f=0});
 return gifts.map(g=>({id:g.s.id,to:g.to}))}
 // ===== Team mode: transfers (team project step 5) =====
 // MAP: tmOpen -> tmErr -> popup -> tmDo = Connect / Gift on a living teammate's star (called from tap) | fgErr -> fgAsk -> fgDo / fgNo = giving Fleets to a teammate's star (called from moveF) | tmLinked, tmSector = the two geometry tests. Rules 6 and 7 of TEAM_MODE_PROJECT.md. Every change saves ONE undo snapshot first, and the confirm functions re-check everything (the board may have changed while the popup was open).
@@ -601,11 +603,11 @@ undo.push(JSON.stringify(G));a.f-=f.n;t.f=(t.f||0)+f.n;t.fm=(t.fm||0)+f.n;resetF
 function giftMsg(g){const n={};(g||[]).forEach(x=>{n[x.to]=(n[x.to]||0)+1});return Object.keys(n).map(t=>' '+n[t]+' Star'+(n[t]>1?'s':'')+' passed to '+NM[t]+'.').join('')}
 // Walk up the gaps between scores; at the first gap bigger than 3 that eliminates someone, eliminate those players and return a message; otherwise return nothing. (step 6) In a team game a player at the lower level is IMMUNE to a gap if every player in the level directly ahead is a teammate of theirs; a gap whose lower players are all immune is walked past, and a level that is partly immune loses only its non-immune players. Without teams nobody is immune, so this is the old rule exactly. Eliminated players' stars linked to a living teammate pass to that teammate (kill), also to an immune player of the same level.
 function deficit(vp){const al=G.pl.filter(c=>G.alive[c]),t=[...new Set(al.map(c=>vp[c]))].sort((a,b)=>a-b);
- for(let i=0;i+1<t.length;i++)if(t[i+1]-t[i]>3){const lo=al.filter(c=>vp[c]==t[i]),hi=al.filter(c=>vp[c]==t[i+1]),v=teamsOn()?lo.filter(c=>!hi.every(h=>sameTeam(h,c))):lo;if(!v.length)continue;let g=[];v.forEach(c=>{g=g.concat(kill(c,v))});return ' '+v.map(c=>NM[c]).join(' and ')+' eliminated by deficit.'+giftMsg(g)}return ''}
+ for(let i=0;i+1<t.length;i++)if(t[i+1]-t[i]>3){const lo=al.filter(c=>vp[c]==t[i]),hi=al.filter(c=>vp[c]==t[i+1]),v=teamsOn()?lo.filter(c=>!hi.every(h=>sameTeam(h,c))):lo;if(!v.length)continue;let g=[];v.forEach(c=>{g=g.concat(kill(c,v))});v.forEach(c=>{G.out[c].w='d'});return ' '+v.map(c=>NM[c]).join(' and ')+' eliminated by deficit.'+giftMsg(g)}return ''}
 // conc() asks the current player to confirm conceding.
 function conc(){if(!G||G.over||lock())return;if(pend&&pend.ph)return say('Finish the Defence call first.');ov(`<h1>${NM[cur()]} concedes?</h1><p>You are eliminated immediately.</p><div class="r"><button onclick="doConc()">Concede</button><button onclick="$('ov').style.display='none'">Cancel</button></div>`)}
 // doConc() eliminates the current player and fixes the turn order. If only one side is left (sidesLeft: one player, or in a team game one team) the game ends; otherwise step back one and end the turn so the next player starts.
-function doConc(){$('ov').style.display='none';delete G.pv;const c=cur(),b0=JSON.parse(JSON.stringify(G)),gm=giftMsg(kill(c));mvRec({k:'x'},b0);G.order=G.order.filter(x=>G.alive[x]);histSnap('c',c);if(sidesLeft()<2){G.ti=Math.min(G.ti,G.order.length-1);return finish()}G.ti--;histMute=true;try{endTurn()}finally{histMute=false}say(NM[c]+' conceded.'+gm+' '+NM[cur()]+' to move.')}
+function doConc(){$('ov').style.display='none';delete G.pv;const c=cur(),b0=JSON.parse(JSON.stringify(G)),gm=giftMsg(kill(c));G.out[c].w='c';mvRec({k:'x'},b0);G.order=G.order.filter(x=>G.alive[x]);histSnap('c',c);if(sidesLeft()<2){G.ti=Math.min(G.ti,G.order.length-1);return finish()}G.ti--;histMute=true;try{endTurn()}finally{histMute=false}say(NM[c]+' conceded.'+gm+' '+NM[cur()]+' to move.')}
 // cost(a,b) = Fuel a line costs = system borders crossed = column difference plus row difference.
 const cost=(a,b)=>Math.abs(Math.floor(a.x)-Math.floor(b.x))+Math.abs(Math.floor(a.y)-Math.floor(b.y));
 // dseg(p,a,b) = shortest distance from point p to the line segment a-b (geometry).
@@ -653,7 +655,7 @@ const clearWin=top=>teamsOn()?new Set(top.map(teamOf)).size==1:top.length==1;
 const nStars=c=>G.stars.filter(s=>s.o==c).length,starsTxt=n=>n+(n==1?' Star':' Stars'),teamStars=t=>G.pl.filter(c=>G.alive[c]&&teamOf(c)==t).reduce((a,c)=>a+nStars(c),0);
 const otRules=()=>teamsOn()?'Tiebreak: at the end of each overtime round the team with the most combined VP wins. If teams are tied on VP, the tied team whose living players control the most Stars wins. If their Stars are equal too, another overtime round is played.':'Tiebreak: at the end of each overtime round the player with the most VP wins. If players are tied on VP, the tied player who controls the most Stars wins. If their Stars are equal too, another overtime round is played.';
 // finish() does final scoring: store the winners (still a tie only when End game stops a tied game), redraw, and show the end dialog with everyone's scores.
-function finish(){const {vp}=calc();G.score=vp;G.over=winners(vp);histSnap('f');histSave();render();overDlg()}
+function finish(){const {vp}=calc();G.score=vp;G.over=winners(vp);histSnap('f');histSave();render();overDlg(1)}
 // (new) overDlg() shows the end-of-game dialog (winner and final scores; step 6: or the team result). It is its own function so online players who only RECEIVE the final position can show it too.
 let overHidden=false;
 // (new) overDlg() also clears overHidden (the end screen is showing). Hide closes it but keeps the finished board visible; the Menu button and the End game button (the End turn button relabelled) bring it back (see overHide, saveUI, the End turn handler and render).
@@ -678,17 +680,22 @@ let transTxt='';
 function transDlg(){transTxt=transcript();ov('<h1>Transcription</h1><p style="margin:0 0 8px">Every move of the game, in order.</p><textarea id="tt" readonly rows="14" wrap="off" spellcheck="false" style="width:100%;box-sizing:border-box;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;white-space:pre"></textarea><div class="r" style="margin-top:8px"><button onclick="transCopy()">Copy</button><button onclick="transSave(this)">Save .txt</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r"><button onclick="overDlg()">Back</button></div>');$('tt').value=transTxt}
 async function transCopy(){lm(await copyText(transTxt)?'Copied.':'Copying is blocked here. Select the text and copy it by hand.',0)}
 async function transSave(btn){const name='constellate-transcription-'+(G.gid||'game')+'.txt';try{if(dl){await dl.save({filename:name,data:transTxt})}else{const u=URL.createObjectURL(new Blob([transTxt],{type:'text/plain'})),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}btn.textContent='Saved'}catch(e){btn.textContent='Save failed'}}
-function overDlg(){overHidden=false;const {vp}=calc(),top=G.over,sys=c=>starsTxt(nStars(c));let head,sub='',body;const btn='</p>'+(!net.on||net.role=='host'?'<div class="r" style="margin-bottom:8px"><button onclick="rematch()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Instant rematch</button></div>':'')+'<div class="r"><button onclick="saveFile(this)">Save file</button><button onclick="newGame()">New game</button><button onclick="hvOpen()">History</button></div><div class="r" style="margin-top:8px">'+(G.pm=='fixed'?'<button onclick="transDlg()">Transcribe Game</button>':'')+'<button onclick="overHide()">Hide this screen</button></div>';
+// (changed, turn and round transitions) overDlg(anim): anim = the game has just ended (finish, or the final position arriving online), so the screen plays its reveal (endSeq): it waits for the board to zoom out, opens at the size of the result and the player lines, shows the result, writes the player lines downward one at a time (color dot first, in the button text color), then grows downward to show the buttons. Opened again later (Menu, a loaded finished game, Back from Transcribe) it simply appears. Each player who is out shows X and why (outX).
+function overDlg(anim){overHidden=false;const {vp}=calc(),top=G.over,sys=c=>starsTxt(nStars(c));let head,sub='',body;
+// (new) erow(c,t,ind) = one player line on the end screen: color dot, text t, X and why when out; ind = indented under a team line. trow(t) = a team's line.
+const erow=(c,t,ind)=>'<div class="erow" style="display:flex;align-items:center;gap:8px;margin:4px 0;color:var(--ink)'+(ind?';padding-left:14px':'')+'">'+dotH(c,12)+'<span>'+t+'</span>'+(G.alive[c]?'':outX(c))+'</div>',trow=t=>'<div class="erow" style="margin:8px 0 2px;color:var(--ink);font-weight:700">'+t+'</div>';
+const btn='<div class="ovft" style="margin-top:14px">'+(!net.on||net.role=='host'?'<div class="r" style="margin-bottom:8px"><button onclick="rematch()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Instant rematch</button></div>':'')+'<div class="r"><button onclick="saveFile(this)">Save file</button><button onclick="newGame()">New game</button><button onclick="hvOpen()">History</button></div><div class="r" style="margin-top:8px">'+(G.pm=='fixed'?'<button onclick="transDlg()">Transcribe Game</button>':'')+'<button onclick="overHide()">Hide this screen</button></div></div>';
 // (step 6) Team game: 'Team N wins' (with its members and why); the scores are grouped by team, each team with its combined VP and Stars. (T4) via = the leaders were tied on VP and the Stars tiebreaker decided: the title says 'wins via Stars'. A tie that is left after the tiebreaker is a 'Perfect Tie!' (Stars equal); it can end a game only through End game, since otherwise overtime follows. A game won in overtime says in which round.
 const tie='<p style="margin:0 0 8px">The game was ended before the tie was broken.</p>';
 if(teamsOn()){const wt=[...new Set(top.map(teamOf))],ts=[...new Set(G.pl.map(teamOf))].sort((a,b)=>teamVp(b,vp)-teamVp(a,vp)||a-b),nm=l=>l.map(c=>NM[c]).join(' and '),m=Math.max(...ts.map(t=>teamVp(t,vp))),via=wt.length==1&&sidesLeft()>1&&ts.filter(t=>teamVp(t,vp)==m).length>1;
 if(wt.length>1){head='Perfect Tie!';sub='<p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p>'+tie}else{head='Team '+wt[0]+' wins'+(via?' via Stars':'');sub='<p style="margin:0 0 8px">'+nm(top)+(sidesLeft()<2?' (the only team left).':'.')+(via?' Tied on combined VP, so the combined Stars of living players broke the tie.':'')+'</p>'}
-body=ts.map(t=>'<b style="color:var(--ink)">Team '+t+': '+teamVp(t,vp)+' VP, '+starsTxt(teamStars(t))+'</b><br>'+G.pl.filter(c=>teamOf(c)==t).map(c=>'&nbsp;&nbsp;'+dotH(c,16)+' '+NM[c]+' '+vp[c]+' VP, '+sys(c)+(G.alive[c]?'':' (eliminated)')).join('<br>')).join('<br>')}
+body=ts.map(t=>trow('Team '+t+': '+teamVp(t,vp)+' VP, '+starsTxt(teamStars(t)))+G.pl.filter(c=>teamOf(c)==t).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c),1)).join('')).join('')}
 else{const al=G.pl.filter(c=>G.alive[c]),m=Math.max(...al.map(c=>vp[c])),via=top.length==1&&al.filter(c=>vp[c]==m).length>1;
 head=top.length==1?NM[top[0]]+' wins'+(via?' via Stars':''):'Perfect Tie!';if(top.length>1)sub='<p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p>'+tie;else if(via)sub='<p style="margin:0 0 8px">Tied on VP, so the Stars each player controls broke the tie.</p>';
-body=G.pl.map(c=>NM[c]+' '+vp[c]+' VP, '+sys(c)+(G.alive[c]?'':' (eliminated)')).join('<br>')}
+// (changed) Players are listed best first: winners, then the others by VP and Stars, then those who are out.
+const rk=c=>(G.alive[c]?0:1e6)-(top.includes(c)?1e5:0)-vp[c]*100-nStars(c);body=G.pl.slice().sort((a,b)=>rk(a)-rk(b)).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c))).join('')}
 if(G.round>30&&clearWin(top))sub+='<p style="margin:0 0 8px">Decided in '+rdName(G.round)+'.</p>';
-ov('<h1>'+head+'</h1>'+sub+'<p>'+body+btn)}
+ov('<h1>'+head+'</h1>'+sub+'<div class="erl">'+body+'</div>'+btn);if(anim)endSeq()}
 // tap(bx,by) runs when the board is tapped, in board units. cx,cy = the system column and row. Do nothing without a game or after it ends.
 function tap(bx,by){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
 // (new) While a computer player has the turn, taps do nothing, except a person answering the computer's attack with a Hold/Retreat choice (on this device, or sent here from the host when playing online).
@@ -795,19 +802,23 @@ tied.sort((a,b)=>dist(a)-dist(b));const pick=tied[0];
 // Add them to the order, remove them from the waiting list, and make them the reference for the next place.
 out.push(pick);rem.splice(rem.indexOf(pick),1);last=pick}
 return out}
-// (new) roundPop() shows the round-start popup: round number, Fuel this round, and each player's snapshot rank and score (X for eliminated players).
+// (new) roundPop() shows the round-start popup: round number, Fuel this round, and each player's snapshot rank and score (X and the reason for eliminated players).
+// (changed, turn and round transitions) It plays as a reveal (rpSeq): the window waits for the board to zoom out, opens at the size of the title and the player lines, the players appear one by one in LAST round's turn order with "VP:", their VP scrambles into place, the lines slide into the NEW order with their ranks, the elimination notes appear, and the window grows downward to show Save file and "Tap to start the round". The first tap jumps to the end, the next one closes it. Everything is in the page from the start (only hidden), so code that reads the popup's text right away still works.
 function roundPop(){
 // (new) When only computer players are left in the game there is nobody to tap the popup, so the next round just begins.
 if(allCpu())return;
-// row(c) builds one player's line: color dot, name, rank, score. (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
-const ot=G.round>30,row=c=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0">${dotH(c,teamsOn()?18:12)}<b>${NM[c]}</b><span style="margin-left:auto">Rank ${G.alive[c]?G.rank[c]:'X'}</span><span style="min-width:56px;text-align:right">${G.alive[c]?(G.score[c]||0)+' VP':'X'}</span>${ot?`<span style="min-width:64px;text-align:right">${G.alive[c]?starsTxt(nStars(c)):'X'}</span>`:''}</div>`;
-// Show the dialog: alive players in turn order first, then eliminated players. (T4) An overtime round only starts after a round that ended in a Perfect Tie (VP and Stars equal), so its popup says so and explains the tiebreak (otRules) under the round name.
-ov(`${ot?'<h1>Perfect Tie!</h1><p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p><p style="margin:0 0 8px"><b>'+rdName(G.round)+'</b></p><p style="margin:0 0 8px">'+otRules()+'</p>':'<h1>'+rdName(G.round)+'</h1>'}<p>Fuel this round: <b>${acts(G.round)}</b></p>${G.sz?`<p>Custom board: ${G.sz} by ${G.sz} sectors</p>`:''}${G.pm?`<p>Placement: ${G.pm=='fixed'?'fixed positions only':'free placement only'}</p>`:''}${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}${teamsOn()?'<p style="margin:8px 0 0;color:var(--ink);font-weight:600">'+teamLine(G.score)+(ot?' · Stars: '+[...new Set(G.pl.map(teamOf))].map(t=>'Team '+t+' '+teamStars(t)).join(', '):'')+'</p>':''}<div class="r" style="margin-top:10px"><button onclick="event.stopPropagation();saveFile(this)">Save file</button></div><p style="margin:12px 0 0;text-align:center">Tap to start the round</p>`);
-// A tap anywhere (the backdrop or the box) dismisses it.
-$('ov').onclick=closeRound}
+// row(c) builds one player's line: color dot, name, rank, "VP:" and score (the score is a .scr number, see rpSeq), or X and why for a player who is out (outX). (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
+const ot=G.round>30,row=c=>`<div class="rrow" data-c="${c}" style="display:flex;align-items:center;gap:8px;margin:6px 0">${dotH(c,teamsOn()?18:12)}<b>${NM[c]}</b>${G.alive[c]?`<span class="rk" style="margin-left:auto">Rank ${G.rank[c]}</span><span style="min-width:64px;text-align:right">VP: <span class="scr" data-s="">${G.score[c]||0}</span></span>${ot?`<span style="min-width:64px;text-align:right">${starsTxt(nStars(c))}</span>`:''}`:`<span style="margin-left:auto">${outX(c)}</span>`}</div>`;
+// (new) notes = one warning line under the players for everyone eliminated in the round that just ended (outWhy).
+const notes=G.pl.filter(c=>!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==G.round-1).map(c=>'<p class="rnote" style="color:var(--warn);font-weight:600;margin:8px 0 0">'+outWhy(c)+'</p>').join('');
+// Show the dialog: alive players in turn order first, then eliminated players. (T4) An overtime round only starts after a round that ended in a Perfect Tie (VP and Stars equal), so its popup says so and explains the tiebreak (otRules) under the round name. (new) .ovft = the part the window uncovers last.
+ov(`${ot?'<h1>Perfect Tie!</h1><p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p><p style="margin:0 0 8px"><b>'+rdName(G.round)+'</b></p><p style="margin:0 0 8px">'+otRules()+'</p>':'<h1>'+rdName(G.round)+'</h1>'}<p>Fuel this round: <b>${acts(G.round)}</b></p>${G.sz?`<p>Custom board: ${G.sz} by ${G.sz} sectors</p>`:''}${G.pm?`<p>Placement: ${G.pm=='fixed'?'fixed positions only':'free placement only'}</p>`:''}<div class="rpl">${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}</div>${notes}${teamsOn()?'<p class="rtm" style="margin:8px 0 0;color:var(--ink);font-weight:600">'+teamLine(G.score)+(ot?' · Stars: '+[...new Set(G.pl.map(teamOf))].map(t=>'Team '+t+' '+teamStars(t)).join(', '):'')+'</p>':''}<div class="ovft"><div class="r" style="margin-top:10px"><button onclick="event.stopPropagation();saveFile(this)">Save file</button></div><p style="margin:12px 0 0;text-align:center">Tap to start the round</p></div>`);
+// A tap anywhere (the backdrop or the box) dismisses it; (new) while the reveal plays, the first tap only jumps it to the end. rpOn = the round popup is showing (the board's zoom in waits for it, see camTurn).
+$('ov').onclick=e=>{if(e&&e.target&&!e.target.isConnected)return;if(e&&seqSkip())return;closeRound(e)};rpOn=true;rpSeq()}
 // closeRound() hides the popup and removes its tap handler so other dialogs are not affected.
 // (fixed) The click that OPENS the popup (a button inside another dialog, which was just replaced) bubbles up to the popup's own tap handler and used to close it instantly. A click whose target is no longer on the page is therefore ignored.
-function closeRound(e){if(e&&e.target&&!e.target.isConnected)return;$('ov').style.display='none';$('ov').onclick=null}
+// (new) It also ends a reveal that is still playing, and starts the board's zoom in on the first player if it was waiting for the popup (camWait).
+function closeRound(e){if(e&&e.target&&!e.target.isConnected)return;seqSkip();rpOn=false;$('ov').style.display='none';$('ov').onclick=null;if(camWait)camIn()}
 // endTurn() ends the current turn. em holds an extra message. Clear selection, undo history and used stars.
 function endTurn(){if(!G||G.over)return;
 // (new) A turn is being committed: record the board as it stands now (not when this call comes from a concession; that records its own snapshot).
@@ -818,8 +829,9 @@ if(!histMute)histSnap('t',cur());let em='',newRound=false;resetFlow();undo=[];G.
 // (T4) After round 30 and after every overtime round, score as if it were the last round, Systems tiebreaker included (RULES.md 8.3): a clear winner ends the game; a tie plays on into the next (overtime) round. A tied round still runs the normal deficit check, like any round that does not end the game (Shmorden, 2026-10-24).
  else{const {vp}=calc();G.score=vp;if(G.round>=30){if(clearWin(winners(vp)))return finish();em=G.round==30?'. Perfect Tie! Stars equal, so the game goes to overtime.':'. Perfect Tie again, so overtime goes on.'}em+=deficit(vp);if(sidesLeft()<2)return finish();const ref=G.first;
 // Build the new turn order: highest VP first, ties broken by position after ref in the player list. Then round+1 and pointer to 0.
+  // (new) G.lo = the turn order the round that just ended started with (the round screen shows the players in it first, then slides them into the new order); G.po = the order the new round starts with.
   // (changed) Take the new rank snapshot from the round-end scores, build the turn order from it with the rulebook tie rules, move to the next round, and remember to show the popup.
-G.rank=rankSnap(vp);G.order=turnOrder(ref);G.first=G.order[0];G.round++;G.ti=0;newRound=true}
+G.lo=(G.po||G.order).slice();G.rank=rankSnap(vp);G.order=turnOrder(ref);G.po=G.order.slice();G.first=G.order[0];G.round++;G.ti=0;newRound=true}
 // Start the next turn and announce who is up.
  beginTurn();say(NM[cur()]+(cpuOf(cur())?' (computer)':'')+' to move'+em);
 // (new) At a round rollover record the start of the new round (after scoring, eliminations and the new ranks), then write the history to storage once.
@@ -902,17 +914,18 @@ W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Ma
  $('chips').innerHTML=G.pl.map(c=>`<div class="chip ${c==me&&!G.over?'on':''} ${G.alive[c]?'':'dead'} ${net.on&&!seatUp(c)?'off':''}" style="--c:${COL[c]}">${chipIn(c,vp[c],G.alive[c],G.rank[c])}</div>`).join('');
 // (new) Online: after every redraw, send changes to the other players if this device is in charge of the turn. Then, if a computer player has the turn here, schedule its next move.
 $('tvp').innerHTML=teamLine(vp);
- netTick();cpuSched()}
+// (new) Start the turn transition if the turn has changed (camTurn).
+ camTurn();netTick();cpuSched()}
 // apply() applies the current pan and zoom to the drawing and records the zoom level for CSS.
 // (changed) apply() now batches updates to one per screen frame in touch mode (smoother on iPhone); applyNow() does the real work.
 let rafId=0;function apply(){if(useTouch()&&typeof requestAnimationFrame=='function'){if(!rafId)rafId=requestAnimationFrame(()=>{rafId=0;applyNow()})}else applyNow()}
 function applyNow(){W.setAttribute('transform',`translate(${view.x} ${view.y}) scale(${view.k})`);svg.dataset.z=view.k>38?1:0}
-// fit() sizes the whole board to the screen and centers it.
+// fit() sizes the whole board to the screen and centers it. (new) It stops a camera move first (camStop).
 function fitTo(V,box,ap){const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
-function fit(){fitTo(view,st,apply)}
-// zoomAt(f,px,py) zooms by factor f while keeping point (px,py) still, within zoom limits.
-function zoomAt(f,px,py,V,ap){V=V||view;ap=ap||apply;const nk=Math.max(V.min*.9,Math.min(90,V.k*f)),r=nk/V.k;V.x=px-(px-V.x)*r;V.y=py-(py-V.y)*r;V.k=nk;ap()}
+function fit(){camStop();fitTo(view,st,apply)}
+// zoomAt(f,px,py) zooms by factor f while keeping point (px,py) still, within zoom limits. (new) On the live board it first stops a turn-change camera move (camStop), so the + and - buttons win.
+function zoomAt(f,px,py,V,ap){V=V||view;ap=ap||apply;if(V===view)camStop();const nk=Math.max(V.min*.9,Math.min(90,V.k*f)),r=nk/V.k;V.x=px-(px-V.x)*r;V.y=py-(py-V.y)*r;V.k=nk;ap()}
 // P keeps track of fingers touching the screen. moved = distance dragged, multi = a second finger was used, last = previous gesture.
 // ===== iPhone / iPad (Safari) controls =====
 // Safari on iPhone often hands touches to the page's own scrolling and zooming instead of the Pointer Events the board uses, so taps, drags and pinches fail. On Apple devices the board therefore uses classic Touch Events and cancels Safari's own handling. IOS = this looks like an iPhone, iPad or iPod (iPadOS can pretend to be a Mac, hence the touch-points test).
@@ -934,6 +947,8 @@ const gestOf=ts=>{const a=ts[0],b=ts[1]||ts[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y
 let tapAt=0;
 document.addEventListener('click',e=>{if(e.isTrusted&&Date.now()-tapAt<300&&e.target&&e.target.closest&&e.target.closest('button,#ov')){e.stopImmediatePropagation();e.preventDefault()}},true);
 function bindBoard(svgEl,box,V,ap,onTap0){const onTap=(x,y)=>{tapAt=Date.now();onTap0(x,y)};
+// (new) Any touch, click or wheel on the live board stops a turn-change camera move (camStop), so the player is never fought for the view.
+['touchstart','pointerdown','wheel'].forEach(n=>svgEl.addEventListener(n,()=>{if(V===view)camStop()},{passive:true}));
 let tMoved=0,tMulti=0,tPrev=null,tLast=null;
 // Touch events (used on Apple devices): take over the touch so Safari cannot scroll or zoom the page.
 svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0}else{tMulti=1;tMoved=99}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
@@ -1058,9 +1073,12 @@ if(n.pl.some(c=>n.alive[c]&&!I(n.rank[c],1,4)))bad('The ranks are invalid.');
 if(!n.pl.includes(n.first))n.first=n.order[0];
 // history is a separate optional field: it is checked by prepHist and kept outside the game state; a game id must be a short text.
 delete n.history;if(n.gid!=null&&(typeof n.gid!='string'||n.gid.length>40))delete n.gid;
+// (new) Turn and round transitions: po / lo = the turn order this round / the last round started with, out = {color: {w: why ('d' Deficit, 'z' no Stars left, 'c' conceded), r: round}} for eliminated players. They only change what the round and end screens show, so a bad value is dropped instead of refusing the file (older saves have none).
+['po','lo'].forEach(f=>{if(n[f]!=null&&(!Array.isArray(n[f])||n[f].length>4||new Set(n[f]).size!=n[f].length||n[f].some(c=>!n.pl.includes(c))))delete n[f]});
+if(n.out!=null){const o={};if(typeof n.out=='object'&&!Array.isArray(n.out))n.pl.forEach(c=>{const e=n.out[c];if(e&&typeof e=='object'&&['d','z','c'].includes(e.w)&&I(e.r,1,RMAX)&&!n.alive[c])o[c]={w:e.w,r:e.r}});if(Object.keys(o).length)n.out=o;else delete n.out}
 return n}
 // loadObj(o) loads a game: validate first (prepG), then replace the live game and reset every half-finished interaction.
-function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='s';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';fit();say('Game loaded');render();
+function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='s';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';camKey=null;fit();say('Game loaded');render();
 // (new) A finished game opens on its end screen (Save file, New game, History).
 if(G.over)overDlg()}
 // lm(t,err) shows a status line inside the Menu dialog (or the bottom message if the Menu is closed).
@@ -1485,7 +1503,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-26-b';
+const BUILD='2026-10-26-c';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1626,10 +1644,85 @@ const animLabel=()=>'Animations: '+(animMode=='on'?'On':animMode=='fast'?'Fast':
 function animCycle(b){animMode=animMode=='on'?'fast':animMode=='fast'?'off':'on';try{localStorage.setItem(AKEY,animMode)}catch(e){}b.textContent=animLabel()}
 const soundLabel=()=>'Sound: '+(soundOn?'On':'Off');
 function soundToggle(b){soundOn=!soundOn;try{localStorage.setItem(SKEY2,soundOn?'1':'0')}catch(e){}b.textContent=soundLabel()}
+// ===== Turn and round transitions: camera moves, round screen and end screen reveals =====
+// (new) Shmorden's request 2026-10-26. On every change of turn the board zooms out to Fit, then zooms in on the player whose turn it is (camBox). At the end of a round it zooms out and the round screen plays its reveal (roundPop, rpSeq); the zoom in waits until that screen is closed. At the end of the game it zooms out and the end screen plays its reveal (overDlg, endSeq). Animations Off (or the phone's reduce-motion setting) turns all of it off. With CPU speed Instant a computer's turn only zooms out. A touch, drag or wheel on the board stops a camera move where it is. All timings come from the Animations speed (animMs) and are placeholders.
+// calm() = no animations wanted. camMs() = how long one camera move takes. camRaf = the running camera frame, camT = the pause before the zoom in, camWait = the zoom in waits for the round screen to close, camEnd = when the running camera move ends (performance.now() time; the screens wait for it), camKey = the turn last seen by camTurn (null = do not animate the next change: a new or loaded game). rpOn = the round screen is showing.
+const calm=()=>animMode=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
+const camMs=()=>Math.round(animMs()*1.5);
+let camRaf=0,camT=null,camWait=false,camEnd=0,camKey=null,rpOn=false;
+// camStop() stops any camera move and cancels a waiting zoom in (the player took over the view, or the board was refitted).
+function camStop(){cancelAnimationFrame(camRaf);camRaf=0;clearTimeout(camT);camT=null;camWait=false;camEnd=0}
+// camGo(to,ms,then) moves the live view to to = {k,x,y} in ms (eased in and out), then calls then. The zoom changes evenly in scale steps (log k) while the board point in the middle of the screen slides in a straight line, so it reads as one camera move rather than a drift plus a zoom. A view that is already there finishes at once.
+function camGo(to,ms,then){cancelAnimationFrame(camRaf);camRaf=0;const r=st.getBoundingClientRect(),cx=r.width/2,cy=r.height/2,k0=view.k,p0={x:(cx-view.x)/k0,y:(cy-view.y)/k0},p1={x:(cx-to.x)/to.k,y:(cy-to.y)/to.k};
+const done=()=>{camRaf=0;camEnd=0;if(then)then()},set=()=>{view.k=to.k;view.x=to.x;view.y=to.y;applyNow()};
+if(ms<=0||(Math.abs(k0-to.k)<.01*k0&&Math.abs(view.x-to.x)<1&&Math.abs(view.y-to.y)<1)){set();return done()}
+const t0=performance.now(),ease=t=>t<.5?4*t*t*t:1-Math.pow(2-2*t,3)/2,l0=Math.log(k0),l1=Math.log(to.k);camEnd=t0+ms;
+const step=now=>{const t=Math.min(1,(now-t0)/ms),e=ease(t),k=Math.exp(l0+(l1-l0)*e);view.k=k;view.x=cx-(p0.x+(p1.x-p0.x)*e)*k;view.y=cy-(p0.y+(p1.y-p0.y)*e)*k;applyNow();if(t<1)camRaf=requestAnimationFrame(step);else{set();done()}};
+camRaf=requestAnimationFrame(step)}
+// camFit() = the Fit view (see fitTo) without applying it.
+function camFit(){const V={};fitTo(V,st,()=>{});return V}
+// camBox(c) = the view that shows player c's territory: the box around every sector c controls and every system holding one of c's Stars, stretched to the board edge(s) c started from (the edge or corner nearest c's first Capital, G.caps), and at least 3 sectors (9 systems) wide and tall so a small territory does not zoom in too far (placeholder). The box is fitted to the screen like Fit (0.1 system margin), never smaller than Fit. Across the box it is centered; but the board is never pulled away from a screen edge it would cover, so the home edge stays on its own side of the screen. null = c owns nothing.
+function camBox(c){const N=NSYS(G),{ctl}=calc();let x0=N,y0=N,x1=0,y1=0,any=false;const add=(a,b,w)=>{x0=Math.min(x0,a);y0=Math.min(y0,b);x1=Math.max(x1,a+w);y1=Math.max(y1,b+w);any=true};
+ctl.forEach((rw,y)=>rw.forEach((o,x)=>{if(o==c)add(x*3,y*3,3)}));G.stars.forEach(q=>{if(q.o==c)add(Math.floor(q.x),Math.floor(q.y),1)});if(!any)return null;
+const cp=G.caps&&G.caps[c];if(cp){if(cp[0]<=1)x0=0;if(cp[0]>=N-2)x1=N;if(cp[1]<=1)y0=0;if(cp[1]>=N-2)y1=N}
+const M=Math.min(N,9),grow=(a,b)=>{if(b-a>=M)return[a,b];const m=Math.max(0,Math.min(N-M,(a+b-M)/2));return[m,m+M]};[x0,x1]=grow(x0,x1);[y0,y1]=grow(y0,y1);
+const r=st.getBoundingClientRect(),F=camFit(),k=Math.max(F.min,Math.min(90,r.width/(x1-x0+.2),r.height/(y1-y0+.2)));
+// ax(lo,hi,W) = the board's offset along one axis: centered when the whole board fits that way, else the box is centered but clamped so no empty space shows past a board edge.
+const ax=(lo,hi,W)=>N*k<=W?(W-N*k)/2:Math.max(W-(N+.1)*k,Math.min(.1*k,W/2-(lo+hi)/2*k));return{k,x:ax(x0,x1,r.width),y:ax(y0,y1,r.height)}}
+// camTurn() runs after every redraw (render) and starts the transition when the turn has changed since the last call: zoom out to Fit, a short pause, then zoom in (camIn), unless the game is over or the round screen is showing (closeRound zooms in when it closes).
+function camTurn(){if(!G)return;const k=G.over?'over':G.round+'/'+G.ti+'/'+cur();if(k==camKey)return;const p=camKey;camKey=k;if(p==null||calm())return;
+camStop();const F=camFit();view.min=F.min;camGo(F,camMs(),()=>{if(G&&!G.over)camT=setTimeout(()=>{camT=null;if(rpOn)camWait=true;else camIn()},Math.round(animMs()*.5))})}
+// camIn() zooms in on the player whose turn it is (camBox); not for a computer while CPU speed is Instant (its turn is over before the camera would arrive).
+function camIn(){camWait=false;if(!G||G.over||calm())return;const c=cur();if(cpuOf(c)&&cpuMs==0)return;const t=camBox(c);if(t)camGo(t,camMs())}
+// ----- Why a player is out (round and end screens) -----
+// outX(c) = 'X' and one word in the warning color: Deficit, Eliminated (lost every Star) or Conceded (placeholder words; G.out, see kill). A game saved before this build shows the X alone.
+const outX=c=>{const o=G.out&&G.out[c];return '<b style="color:var(--warn)">X'+(o?' '+{d:'Deficit',z:'Eliminated',c:'Conceded'}[o.w]:'')+'</b>'};
+// outWhy(c) = the sentence the round screen shows under the players in the round c went out (wording from RULES.md 7.2, 7.4, 7.5; placeholder).
+const outWhy=c=>{const w=G.out&&G.out[c]&&G.out[c].w;return NM[c]+(w=='d'?' eliminated by Deficit Elimination: more than 3 VP behind the next score above.':w=='c'?' conceded and is eliminated.':' eliminated: no Stars left.')};
+// ----- Reveals: a dialog whose parts appear one after another -----
+// seq = the reveal playing now: t = its timers, left = steps not yet run, a = its animations, x = stop functions (number scrambles), skip = jumping to the end. seqRun(steps) plays steps = [{at: ms from now, fn(s)}]. seqSkip() jumps a playing reveal to its end (a tap, a new dialog, closing it) and says whether there was one: the steps left run at once with s.skip set (so they only set their final look) and every animation stops; each part's final look is its plain style, so nothing is left half done.
+let seq=null;
+function seqRun(steps){seqSkip();const s={t:[],left:steps.slice().sort((a,b)=>a.at-b.at),a:[],x:[],skip:false};seq=s;
+s.left.slice().forEach(p=>s.t.push(setTimeout(()=>{if(seq!==s)return;s.left.splice(s.left.indexOf(p),1);p.fn(s);if(!s.left.length)seq=null},p.at)))}
+function seqSkip(){const s=seq;if(!s)return false;seq=null;s.skip=true;s.t.forEach(clearTimeout);s.x.forEach(f=>f());s.left.forEach(p=>{try{p.fn(s)}catch(e){}});s.left=[];s.a.forEach(a=>{try{a.cancel()}catch(e){}});return true}
+// seqA(s,el,kf,o) plays one animation as part of reveal s (not while skipping).
+const seqA=(s,el,kf,o)=>{if(!s.skip&&el&&el.animate)s.a.push(el.animate(kf,o))};
+// rvPrep() readies the dialog ov() just drew for a reveal and returns R = {o, box, ft = the footer (.ovft), clip, fullH = outer heights, ext = padding plus border, since a CSS height is the inside height}. The whole layer is hidden (class rvh) so it can wait for the camera. The window is cut to clip = the height of everything above the footer and placed so that its FULL size is centered; rvFoot then only moves its bottom edge. A window too tall for the screen (it scrolls) is not cut; its footer just fades in.
+function rvPrep(){const o=$('ov'),box=o.firstChild,ft=box.querySelector('.ovft');o.classList.add('rvh');try{o.getAnimations().forEach(a=>a.cancel())}catch(e){}box.classList.remove('pop');
+const fullH=box.offsetHeight,room=o.clientHeight-40,cs=getComputedStyle(box),ext=['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((a,k)=>a+(parseFloat(cs[k])||0),0);let clip=0;
+if(ft&&fullH<=room*.92){clip=Math.round(ft.getBoundingClientRect().top-box.getBoundingClientRect().top+6);Object.assign(box.style,{alignSelf:'flex-start',marginTop:Math.max(0,(room-fullH)/2)+'px',height:(clip-ext)+'px',overflow:'hidden'})}
+if(ft)ft.style.opacity='0';return{o,box,ft,clip,fullH,ext}}
+// rvOpen(R,s) shows the layer and opens the window from its middle, like every dialog (see ov).
+function rvOpen(R,s){R.o.classList.remove('rvh');const U=animMs();seqA(s,R.o,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'});seqA(s,R.box,[{transform:'scaleY(.05)',opacity:0},{transform:'none',opacity:1}],{duration:U,easing:'cubic-bezier(.2,.8,.2,1)'})}
+// rvFoot(R,s) grows the window downward to its full height and fades the footer in, then gives the window back its normal style.
+function rvFoot(R,s){const {box,ft,clip,fullH,ext}=R,clr=()=>{['alignSelf','marginTop','height','overflow'].forEach(k=>{box.style[k]=''})};if(ft)ft.style.opacity='';
+if(!clip||s.skip||!box.animate)return clr();const U=animMs(),a=box.animate([{height:(clip-ext)+'px'},{height:(fullH-ext)+'px'}],{duration:U,easing:'cubic-bezier(.2,.8,.2,1)'});s.a.push(a);box.style.height=(fullH-ext)+'px';a.finished.then(clr,clr);if(ft)seqA(s,ft,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})}
+// scramble(s,el,ms) = a .scr number (its real value is in the page but see-through; CSS shows data-s over it) flickers through random numbers of the same length for ms, then shows the real value.
+function scramble(s,el,ms){const end=()=>{clearInterval(id);el.classList.remove('scr')};let id=0;if(s.skip)return end();const n=el.textContent.length,t0=performance.now();
+id=setInterval(()=>{if(performance.now()-t0>=ms)return end();let r='';for(let i=0;i<n;i++)r+=Math.floor(Math.random()*(i||n<2?10:9))+(i||n<2?0:1);el.dataset.s=r},45);s.x.push(end)}
+// rpSeq() = the round screen's reveal (see roundPop). U = one animation, P = a brief pause (both placeholders). rows = the player lines as drawn (new order); old = last round's order (G.lo; players already out before it go last), and each line starts moved to where its player stood in that order (dy), then slides home.
+function rpSeq(){const o=$('ov');if(calm()){o.querySelectorAll('.scr').forEach(e=>e.classList.remove('scr'));return}
+const R=rvPrep(),U=animMs(),P=U,rows=[...R.box.querySelectorAll('.rrow')],fin=rows.map(r=>+r.dataset.c),old=(G.lo||G.order).filter(c=>fin.includes(c)),tops=rows.map(r=>r.offsetTop);fin.forEach(c=>{if(!old.includes(c))old.push(c)});
+const dy=rows.map((r,i)=>tops[old.indexOf(fin[i])]-tops[i]),moves=dy.some(d=>d),late=[...R.box.querySelectorAll('.rnote,.rtm')],rks=[...R.box.querySelectorAll('.rk')];
+rows.forEach((r,i)=>{r.style.opacity='0';if(dy[i])r.style.transform='translateY('+dy[i]+'px)'});late.concat(rks).forEach(e=>{e.style.opacity='0'});
+const steps=[],t0=Math.max(0,camEnd-performance.now());steps.push({at:t0,fn:s=>rvOpen(R,s)});
+// The players appear one by one in last round's order.
+let t=t0+U+P;old.forEach(c=>{const i=fin.indexOf(c),r=rows[i];steps.push({at:t,fn:s=>{r.style.opacity='';seqA(s,r,[{opacity:0,transform:'translate(-16px,'+dy[i]+'px)'},{opacity:1,transform:'translate(0,'+dy[i]+'px)'}],{duration:U,easing:'ease-out'})}});t+=U*.5});
+// Their VP scrambles into place, then the lines slide into the new order and the ranks fade in.
+t+=U*.5+P;const S=U*2;steps.push({at:t,fn:s=>R.box.querySelectorAll('.scr').forEach(e=>scramble(s,e,S))});t+=S+P;
+const sl=moves?U*1.6:U*.5;steps.push({at:t,fn:s=>{rows.forEach((r,i)=>{r.style.transform='';if(dy[i])seqA(s,r,[{transform:'translateY('+dy[i]+'px)'},{transform:'none'}],{duration:sl,easing:'cubic-bezier(.2,.8,.2,1)'})});rks.forEach(e=>{e.style.opacity='';seqA(s,e,[{opacity:0},{opacity:1}],{duration:sl,easing:'ease-out'})})}});t+=sl+P;
+// The elimination notes and the team line, then the buttons.
+if(late.length){steps.push({at:t,fn:s=>late.forEach(e=>{e.style.opacity='';seqA(s,e,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})})});t+=U+P}
+steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});seqRun(steps)}
+// endSeq() = the end screen's reveal (see overDlg): the result shows as the window opens; after a pause the player lines are written downward one at a time (a shorter pause between them), then a pause and the buttons.
+function endSeq(){if(calm())return;const R=rvPrep(),U=animMs(),P=U,rows=[...R.box.querySelectorAll('.erow')];rows.forEach(r=>{r.style.opacity='0'});
+const steps=[],t0=Math.max(0,camEnd-performance.now());steps.push({at:t0,fn:s=>rvOpen(R,s)});let t=t0+U+P;
+rows.forEach(r=>{steps.push({at:t,fn:s=>{r.style.opacity='';seqA(s,r,[{opacity:0,clipPath:'inset(0 0 100% 0)'},{opacity:1,clipPath:'inset(0 0 0 0)'}],{duration:U,easing:'ease-out'})}});t+=U*.6});
+t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});seqRun(steps);R.box.addEventListener('click',()=>seqSkip())}
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=12,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=13,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
@@ -1691,11 +1784,11 @@ function applySt(m){if(!G)return false;let g;try{g=prepG(JSON.parse(m.g))}catch(
 const was=cur(),oldR=G.round,wasOver=!!G.over,wasMine=net.my.includes(was);G=g;let ok=m.h?mergeHist(m.h):true;if(m.mv&&!mvApply(m.mv))ok=false;netClearFlow();net.lastG=JSON.stringify(G);
 if(cur()!==was||G.round!==oldR)say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();
 if(!wasMine&&net.my.includes(cur())&&!G.over)buzz(220);
-if(G.round>oldR&&!G.over)roundPop();if(G.over&&!wasOver)overDlg();return ok}
+if(G.round>oldR&&!G.over)roundPop();if(G.over&&!wasOver)overDlg(1);return ok}
 // applyFull(m) takes a complete copy of the game and history (new game, rejoin, repair).
 function applyFull(m){let g;try{g=prepG(JSON.parse(m.g))}catch(e){return nsend(net.conn,{t:'need'})}
 ov2Close(1);G=g;adoptHistory(m.h);if(m.seats)net.seats=m.seats;net.started=true;net.lobby=false;net.rq=null;net.acting=false;netClearFlow();net.lastG=JSON.stringify(G);net.hsent=H?H.snaps.length:0;
-$('ov').onclick=null;$('ov').style.display='none';fit();say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
+$('ov').onclick=null;$('ov').style.display='none';camKey=null;fit();if(m.start)camWait=true;say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
 // netAsk(m) arrives on the DEFENDER's device: show the ringed Retreat spots and Hold button, or clear them.
 function netAsk(m){if(!net.my.includes(m.def))return;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,sent:false}:null;
 if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display=net.rq.hOK?'block':'';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX))}else{hl=[];$('hold').style.display='';say('')}render()}
