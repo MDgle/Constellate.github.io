@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-27-e",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-27-f",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -127,7 +127,7 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* (new) .pchip: a player line on the round and end screens drawn as a player chip: a border in the player's color (--c) around a dull tint of it (22% of the color over the panel; plain panel on browsers without color-mix). Placeholder look, the place for chip cosmetics later. */
 .ord{min-width:30px;font-weight:700}.pchip{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;border:2px solid var(--c);border-radius:8px;background:var(--panel);background:color-mix(in srgb,var(--c) 22%,var(--panel));color:var(--ink)}
 :root[data-theme="cgreen"] .pchip,:root[data-theme="ccyan"] .pchip,:root[data-theme="corange"] .pchip{border-radius:0}.scr{position:relative;color:transparent}.scr::after{content:attr(data-s);position:absolute;right:0;top:0;color:var(--ink)}
-/* (new) #hskip: "Hold to skip" with a bar that fills while a finger is held down during the Deficit Elimination animation (dfRun). Above every dialog layer. Placeholder look. */
+/* (new) #hskip: "Hold to skip" with a bar that fills while a finger is held down during the Deficit Elimination animation (dfRun). Above every dialog layer. Placeholder look. (new) Drag and drop uses it too, with "Hold to drag" and "Hold for precision" (ddBar). */
 #hskip{position:fixed;left:50%;bottom:14%;transform:translateX(-50%);z-index:20;display:none;flex-direction:column;align-items:center;gap:6px;padding:8px 14px;background:rgba(0,0,0,.72);color:#fff;font-weight:600;font-size:15px;border-radius:8px;pointer-events:none}
 #hskip i{display:block;width:150px;height:6px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden}#hskip b{display:block;height:100%;width:0;background:#fff}
 /* (new) #ov2: a second dialog layer drawn ON TOP of #ov. The color picker and the name box open here, so the page that opened them stays underneath (dimmed) and is not replaced. It copies the look of #ov and its box. */
@@ -320,7 +320,7 @@ function menuBanner(){let i;do{i=Math.floor(Math.random()*MENU_TIPS.length)}whil
 let ink='#000';try{const c=getComputedStyle(document.documentElement).getPropertyValue('--sel-line').trim(),h=hexNorm(c);if(h){const v=parseInt(h.slice(1),16);if(((v>>16&255)*.299+(v>>8&255)*.587+(v&255)*.114)<140)ink='#fff'}}catch(e){}
 return '<div class="mq" style="color:'+ink+'"><span style="animation-duration:'+(6+t.length*.22).toFixed(1)+'s">'+esc(t)+'</span></div>'}
 // howToDlg() = the How to play page opened from the start menu. Back returns to the start menu.
-function howToDlg(){ovDir=1;ov('<h1>How to play</h1>'+['Tap one of your Stars, then tap a target to place a new star.','Crossing grid lines costs 1 Fuel each.','Place units on stars connected to your capital to make them stronger.','Move them strategically.','Stronger stars can capture weaker stars.','Watch out! If you fall more than 3 points behind the player ahead of you, you are instantly eliminated!','Each sector you control gives you 1 point.','The center sector gives you 3 points.','Each full row or column of Sectors you control gives you 1 bonus point.'].map(t=>'<p style="color:var(--ink);margin:0 0 10px">'+t+'</p>').join('')+'<div class="r" style="margin-top:12px"><button onclick="menu()">Back</button></div>')}
+function howToDlg(){ovDir=1;ov('<h1>How to play</h1>'+['Tap one of your Stars, then tap a target to place a new star.','Tap and hold for drag and drop, and hold newly placed stars for precise positioning.','Crossing grid lines costs 1 Fuel each.','Place units on stars connected to your capital to make them stronger.','Move them strategically.','Stronger stars can capture weaker stars.','Watch out! If you fall more than 3 points behind the player ahead of you, you are instantly eliminated!','Each sector you control gives you 1 point.','The center sector gives you 3 points.','Each full row or column of Sectors you control gives you 1 bonus point.'].map(t=>'<p style="color:var(--ink);margin:0 0 10px">'+t+'</p>').join('')+'<div class="r" style="margin-top:12px"><button onclick="menu()">Back</button></div>')}
 // start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
 // (changed) start(n,sz): n players on a board of sz sectors per side (default 7). Capitals sit the same distance from the edges on every size: one system in (e = far side, m = middle).
 function start(n,sz,pm,cpu,team,look){sz=[3,5,7].includes(sz)?sz:7;const N=sz*3,e=N-2,m=(N-1)/2,pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[e,1],2:[1,e]}:{0:[m,1],1:[1,m],2:[e,m],3:[m,e]};
@@ -345,7 +345,7 @@ const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
 const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
 // beginTurn() resets per-turn things: used stars, Fuel, mode (nothing selected). pool = Fleets to place = your rank from the round-start snapshot (G.rank): 1 + the number of distinct scores higher than yours, so tied players share a rank (dense ranks, RULES.md 2.2). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
-function beginTurn(){delete G.pv;if(!cpuOf(cur())&&(!net.on||net.my.includes(cur())))buzz(220);G.used=[];G.ap=acts(G.round);mode='';G.pool=G.rank[cur()]||1;G.stars.forEach(s=>{s.fm=0;delete s.fa});const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
+function beginTurn(){delete G.pv;delete G.nw;if(!cpuOf(cur())&&(!net.on||net.my.includes(cur())))buzz(220);G.used=[];G.ap=acts(G.round);mode='';G.pool=G.rank[cur()]||1;G.stars.forEach(s=>{s.fm=0;delete s.fa});const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
 // placeable() lists stars that can receive Fleets: none if your capital is lost, only the capital if capOnly, otherwise every own star reachable from the capital by walking your own connections (a flood-fill search).
 function placeable(){const me=cur(),cp=capStar(me);if(!cp||cp.o!=me)return[];if(G.capOnly)return[cp];const seen=new Set([cp.id]),q=[cp];while(q.length){const s=q.pop();G.conns.forEach(c=>{if(c[0]==s.id||c[1]==s.id){const t=by(c[0]==s.id?c[1]:c[0]);if(t.o==me&&!seen.has(t.id)){seen.add(t.id);q.push(t)}}})}return G.stars.filter(s=>seen.has(s.id))}
 // placeF(t) places one Fleet on star t if allowed, otherwise explains why. It saves an undo snapshot first.
@@ -424,7 +424,7 @@ pvSel=null;
 if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n});say('Moved '+p.n+'.');return render()}
 if(p.k=='c'||p.k=='g'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const b=by(p.b);tmApply(p.k=='c'?'conn':'gift',a,b);say(p.k=='c'?'Connected to '+NM[b.o]+'\'s Star for '+p.c+'.':'Gave the Star to '+NM[b.o]+' for '+p.c+'.');return render()}
 if(p.k=='h'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;say('Gave '+p.n+' Fleet'+(p.n>1?'s':'')+' to '+NM[t.o]+'.');return render()}
-if(p.k=='s'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(n.id);mvRec({k:'s',a:mvPos(a),b:mvPos(p),c:p.c});const m=elim();say('Star set for '+p.c+' Fuel.'+m);return render()}
+if(p.k=='s'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(n.id);nwAdd(n,a);mvRec({k:'s',a:mvPos(a),b:mvPos(p),c:p.c});const m=elim();say('Star set for '+p.c+' Fuel.'+m);return render()}
 pvDrop(p);pend={b:p.b,att:[{a:a.id,use:p.use,c:p.c}],pv:p};resolve(p.use)}
 function pvRestore(p){const L=G.pv||(G.pv=[]);L.push(p);G.ap-=p.c;G.used.push(p.a)}
 // pvLineOK(a,b) = a new line a-b keeps clear of the grey preview Stars (not the line's own ends). pvSpotErr(me) = a new Star at me keeps clear of preview Stars and of the dashed lines.
@@ -758,7 +758,7 @@ function tap(bx,by){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(b
  const c=cost(a,b);
 // Not enough Fuel: say so and stop.
  if(c>G.ap)return say('That costs '+c+' Fuel. You have '+G.ap+' Fuel.');
-// (new) Fixed positions: tapping an empty system opens the placement window instead of placing at the tap point (it only opens when the move is possible and a spot is legal).
+// (new) Fixed positions: tapping an empty system opens the precision placement menu instead of placing at the tap point (it only opens when the move is possible and a spot is legal).
 if(kind=='set'&&useFixed())return fxOpen(a,cx,cy,c);
 // Line too close to another star: say so and stop.
  // (new) For a new star: reject a spot that touches a star or connection, and say so plainly when the whole system has no legal spot.
@@ -778,7 +778,7 @@ const cb=str(b),fr=a.f||0,m=Math.max(0,cb+1-cs(a));if(str(a)<=cb)return say('Too
  if(kind=='set'&&pvOn())return pvAdd({k:'s',a:a.id,x:b.x,y:b.y,c},'Preview: new Star for '+c+' Fuel. Confirm or Cancel, or pick another Star.');
  undo.push(JSON.stringify(G));
 // Set: create a new star with a fresh id, connect it to the origin, mark both used.
- if(kind=='set'){const n={id:G.nid++,x:b.x,y:b.y,o:me};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id)}
+ if(kind=='set'){const n={id:G.nid++,x:b.x,y:b.y,o:me};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id);nwAdd(n,a)}
 // Connect: add a connection between the two stars, mark the origin used.
  else if(kind=='conn'){G.conns.push([a.id,b.id]);G.used.push(a.id)}
 
@@ -895,13 +895,14 @@ function boardSVG(S,ctl,L){let s='';
 // A local helper to find a star by id.
  const by=id=>S.stars.find(q=>q.id==id);
 // Draw each connection as a colored line between its two stars. (step 7) (step 7d) Every link is one line in the color of its FIRST end, i.e. the player who made it; a link between teammates gets no stripe or gradient.
- S.conns.forEach(([p,q])=>{const a=by(p),b=by(q);s+=`<line x1=\"${a.x}\" y1=\"${a.y}\" x2=\"${b.x}\" y2=\"${b.y}\" stroke=\"${COL[a.o]}\" stroke-width=\"${LINE_W}\" stroke-linecap=\"round\"/>`});
+ // (new, drag and drop) L.dd = the Star or Star preview being dragged ({id} or {i}): it and its line are drawn by the drag overlay (ddSVG) instead.
+ S.conns.forEach(([p,q])=>{if(L&&L.dd&&L.dd.id!=null&&(p===L.dd.id||q===L.dd.id))return;const a=by(p),b=by(q);s+=`<line x1=\"${a.x}\" y1=\"${a.y}\" x2=\"${b.x}\" y2=\"${b.y}\" stroke=\"${COL[a.o]}\" stroke-width=\"${LINE_W}\" stroke-linecap=\"round\"/>`});
  // (new) Deficit Elimination animation (live board only): the eliminated players' connections still on show (dgSVG), under the Stars. The group is always there so dfPrep and dfRun can fill it without a full redraw.
  if(L)s+='<g id="dgh">'+dgSVG()+'</g>';
  // (new) Multi-attack preview: a dashed line from each chosen attacker to the target (they turn solid when the attack lands).
  if(L&&L.multi&&L.multi.t!=null)L.multi.att.forEach(x=>{const a=by(x.id),b=by(L.multi.t);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round"/>`});
 // For each star: op = opacity (dimmed if it already acted this turn), f = the shared style text.
- S.stars.forEach(q=>{const op=L&&q.o==L.me&&L.used.includes(q.id)?.5:1,f=`fill="${COL[q.o]}" stroke="var(--ink)" stroke-width="${R_STROKE}" opacity="${op}"`;
+ S.stars.forEach(q=>{if(L&&L.dd&&q.id===L.dd.id)return;const op=L&&q.o==L.me&&L.used.includes(q.id)?.5:1,f=`fill="${COL[q.o]}" stroke="var(--ink)" stroke-width="${R_STROKE}" opacity="${op}"`;
 // Capitals are drawn as a star shape, normal stars as circles.
   s+=q.cap?`<polygon points="${sp(q.x,q.y,R_CAP,R_CAP_IN)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r="${R_STAR}" ${f}/>`;
 // If the star holds Fleets, draw a small badge showing the number. (new) L.fd = changes shown during a Defence call (defLive).
@@ -921,12 +922,14 @@ function boardSVG(S,ctl,L){let s='';
 // If it is the selected star, draw a dashed ring.
   if(L&&q.id==L.sel)s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".18 .12"/>`});
 // (new) Move previews: a dashed line in the player's color from the origin to the new spot (with a ghost Star in the player's color at half strength, full-strength dashed border) or to the target of a capture; the selected one gets a dashed ring.
- if(L&&S.pv)S.pv.forEach(p=>{const a=by(p.a);if(!a)return;let ex,ey;if(p.k=='s'){ex=p.x;ey=p.y}else{const b=by(p.b);if(!b)return;ex=b.x;ey=b.y}const col=COL[a.o];
+ if(L&&S.pv)S.pv.forEach(p=>{const a=by(p.a);if(!a||(L.dd&&p.i===L.dd.i))return;let ex,ey;if(p.k=='s'){ex=p.x;ey=p.y}else{const b=by(p.b);if(!b)return;ex=b.x;ey=b.y}const col=COL[a.o];
   s+=p.k=='f'?`<polyline points="${(p.path||[]).map(i=>by(i)).filter(Boolean).map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`:`<line x1="${a.x}" y1="${a.y}" x2="${ex}" y2="${ey}" stroke="${col}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/>`;
   if(p.k=='s')s+=`<circle cx="${ex}" cy="${ey}" r="${R_STAR}" fill="${col}" fill-opacity=".5" stroke="${col}" stroke-width="${R_STROKE}" stroke-dasharray=".08 .06"/>`;
   if(p.i==L.pvSel)s+=`<circle cx="${ex}" cy="${ey}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/><circle cx="${a.x}" cy="${a.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09"/>`});
 // (new) While a defender chooses Hold or Retreat: a dashed line in the attacker's color from each attacker to the target, a solid ring on each attacker, a dashed ring on the target (also shown when the attacker is a computer, and on the defender's own device online).
  if(L&&L.atk&&Array.isArray(L.atk.att)){const tg=by(L.atk.b);if(tg){L.atk.att.forEach(id=>{const a=by(id);if(!a)return;s+=`<line x1="${a.x}" y1="${a.y}" x2="${tg.x}" y2="${tg.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/><circle cx="${a.x}" cy="${a.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09"/>`});s+=`<circle cx="${tg.x}" cy="${tg.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`}}
+// (new, drag and drop) The drag overlay goes on top of everything; ddPaint refills #ddg on each finger move without redrawing the board.
+ if(L&&L.dd)s+='<g id="ddg">'+ddSVG()+'</g>';
 // Put all the shapes into the page, then highlight the active mode button and update the Place label.
  return s}
 // (new) fuelUi(n) = the Fuel gauge in the info row: "Fuel n" and the bar, filled n out of this round's Fuel (acts), so it starts full and empties as Fuel is spent. n is the Fuel left after any multi-attack lines being chosen, so the bar also drops while a multi-attack is set up, and rises again on Cancel, Undo or a cancelled preview. The dashed step lines are rebuilt only when the round's Fuel changes. The fill slides at the Animations speed (animMs; none when Animations are off or reduced motion is on), see fuelGo.
@@ -947,13 +950,14 @@ if(pct==fuelPct)return;const ms=fuelPct<0||(window.matchMedia&&matchMedia('(pref
 // persist() autosaves the game in the browser (silently ignores errors).
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 // render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
-// (new) rs = the selected Star in Stars mode (its Fuel range is outlined); none while an attack is being resolved (pend: Fleet choice and the Defence call) or with the range border switched off (rngOn). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
+// (new) rs = the selected Star in Stars mode (its Fuel range is outlined); none while an attack is being resolved (pend: Fleet choice and the Defence call) or with the range border switched off (rngOn). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. (new) While a Star is dragged (dg), the outline is drawn round its origin with the Fuel the drag may spend (dg.n), and the Fuel shown is what would be left after the drop. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
 function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
-W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
+const da=dg&&by(dg.a);
+W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:da?{id:dg.id,i:dg.i}:null,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
 // Fill the info row: player name, round (and online status); Fuel left goes to the gauge (fuelUi).
- $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(fl);
+ $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(da&&dg.e?Math.max(0,dg.n-dg.e.c):fl);
 // Fill the score chips: one per player with VP and star count.
  $('chips').innerHTML=G.pl.map(c=>`<div class="chip ${c==me&&!G.over?'on':''} ${G.alive[c]?'':'dead'} ${net.on&&!seatUp(c)?'off':''}" style="--c:${COL[c]}">${chipIn(c,vp[c],G.alive[c],G.rank[c])}</div>`).join('');
 // (new) Online: after every redraw, send changes to the other players if this device is in charge of the turn. Then, if a computer player has the turn here, schedule its next move.
@@ -991,37 +995,46 @@ const tPts=e=>[...e.touches].map(t=>({x:t.clientX,y:t.clientY}));
 const gestOf=ts=>{const a=ts[0],b=ts[1]||ts[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
 // Safari's own pinch-zoom of the whole page sends gesture events; cancel them while touch controls are on.
 ['gesturestart','gesturechange','gestureend'].forEach(n=>document.addEventListener(n,e=>{if(useTouch())e.preventDefault()},{passive:false}));
-// bindBoard(svgEl,box,V,ap,onTap) wires tap, drag-pan, pinch-zoom and wheel-zoom for ONE board. svgEl = its drawing surface, box = the container that sizes it, V = its own pan/zoom values, ap = function that applies V, onTap(bx,by) = called with board coordinates on a tap. The live board and the history viewer each get their own copy, so they never share zoom or gesture state.
+// bindBoard(svgEl,box,V,ap,onTap,hk) wires tap, drag-pan, pinch-zoom and wheel-zoom for ONE board. svgEl = its drawing surface, box = the container that sizes it, V = its own pan/zoom values, ap = function that applies V, onTap(bx,by) = called with board coordinates on a tap. The live board and the history viewer each get their own copy, so they never share zoom or gesture state.
+// (new, drag and drop) hk = optional press-and-hold hooks (live board only, ddHold): down(bx,by) when one finger touches, owns() = a hold has taken the gesture over (then the finger's moves go to move(bx,by) and its lift to up(bx,by) instead of panning and tapping), cancel(all) when the finger pans, lifts as a tap or a second finger arrives (all = also stop a drag in progress).
 // (new) Ghost-click guard. A board tap is handled the instant the finger lifts, and many phones then send a follow-up "click" to whatever is under the finger NOW. If the tap just opened a popup (How many Fleets? Hold button, ...), that click pressed a popup button by itself: it applied a Fleet number you never chose, or hit Cancel so the popup vanished. tapAt = when the last board tap happened; for 300 ms afterwards, real (not programmatic) clicks on buttons and dialogs are ignored.
 let tapAt=0;
 document.addEventListener('click',e=>{if(e.isTrusted&&Date.now()-tapAt<300&&e.target&&e.target.closest&&e.target.closest('button,#ov')){e.stopImmediatePropagation();e.preventDefault()}},true);
-function bindBoard(svgEl,box,V,ap,onTap0){const onTap=(x,y)=>{tapAt=Date.now();onTap0(x,y)};
+function bindBoard(svgEl,box,V,ap,onTap0,hk){const onTap=(x,y)=>{tapAt=Date.now();onTap0(x,y)},bxy=(cx,cy,f)=>{const r=box.getBoundingClientRect();f((cx-r.left-V.x)/V.k,(cy-r.top-V.y)/V.k)};
 // (new) Any touch, click or wheel on the live board stops a turn-change camera move (camStop), so the player is never fought for the view.
 ['touchstart','pointerdown','wheel'].forEach(n=>svgEl.addEventListener(n,()=>{if(V===view)camStop()},{passive:true}));
 let tMoved=0,tMulti=0,tPrev=null,tLast=null;
 // Touch events (used on Apple devices): take over the touch so Safari cannot scroll or zoom the page.
-svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0}else{tMulti=1;tMoved=99}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
+svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
 svgEl.addEventListener('touchmove',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length)return;
-if(ts.length==1){const dx=ts[0].x-tPrev.x,dy=ts[0].y-tPrev.y;tPrev=ts[0];tMoved+=Math.abs(dx)+Math.abs(dy);if(tMoved>10){V.x+=dx;V.y+=dy;ap()}}
+if(hk&&hk.owns()){tPrev=ts[0];if(ts.length==1)bxy(ts[0].x,ts[0].y,hk.move);return}
+if(ts.length==1){const dx=ts[0].x-tPrev.x,dy=ts[0].y-tPrev.y;tPrev=ts[0];tMoved+=Math.abs(dx)+Math.abs(dy);if(tMoved>10){if(hk)hk.cancel();V.x+=dx;V.y+=dy;ap()}}
 else{const g=gestOf(ts),r=box.getBoundingClientRect();V.x+=g.cx-tLast.cx;V.y+=g.cy-tLast.cy;zoomAt(g.d/tLast.d,g.cx-r.left,g.cy-r.top,V,ap);tLast=g}},{passive:false});
 const tEnd=e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);
+if(hk&&hk.owns()){if(!ts.length){if(e.type=='touchend'&&e.changedTouches.length){const t=e.changedTouches[0];bxy(t.clientX,t.clientY,hk.up)}else hk.cancel(1)}if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}return}
+if(hk&&!ts.length)hk.cancel();
 if(e.type=='touchend'&&!ts.length&&!tMulti&&tMoved<=10&&e.changedTouches.length){const t=e.changedTouches[0],r=box.getBoundingClientRect();onTap((t.clientX-r.left-V.x)/V.k,(t.clientY-r.top-V.y)/V.k)}
 if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}};
 svgEl.addEventListener('touchend',tEnd,{passive:false});svgEl.addEventListener('touchcancel',tEnd,{passive:false});
 // Pointer events (used everywhere else: mouse, Android, Quest): same behaviour.
 const P=new Map();let moved=0,twoFinger=0,last=null;
 const gest=()=>{const v=[...P.values()],a=v[0],b=v[1]||v[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
-svgEl.addEventListener('pointerdown',e=>{if(useTouch()&&e.pointerType==='touch')return;svgEl.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size==1){moved=0;twoFinger=0}else{twoFinger=1;moved=99}last=gest()});
+svgEl.addEventListener('pointerdown',e=>{if(useTouch()&&e.pointerType==='touch')return;svgEl.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size==1){moved=0;twoFinger=0;if(hk)bxy(e.clientX,e.clientY,hk.down)}else{twoFinger=1;moved=99;if(hk)hk.cancel(1)}last=gest()});
 svgEl.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
-if(P.size==1){moved+=Math.abs(dx)+Math.abs(dy);if(moved>8){V.x+=dx;V.y+=dy;ap()}}
+if(hk&&hk.owns()){if(P.size==1)bxy(e.clientX,e.clientY,hk.move);return}
+if(P.size==1){moved+=Math.abs(dx)+Math.abs(dy);if(moved>8){if(hk)hk.cancel();V.x+=dx;V.y+=dy;ap()}}
 else if(P.size==2){const g=gest(),r=box.getBoundingClientRect();V.x+=g.cx-last.cx;V.y+=g.cy-last.cy;zoomAt(g.d/last.d,g.cx-r.left,g.cy-r.top,V,ap);last=g}});
 const up=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);
+if(hk&&hk.owns()){if(P.size==0){if(e.type=='pointerup')bxy(e.clientX,e.clientY,hk.up);else hk.cancel(1)}return}
+if(hk&&P.size==0)hk.cancel();
 if(P.size==0&&!twoFinger&&moved<=8&&e.type=='pointerup'){const r=box.getBoundingClientRect();onTap((e.clientX-r.left-V.x)/V.k,(e.clientY-r.top-V.y)/V.k)}
 if(P.size==1)last=gest()};
 svgEl.addEventListener('pointerup',up);svgEl.addEventListener('pointercancel',up);
 svgEl.addEventListener('wheel',e=>{e.preventDefault();const r=box.getBoundingClientRect();zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top,V,ap)},{passive:false})}
 // The live board uses it with its own view; the tap goes to the game's tap().
-bindBoard(svg,st,view,apply,(bx,by)=>tap(bx,by));
+bindBoard(svg,st,view,apply,(bx,by)=>tap(bx,by),{down:ddDown,owns:ddOwns,move:ddMove,up:ddUp,cancel:ddCancel});
+// (new, drag and drop) A long press on the board must not open the browser's own menu.
+svg.addEventListener('contextmenu',e=>e.preventDefault());
 // mid(f) zooms around the center of the board area.
 const mid=f=>{const r=st.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)};
 // Hook up the + and - zoom buttons, Fit, the mode buttons (via data-m) and the Concede button.
@@ -1039,7 +1052,7 @@ $('un').onclick=()=>{if(lock())return;
 if(pend&&pend.ph){if(multi){pend=null;hl=[];$('hold').style.display='';multi.step='sel';say(multiMsg('Back to the multi-attack.'))}else{const pp=pend.pv;resetFlow();if(pp){pvRestore(pp);pvSel=pp.i;say('Back to the capture preview.')}else say('Attack cancelled. Nothing was changed.')}return render()}
 // (new) While setting up a multi-attack, Undo removes the last attacker, then the target, then leaves Multi mode.
 if(multi){if(multi.att.length){multi.att.pop();say(multiMsg('Last attacker removed.'))}else if(multi.t!=null){multi.t=null;multi.step='target';say('Target cleared. Tap an enemy Star as the target.')}else{resetFlow();mode='';say('Multi-attack closed.')}return render()}
-if(G&&!G.over&&undo.length){const tp=undo[undo.length-1];if(!(tp&&tp.pv))mvUndo();const cv=G.cpuV,cb=G.cpuB;G=JSON.parse(undo.pop());if(cv){G.cpuV=cv;if(cb)G.cpuB=cb;else delete G.cpuB}resetFlow();say('Undone');render()}};
+if(G&&!G.over&&undo.length){const tp=undo[undo.length-1];if(tp&&tp.mx)mvFixUndo(tp.mx);else if(!(tp&&tp.pv))mvUndo();const cv=G.cpuV,cb=G.cpuB;G=JSON.parse(undo.pop());if(cv){G.cpuV=cv;if(cb)G.cpuB=cb;else delete G.cpuB}resetFlow();say('Undone');render()}};
 // dl: the download helper, used by Save file when the page allows it.
 let dl=null;try{window.claude&&claude.use('downloads').then(d=>{dl=d}).catch(()=>{})}catch(e){}
 // loadObj(o) loads a saved game: check it looks valid, make it the current game, fill in defaults for older saves, reset the interface.
@@ -1113,6 +1126,8 @@ if(!F(n.ap)||n.ap<0||n.ap>99)bad('The Fuel count is invalid.');
 if(!Array.isArray(n.used)||n.used.some(i=>!ids.has(i)))bad('The used-star list is invalid.');
 // (new) Move previews (G.pv): absent or empty = none; each is {i, k: s new Star at x,y | t capture of star b with use Fleets | f Fleet move along path | (team games) c Connect to teammate star b | g Gift of star a to teammate star b | h Fleets n given to teammate star b, a: origin star, c: Fuel paid}.
 if(n.pv==null)delete n.pv;else{if(!Array.isArray(n.pv)||n.pv.length>40||n.pv.some(p=>!p||!['s','t','f','c','g','h'].includes(p.k)||!ids.has(p.a)||!I(p.c,0,99)||!I(p.i,1,1e6)||(p.k=='s'?!(F(p.x)&&F(p.y)&&p.x>=0&&p.x<=NS&&p.y>=0&&p.y<=NS):p.k=='t'?!(ids.has(p.b)&&I(p.use,0,9999)):p.k=='c'||p.k=='g'?!ids.has(p.b):p.k=='h'?!(ids.has(p.b)&&I(p.n,1,9999)):!(ids.has(p.b)&&I(p.n,1,9999)&&Array.isArray(p.path)&&p.path.length<=40&&p.path.every(i=>ids.has(i))))))bad('The move previews are invalid.');if(!n.pv.length)delete n.pv}
+// (new, drag and drop) Stars set this turn (G.nw = [[new Star id, origin Star id]]): only lets them be moved again this turn, so a bad list is dropped rather than refusing the file.
+if(n.nw!=null&&!(Array.isArray(n.nw)&&n.nw.length<=400&&n.nw.every(q=>Array.isArray(q)&&q.length==2&&ids.has(q[0])&&ids.has(q[1]))))delete n.nw;
 if(!I(n.nid,1,1e7)||[...ids].some(i=>i>=n.nid))n.nid=Math.max(0,...ids)+1;
 if(n.score==null||typeof n.score!='object')bad('The scores are invalid.');
 if(n.over!=null&&(!Array.isArray(n.over)||n.over.some(c=>!n.pl.includes(c))))bad('The game-over data is invalid.');
@@ -1366,44 +1381,145 @@ const fxLegal=(a,cx,cy)=>FX.filter(q=>fxOK(a,fxPos(cx,cy,q)));
 // fxSys(cx,cy) = the system's name: sector letter+number, then system letter+number inside the sector, e.g. 'A1 · a1' (first system) or 'G7 · c3' (last system on the standard board). fxName adds the spot: 'G7 · c3 · L12'.
 const fxSys=(cx,cy)=>String.fromCharCode(65+Math.floor(cx/3))+(Math.floor(cy/3)+1)+' · '+'abc'[cx%3]+(cy%3+1);
 const fxName=(cx,cy,q)=>fxSys(cx,cy)+' · '+q.k;
-// fixOn = this device's choice (Game menu page) to use fixed positions when the game allows both; fxLabels = show the S/L/V labels in the placement window (hidden until you turn them on; not remembered).
+// fixOn = this device's choice (Game menu page) to use fixed positions when the game allows both; fxLabels = show the S/L/V labels in the precision placement menu (hidden until you turn them on; not remembered).
 let fixOn=false,fxLabels=false;try{fixOn=localStorage.getItem('constellate-fixed')==='1'}catch(e){}
-// useFixed() = should a new star be placed with the placement window right now? A game can force it (G.pm 'fixed'), forbid it (G.pm 'free'), or leave it to the player (no G.pm).
+// useFixed() = should a new star be placed with the precision placement menu right now (on a tap, and on a drag's drop)? A game can force it (G.pm 'fixed'), forbid it (G.pm 'free'), or leave it to the player (no G.pm).
 const useFixed=()=>!!G&&!cpuRun&&(G.pm=='fixed'||(G.pm!='free'&&fixOn));
 // placeLabel() = text of the Game page toggle; placeToggle(b) flips it (when the game leaves it to the player).
 const placeLabel=()=>G&&G.pm=='free'?'Placement: Free (game rule)':G&&G.pm=='fixed'?'Placement: Fixed (game rule)':'Placement: '+(fixOn?'Fixed positions':'Free');
 function placeToggle(b){if(G&&G.pm)return;fixOn=!fixOn;try{localStorage.setItem('constellate-fixed',fixOn?'1':'0')}catch(e){}b.textContent=placeLabel()}
-// fx = the placement window's state: a = source star id, cx,cy = target system, c = Fuel cost, tab = S/L/V, pick = chosen spot label or null.
+// (changed, drag and drop) fx = the precision placement menu's state (until build 2026-10-27-f the fixed-positions placement window): a = origin star id, cx,cy = target system, c = Fuel cost, mv = the Star being moved instead of a new one (null, {k:'pv', i: Star preview id} or {k:'st', id: a Star set this turn}), tab = F (Free) or S/L/V, pick = chosen fixed spot label or null, fp = chosen free point {x,y} or null.
 let fx=null;
-// fxOpen(a,cx,cy,c) opens the placement window for an empty system, but only when at least one spot is legal (otherwise it says why and nothing opens).
-function fxOpen(a,cx,cy,c){if(!fxLegal(a,cx,cy).length)return say('No room for a Star in this system.');fx={a:a.id,cx,cy,c,tab:'S',pick:null};fxDraw()}
+// plFree() / plFix() = this game allows free placement / fixed positions (G.pm 'free' or 'fixed' allows only that one; no G.pm leaves it to each player, so both are allowed).
+const plFree=()=>!!G&&G.pm!='fixed',plFix=()=>!!G&&G.pm!='free';
+// fxOpen(a,cx,cy,c,o) opens the precision placement menu for an empty system, but only when at least one spot is legal (otherwise it says why and nothing opens). Panels: Free (anywhere legal: tap or drag inside the window) unless the game is fixed positions only, then Space / Line / Vertex unless it is free placement only. It starts on Space when this placement uses fixed positions (useFixed), otherwise on Free. o = {mv: the Star being moved (see fx), fp: a free point to start with, e.g. where a drag paused}.
+function fxOpen(a,cx,cy,c,o){o=o||{};const m=o.mv||null,fr=plFree()&&exRun(m,()=>roomIn(cx,cy,a)),fi=plFix()&&exRun(m,()=>fxLegal(a,cx,cy).length>0);
+if(!fr&&!fi)return say('No room for a Star in this system.');
+fx={a:a.id,cx,cy,c,mv:m,tab:fi&&(useFixed()||!fr)?'S':'F',pick:null,fp:null};if(o.fp&&fr&&exRun(m,()=>!spotErr(o.fp)&&clear(a,o.fp)))fx.fp={x:o.fp.x,y:o.fp.y};fxDraw()}
 function fxTab(t){if(fx){fx.tab=t;fxDraw()}}
 function fxPick(k){if(fx){fx.pick=k;fxDraw()}}
 function fxLabelsToggle(){fxLabels=!fxLabels;if(fx)fxDraw()}
 function fxCancel(){fx=null;$('ov').style.display='none';say('')}
-// fxSvg() draws the zoomed-in window: the legal part of the system, the tic-tac-toe reference lines, nearby connections, the spots of the chosen tab (blue = legal, grey ring = blocked), and the star and its new line at the chosen spot.
-function fxSvg(){const a=by(fx.a),cx=fx.cx,cy=fx.cy,me=cur(),pad=.04,vx=cx-pad,vy=cy-pad,vw=1+2*pad,zw=1-2*MARG;
+// fxSel() = the chosen position as {p: board point, nm: its name}, or null while nothing legal is chosen on the panel shown. fxStat() = the line of text under the window. fxDyn() = the chosen Star and its dashed line (grey and dashed where a free point is blocked). Call these inside exRun(fx.mv, ...), so a Star being moved does not block itself.
+function fxSel(){const a=by(fx.a);if(fx.tab=='F')return fx.fp&&!spotErr(fx.fp)&&clear(a,fx.fp)?{p:fx.fp,nm:fxSys(fx.cx,fx.cy)}:null;const q=fx.pick&&FX.find(z=>z.k==fx.pick),p=q&&fxPos(fx.cx,fx.cy,q);return p&&fxOK(a,p)?{p,nm:fxName(fx.cx,fx.cy,q)}:null}
+function fxStat(){if(fx.tab=='F'){if(!fx.fp)return 'Tap or drag inside the system to place the Star.';const e=spotErr(fx.fp)||(clear(by(fx.a),fx.fp)?'':'The line passes too close to another Star.');return e?e+' Try another spot.':'Selected: free position in '+fxSys(fx.cx,fx.cy)+'.'}const pk=fx.pick&&FX.find(q=>q.k==fx.pick);return pk?'Selected: '+fxName(fx.cx,fx.cy,pk):'Tap a blue dot to choose a position. Grey rings are blocked.'}
+function fxDyn(){const a=by(fx.a),F=fx.tab=='F',pk=!F&&fx.pick&&FX.find(q=>q.k==fx.pick),pp=F?fx.fp:pk&&fxPos(fx.cx,fx.cy,pk);if(!a||!pp)return '';const ok=!F||(!spotErr(pp)&&clear(a,pp)),col=ok?COL[cur()]:'#8a97a3';
+return '<line x1="'+a.x+'" y1="'+a.y+'" x2="'+pp.x+'" y2="'+pp.y+'" stroke="'+col+'" stroke-width="'+LINE_W+'" stroke-dasharray=".08 .06" stroke-linecap="round"/><circle cx="'+pp.x+'" cy="'+pp.y+'" r="'+R_STAR+'" fill="'+col+'" fill-opacity=".6" stroke="'+col+'" stroke-width="'+R_STROKE+'"'+(ok?'':' stroke-dasharray=".04 .03"')+'/>'}
+// fxSvg() draws the zoomed-in window: the system, the tic-tac-toe reference lines, nearby connections and Stars, the chosen Star (#fxdyn, fxDyn), then on the fixed panels the spots of the chosen tab (blue = legal, grey ring = blocked), or on the Free panel a dashed box round the area a Star's center can use.
+function fxSvg(){const cx=fx.cx,cy=fx.cy,pad=.04,vx=cx-pad,vy=cy-pad,vw=1+2*pad,zw=1-2*MARG,F=fx.tab=='F';
 // The black square is the system border. The thin red lines are the tic-tac-toe guide between the Spaces (halfway between neighboring Space columns and rows).
-let h='<svg viewBox="'+vx+' '+vy+' '+vw+' '+vw+'" style="width:100%;display:block;background:var(--bg);border:1px solid var(--line);border-radius:10px">';
+let h='<svg id="fxsv" viewBox="'+vx+' '+vy+' '+vw+' '+vw+'" style="width:100%;display:block;background:var(--bg);border:1px solid var(--line);border-radius:10px"'+(F?' onpointerdown="fxFreeDn(event)" onpointermove="fxFreeMv(event)" onpointerup="fxFreeUp()" onpointercancel="fxFreeUp()"':'')+'>';
 h+='<rect x="'+cx+'" y="'+cy+'" width="1" height="1" fill="none" stroke="var(--ink)" stroke-width=".012"/>';
 [2,4].forEach(i=>{const x=cx+MARG+zw*(i-1)/4,y=cy+MARG+zw*(i-1)/4;h+='<line x1="'+x+'" y1="'+cy+'" x2="'+x+'" y2="'+(cy+1)+'" stroke="#e53e3e" stroke-opacity=".6" stroke-width=".008"/><line x1="'+cx+'" y1="'+y+'" x2="'+(cx+1)+'" y2="'+y+'" stroke="#e53e3e" stroke-opacity=".6" stroke-width=".008"/>'});
 const inView=(x0,y0,x1,y1)=>Math.max(x0,x1)>=vx&&Math.min(x0,x1)<=vx+vw&&Math.max(y0,y1)>=vy&&Math.min(y0,y1)<=vy+vw;
 G.conns.forEach(q=>{const s1=by(q[0]),s2=by(q[1]);if(!s1||!s2||!inView(s1.x,s1.y,s2.x,s2.y))return;h+='<line x1="'+s1.x+'" y1="'+s1.y+'" x2="'+s2.x+'" y2="'+s2.y+'" stroke="'+COL[s1.o]+'" stroke-opacity=".6" stroke-width="'+LINE_W+'" stroke-linecap="round"/>'});
 G.stars.forEach(t=>{if(inView(t.x-.25,t.y-.25,t.x+.25,t.y+.25))h+='<circle cx="'+t.x+'" cy="'+t.y+'" r="'+outerR(t)+'" fill="'+COL[t.o]+'" fill-opacity=".45" stroke="'+COL[t.o]+'" stroke-width=".01"/>'});
-const pk=fx.pick&&FX.find(q=>q.k==fx.pick),pp=pk&&fxPos(cx,cy,pk);
-if(pp)h+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+pp.x+'" y2="'+pp.y+'" stroke="'+COL[me]+'" stroke-width="'+LINE_W+'" stroke-dasharray=".08 .06" stroke-linecap="round"/><circle cx="'+pp.x+'" cy="'+pp.y+'" r="'+R_STAR+'" fill="'+COL[me]+'" fill-opacity=".6" stroke="'+COL[me]+'" stroke-width="'+R_STROKE+'"/>';
-FX.filter(q=>q.t==fx.tab).forEach(q=>{const p=fxPos(cx,cy,q),ok=fxOK(a,p),sel=q.k==fx.pick;
-if(ok)h+='<circle cx="'+p.x+'" cy="'+p.y+'" r="'+(sel?.05:.04)+'" fill="'+(sel?'#fff':'#3bb4ff')+'" stroke="'+(sel?COL[me]:'#fff')+'" stroke-width=".012"/><circle cx="'+p.x+'" cy="'+p.y+'" r=".06" fill="transparent" style="cursor:pointer" onclick="fxPick(\''+q.k+'\')"/>';
+if(F)h+='<rect x="'+(cx+MARG)+'" y="'+(cy+MARG)+'" width="'+zw+'" height="'+zw+'" fill="none" stroke="var(--mut)" stroke-width=".008" stroke-dasharray=".03 .02"/>';
+h+='<g id="fxdyn">'+fxDyn()+'</g>';
+const a=by(fx.a);if(!F)FX.filter(q=>q.t==fx.tab).forEach(q=>{const p=fxPos(cx,cy,q),ok=fxOK(a,p),sel=q.k==fx.pick;
+if(ok)h+='<circle cx="'+p.x+'" cy="'+p.y+'" r="'+(sel?.05:.04)+'" fill="'+(sel?'#fff':'#3bb4ff')+'" stroke="'+(sel?COL[cur()]:'#fff')+'" stroke-width=".012"/><circle cx="'+p.x+'" cy="'+p.y+'" r=".06" fill="transparent" style="cursor:pointer" onclick="fxPick(\''+q.k+'\')"/>';
 else h+='<circle cx="'+p.x+'" cy="'+p.y+'" r=".03" fill="none" stroke="#8a97a3" stroke-opacity=".7" stroke-width=".008"/>';
 if(fxLabels)h+='<text x="'+(p.x+.05)+'" y="'+(p.y-.035)+'" font-size=".042" font-weight="700" fill="var(--ink)" stroke="var(--bg)" stroke-width=".012" paint-order="stroke" pointer-events="none">'+q.k+'</text>'});
 return h+'</svg>'}
-// fxDraw() builds the placement dialog: title, Space/Line/Vertex tabs with how many spots are legal, the window, what is selected, then Confirm, the label toggle and Cancel.
-function fxDraw(){const a=by(fx.a),cnt=t=>FX.filter(q=>q.t==t&&fxOK(a,fxPos(fx.cx,fx.cy,q))).length,pk=fx.pick&&FX.find(q=>q.k==fx.pick);
-ov('<h1>Place a Star</h1><p style="margin:0 0 8px">'+fxSys(fx.cx,fx.cy)+' · costs '+fx.c+' Fuel</p>'+tabBar([['S','Space ('+cnt('S')+')'],['L','Line ('+cnt('L')+')'],['V','Vertex ('+cnt('V')+')']],fx.tab,'fxTab')+'<div style="margin:8px 0">'+fxSvg()+'</div><p style="margin:0 0 8px;min-height:1.3em;color:var(--mut)">'+(pk?'Selected: '+fxName(fx.cx,fx.cy,pk):'Tap a blue dot to choose a position. Grey rings are blocked.')+'</p><div class="r"><button onclick="fxConfirm()"'+(pk?'':' disabled')+'>Confirm</button><button onclick="fxLabelsToggle()">Labels: '+(fxLabels?'Shown':'Hidden')+'</button></div><div class="r" style="margin-top:8px"><button onclick="fxCancel()">Cancel</button></div>')}
-// fxConfirm() makes the move exactly like free placement does (undo snapshot, new star, connection, Fuel spent, eliminations, redraw).
-function fxConfirm(){if(!fx||!fx.pick)return;const a=by(fx.a),q=FX.find(z=>z.k==fx.pick),p=fxPos(fx.cx,fx.cy,q);if(!a||!fxOK(a,p)){fx.pick=null;return fxDraw()}
-$('ov').style.display='none';if(pvOn()){const c0=fx.c,nm0=fxName(fx.cx,fx.cy,q);fx=null;return pvAdd({k:'s',a:a.id,x:p.x,y:p.y,c:c0},'Preview: Star at '+nm0+' for '+c0+' Fuel. Confirm or Cancel, or pick another Star.')}undo.push(JSON.stringify(G));const me=cur(),n={id:G.nid++,x:p.x,y:p.y,o:me};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id);G.ap-=fx.c;sel=null;
-const nm=fxName(fx.cx,fx.cy,q),c=fx.c;fx=null;mvRec({k:'s',a:mvPos(a),b:mvPos(p),c});const m=elim();say('Star set at '+nm+' for '+c+' Fuel.'+m);render()}
+// fxDraw() builds the menu: title, the panels this game allows (Free; Space / Line / Vertex with how many spots are legal), the window, what is selected, then Confirm, the label toggle (fixed panels) and Cancel. The text is built with the moved Star off the board (exRun), and shown after.
+function fxDraw(){const h=exRun(fx.mv,()=>{const a=by(fx.a),cnt=t=>FX.filter(q=>q.t==t&&fxOK(a,fxPos(fx.cx,fx.cy,q))).length,tabs=[];if(plFree())tabs.push(['F','Free']);if(plFix())tabs.push(['S','Space ('+cnt('S')+')'],['L','Line ('+cnt('L')+')'],['V','Vertex ('+cnt('V')+')']);
+return '<h1>Precision placement</h1><p style="margin:0 0 8px">'+fxSys(fx.cx,fx.cy)+' · costs '+fx.c+' Fuel'+(fx.mv?' · moving a Star':'')+'</p>'+tabBar(tabs,fx.tab,'fxTab')+'<div style="margin:8px 0">'+fxSvg()+'</div><p id="fxst" style="margin:0 0 8px;min-height:1.3em;color:var(--mut)">'+fxStat()+'</p><div class="r"><button id="fxok" onclick="fxConfirm()"'+(fxSel()?'':' disabled')+'>Confirm</button>'+(fx.tab!='F'?'<button onclick="fxLabelsToggle()">Labels: '+(fxLabels?'Shown':'Hidden')+'</button>':'')+'</div><div class="r" style="margin-top:8px"><button onclick="fxCancel()">Cancel</button></div>'});ov(h)}
+// (new) The Free panel: a finger (or mouse) pressed in the window puts the Star there and drags it while held (fxFreeDn / fxFreeMv / fxFreeUp). fxPt(ev) = the board point under it, kept inside the area a Star's center can use. Only the Star, the text and Confirm are refreshed (fxFresh), so the window keeps hold of the finger.
+let fxDrag=false;
+function fxPt(ev){const r=$('fxsv').getBoundingClientRect(),pad=.04,vw=1+2*pad,x=fx.cx-pad+(ev.clientX-r.left)/r.width*vw,y=fx.cy-pad+(ev.clientY-r.top)/r.height*vw;return{x:Math.min(fx.cx+1-MARG,Math.max(fx.cx+MARG,x)),y:Math.min(fx.cy+1-MARG,Math.max(fx.cy+MARG,y))}}
+function fxFreeDn(ev){if(!fx||fx.tab!='F')return;fxDrag=true;try{ev.currentTarget.setPointerCapture(ev.pointerId)}catch(e){}fxFreeMv(ev)}
+function fxFreeMv(ev){if(!fx||fx.tab!='F'||!fxDrag)return;fx.fp=fxPt(ev);fxFresh()}
+function fxFreeUp(){fxDrag=false}
+function fxFresh(){exRun(fx.mv,()=>{$('fxdyn').innerHTML=fxDyn();$('fxst').textContent=fxStat();$('fxok').disabled=!fxSel()})}
+// fxConfirm() makes the move exactly like free placement does (undo snapshot, new star, connection, Fuel spent, eliminations, redraw), or a Star preview with Move preview on. (new) A menu opened for a Star being moved moves it instead (stMove).
+function fxConfirm(){if(!fx)return;const a=by(fx.a),sl=a&&exRun(fx.mv,fxSel);if(!sl){fx.pick=null;fx.fp=null;return fxDraw()}
+$('ov').style.display='none';const f=fx,p=sl.p,nm=sl.nm,c=f.c;fx=null;if(f.mv)return stMove(f.mv,a,p,c,nm);
+if(pvOn())return pvAdd({k:'s',a:a.id,x:p.x,y:p.y,c},'Preview: Star at '+nm+' for '+c+' Fuel. Confirm or Cancel, or pick another Star.');
+undo.push(JSON.stringify(G));const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id);G.ap-=c;nwAdd(n,a);sel=null;
+mvRec({k:'s',a:mvPos(a),b:mvPos(p),c});const m=elim();say('Star set at '+nm+' for '+c+' Fuel.'+m);render()}
+// ===== Drag and drop =====
+// (new) Shmorden's request 2026-10-27, asked for by many testers. Hold one of your Stars that has not acted for holdMs() (0.5 s with Animations On, 0.25 s with Fast or Off) and a new Star comes out of it on your finger: a Star and dashed line in the move-preview style, with a thin white crosshair (a tight dashed ring round the Star and a cross reaching one system out) so it can be seen under the finger. The cross turns dashed where the Star can't go (a system with a Star, too close to a Star or Connection, the line blocked). Past the Fuel range the Star stops at the edge of the range and shows as an X in the Fuel color. The Fuel gauge and the range outline follow the drag. Letting go where the Star can go places it there (a dashed preview with Move preview on); anywhere else nothing happens. Holding still over a system that has room for PREC_MS opens the precision placement menu there ("Hold for precision"); a placement with fixed positions opens it on every drop.
+// Stars set this turn (G.nw) and Star previews can be held and dragged the same way to move them, inside their system or, as the Fuel allows, to another one (the Fuel is worked out again from the origin). With a Star selected, holding an empty system in its Fuel range opens the menu too.
+// MAP: holdMs, PREC_MS = timings | ddDown, ddOwns, ddMove, ddUp, ddCancel = the board's hold hooks (bindBoard) | ddCan = may a hold start | ddPick = what a press would drag | ddEval = where the dragged Star would go and why it can't | ddSettle, ddPrec = hold still for precision | ddDrop, ddPlace = letting go | stMove = move a Star or Star preview | ddSVG, ddPaint, ddBar = what is drawn | nwAdd, nwOf = Stars set this turn | exRun = check a spot with the moved Star off the board | mvFix = keep the move log true when a Star moves. Computers never drag.
+const holdMs=()=>animMode=='on'?500:250,PREC_MS=500;
+// ddP = a press that may become a hold: {x,y: board point, cx,cy: its system, k: 'drag' (pk = the Star to drag, from ddPick) or 'prec' (an empty system to open the menu on)}. dg = the drag in progress: ddPick's fields ({k: 'new' a new Star from origin a | 'pv' Star preview i | 'st' Star id set this turn, a: origin id, c0: Fuel the moved Star already cost, m: what exRun takes off the board, x,y: where it was}) plus n = Fuel the drag may spend (Fuel left + c0), ox,oy = the Star's offset from the finger (a moved Star does not jump to the finger), e = ddEval of the last finger point, h = where the finger last settled, sc = which systems have room (worked out once each). ddT = the press timer, ddPT = the precision timer during a drag, ddFired = a hold opened the menu and the finger is still down (its lift must not tap).
+let ddP=null,dg=null,ddT=0,ddPT=0,ddFired=false,ddBarT=0,ddBarA=null;
+// nwAdd(n,a) remembers that Star n was set this turn from Star a (G.nw = [[new id, origin id]], cleared by beginTurn; saves and online games carry it). nwOf(id) = the origin of Star id when it was set this turn and may still be moved: both still yours, not a Capital, and its only Connection is the line it was set with (a later Connection to it would change that line's Fuel too, so then it stays put; Undo can still take it back).
+function nwAdd(n,a){(G.nw||(G.nw=[])).push([n.id,a.id])}
+function nwOf(id){const r=(G.nw||[]).find(q=>q[0]==id),s=r&&by(id),a=r&&by(r[1]),me=cur();if(!s||!a||s.o!=me||a.o!=me||s.cap)return null;const L=G.conns.filter(q=>q[0]==id||q[1]==id);return L.length==1&&(L[0][0]==a.id||L[0][1]==a.id)?a:null}
+// exRun(m,fn) runs fn with the Star being moved taken off the board (m = {k:'pv', i} takes that Star preview out of G.pv; {k:'st', id} takes the Star and its Connection out), so it does not block its own new spot; everything is put back after, even on an error. m = null just runs fn.
+function exRun(m,fn){if(!m)return fn();if(m.k=='pv'){const L=G.pv;G.pv=(L||[]).filter(q=>q.i!=m.i);try{return fn()}finally{G.pv=L}}const S=G.stars,C=G.conns;G.stars=S.filter(q=>q.id!=m.id);G.conns=C.filter(q=>q[0]!=m.id&&q[1]!=m.id);try{return fn()}finally{G.stars=S;G.conns=C}}
+// sysFree(cx,cy) = no Star and no Star preview in system (cx,cy). ddSysOK(a,cx,cy,m) = a Star from a (with m off the board) could go in that system through the menu: on the board, not a's own system, empty, and room for a free Star or a fixed spot that this game allows. The Fuel is checked by the caller.
+const sysFree=(cx,cy)=>!sysStar(cx,cy)&&!(G.pv||[]).some(q=>q.k=='s'&&Math.floor(q.x)==cx&&Math.floor(q.y)==cy);
+function ddSysOK(a,cx,cy,m){const N=NSYS(G);return cx>=0&&cy>=0&&cx<N&&cy<N&&Math.abs(cx-Math.floor(a.x))+Math.abs(cy-Math.floor(a.y))>=1&&exRun(m,()=>sysFree(cx,cy)&&((plFree()&&roomIn(cx,cy,a))||(plFix()&&fxLegal(a,cx,cy).length>0)))}
+// ddCan() = may a press on the board start a hold now: a person's own turn on this device, no attack being resolved, no multi-attack, no dialog or reveal open (a dialog playing its closing animation counts as closed, as the board already takes taps then), and Stars mode or nothing selected.
+function ddCan(){return !!G&&!G.over&&!cpuRun&&!cpuOf(cur())&&!(net.on&&!net.my.includes(cur()))&&!pend&&!multi&&!flow&&!dfOn&&!rpOn&&($('ov').style.display!='flex'||!!ovClosing)&&(mode==''||mode=='s')}
+// ddPick(cx,cy,x,y) = what holding at board point (x,y) in system (cx,cy) would drag, or null: a Star preview in that system, a Star set this turn (nwOf), or one of your Stars that has not acted (a new Star, if there is Fuel). A press on your Fleet badge (not on a Star) drags nothing, as a tap there means Fleets.
+function ddPick(cx,cy,x,y){const me=cur(),t=sysStar(cx,cy),fb=badgeAt(x,y),onS=q=>!!q&&Math.hypot(x-q.x,y-q.y)<=R_STAR+R_STROKE;if(fb&&fb.o==me&&!onS(fb)&&!onS(t))return null;
+const pv=(G.pv||[]).find(p=>p.k=='s'&&Math.floor(p.x)==cx&&Math.floor(p.y)==cy);if(pv)return by(pv.a)?{k:'pv',a:pv.a,i:pv.i,c0:pv.c,m:{k:'pv',i:pv.i},x:pv.x,y:pv.y}:null;
+if(!t||t.o!=me)return null;if(!G.used.includes(t.id))return G.ap>0?{k:'new',a:t.id,c0:0,m:null,x:t.x,y:t.y}:null;
+const a=nwOf(t.id);return a?{k:'st',a:a.id,id:t.id,c0:cost(a,t),m:{k:'st',id:t.id},x:t.x,y:t.y}:null}
+// The board's hold hooks. ddDown(x,y): a finger touched at board point (x,y); if holding it there could do something, the hold bar starts and ddFire runs after holdMs() unless the finger moves first (ddCancel) or lifts (a tap, ddCancel). ddOwns() = a hold has taken over this gesture.
+function ddDown(x,y){ddDisarm();ddFired=false;if(dg||!ddCan())return;const cx=Math.floor(x),cy=Math.floor(y),pk=ddPick(cx,cy,x,y),a=!pk&&mode=='s'&&sel!=null?by(sel):null;let k=pk?'drag':null;
+if(!k&&a&&!G.used.includes(a.id)&&cost(a,{x,y})<=G.ap&&ddSysOK(a,cx,cy,null))k='prec';if(!k)return;
+ddP={x,y,cx,cy,k,pk};const ms=holdMs();ddBar(k=='prec'?'Hold for precision':'Hold to drag',ms);ddT=setTimeout(ddFire,ms)}
+function ddOwns(){return !!dg||ddFired}
+function ddDisarm(){clearTimeout(ddT);ddT=0;ddP=null;if(!dg)ddBarHide()}
+function ddCancel(all){ddDisarm();if(all&&dg)ddStop('Drag cancelled.')}
+// ddFire() = the press was held: a 'prec' press opens the menu on its system for the selected Star; a 'drag' press starts the drag (Stars mode, nothing selected) and starts timing a hold for precision at once, so holding a Star set this turn still for longer opens the menu on its own system.
+function ddFire(){ddT=0;const P0=ddP;ddP=null;ddBarHide();if(!P0||!ddCan())return;tapAt=Date.now();buzz(30);
+if(P0.k=='prec'){const a=by(sel);if(!a)return;ddFired=true;return fxOpen(a,P0.cx,P0.cy,cost(a,{x:P0.x,y:P0.y}))}
+const k=P0.pk,nw=k.k=='new';mode='s';sel=null;pvSel=null;hint=null;dg=Object.assign({},k,{n:G.ap+k.c0,ox:nw?0:k.x-P0.x,oy:nw?0:k.y-P0.y,e:null,h:null,sc:{}});dg.e=ddEval(dg,P0.x,P0.y);render();ddMsg();ddSettle(P0.x,P0.y)}
+// ddMove(x,y): the finger moved during a drag. The Star follows (ddEval, ddPaint); a move of more than 8 pixels from where the finger settled starts the precision timing again from here.
+function ddMove(x,y){if(!dg)return;dg.e=ddEval(dg,x,y);ddPaint();if(!dg.h||Math.hypot(x-dg.h.x,y-dg.h.y)*view.k>8)ddSettle(x,y)}
+// ddUp(x,y): the finger lifted. Ends the gesture; a drag drops its Star where the finger was (ddDrop).
+function ddUp(x,y){ddFired=false;if(!dg)return;clearTimeout(ddPT);ddPT=0;ddBarHide();const d=dg,e=ddEval(d,x,y);dg=null;ddDrop(d,e)}
+// ddRoom(d,cx,cy) = ddSysOK for drag d, remembered per system (it tries many spots).
+function ddRoom(d,cx,cy){const k=cx+','+cy;if(!(k in d.sc))d.sc[k]=ddSysOK(by(d.a),cx,cy,d.m);return d.sc[k]}
+// ddEval(d,x,y) = where drag d's Star would be with the finger at board point (x,y): {x,y: the Star's point, kept inside its system's legal area, cx,cy: the system, c: Fuel from the origin, out: past the Fuel range (the point is then the nearest one inside the range), err: why it can't go there ('' = it can)}. With fixed positions the question is only whether the system has room, as the menu chooses the spot.
+function ddEval(d,x,y){x+=d.ox;y+=d.oy;const a=by(d.a),n=d.n,N=NSYS(G),ax=Math.floor(a.x),ay=Math.floor(a.y),inR=(i,j)=>i>=0&&j>=0&&i<N&&j<N&&Math.abs(i-ax)+Math.abs(j-ay)<=n;let cx=Math.floor(x),cy=Math.floor(y),out=false;
+if(!inR(cx,cy)){out=true;let bd=1e9;for(let j=0;j<N;j++)for(let i=0;i<N;i++){if(!inR(i,j))continue;const g=Math.hypot(Math.max(i-x,0,x-i-1),Math.max(j-y,0,y-j-1));if(g<bd){bd=g;cx=i;cy=j}}}
+const p={x:Math.min(cx+1-MARG,Math.max(cx+MARG,x)),y:Math.min(cy+1-MARG,Math.max(cy+MARG,y))},c=cost(a,p),full=()=>c<1||!sysFree(cx,cy);
+const err=out?'Out of Fuel range.':useFixed()?(ddRoom(d,cx,cy)?'':exRun(d.m,full)?'That system already has a Star.':'No room for a Star in this system.'):exRun(d.m,()=>full()?'That system already has a Star.':spotErr(p)||(clear(a,p)?'':'The line passes too close to another Star.'));
+return {x:p.x,y:p.y,cx,cy,c,out,err}}
+// ddSettle(x,y): the finger settled at (x,y). Over a system with room (in range), a hold of PREC_MS opens the menu there (ddPrec); its bar shows after 0.25 s, so it does not flicker during a slow drag.
+function ddSettle(x,y){dg.h={x,y};clearTimeout(ddPT);ddPT=0;ddBarHide();const e=dg.e;if(e.out||!ddRoom(dg,e.cx,e.cy))return;ddBar('Hold for precision',PREC_MS,250);ddPT=setTimeout(ddPrec,PREC_MS)}
+// ddPrec() = held still long enough: the drag ends and the menu opens on that system, starting from the point the Star was at; the Star being moved stays where it was unless the menu is confirmed.
+function ddPrec(){ddPT=0;ddBarHide();if(!dg||!G||G.over)return;const d=dg,e=d.e,a=by(d.a);dg=null;ddFired=true;tapAt=Date.now();buzz(30);render();if(a)fxOpen(a,e.cx,e.cy,e.c,{mv:d.m,fp:{x:e.x,y:e.y}})}
+// ddDrop(d,e) = drag d let go at e. A moved Star let go where it started stays put silently. Past the range or where it can't go: nothing happens and the bottom line says why. With fixed positions the menu opens on that system. Otherwise the Star is placed there (ddPlace).
+function ddDrop(d,e){const a=by(d.a);render();if(!a)return;const nw=d.k=='new',no=' Nothing '+(nw?'was placed.':'moved.');
+if(!nw&&Math.abs(e.x-d.x)<1e-9&&Math.abs(e.y-d.y)<1e-9)return say('');
+if(e.err)return say(e.err+no);if(useFixed())return fxOpen(a,e.cx,e.cy,e.c,{mv:d.m});ddPlace(d,a,e)}
+// ddPlace(d,a,e) places drag d's Star at e from origin a: a new Star exactly as a tap would (a preview with Move preview on), or the moved Star at its new point (stMove).
+function ddPlace(d,a,e){const c=e.c,p={x:e.x,y:e.y};if(d.k!='new')return stMove(d.m,a,p,c,'');
+if(pvOn())return pvAdd({k:'s',a:a.id,x:p.x,y:p.y,c},'Preview: new Star for '+c+' Fuel. Confirm or Cancel, or pick another Star.');
+undo.push(JSON.stringify(G));const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id);G.ap-=c;nwAdd(n,a);sel=null;mvRec({k:'s',a:mvPos(a),b:mvPos(p),c});const m=elim();say('Star set for '+c+' Fuel.'+m);render()}
+// stMove(m,a,p,c,nm) moves Star preview or Star m (from origin a) to point p, which now costs c Fuel: the Fuel it cost before is given back and c is paid (the caller has checked it fits and the spot is legal). nm = the spot's name for the message, or ''. A Star preview stays a preview and is selected (Undo puts it back; nothing is logged). A Star set this turn moves on the board, its Fleets with it; the move log is rewritten to match (mvFix) and Undo puts both back.
+function stMove(m,a,p,c,nm){const at=nm?' to '+nm:'';
+if(m.k=='pv'){const q=(G.pv||[]).find(z=>z.i==m.i);if(!q)return render();undo.push(pvTag(JSON.stringify(G)));G.ap+=q.c-c;q.x=p.x;q.y=p.y;q.c=c;sel=null;pvSel=q.i;say('Star preview moved'+at+' ('+c+' Fuel). Confirm or Cancel, or pick another Star.');return render()}
+const s=by(m.id);if(!s)return render();const c0=cost(a,s),u=new String(JSON.stringify(G));u.mx=mvFix(s.id,mvPos(s),mvPos(p),c);undo.push(u);s.x=p.x;s.y=p.y;G.ap+=c0-c;sel=null;
+say('Star moved'+at+' for '+c+' Fuel'+(c<c0?' ('+(c0-c)+' given back)':c>c0?' ('+(c-c0)+' more)':'')+'.');render()}
+// mvFix(id,o,p,c) rewrites this turn's records in the move log (H.mv) for Star id moving from point o to point p (both mvPos), since the log names Stars by their points: every position o in this turn's records becomes p, the Star's entry in each change list moves too, and the record that set it now costs c. It returns the records it changed as [index, old JSON], which Undo puts back (mvFixUndo).
+function mvFix(id,o,p,c){const out=[];if(!G||!H||H.gid!==G.gid||!H.mv)return out;const me=cur(),eq=v=>Array.isArray(v)&&v.length==2&&v[0]===o[0]&&v[1]===o[1];
+for(let i=H.mv.length-1;i>=0;i--){const r=H.mv[i];if(r.r!==G.round||r.w!==me)break;const j=JSON.stringify(r);let set=false;
+for(const k in r){if(k=='d')continue;const v=r[k];if(eq(v)){r[k]=p.slice();if(k=='b'&&r.k=='s')set=true}else if(Array.isArray(v)&&v.some(eq))r[k]=v.map(z=>eq(z)?p.slice():z)}
+if(set)r.c=c;if(r.d&&Array.isArray(r.d.s))r.d.s.forEach(v=>{if(v[0]===id){v[1]=p[0];v[2]=p[1]}});if(JSON.stringify(r)!==j)out.push([i,j])}return out}
+function mvFixUndo(L){if(H&&H.mv)L.forEach(([i,j])=>{if(i<H.mv.length)H.mv[i]=JSON.parse(j)})}
+// ddSVG() = the drag overlay (board units): the dashed line from the origin, the Star in the move-preview style (an X in the Fuel color past the range), and the crosshair: a tight dashed white ring and a white cross reaching one system out, dashed where the Star can't go. Thin lines keep their screen width at any zoom, with a dark line under the white for light themes. Placeholder look.
+function ddSVG(){if(!dg||!dg.e)return '';const a=by(dg.a);if(!a)return '';const e=dg.e,col=COL[cur()],w=' vector-effect="non-scaling-stroke"',X=e.x,Y=e.y,r=R_STAR,r0=R_STAR+R_STROKE+.05,da=e.err?' stroke-dasharray="4 3"':'';
+let s='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+X+'" y2="'+Y+'" stroke="'+col+'" stroke-width="'+LINE_W+'" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/>';
+s+=e.out?'<path d="M'+(X-r)+' '+(Y-r)+'L'+(X+r)+' '+(Y+r)+'M'+(X-r)+' '+(Y+r)+'L'+(X+r)+' '+(Y-r)+'" stroke="var(--warn)" stroke-width=".08" stroke-linecap="round"/>':'<circle cx="'+X+'" cy="'+Y+'" r="'+r+'" fill="'+col+'" fill-opacity=".5" stroke="'+col+'" stroke-width="'+R_STROKE+'" stroke-dasharray=".08 .06"/>';
+const h='M'+(X-1)+' '+Y+'H'+(X-r0)+'M'+(X+r0)+' '+Y+'H'+(X+1)+'M'+X+' '+(Y-1)+'V'+(Y-r0)+'M'+X+' '+(Y+r0)+'V'+(Y+1);
+s+='<path d="'+h+'" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="3"'+w+da+'/><path d="'+h+'" fill="none" stroke="#fff" stroke-width="1.2"'+w+da+'/>';
+s+='<circle cx="'+X+'" cy="'+Y+'" r="'+r0+'" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="3" stroke-dasharray="3 2"'+w+'/><circle cx="'+X+'" cy="'+Y+'" r="'+r0+'" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2"'+w+'/>';return s}
+// ddPaint() redraws only the overlay (#ddg), the Fuel gauge and the bottom line after a finger move. ddMsg() = the bottom line during a drag: why the Star can't go, or what letting go does and costs.
+function ddPaint(){const g=$('ddg');if(g)g.innerHTML=ddSVG();fuelUi(Math.max(0,dg.n-dg.e.c));ddMsg()}
+function ddMsg(){const e=dg.e;say(e.err?e.err:useFixed()?'Let go to choose a fixed position ('+e.c+' Fuel).':(dg.k=='new'?'New Star: ':'Moving the Star: ')+e.c+' Fuel. Let go to place it, or hold still for precision.')}
+// ddStop(msg) ends a drag without placing anything (msg = the bottom line, or null to leave it).
+function ddStop(msg){clearTimeout(ddPT);ddPT=0;ddBarHide();dg=null;render();if(msg!=null)say(msg)}
+// ddBar(t,ms,dl) shows the hold bar (#hskip, shared with the Deficit Elimination's "Hold to skip") with text t after dl ms (default 120, so a quick tap shows nothing), filling up by the time ms is reached. ddBarHide() hides it.
+function ddBar(t,ms,dl){ddBarHide();dl=dl==null?120:dl;ddBarT=setTimeout(()=>{ddBarT=0;const h=dfHoldUi(t),b=h.querySelector('b');h.style.display='flex';b.style.width='0';if(b.animate)ddBarA=b.animate([{width:'0'},{width:'100%'}],{duration:Math.max(60,ms-dl),fill:'forwards'})},dl)}
+function ddBarHide(){clearTimeout(ddBarT);ddBarT=0;try{if(ddBarA)ddBarA.cancel()}catch(e){}ddBarA=null;const h=$('hskip');if(h&&!dfOn)h.style.display='none'}
 // ===== (new) Themes and the Settings page =====
 // THEME_VARS = every color variable a theme sets. THEME_DEF = each preset theme's values (the same numbers as the CSS blocks near the top of the file). THEMES = [key, name] in the order shown; "custom" uses the palette you edit. theme = the one in use, remembered in this browser. Dark is the default.
 const THEME_VARS=["bg","panel","ink","mut","grid","sec","line","dis","dis-ink","warn","acc","acc-hover","acc-press","acc-ink","acc-line","sel","sel-hover","sel-press","sel-ink","sel-line"];
@@ -1555,7 +1671,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-27-e';
+const BUILD='2026-10-27-f';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1862,8 +1978,8 @@ dfStopF=stop;next()}
 function dfCover(){const d=document.createElement('div');d.id='dfcv';d.style.cssText='position:fixed;inset:0;z-index:5;touch-action:none';document.body.appendChild(d);return d}
 // dfSpec(E,after) (from roundPop, while this device spectates a game where only computers are left, or in a game of computers only, so there is no round screen; E = the round that just ended, after = what follows instead of play going on: the end screen): when the round removed players by Deficit Elimination, play their animation on the board alone, after the round's zoom out has finished. dfOn holds the computers (cpuTick) and the turn's zoom in (camTurn) until it is over. Shmorden, 2026-10-27.
 function dfSpec(E,after){dfPrep(E);if(!dfG){if(after)after();return}dfAfter=after||null;dfOn=true;setTimeout(()=>{if(dfOn&&dfG&&!dfStopF)dfRun(null)},Math.max(0,camEnd-performance.now())+60)}
-// dfHoldUi() = the "Hold to skip" element (#hskip), made the first time it is needed.
-function dfHoldUi(){let h=$('hskip');if(!h){h=document.createElement('div');h.id='hskip';h.innerHTML='<span>Hold to skip</span><i><b></b></i>';document.body.appendChild(h)}return h}
+// dfHoldUi(t) = the hold bar element (#hskip), made the first time it is needed, with text t (default "Hold to skip"; drag and drop shows "Hold to drag" and "Hold for precision", see ddBar).
+function dfHoldUi(t){let h=$('hskip');if(!h){h=document.createElement('div');h.id='hskip';h.innerHTML='<span>Hold to skip</span><i><b></b></i>';document.body.appendChild(h)}h.querySelector('span').textContent=t||'Hold to skip';return h}
 // endSeq() = the end screen's reveal (see overDlg): the result shows as the window opens; after a pause the player lines are written downward one at a time (a shorter pause between them), then a pause and the buttons.
 function endSeq(){if(calm())return;const R=rvPrep(),U=animMs(),P=U,rows=[...R.box.querySelectorAll('.erow')];rows.forEach(r=>{r.style.opacity='0'});
 const steps=[],t0=Math.max(0,camEnd-performance.now());steps.push({at:t0,fn:s=>rvOpen(R,s)});let t=t0+U+P;
@@ -1872,7 +1988,7 @@ t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});se
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=15,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=16,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
