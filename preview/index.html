@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-27-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-27-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -835,7 +835,8 @@ return out}
 let specGid=null;
 function roundPop(){
 // (new) In a game of computers only there is nobody to tap the popup, so the next round just begins. (fixed) Once every person in the game is out (Deficit, eliminated or conceded) the popup still shows, with End game and Spectate (cw); before, it was skipped as if nobody were playing. After Spectate (specGid = this game's id, this device only) it is skipped again, as in a game of computers only.
-const cw=allCpu();if(cw&&(!G.pl.some(c=>!G.cpu[c])||specGid===G.gid))return;
+// (new) While spectating, a Deficit Elimination still plays its animation on the board alone (dfSpec).
+const cw=allCpu();if(cw&&(!G.pl.some(c=>!G.cpu[c])||specGid===G.gid)){if(specGid===G.gid)dfSpec();return}
 // (new) jo(c) = player c went out in the round that just ended and the screen plays its reveal: the line first shows their VP like everyone else's (class rvp), and the reason (class rout, hidden) replaces it later in the reveal (rpSeq, dfRun).
 const jo=c=>!calm()&&!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==G.round-1;
 // row(c) builds one player's line as a player chip (pchip), left-aligned like the end screen: rank (1st, 2nd; it fades in as the lines slide), color dot, name, "VP:" and score (the score is a .scr number, see rpSeq), or why a player is out (outX). (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
@@ -1545,7 +1546,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-27-c';
+const BUILD='2026-10-27-d';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1717,7 +1718,7 @@ const r=st.getBoundingClientRect(),F=camFit(),k=Math.max(F.min,Math.min(90,r.wid
 const ax=(lo,hi,W)=>camAx((lo+hi)/2,k,W);return{k,x:ax(x0,x1,r.width),y:ax(y0,y1,r.height)}}
 // camTurn() runs after every redraw (render) and starts the transition when the turn has changed since the last call. (changed, Shmorden 2026-10-26) A change of turn within a round pans and zooms straight to the player whose turn it is (camIn), in one move, with no zoom out first. A new round, the end of the game, and a computer's turn at CPU speed Instant or with the Dev switch camCpu off still zoom out to Fit; after a new round the zoom in follows a short pause, or waits for the round screen to close (closeRound).
 function camTurn(){if(!G)return;const k=G.over?'over':G.round+'/'+G.ti+'/'+cur();if(k==camKey)return;const p=camKey;camKey=k;if(p==null||calm())return;
-camStop();const F=camFit();view.min=F.min;if(!G.over&&p.split('/')[0]==String(G.round)&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))return camIn();camGo(F,camMs(),()=>{if(G&&!G.over&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))camT=setTimeout(()=>{camT=null;if(rpOn)camWait=true;else camIn()},Math.round(animMs()*.5))})}
+camStop();const F=camFit();view.min=F.min;if(!G.over&&p.split('/')[0]==String(G.round)&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))return camIn();camGo(F,camMs(),()=>{if(G&&!G.over&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))camT=setTimeout(()=>{camT=null;if(rpOn||dfOn)camWait=true;else camIn()},Math.round(animMs()*.5))})}
 // camBusy() = a camera move is running or about to start; computers wait for it (cpuTick) so they never move while the board is still zooming.
 const camBusy=()=>!!camRaf||!!camT;
 // camDefView(a) = the view for a Defence call, a = {att: attacking star ids, b: target star id}: the middle of the attack line(s) (the middle of the box around the target and the attackers) is the middle of the screen, zoomed out as far as needed that the sector of the target and of every attacker is fully in view (never closer than 9 systems across, like camBox), and the board edge stays at the screen edge (camAx).
@@ -1819,21 +1820,25 @@ function dgDraw(){const g=$('dgh');if(g)g.innerHTML=dgSVG()}
 function dfBox(c){const P=[];dfG.L.forEach(l=>{if(l.c==c)P.push(by(l.a),by(l.b))});G.stars.forEach(q=>{if(q.o==c)P.push(q)});const Q=P.filter(Boolean);if(!Q.length)return camFit();
 const sx=Q.map(q=>Math.floor(q.x/3)*3),sy=Q.map(q=>Math.floor(q.y/3)*3);return camFitBox(Math.min(...sx),Math.min(...sy),Math.max(...sx)+3,Math.max(...sy)+3)}
 // dfStop() ends the animation at once (the round screen closes, or another dialog opens): nothing more is drawn, the round screen is fully visible again.
-function dfStop(){if(dfStopF){const f=dfStopF;dfStopF=null;f()}dfG=null;dgDraw()}
+function dfStop(){if(dfStopF){const f=dfStopF;dfStopF=null;f()}else dfOn=false;dfG=null;dgDraw()}
 // dfRun(R) plays the animation for every player in dfG.list (R = the round screen, see rvPrep), then shows the buttons (rvFoot). ph = the part of the current player now playing: 1 claxon, 2 fading out and zooming in, 3 erasing, 4 coming back. T = its timers, A = its animations, so a skip can stop them.
-function dfRun(R){if(!rpOn||!R.box.isConnected||!dfG)return;dfOn=true;const o=R.o,U=animMs(),P=U,list=dfG.list.slice(),hs=dfHoldUi();let i=-1,ph=0,T=[],A=[];
-const at=(ms,f)=>T.push(setTimeout(f,ms)),clr=()=>{T.forEach(clearTimeout);T=[];A.forEach(a=>{try{a.cancel()}catch(e){}});A=[];cancelAnimationFrame(dfRaf);dfRaf=0},rowOf=c=>R.box.querySelector('.rrow[data-c="'+c+'"]');
+// (new) R = null (bd, board only; see dfSpec): no round screen, so no claxon, fade or reason; each player is zoom in, erase, zoom back out to Fit. A see-through cover (dfCover) takes the touches for the hold to skip. At the end the turn's normal zoom in runs if it was waiting (camWait), and play carries on.
+function dfRun(R){const bd=!R;if(!dfG||(!bd&&(!rpOn||!R.box.isConnected))){dfOn=false;return}dfOn=true;const o=bd?dfCover():R.o,U=animMs(),P=U,list=dfG.list.slice(),hs=dfHoldUi();let i=-1,ph=0,T=[],A=[];
+const at=(ms,f)=>T.push(setTimeout(f,ms)),clr=()=>{T.forEach(clearTimeout);T=[];A.forEach(a=>{try{a.cancel()}catch(e){}});A=[];cancelAnimationFrame(dfRaf);dfRaf=0},rowOf=c=>bd?null:R.box.querySelector('.rrow[data-c="'+c+'"]');
 // next(): the next player's claxon (3 slow pulses), then the round screen fades away and the board zooms to them, then their connections retract.
 const next=()=>{clr();i++;if(i>=list.length)return fin();const c=list[i],r=rowOf(c);ph=1;if(r&&r.animate)A.push(r.animate(dfFlash(r),{duration:U*1.6,iterations:3,easing:'ease-in-out'}));
- at(U*4.8,()=>{ph=2;if(o.animate)A.push(o.animate([{opacity:1},{opacity:0}],{duration:U,easing:'ease-in'}));at(U,()=>{o.style.opacity='0';camGo(dfBox(c),camMs(),()=>at(P*.5,()=>{
+ // zin(): zoom to the player, a half-pause, then their lines retract wave by wave.
+ const zin=()=>{ph=2;camGo(dfBox(c),camMs(),()=>at(P*.5,()=>{
   ph=3;const n=Math.max(0,...dfG.L.filter(l=>l.c==c).map(l=>l.w+1));dfG.cur=c;dfG.t0=performance.now();const step=()=>{dgDraw();if(dfG&&performance.now()-dfG.t0<n*DF_MS)dfRaf=requestAnimationFrame(step);else dfRaf=0};dfRaf=requestAnimationFrame(step);
-  at(n*DF_MS+P*.5,back)}))})})};
+  at(n*DF_MS+P*.5,back)}))};
+ if(bd)return zin();
+ at(U*4.8,()=>{ph=2;if(o.animate)A.push(o.animate([{opacity:1},{opacity:0}],{duration:U,easing:'ease-in'}));at(U,()=>{o.style.opacity='0';zin()})})};
 // back(): the player's lines are gone; the board zooms back out to Fit as the round screen fades back in with their reason and note; a pause, then the next player.
-const back=()=>{clr();ph=4;const c=list[i],r=rowOf(c),nt=R.box.querySelector('.rnote[data-c="'+c+'"]'),fade=o.style.opacity=='0';dfG.L=dfG.L.filter(l=>l.c!=c);dfG.cur=null;dgDraw();camGo(camFit(),camMs());o.style.opacity='';
+const back=()=>{clr();ph=4;const c=list[i],r=rowOf(c),nt=bd?null:R.box.querySelector('.rnote[data-c="'+c+'"]'),fade=o.style.opacity=='0';dfG.L=dfG.L.filter(l=>l.c!=c);dfG.cur=null;dgDraw();camGo(camFit(),camMs());o.style.opacity='';
  if(fade&&o.animate)A.push(o.animate([{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'}));const s={skip:false,a:A};
- at(fade?U:0,()=>{if(r)rvOut(s,r);if(nt){nt.style.opacity='';seqA(s,nt,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})}at(U+P,next)})};
+ at(fade?U:0,()=>{if(r)rvOut(s,r);if(nt){nt.style.opacity='';seqA(s,nt,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})}at(bd?camMs()+P:U+P,next)})};
 // fin(): every player is done: the buttons, and taps work normally again.
-const fin=()=>{clr();stop();rvFoot(R,{skip:false,a:[],x:[]})};
+const fin=()=>{clr();stop();if(!bd)rvFoot(R,{skip:false,a:[],x:[]});else if(camWait&&G&&!G.over)camIn()};
 // skip(): a finger held for HOLD_MS jumps the current player to the end of their part (back).
 const skip=()=>{if(ph&&ph<4)back()};
 // The hold to skip: a touch shows "Hold to skip" and fills the bar; lifting the finger early empties it and hides it shortly after.
@@ -1841,8 +1846,12 @@ let ht=null,hh=null,ha=null;const down=()=>{if(!dfOn)return;clearTimeout(hh);cle
  up=()=>{if(ht){clearTimeout(ht);ht=null;try{if(ha)ha.cancel()}catch(e){}hh=setTimeout(hide,900)}},hide=()=>{clearTimeout(hh);hs.style.display='none';try{if(ha)ha.cancel()}catch(e){}ha=null};
 o.addEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(k=>o.addEventListener(k,up));
 // stop(): end it (fin or dfStop): no timers, no hold handlers, the round screen visible.
-const stop=()=>{clr();clearTimeout(ht);ht=null;hide();o.removeEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(k=>o.removeEventListener(k,up));o.style.opacity='';dfOn=false;dfStopF=null;dfG=null;dgDraw()};
+const stop=()=>{clr();clearTimeout(ht);ht=null;hide();o.removeEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(k=>o.removeEventListener(k,up));o.style.opacity='';if(bd)o.remove();dfOn=false;dfStopF=null;dfG=null;dgDraw()};
 dfStopF=stop;next()}
+// dfCover() = a see-through layer over the whole screen for the board-only animation (dfRun with no round screen): it takes the touches (hold to skip) so the board is not dragged meanwhile.
+function dfCover(){const d=document.createElement('div');d.id='dfcv';d.style.cssText='position:fixed;inset:0;z-index:5;touch-action:none';document.body.appendChild(d);return d}
+// dfSpec() (from roundPop, while this device spectates a game where only computers are left, so there is no round screen): when the round removed players by Deficit Elimination, play their animation on the board alone, after the round's zoom out has finished. dfOn holds the computers (cpuTick) and the turn's zoom in (camTurn) until it is over. Shmorden, 2026-10-27.
+function dfSpec(){dfPrep();if(!dfG)return;dfOn=true;setTimeout(()=>{if(dfOn&&dfG&&!dfStopF)dfRun(null)},Math.max(0,camEnd-performance.now())+60)}
 // dfHoldUi() = the "Hold to skip" element (#hskip), made the first time it is needed.
 function dfHoldUi(){let h=$('hskip');if(!h){h=document.createElement('div');h.id='hskip';h.innerHTML='<span>Hold to skip</span><i><b></b></i>';document.body.appendChild(h)}return h}
 // endSeq() = the end screen's reveal (see overDlg): the result shows as the window opens; after a pause the player lines are written downward one at a time (a shorter pause between them), then a pause and the buttons.
@@ -2495,7 +2504,7 @@ catch(e){cpuErr=e&&e.message?e.message+' | '+((e.stack||'').split('\n')[1]||''):
 finally{cpuRun=false;cpuTab=null}}
 // The timer: after every redraw, if it is a computer's turn on this device, make its next move after a pause. It waits while a dialog is open (the Menu, the round popup) or a person is answering a Hold/Retreat question.
 function cpuSched(){if(!cpuTimers||cpuTimer||!G||G.over||!cpuHere(cur()))return;cpuTimer=setTimeout(cpuTick,cpuMs)}
-function cpuTick(){cpuTimer=null;if(!G||G.over||!cpuHere(cur()))return;const ovOn=$('ov').style.display&&$('ov').style.display!='none';if(ovOn||(pend&&pend.ph)){cpuTimer=setTimeout(cpuTick,250);return}
+function cpuTick(){cpuTimer=null;if(!G||G.over||!cpuHere(cur()))return;const ovOn=$('ov').style.display&&$('ov').style.display!='none';if(ovOn||dfOn||(pend&&pend.ph)){cpuTimer=setTimeout(cpuTick,250);return}
 // (new) Never move while the board is still zooming (camBusy): look again shortly.
 if(camBusy()){cpuTimer=setTimeout(cpuTick,100);return}
 const r=cpuStep();if(r=='wait'&&!cpuTimer)cpuTimer=setTimeout(cpuTick,250);else if(r=='acted'&&!cpuTimer)cpuTimer=setTimeout(cpuTick,cpuMs)}
