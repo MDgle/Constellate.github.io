@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-27-i",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-27-j",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -143,8 +143,8 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #zoom: the zoom buttons floating at the top right of the board; also lets tall dialogs scroll. */
 #zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px}#zoom button{background:var(--panel)}/* (changed 2026-10-27-i) The whole box, padding and border included (44 px), stays inside the layer's padding, so no dialog reaches past the screen's edge; a taller one scrolls. (92% of the content height alone could run past the bottom.) */
 #ov>div{max-height:calc(100% - 44px);overflow:auto}
-/* (new) The last button row of a dialog (Close, Back, Cancel...) stays on the bottom edge while a long dialog scrolls under it (Shmorden, 2026-10-27). It sits over the box's 20 px bottom padding (bottom -20px), so nothing shows under it; the negative margin and the padding cancel out while nothing scrolls. */
-#ov>div>.r:last-child{position:sticky;bottom:-20px;z-index:1;background:var(--panel);padding-bottom:20px;margin-bottom:-20px;padding-top:8px}
+/* (new) The last button row of a dialog (Close, Back, Cancel...) stays on the bottom edge while a long dialog scrolls under it (Shmorden, 2026-10-27). (changed 2026-10-27-j) Only on a dialog that really scrolls (class ovsc, set by ovSc): a pinned row on every dialog showed up a moment after the dialog on the phone. It sits over the box's 20 px bottom padding (bottom -20px), so nothing shows under it; the negative margin and the padding cancel out while nothing scrolls. */
+#ov>div.ovsc>.r:last-child{position:sticky;bottom:-20px;z-index:1;background:var(--panel);padding-bottom:20px;margin-bottom:-20px;padding-top:8px}
 /* (new) .mq: the scrolling tip banner on the main menu. The text starts just outside the right edge and slides out past the left edge, over and over. */
 .mq{overflow:hidden;white-space:nowrap;background:var(--sel-line);color:#000;border-radius:8px;margin-top:12px;padding:8px 0;font-weight:600;font-style:italic;font-size:14px}
 .mq span{display:inline-block;padding-left:100%;animation:mq 12s linear infinite}
@@ -272,12 +272,14 @@ const say=t=>{$('msg').textContent=t||''};
 // (new) ovDir = which way the NEXT ov() call should slide its content in when a dialog that is already open changes page: 1 = from the right (forward / next page), -1 = from the left (back), 0 = no slide. Callers set it just before calling ov(); ov() reads it once and clears it.
 let ovDir=0,ovClosing=null,ovWasClosing=false,ovPrev='';
 function ov(h){const o=$('ov');seqSkip();dfStop();o.classList.remove('rvh');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=o.firstChild.scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
-o.innerHTML='<div>'+h+'</div>';o.style.display='flex';o.style.alignItems='';if(o.dataset)o.dataset.page='';
+o.innerHTML='<div>'+h+'</div>';o.style.display='flex';o.style.alignItems='';if(o.dataset)o.dataset.page='';ovSc(o.firstChild);
 // (new) Redrawing the SAME dialog (a tap that changes a choice) keeps its scroll position instead of jumping to the top; a different dialog starts at the top.
 try{const n=o.firstChild;if(top&&was&&n&&n.querySelector&&((n.querySelector('h1')||{}).textContent||'')==was)n.scrollTop=top}catch(e){}
 // (new) Animation: a dialog that opens from nothing grows vertically from its middle. Redrawing a dialog that is already open (a tab or choice changed) does not replay it.
 try{if(!wasOpen&&animMode!='off'&&o.firstChild&&o.firstChild.classList&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}
 else if(wasOpen&&dir&&oldInner&&animMode!='off'&&o.firstChild&&o.firstChild.animate&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches))ovSwipe(o.firstChild,oldInner,oldH,dir)}catch(e){}}
+// (new) ovSc(b) marks dialog box b (class ovsc) when its content is taller than the box, so its last button row is pinned (see the CSS); it runs after drawing, after menuPin and after a page swipe.
+function ovSc(b){if(b&&b.classList)b.classList.toggle('ovsc',b.scrollHeight>b.clientHeight+1)}
 // (new) Page transition. ovCH(b) = the height of a dialog's content area (without its padding). ovSwipe(box,oldInner,oldH,dir) plays, on the dialog that was just drawn: 1) the old page's content swipes out (to the left when dir is 1, to the right when -1), 2) the window changes height from the old page's height to the new page's, 3) the new page's content swipes in from the side dir points to. The new content is already in place, so code that looks things up right after ov() still works; the old content is a throw-away picture (ids removed, clicks off) clipped inside the window. The three steps are timed from the Animations speed.
 // (new) Closing animation. Dialogs are closed all over the code with $('ov').style.display='none'. A watcher on that style notices the change and, instead of letting the dialog vanish, shows it again for a moment while it plays the opening in reverse (the window shrinks vertically to a line and fades, and so does the dim backdrop), then really hides it. A new ov() call in the middle cancels the close. ovPrev = the display value seen last. obsFlush() drops the watcher's own changes so they do not re-trigger it.
 function obsFlush(){try{ovObs.takeRecords()}catch(e){}ovPrev=$('ov').style.display}
@@ -306,7 +308,7 @@ anims.push(ghost.animate([{transform:'none',opacity:1},{transform:'translateX('+
 if(resize)anims.push(box.animate([{height:oldH+'px'},{height:newH+'px'}],{delay:tOut,duration:tRs,easing:ease,fill:'both'}));
 const t0=tOut+(resize?tRs:0);
 kids.forEach(k=>anims.push(k.animate([{transform:'translateX('+D+'px)',opacity:0},{transform:'none',opacity:1}],{delay:t0,duration:tIn,easing:ease,fill:'both'})));
-Promise.all(anims.map(a=>a.finished)).then(()=>{ghost.remove();anims.forEach(a=>{try{a.cancel()}catch(e){}});box.style.position='';box.style.overflow=ov0}).catch(()=>{})}
+Promise.all(anims.map(a=>a.finished)).then(()=>{ghost.remove();anims.forEach(a=>{try{a.cancel()}catch(e){}});box.style.position='';box.style.overflow=ov0;ovSc(box)}).catch(()=>{})}
 
 // menu() builds the start screen. First it looks for an autosave in the browser (try/catch so a blocked browser does not crash it).
 // creditsDlg() = the start menu's Credits page: who made the game and how the code is written. Back returns to the start menu.
@@ -683,7 +685,10 @@ const nStars=c=>G.stars.filter(s=>s.o==c).length,starsTxt=n=>n+(n==1?' Star':' S
 const otRules=()=>teamsOn()?'Tiebreak: at the end of each overtime round the team with the most combined VP wins. If teams are tied on VP, the tied team whose living players control the most Stars wins. If their Stars are equal too, another overtime round is played.':'Tiebreak: at the end of each overtime round the player with the most VP wins. If players are tied on VP, the tied player who controls the most Stars wins. If their Stars are equal too, another overtime round is played.';
 // finish() does final scoring: store the winners (still a tie only when End game stops a tied game), redraw, and show the end dialog with everyone's scores.
 // (new) When a Deficit Elimination ended the game, the round screen and the animation come first and the end screen after them (dfEnd).
-function finish(){const {vp}=calc();G.score=vp;G.over=winners(vp);histSnap('f');histSave();render();if(!dfEnd())overDlg(1)}
+function finish(){const {vp}=calc();G.score=vp;G.over=winners(vp);histSnap('f');histSave();render();if(!dfEnd())overLater()}
+// (new 2026-10-27-j) overLater() opens the end screen; when the game just ended because a player lost their last Star (a capture this round), the board stays on show for END_HOLD ms first, so everyone sees the final capture (Shmorden). It is also used when the final position arrives online. Nothing happens if another game has been loaded meanwhile.
+const END_HOLD=2000;
+function overLater(){const g=G,lz=G.pl.some(c=>!G.alive[c]&&G.out&&G.out[c]&&G.out[c].w=='z'&&G.out[c].r==G.round);if(!lz)return overDlg(1);setTimeout(()=>{if(G===g&&G.over)overDlg(1)},END_HOLD)}
 // dfEnd() = the game just ended because the round-end Deficit Elimination left one side (G.dk is from this round and has connections to erase), with animations on: play the round screen and the animation (roundPop fin), which then open the end screen. Says whether it did.
 function dfEnd(){if(!G||!G.over||calm()||!G.dk||G.dk.r!=G.round||!(G.dk.L||[]).length)return false;roundPop(true);return true}
 // (new) overDlg() shows the end-of-game dialog (winner and final scores; step 6: or the team result). It is its own function so online players who only RECEIVE the final position can show it too.
@@ -744,16 +749,18 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
  // (changed) A tap off the board leaves Multi even with a target chosen (Shmorden, 2026-10-27: an empty system leaves Place, Move and Multi).
  if(cx<0||cy<0||cx>=NSYS(G)||cy>=NSYS(G)){if(mode=='x'&&multi&&multi.t!=null)return multiCancel();if(mode&&(idle||mode=='m'))return modeOff();sel=null;pvSel=null;say('');return render()}
 // (new) onB = the tap is on one of your Fleet badges and not on a Star (the badge overlaps its own Star and can reach a neighbor's; a tap that could be either counts as the Star).
-// Nothing selected (mode ''): a Fleet badge switches to Move, one of your Stars to Set, and the tap then carries on in that mode; any other tap is handled like Set mode without switching (a move preview can still be picked).
-// (new) In Set or Multi with nothing in progress, or in Place, a Fleet badge also switches to Move (selecting a Fleet means Fleets).
+// Nothing selected (mode ''): one of your Stars (or its Fleet badge) goes to Set, and the tap then carries on in that mode; any other tap is handled like Set mode without switching (a move preview can still be picked).
+// (changed 2026-10-27-j) A Fleet badge never switches to Move any more (Move comes from the Move button or a Fleet drag): in every mode a tap on your badge counts as a tap on its Star.
   const me=cur(),fb=badgeAt(bx,by),ts=sysStar(cx,cy),onS=q=>!!q&&Math.hypot(bx-q.x,by-q.y)<=R_STAR+R_STROKE,onB=!!fb&&fb.o==me&&!onS(fb)&&!onS(ts);
   // (changed) In Place a Fleet badge counts as its Star, so the tap places a Fleet there (Shmorden, 2026-10-27).
-  if(!mode){if(onB)mode='m';else if(ts&&ts.o==me)mode='s'}else if(onB&&mode!='m'&&mode!='p'&&idle){resetFlow();mode='m'}
+  // (changed 2026-10-27-j) Move comes on only from the Move button or a Fleet drag (Shmorden): a tap on your Fleet badge counts as a tap on its Star in every mode, so with nothing selected it selects that Star (Set).
+  if(!mode){const q=onB?fb:ts;if(q&&q.o==me)mode='s'}
 // t = the star in the tapped system, me = the current player. Place mode goes to placeF, Move mode goes to moveF.
  // (changed) In Move mode a tap on a Fleet badge counts as a tap on its star (badgeAt), otherwise the system tapped decides as before.
  // (new) In the Fleets pair, a tap that doesn't place a Fleet, choose a group, finish a move or open a Fleet popup leaves the mode (back to nothing selected); placeF / moveF have already said why.
   // (changed) In Place, a tap on one of your Stars only ever places a Fleet: when it can't, it says why and Place stays on (it never selects the Star). Anything else leaves Place, as before.
-  const t=((mode=='m'||(mode=='p'&&onB))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
+  // (2026-10-27-j) With a Star selected the tap aims, and aims at the system tapped (whatever is in it), never at a Fleet badge reaching in from a neighbor.
+  const t=((mode=='m'||(onB&&!(mode=='s'&&sel!=null)))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
   if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}const u=undo.length;moveF(t);if(!flow&&undo.length==u&&$('ov').style.display!='flex')modeOff(1);return}
   // (new) Multi mode has its own tap handler. (new) An empty system before a target is chosen leaves Multi.
   // (changed) An empty system leaves Multi even with a target chosen (Shmorden, 2026-10-27).
@@ -861,9 +868,9 @@ const jo=c=>!calm()&&!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==E;
 // (new) RK = the ranks shown (the final ones when fin), ord = the order of the living players' lines.
 const RK=fin?rankSnap(G.score):G.rank,ord=fin?G.pl.filter(c=>G.alive[c]).sort((a,b)=>RK[a]-RK[b]):G.order;
 // row(c) builds one player's line as a player chip (pchip), left-aligned like the end screen: rank (1st, 2nd; it fades in as the lines slide), color dot, name, "VP:" and score (the score is a .scr number, see rpSeq), or why a player is out (outX). (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
-// (new) bh(c) = the "behind" hint on a player's line (Shmorden, 2026-10-27): how far they are behind the next score level up among the living and those who went out this round (outNow; dNow = by Deficit Elimination, whose lines keep the hint, with Animations off too), and who is on it: "<b>2</b> behind Red". 1 plain, 2 orange, 3 or more red. Nothing for the leaders. (changed 2026-10-27-i) It sits at the right end of the line in slightly smaller text, fades in as soon as the VP has counted up (rpSeq), and on the line of a player removed by Deficit Elimination this round it stays after "Deficit" replaces their VP; a player who went out another way loses it with their VP. Colors and size are placeholders.
-const outNow=c=>!G.alive[c]&&!!G.out&&!!G.out[c]&&G.out[c].r==E,dNow=c=>outNow(c)&&G.out[c].w=='d',shown=G.pl.filter(c=>G.alive[c]||outNow(c)),bh=c=>{const v=G.score[c]||0,up=shown.map(d=>G.score[d]||0).filter(w=>w>v);if(!up.length)return '';const n=Math.min(...up),g=n-v;return `<span class="rbh" style="margin-left:auto;font-weight:400;font-size:.88em;white-space:nowrap;align-self:center${g>=3?';color:#e53e3e':g==2?';color:#f08c00':''}"><b>${g}</b> behind ${shown.filter(d=>(G.score[d]||0)==n).map(d=>NM[d]).join(' and ')}</span>`};
-const ot=G.round>30,row=c=>`<div class="rrow pchip" data-c="${c}" style="${pchipS(c)}"><span class="rk">${ordH(G.alive[c]&&RK[c])}</span>${dotH(c,teamsOn()?18:12)}<b>${NM[c]}</b>${G.alive[c]?`<span>VP: <span class="scr" data-s="">${G.score[c]||0}</span></span>${ot?`<span>${starsTxt(nStars(c))}</span>`:''}${bh(c)}`:jo(c)?`<span class="rvp">VP: <span class="scr" data-s="">${G.score[c]||0}</span>${G.out[c].w=='d'?'':bh(c)}</span><span class="rout" hidden>${outX(c)}</span>${G.out[c].w=='d'?bh(c):''}`:outX(c)+(dNow(c)?bh(c):'')}</div>`;
+// (new) bh(c) = the "behind" hint on a player's line (Shmorden, 2026-10-27): how far they are behind the next score level up among the living and those who went out this round (outNow; dNow = by Deficit Elimination, whose lines keep the hint, with Animations off too), and who is on it: "<b>2</b> behind Red". 1 plain, 2 orange, 3 or more red. Nothing for the leaders. (changed 2026-10-27-i) It sits at the right end of the line, fades in as soon as the VP has counted up (rpSeq), and on the line of a player removed by Deficit Elimination this round (class rbd) it appears after "Deficit" replaces their VP, once their animation has played (rvOut); a player who went out another way loses it with their VP. (changed 2026-10-27-j) Normal text size; it takes no room until it appears (hidden while the reveal plays), and then the player's name shrinks if the line needs it (rbFit). Colors are placeholders.
+const outNow=c=>!G.alive[c]&&!!G.out&&!!G.out[c]&&G.out[c].r==E,dNow=c=>outNow(c)&&G.out[c].w=='d',shown=G.pl.filter(c=>G.alive[c]||outNow(c)),bh=c=>{const v=G.score[c]||0,up=shown.map(d=>G.score[d]||0).filter(w=>w>v);if(!up.length)return '';const n=Math.min(...up),g=n-v;return `<span class="rbh${dNow(c)?' rbd':''}"${calm()?'':' hidden'} style="margin-left:auto;font-weight:400;white-space:nowrap;align-self:center${g>=3?';color:#e53e3e':g==2?';color:#f08c00':''}"><b>${g}</b> behind ${shown.filter(d=>(G.score[d]||0)==n).map(d=>NM[d]).join(' and ')}</span>`};
+const ot=G.round>30,row=c=>`<div class="rrow pchip" data-c="${c}" style="${pchipS(c)}"><span class="rk">${ordH(G.alive[c]&&RK[c])}</span>${dotH(c,teamsOn()?18:12)}<b class="rnm">${NM[c]}</b>${G.alive[c]?`<span>VP: <span class="scr" data-s="">${G.score[c]||0}</span></span>${ot?`<span>${starsTxt(nStars(c))}</span>`:''}${bh(c)}`:jo(c)?`<span class="rvp">VP: <span class="scr" data-s="">${G.score[c]||0}</span>${G.out[c].w=='d'?'':bh(c)}</span><span class="rout" hidden>${outX(c)}</span>${G.out[c].w=='d'?bh(c):''}`:outX(c)+(dNow(c)?bh(c):'')}</div>`;
 // (new) notes = one warning line under the players for everyone eliminated in the round that just ended (outWhy).
 const notes=G.pl.filter(c=>!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==E).map(c=>'<p class="rnote" data-c="'+c+'" style="color:var(--warn);font-weight:600;margin:8px 0 0">'+outWhy(c)+'</p>').join('');
 // Show the dialog: alive players in turn order first, then eliminated players. (T4) An overtime round only starts after a round that ended in a Perfect Tie (VP and Stars equal), so its popup says so and explains the tiebreak (otRules) under the round name. (new) .ovft = the part the window uncovers last.
@@ -1016,36 +1023,38 @@ const gestOf=ts=>{const a=ts[0],b=ts[1]||ts[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y
 // bindBoard(svgEl,box,V,ap,onTap,hk) wires tap, drag-pan, pinch-zoom and wheel-zoom for ONE board. svgEl = its drawing surface, box = the container that sizes it, V = its own pan/zoom values, ap = function that applies V, onTap(bx,by) = called with board coordinates on a tap. The live board and the history viewer each get their own copy, so they never share zoom or gesture state.
 // (new, drag and drop) hk = optional press-and-hold hooks (live board only, ddHold): down(bx,by) when one finger touches, owns() = a hold has taken the gesture over (then the finger's moves go to move(bx,by) and its lift to up(bx,by) instead of panning and tapping), cancel(all) when the finger lifts as a tap or a second finger arrives (all = also stop a drag in progress), pan(bx,by) when the finger has moved far enough to pan: true = the hold hooks took the gesture (an Instant drag), so the board does not pan.
 // (new) Ghost-click guard. A board tap is handled the instant the finger lifts, and many phones then send a follow-up "click" to whatever is under the finger NOW. If the tap just opened a popup (How many Fleets? Hold button, ...), that click pressed a popup button by itself: it applied a Fleet number you never chose, or hit Cancel so the popup vanished. tapAt = when the last board tap happened; for 300 ms afterwards, real (not programmatic) clicks on buttons and dialogs are ignored.
+// (new 2026-10-27-j) TAP_TOL = how far (px) a finger may end up from where it went down and still count as a tap rather than a pan; it is measured as the distance from the start, not the path, so a shaky finger's jitter does not add up (Shmorden: testers with shaky hands). A mouse keeps 8 px. A tap counts where the finger went DOWN (p0 / t0p), not where it lifted, as that is where a shaky finger was aiming.
+const TAP_TOL=14;
 let tapAt=0;
 document.addEventListener('click',e=>{if(e.isTrusted&&Date.now()-tapAt<300&&e.target&&e.target.closest&&e.target.closest('button,#ov')){e.stopImmediatePropagation();e.preventDefault()}},true);
 function bindBoard(svgEl,box,V,ap,onTap0,hk){const onTap=(x,y)=>{tapAt=Date.now();onTap0(x,y)},bxy=(cx,cy,f)=>{const r=box.getBoundingClientRect();return f((cx-r.left-V.x)/V.k,(cy-r.top-V.y)/V.k)};
 // (new) Any touch, click or wheel on the live board stops a turn-change camera move (camStop), so the player is never fought for the view.
 ['touchstart','pointerdown','wheel'].forEach(n=>svgEl.addEventListener(n,()=>{if(V===view)camStop()},{passive:true}));
-let tMoved=0,tMulti=0,tPrev=null,tLast=null;
+let tMoved=0,tMulti=0,tPrev=null,tLast=null,t0p=null;
 // Touch events (used on Apple devices): take over the touch so Safari cannot scroll or zoom the page.
-svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
+svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;t0p=ts[0];if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
 svgEl.addEventListener('touchmove',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length)return;
 if(hk&&hk.owns()){tPrev=ts[0];if(ts.length==1)bxy(ts[0].x,ts[0].y,hk.move);return}
-if(ts.length==1){const dx=ts[0].x-tPrev.x,dy=ts[0].y-tPrev.y;tPrev=ts[0];tMoved+=Math.abs(dx)+Math.abs(dy);if(tMoved>10){if(hk&&bxy(ts[0].x,ts[0].y,hk.pan))return;V.x+=dx;V.y+=dy;ap()}}
+if(ts.length==1){const dx=ts[0].x-tPrev.x,dy=ts[0].y-tPrev.y;tPrev=ts[0];if(tMoved<=TAP_TOL&&t0p)tMoved=Math.hypot(ts[0].x-t0p.x,ts[0].y-t0p.y);if(tMoved>TAP_TOL){if(hk&&bxy(ts[0].x,ts[0].y,hk.pan))return;V.x+=dx;V.y+=dy;ap()}}
 else{const g=gestOf(ts),r=box.getBoundingClientRect();V.x+=g.cx-tLast.cx;V.y+=g.cy-tLast.cy;zoomAt(g.d/tLast.d,g.cx-r.left,g.cy-r.top,V,ap);tLast=g}},{passive:false});
 const tEnd=e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);
 if(hk&&hk.owns()){if(!ts.length){if(e.type=='touchend'&&e.changedTouches.length){const t=e.changedTouches[0];bxy(t.clientX,t.clientY,hk.up)}else hk.cancel(1)}if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}return}
 if(hk&&!ts.length)hk.cancel();
-if(e.type=='touchend'&&!ts.length&&!tMulti&&tMoved<=10&&e.changedTouches.length){const t=e.changedTouches[0],r=box.getBoundingClientRect();onTap((t.clientX-r.left-V.x)/V.k,(t.clientY-r.top-V.y)/V.k)}
+if(e.type=='touchend'&&!ts.length&&!tMulti&&tMoved<=TAP_TOL&&e.changedTouches.length){const t=t0p||{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY},r=box.getBoundingClientRect();onTap((t.x-r.left-V.x)/V.k,(t.y-r.top-V.y)/V.k)}
 if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}};
 svgEl.addEventListener('touchend',tEnd,{passive:false});svgEl.addEventListener('touchcancel',tEnd,{passive:false});
 // Pointer events (used everywhere else: mouse, Android, Quest): same behaviour.
-const P=new Map();let moved=0,twoFinger=0,last=null;
+const P=new Map();let moved=0,twoFinger=0,last=null,p0={x:0,y:0,tol:8};
 const gest=()=>{const v=[...P.values()],a=v[0],b=v[1]||v[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
-svgEl.addEventListener('pointerdown',e=>{if(useTouch()&&e.pointerType==='touch')return;svgEl.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size==1){moved=0;twoFinger=0;if(hk)bxy(e.clientX,e.clientY,hk.down)}else{twoFinger=1;moved=99;if(hk)hk.cancel(1)}last=gest()});
+svgEl.addEventListener('pointerdown',e=>{if(useTouch()&&e.pointerType==='touch')return;svgEl.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size==1){moved=0;twoFinger=0;p0={x:e.clientX,y:e.clientY,tol:e.pointerType==='mouse'?8:TAP_TOL};if(hk)bxy(e.clientX,e.clientY,hk.down)}else{twoFinger=1;moved=99;if(hk)hk.cancel(1)}last=gest()});
 svgEl.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
 if(hk&&hk.owns()){if(P.size==1)bxy(e.clientX,e.clientY,hk.move);return}
-if(P.size==1){moved+=Math.abs(dx)+Math.abs(dy);if(moved>8){if(hk&&bxy(e.clientX,e.clientY,hk.pan))return;V.x+=dx;V.y+=dy;ap()}}
+if(P.size==1){if(moved<=p0.tol)moved=Math.hypot(e.clientX-p0.x,e.clientY-p0.y);if(moved>p0.tol){if(hk&&bxy(e.clientX,e.clientY,hk.pan))return;V.x+=dx;V.y+=dy;ap()}}
 else if(P.size==2){const g=gest(),r=box.getBoundingClientRect();V.x+=g.cx-last.cx;V.y+=g.cy-last.cy;zoomAt(g.d/last.d,g.cx-r.left,g.cy-r.top,V,ap);last=g}});
 const up=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);
 if(hk&&hk.owns()){if(P.size==0){if(e.type=='pointerup')bxy(e.clientX,e.clientY,hk.up);else hk.cancel(1)}return}
 if(hk&&P.size==0)hk.cancel();
-if(P.size==0&&!twoFinger&&moved<=8&&e.type=='pointerup'){const r=box.getBoundingClientRect();onTap((e.clientX-r.left-V.x)/V.k,(e.clientY-r.top-V.y)/V.k)}
+if(P.size==0&&!twoFinger&&moved<=p0.tol&&e.type=='pointerup'){const r=box.getBoundingClientRect();onTap((p0.x-r.left-V.x)/V.k,(p0.y-r.top-V.y)/V.k)}
 if(P.size==1)last=gest()};
 svgEl.addEventListener('pointerup',up);svgEl.addEventListener('pointercancel',up);
 svgEl.addEventListener('wheel',e=>{e.preventDefault();const r=box.getBoundingClientRect();zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top,V,ap)},{passive:false})}
@@ -1351,7 +1360,7 @@ const pgs=[['game',gamePage()],['sl',slPage()]].concat(net.on?[]:[['dev',devPage
 const o=$('ov'),ob=o.style.display=='flex'&&!ovClosing&&o.firstChild?o.firstChild.getBoundingClientRect().top:null;
 ov('<h1>Menu</h1>'+tabBar(tabs,t,'menuPage')+'<div style="margin-top:10px;display:grid">'+pgs.map(([k,h])=>'<div style="grid-area:1/1;min-width:0;'+((k=='dev')!=dv?'display:none;':k==t?'':'visibility:hidden;')+'">'+h+'</div>').join('')+'</div><div class="r" style="margin-top:12px"><button onclick="$(\'ov\').style.display=\'none\'">Close</button></div>');menuPin(ob)}
 // menuPin(top) keeps the Menu's top edge at top (screen px; null = it just opened, so it stays centered) after a page change, so a taller page grows downward; it moves up only as far as needed to fit on the screen, and never goes past the usual bottom limit (the box's max-height, which counts only its content, is cut by its new margin and its own padding and border, so a long page scrolls inside it with Close pinned at the bottom). (fixed 2026-10-27-i) The height is the content's full height (scrollHeight), not the box's height on screen, which is still animating from the old page's. ov() puts the layer back to centered for every other dialog.
-function menuPin(top){const o=$('ov'),b=o.firstChild;if(top==null||!b)return;const cs=getComputedStyle(o),bs=getComputedStyle(b),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0,H=o.clientHeight-pt-pb,ext=(b.offsetHeight-b.clientHeight)+(parseFloat(bs.paddingTop)||0)+(parseFloat(bs.paddingBottom)||0),h=Math.min(H,b.scrollHeight+(b.offsetHeight-b.clientHeight)),m=Math.max(0,Math.min(top-pt,H-h));o.style.alignItems='flex-start';b.style.marginTop=m+'px';b.style.maxHeight=(H-m-ext)+'px'}
+function menuPin(top){const o=$('ov'),b=o.firstChild;if(top==null||!b)return;const cs=getComputedStyle(o),bs=getComputedStyle(b),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0,H=o.clientHeight-pt-pb,ext=(b.offsetHeight-b.clientHeight)+(parseFloat(bs.paddingTop)||0)+(parseFloat(bs.paddingBottom)||0),h=Math.min(H,b.scrollHeight+(b.offsetHeight-b.clientHeight)),m=Math.max(0,Math.min(top-pt,H-h));o.style.alignItems='flex-start';b.style.marginTop=m+'px';b.style.maxHeight=(H-m-ext)+'px';ovSc(b)}
 // gamePage() = Game page: Quick save, the room (online only), controls and haptics, Concede.
 // mainMenu() = the in-game Menu's Main menu button: autosave the game (the same save the Continue saved game button loads) and show the start menu. The game stays in memory, so while it is unfinished New game refuses (menuNew); Continue saved game reloads it. Offline only (an online game has its own menu).
 function mainMenu(){if(!G||net.on)return;persist();histSave();resetFlow();$('ov').onclick=null;menu()}
@@ -1529,7 +1538,8 @@ const a=nwOf(t.id);return a?{k:'st',a:a.id,id:t.id,c0:cost(a,t),m:{k:'st',id:t.i
 function ddDown(x,y){ddDisarm();ddFired=false;if(dg||!ddCan())return;const cx=Math.floor(x),cy=Math.floor(y),pk=ddPick(cx,cy,x,y),rest=mode==''||mode=='s';
 const a=!pk&&mode=='s'&&sel!=null&&!multi?by(sel):null;let k=pk?'drag':null;
 if(!k&&a&&HOLD.pon&&!G.used.includes(a.id)&&cost(a,{x,y})<=G.ap&&ddSysOK(a,cx,cy,null))k='prec';if(!k)return;
-const io=!!pk&&(ddMul(pk.k)||(pk.k=='fl'?rest||mode=='p'||mode=='m':pk.k!='mx'&&rest));
+// (new 2026-10-27-j) With a Star selected the next tap aims at a target anywhere in its system, so only the selected Star itself starts an Instant drag; other Stars and Fleet badges need the hold.
+const io=!!pk&&(ddMul(pk.k)||(pk.k=='fl'?rest||mode=='p'||mode=='m':pk.k!='mx'&&rest))&&!(mode=='s'&&sel!=null&&!(pk.k=='new'&&pk.a==sel));
 ddP={x,y,cx,cy,k,pk,t0:performance.now(),inst:k=='drag'&&io&&!!HOLD.inst&&Math.hypot(x-pk.sx,y-pk.sy)*view.k<=Math.max(12,(R_STAR+R_STROKE)*view.k)};
 if(k=='prec'){ddT=setTimeout(ddFire,precMs());ddRaf=requestAnimationFrame(ddqTick);return}
 const ms=holdMs();if(ms>300)ddBar('Hold to drag',ms);ddT=setTimeout(ddFire,ms)}
@@ -1788,7 +1798,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-27-i';
+const BUILD='2026-10-27-j';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2016,17 +2026,17 @@ if(!clip||s.skip||!box.animate)return clr();const U=animMs(),a=box.animate([{hei
 function odometer(s,el,ms){const V=+el.textContent,end=()=>{clearInterval(id);el.classList.remove('scr')};let id=0;if(s.skip)return end();const t0=performance.now();el.dataset.s='0';
 id=setInterval(()=>{const f=(performance.now()-t0)/ms;if(f>=1)return end();el.dataset.s=String(Math.floor(V*f))},45);s.x.push(end)}
 // rpSeq() = the round screen's reveal (see roundPop). U = one animation, P = a brief pause (both placeholders). rows = the player lines as drawn (new order); old = last round's order (G.lo; players already out before it go last), and each line starts moved to where its player stood in that order (dy), then slides home.
-function rpSeq(){const o=$('ov');if(calm()){o.querySelectorAll('.scr').forEach(e=>e.classList.remove('scr'));return}
+function rpSeq(){const o=$('ov');if(calm()){o.querySelectorAll('.scr').forEach(e=>e.classList.remove('scr'));o.querySelectorAll('.rrow').forEach(rbFit);return}
 const R=rvPrep(),U=animMs(),P=U,rows=[...R.box.querySelectorAll('.rrow')],fin=rows.map(r=>+r.dataset.c),old=(rpOld||G.lo||G.order).filter(c=>fin.includes(c)),tops=rows.map(r=>r.offsetTop);fin.forEach(c=>{if(!old.includes(c))old.push(c)});
-const dy=rows.map((r,i)=>tops[old.indexOf(fin[i])]-tops[i]),moves=dy.some(d=>d),late=[...R.box.querySelectorAll('.rnote,.rtm')],rks=[...R.box.querySelectorAll('.rk')],hbs=[...R.box.querySelectorAll('.rbh')];
-rows.forEach((r,i)=>{r.style.opacity='0';if(dy[i])r.style.transform='translateY('+dy[i]+'px)'});late.concat(rks,hbs).forEach(e=>{e.style.opacity='0'});
+const dy=rows.map((r,i)=>tops[old.indexOf(fin[i])]-tops[i]),moves=dy.some(d=>d),late=[...R.box.querySelectorAll('.rnote,.rtm')],rks=[...R.box.querySelectorAll('.rk')],hbs=[...R.box.querySelectorAll('.rbh:not(.rbd)')];
+rows.forEach((r,i)=>{r.style.opacity='0';if(dy[i])r.style.transform='translateY('+dy[i]+'px)'});late.concat(rks).forEach(e=>{e.style.opacity='0'});
 const steps=[],t0=Math.max(0,camEnd-performance.now());steps.push({at:t0,fn:s=>rvOpen(R,s)});
 // The players appear one by one in last round's order.
 let t=t0+U+P;old.forEach(c=>{const i=fin.indexOf(c),r=rows[i];steps.push({at:t,fn:s=>{r.style.opacity='';seqA(s,r,[{opacity:0,transform:'translate(-16px,'+dy[i]+'px)'},{opacity:1,transform:'translate(0,'+dy[i]+'px)'}],{duration:U,easing:'ease-out'})}});t+=U*.5});
 // Their VP counts up from 0 to its value, then the lines slide into the new order and the ranks fade in.
 t+=U*.5+P;const S=U*2;steps.push({at:t,fn:s=>R.box.querySelectorAll('.scr').forEach(e=>odometer(s,e,S))});t+=S;
 // (new) The behind hints fade in as soon as the VP has counted up.
-if(hbs.length){steps.push({at:t,fn:s=>hbs.forEach(e=>{e.style.opacity='';seqA(s,e,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})})});t+=U*.5}t+=P;
+if(hbs.length){steps.push({at:t,fn:s=>hbs.forEach(e=>{e.hidden=false;rbFit(e.closest('.rrow'));seqA(s,e,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})})});t+=U*.5}t+=P;
 // (new) Players who went out this round (their lines show VP, class rvp): the whole line flashes once, then drops with the slide below. Not a player whose Deficit Elimination animation follows (dl, see dfPrep): their claxon is their flash (Shmorden, 2026-10-27).
 const dl=dfG?dfG.list:[],mine=e=>dl.includes(+e.dataset.c),outs=rows.filter(r=>r.querySelector('.rvp')),fl=outs.filter(r=>!mine(r));if(fl.length){steps.push({at:t,fn:s=>fl.forEach(r=>seqA(s,r,dfFlash(r),{duration:U*.8,easing:'ease-in-out'}))});t+=U*.8}
 const sl=moves?U*1.6:U*.5;steps.push({at:t,fn:s=>{rows.forEach((r,i)=>{r.style.transform='';if(dy[i])seqA(s,r,[{transform:'translateY('+dy[i]+'px)'},{transform:'none'}],{duration:sl,easing:'cubic-bezier(.2,.8,.2,1)'})});rks.forEach(e=>{e.style.opacity='';seqA(s,e,[{opacity:0},{opacity:1}],{duration:sl,easing:'ease-out'})})}});t+=sl+P;
@@ -2036,7 +2046,11 @@ if(nd.length||lt.length){steps.push({at:t,fn:s=>{nd.forEach(r=>rvOut(s,r));lt.fo
 if(dl.length){steps.push({at:t,fn:()=>setTimeout(()=>dfRun(R),0)});return seqRun(steps)}
 steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});seqRun(steps)}
 // rvOut(s,r) = player line r (a player who went out this round) swaps its VP for the reason they are out (outX), fading it in.
-function rvOut(s,r){const a=r.querySelector('.rvp'),b=r.querySelector('.rout');if(a)a.remove();if(b){b.hidden=false;seqA(s,b,[{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'})}}
+function rvOut(s,r){const a=r.querySelector('.rvp'),b=r.querySelector('.rout'),h=r.querySelector('.rbd');if(a)a.remove();if(b){b.hidden=false;seqA(s,b,[{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'})}
+// (new 2026-10-27-j) A Deficit Elimination line's behind hint appears now, after its animation, and the name shrinks if the line needs it.
+if(h){h.hidden=false;rbFit(r);seqA(s,h,[{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'})}}
+// rbFit(r) = round screen line r once its behind hint shows: the line's parts stop wrapping, and if it is then too long for the window the player's name shrinks (to 60% at most) until it fits (Shmorden, 2026-10-27: shrink the name, not the hint); only if that is not enough does the hint wrap. Lines without a showing hint are left alone.
+function rbFit(r){const n=r&&r.querySelector('.rnm'),h=r&&r.querySelector('.rbh:not([hidden])');if(!n||!h)return;[...r.children].forEach(x=>{x.style.whiteSpace='nowrap'});n.style.fontSize='';let f=1;while(r.scrollWidth>r.clientWidth+1&&f>.6){f=Math.round((f-.05)*100)/100;n.style.fontSize=f+'em'}if(r.scrollWidth>r.clientWidth+1)h.style.whiteSpace='normal'}
 // dfFlash(r) = the keyframes for player line r flashing once in the warning color and back (the quick flash before a line drops; the claxon repeats it slowly).
 function dfFlash(r){const b=getComputedStyle(r).backgroundColor,w=getComputedStyle(document.documentElement).getPropertyValue('--warn').trim()||'#ffb347';return[{backgroundColor:b},{backgroundColor:w},{backgroundColor:b}]}
 // ===== Deficit Elimination animation =====
@@ -2169,7 +2183,7 @@ function applySt(m){if(!G)return false;let g;try{g=prepG(JSON.parse(m.g))}catch(
 const was=cur(),oldR=G.round,wasOver=!!G.over,wasMine=net.my.includes(was);G=g;let ok=m.h?mergeHist(m.h):true;if(m.mv&&!mvApply(m.mv))ok=false;netClearFlow();net.lastG=JSON.stringify(G);
 if(cur()!==was||G.round!==oldR)say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();
 if(!wasMine&&net.my.includes(cur())&&!G.over)buzz(220);
-if(G.round>oldR&&!G.over)roundPop();if(G.over&&!wasOver&&!dfEnd())overDlg(1);return ok}
+if(G.round>oldR&&!G.over)roundPop();if(G.over&&!wasOver&&!dfEnd())overLater();return ok}
 // applyFull(m) takes a complete copy of the game and history (new game, rejoin, repair).
 function applyFull(m){let g;try{g=prepG(JSON.parse(m.g))}catch(e){return nsend(net.conn,{t:'need'})}
 ov2Close(1);G=g;adoptHistory(m.h);if(m.seats)net.seats=m.seats;net.started=true;net.lobby=false;net.rq=null;net.acting=false;netClearFlow();net.lastG=JSON.stringify(G);net.hsent=H?H.snaps.length:0;
