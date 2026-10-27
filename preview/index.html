@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-27-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-27-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -68,8 +68,11 @@ body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg
 .chip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,var(--panel))}.chip.dead{opacity:.4;text-decoration:line-through}
 /* (step 7) #tvp: the team totals line under the player chips (team games only; empty = hidden). */
 #tvp{font-size:12px;color:var(--mut);margin-top:4px}#tvp:empty{display:none}
-/* #modes: the row of three mode buttons (Stars, Place, Move); .act marks the selected one. */
-#modes{display:flex;gap:6px;margin-top:6px}#modes button{flex:1;min-height:38px;padding:0 6px}#modes .act{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line);font-weight:600}
+/* #modes: two mode buttons, Star (opens Set / Multi) and Fleet (opens Place / Move), each in its own slot (.mg); .act marks the selected one. A pair's second button (.sub) hides behind the first until its pair is open, then slides down from beneath it and hangs below the top panel, over the board (#top is raised above the board for this, z-index 3; popups #ov 4 and #ov2 6 stay above it). .calm (Animations Off) and reduced motion skip the slide. */
+#top{position:relative;z-index:3}
+#modes{display:flex;gap:6px;margin-top:6px}#modes .mg{flex:1;position:relative;display:flex;min-width:0}#modes button{flex:1;min-height:38px;padding:0 6px;position:relative;z-index:1;white-space:nowrap;overflow:hidden}
+#modes .sub{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:0;box-shadow:0 4px 10px rgba(0,0,0,.45);transition:transform .22s ease-out,opacity .22s ease-out}#modes .sub.shut{transform:translateY(calc(-100% - 6px));opacity:0;pointer-events:none;box-shadow:none}
+#modes.calm .sub{transition:none}@media(prefers-reduced-motion:reduce){#modes .sub{transition:none}}#modes .act{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line);font-weight:600}
 /* #st: the board area stretches to fill leftover space; position:relative lets overlays be placed inside it. */
 #st{flex:1;position:relative;min-height:0;overflow:hidden}
 /* svg: the drawing surface fills its area; touch-action:none lets our code handle finger drags and pinches. */
@@ -103,7 +106,7 @@ button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;bor
 svg .hint{animation:hintf 1.4s linear forwards}@keyframes hintf{0%,71%{opacity:1}100%{opacity:0}}@media(prefers-reduced-motion:reduce){svg .hint{animation:none}}
 button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #ov: full-screen dim backdrop that centers pop-up dialogs (hidden until JS shows it). */
-#ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+#ov{position:fixed;inset:0;z-index:4;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
 /* #ov>div: the dialog box itself. */
 #ov>div{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:20px;max-width:340px;width:100%}
 /* Dialog heading and paragraph text. */
@@ -193,7 +196,7 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
 </style></head><body>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
-<div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><button data-m="s">Stars</button><button data-m="p">Place</button><button data-m="m">Move</button><button data-m="x">Multi</button></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
+<div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
@@ -334,15 +337,15 @@ if(team&&!teamErr(pl,team,cpu)){G.team={};pl.forEach(c=>{G.team[c]=team[c]})}
 // For each player, add a capital star in the middle of its system (the +.5) with a unique id. cap marks it a capital, co remembers who it originally belonged to.
  pl.forEach(c=>{G.alive[c]=true;G.stars.push({id:G.nid++,x:caps[c][0]+.5,y:caps[c][1]+.5,o:c,cap:1,co:c,f:0})});
 // Start the first turn, clear selection and undo, hide the dialog, fit the board to the screen, announce the first player, draw.
- mode='s';resetFlow();G.rank=rankSnap({});G.po=G.order.slice();beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');
+ mode='';resetFlow();G.rank=rankSnap({});G.po=G.order.slice();beginTurn();sel=null;undo=[];$('ov').style.display='none';fit();say(NM[pl[0]]+' to move');
 // (new) A new game starts a fresh history with its first snapshot (round 1, before any turn).
 overHidden=false;H=newHist();histSnap('s');histSave();camKey=null;camSnap=null;render();camWait=true;roundPop()}
 // sysStar(x,y) finds the star in system column x, row y (or nothing).
 const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
 const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
-// beginTurn() resets per-turn things: used stars, Fuel, mode. pool = Fleets to place = your rank from the round-start snapshot (G.rank): 1 + the number of distinct scores higher than yours, so tied players share a rank (dense ranks, RULES.md 2.2). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
-function beginTurn(){delete G.pv;if(!cpuOf(cur())&&(!net.on||net.my.includes(cur())))buzz(220);G.used=[];G.ap=acts(G.round);mode='s';G.pool=G.rank[cur()]||1;G.stars.forEach(s=>{s.fm=0;delete s.fa});const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
+// beginTurn() resets per-turn things: used stars, Fuel, mode (nothing selected). pool = Fleets to place = your rank from the round-start snapshot (G.rank): 1 + the number of distinct scores higher than yours, so tied players share a rank (dense ranks, RULES.md 2.2). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
+function beginTurn(){delete G.pv;if(!cpuOf(cur())&&(!net.on||net.my.includes(cur())))buzz(220);G.used=[];G.ap=acts(G.round);mode='';G.pool=G.rank[cur()]||1;G.stars.forEach(s=>{s.fm=0;delete s.fa});const cp=capStar(cur());G.capOnly=!!cp&&cp.o!=cur()}
 // placeable() lists stars that can receive Fleets: none if your capital is lost, only the capital if capOnly, otherwise every own star reachable from the capital by walking your own connections (a flood-fill search).
 function placeable(){const me=cur(),cp=capStar(me);if(!cp||cp.o!=me)return[];if(G.capOnly)return[cp];const seen=new Set([cp.id]),q=[cp];while(q.length){const s=q.pop();G.conns.forEach(c=>{if(c[0]==s.id||c[1]==s.id){const t=by(c[0]==s.id?c[1]:c[0]);if(t.o==me&&!seen.has(t.id)){seen.add(t.id);q.push(t)}}})}return G.stars.filter(s=>seen.has(s.id))}
 // placeF(t) places one Fleet on star t if allowed, otherwise explains why. It saves an undo snapshot first.
@@ -442,8 +445,8 @@ function multiMsg(p){const st=multiStats();return p+' Target strength '+st.cb+'.
 function multiF(t){const me=cur();if(!multi)multi={t:null,att:[],step:'target'};
 // Step 1: choose the target (must be an enemy star).
 if(multi.t==null){if(!t||t.o==me)return say('Tap an ENEMY Star as the target.');if(isAlly(t.o))return say('That Star belongs to your teammate '+NM[t.o]+'. Teammates cannot attack each other.');if(pvTarget(t.id))return say('That Star already has a pending capture. Confirm or cancel it first.');multi.t=t.id;multi.step='sel';say(multiMsg('Target chosen. Tap your own Stars to add attackers.'));return render()}
-// Step 2: the target cannot be changed here; only own stars can be attackers.
-const b=by(multi.t);if(t&&t.id==b.id)return say('That is the target. Undo removes the last attacker; Cancel closes Multi-attack.');
+// Step 2: the target cannot be changed here; only own stars can be attackers. (changed) Tapping the target again cancels the multi-attack.
+const b=by(multi.t);if(t&&t.id==b.id)return multiCancel();
 if(!t||t.o!=me)return say('Tap one of your own Stars to add it as an attacker.');
 // Tapping an attacker again: a star with Fleets reopens its Fleet choice (which also offers Remove); a star without Fleets is simply removed.
 const old=multi.att.find(x=>x.id==t.id);
@@ -467,8 +470,8 @@ multiStart()}
 function multiStart(){const b=by(multi.t),att=multi.att.map(x=>({a:x.id,use:x.use||0,c:cost(by(x.id),b)})),c=att.reduce((t,x)=>t+x.c,0),tot=att.reduce((t,x)=>t+cs(by(x.a))+x.use,0);
 if(tot<=str(b)){multi.step='sel';return say('Not enough strength.')}if(c>G.ap){multi.step='sel';return say('Not enough Fuel.')}
 $('ov').style.display='none';multi.step='defend';pend={b:b.id,att};resolve()}
-// multiCancel() is the Cancel button (and the Esc key): clear everything, leave Multi mode, nothing was spent or changed.
-function multiCancel(){if(!multi||pend)return;resetFlow();mode='s';say('Multi-attack cancelled. Nothing was changed.');render()}
+// multiCancel() is the Cancel button (and the Esc key, and a second tap on the chosen target): clear everything, leave Multi mode (back to nothing selected), nothing was spent or changed.
+function multiCancel(){if(!multi||pend)return;resetFlow();mode='';say('Multi-attack cancelled. Nothing was changed.');render()}
 // uiMulti() shows Cancel and Confirm (and hides End turn) while attackers are being chosen. (changed) Confirm stays tappable but gets the striped "not yet" look (nogo) until the attack could win (2+ attackers, stronger than the target); a tap then explains why (multiGo). (new) While a multi-attack exists the mode row is replaced by the two Strength boxes (#mbar): the target's Strength in its owner's color, and the attackers' combined Strength (connections + Fleets chosen) in the attacker's color, bright (.win) once it beats the target. Cancel is then the way out of Multi.
 function uiMulti(){const on=!!multi&&!pend;$('mcx').style.display=on?'block':'';$('mcf').style.display=on?'block':'';$('en').style.display=on?'none':'';
 const t=multi&&multi.t!=null?by(multi.t):null,st=t?multiStats():null;
@@ -513,8 +516,8 @@ let holdGive=null;
 function holdAsk(t){holdGive=t.id;ov('<h1>Give 1 Fleet to '+NM[t.o]+'?</h1><p>It retreats to '+NM[t.o]+'\'s Star.</p><div class="r"><button onclick="holdYes()">Yes</button><button onclick="holdNo()">No</button></div>')}
 function holdYes(){const id=holdGive;holdGive=null;$('ov').style.display='none';if(net.on&&net.rq&&!net.rq.sent&&!net.my.includes(cur())){if(net.rq.nb.includes(id))netAnswer(id);return}if(!pend||!pend.ph||!pend.nb.includes(id))return;defTap(by(id),true)}
 function holdNo(){holdGive=null;$('ov').style.display='none'}
-// defTap(t,ok) handles a board tap while the defender is choosing: a ringed star sends the current Fleet there (a teammate's star asks first; ok = already answered Yes).
-function defTap(t,ok){
+// defTap(t,ok) handles a board tap while the defender is choosing: a ringed star sends the current Fleet there (a teammate's star asks first; ok = already answered Yes). (new) Tapping the attacked Star is the same as the Hold button, when Hold is offered.
+function defTap(t,ok){if(t&&t.id==pend.b&&(pend.hOK||pend.hX))return defHold();
 // Anything that is not a ringed star is rejected with a hint.
 if(!t||!pend.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(pend.hOK,pend.hX));
 if(!ok&&t.o!=pend.def)return holdAsk(t);
@@ -522,6 +525,10 @@ if(!ok&&t.o!=pend.def)return holdAsk(t);
 pend.dec.push(t.id);defNext()}
 // defHold() is the Hold button: only valid mid-decision and only when Hold is allowed. It records a Hold and moves on.
 function defHold(){if(pend&&pend.ph&&(pend.hOK||pend.hX)){if(pend.hOK){pend.dec.push('H');pend.hold++}else pend.dec.push('X');defNext()}}
+// (new) defLive() = how the Fleet badges look while a Defence call is being answered, so each choice shows at once: {star id: change}. Every decided defending Fleet leaves the target; a Retreat adds it to the Star it went to; each Hold also removes one committed attacking Fleet (from the first attacker that still has one; fin takes them from the shared pool, so only the badges differ). Nothing on the board changes until fin. Source: pend on the device running the attack, net.rq (sent with the question) on an online defender's device. null = no Defence call.
+function defLive(){const q=pend&&pend.ph?{b:pend.b,a:pend.att.map(x=>x.a),u:pend.att.map(x=>x.use||0),dec:pend.dec}:net.on&&net.rq&&Array.isArray(net.rq.dec)&&Array.isArray(net.rq.u)&&Array.isArray(net.rq.att)?{b:net.rq.b,a:net.rq.att,u:net.rq.u,dec:net.rq.dec}:null;if(!q||!q.dec.length)return null;
+const d={},add=(id,n)=>{d[id]=(d[id]||0)+n};add(q.b,-q.dec.length);let h=0;q.dec.forEach(v=>{if(v==='H')h++;else if(typeof v=='number')add(v,1)});
+q.a.forEach((id,i)=>{const k=Math.min(h,q.u[i]||0);if(k){add(id,-k);h-=k}});return d}
 // fin() applies the finished attack in one go (one attacker or several): settle every defending Fleet from pend.dec, capture the star, draw a connection from each attacker, spend the total Fuel.
 function fin(){const {b:bi,att,A,dec}=pend,b=by(bi),D=b.f||0,c=att.reduce((t,x)=>t+x.c,0);
 // Clear the rings and hide the Hold button, remember the current player me, end the pending state, and save ONE undo snapshot so a single Undo reverses the whole attack.
@@ -532,8 +539,8 @@ const holds=dec.filter(x=>x=='H').length,lost=dec.filter(x=>x=='X').length,rets=
 rets.forEach(id=>{const d=by(id);d.f=(d.f||0)+1});
 // Every attacker: take its committed Fleets off (unmoved first, so fm shrinks only if more are used than were unmoved) and mark it used, since it made a move.
 att.forEach(x=>{const a=by(x.a),free=(a.f||0)-(a.fm||0);a.fm=(a.fm||0)-Math.max(0,x.use-free);a.f=(a.f||0)-x.use;G.used.push(a.id)});
-// The capture: erase the target's connections, change its owner, set the survivors on it (marked moved), draw a connection from EACH attacker, mark the target used, spend the total Fuel, clear selection and multi-attack.
-G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;b.fa=surv;att.forEach(x=>G.conns.push([x.a,b.id]));G.used.push(b.id);G.ap-=c;sel=null;multi=null;
+// The capture: erase the target's connections, change its owner, set the survivors on it (marked moved), draw a connection from EACH attacker, mark the target used, spend the total Fuel, clear selection and multi-attack. (changed) A finished multi-attack also deselects Multi (back to nothing selected).
+G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;b.fa=surv;att.forEach(x=>G.conns.push([x.a,b.id]));G.used.push(b.id);G.ap-=c;sel=null;multi=null;if(mode=='x')mode='';
 mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost]});
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+c+' Fuel.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
@@ -719,17 +726,25 @@ function tap(bx,by){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(b
   if(pend&&pend.ph&&pend.rem)return say(netWaitMsg());
 // (new) While the defender is choosing Hold or Retreat, every board tap goes to defTap instead (a tap outside the board counts as no star).
   if(pend&&pend.ph)return defTap(cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null);
-// A tap outside the board clears the selection.
- if(cx<0||cy<0||cx>=NSYS(G)||cy>=NSYS(G)){sel=null;pvSel=null;say('');return render()}
+// (new) idle = the mode has nothing in progress: Place, Move with no group chosen, Set with no Star selected, Multi with no target. A tap outside the board then leaves the mode (back to nothing selected); otherwise it only clears the selection, as before.
+  const idle=mode=='p'||(mode=='m'&&!flow)||(mode=='s'&&sel==null)||(mode=='x'&&(!multi||multi.t==null));
+ if(cx<0||cy<0||cx>=NSYS(G)||cy>=NSYS(G)){if(mode&&(idle||mode=='m'))return modeOff();sel=null;pvSel=null;say('');return render()}
+// (new) onB = the tap is on one of your Fleet badges and not on a Star (the badge overlaps its own Star and can reach a neighbor's; a tap that could be either counts as the Star).
+// Nothing selected (mode ''): a Fleet badge switches to Move, one of your Stars to Set, and the tap then carries on in that mode; any other tap is handled like Set mode without switching (a move preview can still be picked).
+// (new) In Set or Multi with nothing in progress, or in Place, a Fleet badge also switches to Move (selecting a Fleet means Fleets).
+  const me=cur(),fb=badgeAt(bx,by),ts=sysStar(cx,cy),onS=q=>!!q&&Math.hypot(bx-q.x,by-q.y)<=R_STAR+R_STROKE,onB=!!fb&&fb.o==me&&!onS(fb)&&!onS(ts);
+  if(!mode){if(onB)mode='m';else if(ts&&ts.o==me)mode='s'}else if(onB&&mode!='m'&&idle){resetFlow();mode='m'}
 // t = the star in the tapped system, me = the current player. Place mode goes to placeF, Move mode goes to moveF.
  // (changed) In Move mode a tap on a Fleet badge counts as a tap on its star (badgeAt), otherwise the system tapped decides as before.
-  const t=(mode=='m'&&badgeAt(bx,by))||sysStar(cx,cy),me=cur();if(mode=='p')return placeF(t);if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}return moveF(t)}
-  // (new) Multi mode has its own tap handler.
-  if(mode=='x')return multiF(t);
+ // (new) In the Fleets pair, a tap that doesn't place a Fleet, choose a group, finish a move or open a Fleet popup leaves the mode (back to nothing selected); placeF / moveF have already said why.
+  const t=(mode=='m'&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);placeF(t);return modeOff(1)}
+  if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}const u=undo.length;moveF(t);if(!flow&&undo.length==u&&$('ov').style.display!='flex')modeOff(1);return}
+  // (new) Multi mode has its own tap handler. (new) An empty system before a target is chosen leaves Multi.
+  if(mode=='x'){if(!t&&idle)return modeOff();return multiF(t)}
   // (new) Move preview: tapping the end of a dashed move selects it (Confirm / Cancel appear); any other tap drops that selection and carries on.
-  if(mode=='s'){const pp=pvAt(cx,cy,t,bx,by);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}
+  if(mode=='s'||!mode){const pp=pvAt(cx,cy,t,bx,by);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}
 // Nothing selected yet: tapping your own unused star selects it; anything else shows a hint.
- if(!sel){if(t&&t.o==me){if(G.used.includes(t.id))say('That Star already acted, or is new, this turn.');else{sel=t.id;say('Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets). Tap an empty system to set a Star, your Star to connect, or an enemy Star to take'+(teamsOn()?', or a teammate\'s Star to connect or gift.':'.'))}}else say('Tap one of your Stars to start a move.');return render()}
+ if(!sel){if(t&&t.o==me){if(G.used.includes(t.id))say('That Star already acted, or is new, this turn.');else{sel=t.id;say('Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets). Tap an empty system to set a Star, your Star to connect, or an enemy Star to take'+(teamsOn()?', or a teammate\'s Star to connect or gift.':'.'))}}else if(!t&&mode)return modeOff();else say(mode?'Tap one of your Stars to start a move.':'Tap one of your Stars or Fleets to start a move.');return render()}
 // a = the selected star. Tapping it again deselects.
  const a=G.stars.find(s=>s.id==sel);if(t===a){sel=null;say('');return render()}
 // (step 5) A living teammate's star is never taken: it opens the Connect / Gift popup instead (tmOpen).
@@ -815,11 +830,12 @@ tied.sort((a,b)=>dist(a)-dist(b));const pick=tied[0];
 // Add them to the order, remove them from the waiting list, and make them the reference for the next place.
 out.push(pick);rem.splice(rem.indexOf(pick),1);last=pick}
 return out}
-// (new) roundPop() shows the round-start popup: round number, Fuel this round, and each player's snapshot rank and score (X and the reason for eliminated players).
+// (new) roundPop() shows the round-start popup: round number, Fuel this round, and each player's snapshot rank and score (X and the reason for eliminated players). (new) When only computers are left but people played, it ends with End game (scores the board now, doEndGame) and Spectate (closes it so the computers play on to the end with no more round screens; a tap elsewhere only closes it). Computers wait while it is open (cpuTick).
 // (changed, turn and round transitions) It plays as a reveal (rpSeq): the window waits for the board to zoom out, opens at the size of the title and the player lines, the players appear one by one in LAST round's turn order with "VP:", their VP counts up from 0 like an odometer, the lines slide into the NEW order with their ranks, the elimination notes appear, and the window grows downward to show Save file and "Tap to start the round". The first tap jumps to the end, the next one closes it. Everything is in the page from the start (only hidden), so code that reads the popup's text right away still works.
+let specGid=null;
 function roundPop(){
-// (new) When only computer players are left in the game there is nobody to tap the popup, so the next round just begins.
-if(allCpu())return;
+// (new) In a game of computers only there is nobody to tap the popup, so the next round just begins. (fixed) Once every person in the game is out (Deficit, eliminated or conceded) the popup still shows, with End game and Spectate (cw); before, it was skipped as if nobody were playing. After Spectate (specGid = this game's id, this device only) it is skipped again, as in a game of computers only.
+const cw=allCpu();if(cw&&(!G.pl.some(c=>!G.cpu[c])||specGid===G.gid))return;
 // (new) jo(c) = player c went out in the round that just ended and the screen plays its reveal: the line first shows their VP like everyone else's (class rvp), and the reason (class rout, hidden) replaces it later in the reveal (rpSeq, dfRun).
 const jo=c=>!calm()&&!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==G.round-1;
 // row(c) builds one player's line as a player chip (pchip), left-aligned like the end screen: rank (1st, 2nd; it fades in as the lines slide), color dot, name, "VP:" and score (the score is a .scr number, see rpSeq), or why a player is out (outX). (T4) In overtime it also shows the Stars each player controls, since they break a VP tie.
@@ -827,7 +843,7 @@ const ot=G.round>30,row=c=>`<div class="rrow pchip" data-c="${c}" style="${pchip
 // (new) notes = one warning line under the players for everyone eliminated in the round that just ended (outWhy).
 const notes=G.pl.filter(c=>!G.alive[c]&&G.out&&G.out[c]&&G.out[c].r==G.round-1).map(c=>'<p class="rnote" data-c="'+c+'" style="color:var(--warn);font-weight:600;margin:8px 0 0">'+outWhy(c)+'</p>').join('');
 // Show the dialog: alive players in turn order first, then eliminated players. (T4) An overtime round only starts after a round that ended in a Perfect Tie (VP and Stars equal), so its popup says so and explains the tiebreak (otRules) under the round name. (new) .ovft = the part the window uncovers last.
-ov(`${ot?'<h1>Perfect Tie!</h1><p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p><p style="margin:0 0 8px"><b>'+rdName(G.round)+'</b></p><p style="margin:0 0 8px">'+otRules()+'</p>':'<h1>'+rdName(G.round)+'</h1>'}<p>Fuel this round: <b>${acts(G.round)}</b></p>${G.sz?`<p>Custom board: ${G.sz} by ${G.sz} sectors</p>`:''}${G.pm?`<p>Placement: ${G.pm=='fixed'?'fixed positions only':'free placement only'}</p>`:''}<div class="rpl">${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}</div>${notes}${teamsOn()?'<p class="rtm" style="margin:8px 0 0;color:var(--ink);font-weight:600">'+teamLine(G.score)+(ot?' · Stars: '+[...new Set(G.pl.map(teamOf))].map(t=>'Team '+t+' '+teamStars(t)).join(', '):'')+'</p>':''}<div class="ovft"><div class="r" style="margin-top:10px"><button onclick="event.stopPropagation();saveFile(this)">Save file</button></div><p style="margin:12px 0 0;text-align:center">Tap to start the round</p></div>`);
+ov(`${ot?'<h1>Perfect Tie!</h1><p style="color:var(--ink);font-weight:600;font-size:18px;margin:0 0 8px">Stars equal</p><p style="margin:0 0 8px"><b>'+rdName(G.round)+'</b></p><p style="margin:0 0 8px">'+otRules()+'</p>':'<h1>'+rdName(G.round)+'</h1>'}<p>Fuel this round: <b>${acts(G.round)}</b></p>${G.sz?`<p>Custom board: ${G.sz} by ${G.sz} sectors</p>`:''}${G.pm?`<p>Placement: ${G.pm=='fixed'?'fixed positions only':'free placement only'}</p>`:''}<div class="rpl">${G.order.map(row).join('')}${G.pl.filter(c=>!G.alive[c]).map(row).join('')}</div>${notes}${teamsOn()?'<p class="rtm" style="margin:8px 0 0;color:var(--ink);font-weight:600">'+teamLine(G.score)+(ot?' · Stars: '+[...new Set(G.pl.map(teamOf))].map(t=>'Team '+t+' '+teamStars(t)).join(', '):'')+'</p>':''}<div class="ovft"><div class="r" style="margin-top:10px"><button onclick="event.stopPropagation();saveFile(this)">Save file</button></div>${cw?`<p style="margin:12px 0 0">Only computers are left. Spectate them playing to the end, or end the game now.</p><div class="r" style="margin-top:8px">${!net.on||net.my.includes(cur())?'<button onclick="event.stopPropagation();closeRound();doEndGame()">End game</button>':''}<button onclick="event.stopPropagation();specGid=G.gid;closeRound()">Spectate</button></div>`:'<p style="margin:12px 0 0;text-align:center">Tap to start the round</p>'}</div>`);
 // A tap anywhere (the backdrop or the box) dismisses it; (new) while the reveal plays, the first tap only jumps it to the end. rpOn = the round popup is showing (the board's zoom in waits for it, see camTurn).
 // (new) dfPrep() readies the Deficit Elimination animation before the reveal starts; while it plays (dfOn) taps do nothing (holding skips, see dfRun).
 dfPrep();$('ov').onclick=e=>{if(e&&e.target&&!e.target.isConnected)return;if(e&&dfOn)return;if(e&&seqSkip())return;closeRound(e)};rpOn=true;rpSeq()}
@@ -878,12 +894,12 @@ function boardSVG(S,ctl,L){let s='';
  S.stars.forEach(q=>{const op=L&&q.o==L.me&&L.used.includes(q.id)?.5:1,f=`fill="${COL[q.o]}" stroke="var(--ink)" stroke-width="${R_STROKE}" opacity="${op}"`;
 // Capitals are drawn as a star shape, normal stars as circles.
   s+=q.cap?`<polygon points="${sp(q.x,q.y,R_CAP,R_CAP_IN)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r="${R_STAR}" ${f}/>`;
-// If the star holds Fleets, draw a small badge showing the number.
+// If the star holds Fleets, draw a small badge showing the number. (new) L.fd = changes shown during a Defence call (defLive).
   // (new) Fleet badge styles (live board only): spent (half strength, like a spent Star) when Fleets arrived by an attack this turn or a Fleet move is previewed onto the Star; dashed border when Fleets here already moved this turn. A previewed move also shows the new Fleet counts.
-  {let fl=q.f||0,spent=false,dash=false;if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}})}
+  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}})}
   if(fl>0)s+=`<g opacity="${spent?.5:1}"><rect x="${q.x+BADGE.dx}" y="${q.y+BADGE.dy}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${COL[q.o]}" stroke="${dash?COL[q.o]:'var(--ink)'}" stroke-width=".04"${dash?' stroke-dasharray=".07 .05"':''}/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${fl}</text></g>`}
 // Draw the strength number (visible only when zoomed in).
-  s+=`<text class="t" x="${q.x+.3}" y="${q.y-.22}" font-size=".3" font-weight="700" fill="var(--ink)">${S.conns.filter(c=>c[0]==q.id||c[1]==q.id).length+(q.f||0)}</text>`;
+  s+=`<text class="t" x="${q.x+.3}" y="${q.y-.22}" font-size=".3" font-weight="700" fill="var(--ink)">${S.conns.filter(c=>c[0]==q.id||c[1]==q.id).length+(q.f||0)+(L&&L.fd&&L.fd[q.id]||0)}</text>`;
 // If the star is in the highlight list, ring it.
   // (new) Multi-attack: ring the target and each chosen attacker.
   if(L&&L.multi&&(q.id==L.multi.t||L.multi.att.some(x=>x.id==q.id)))s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="${q.id==L.multi.t?'var(--ink)':COL[q.o]}" stroke-width=".09"${q.id==L.multi.t?' stroke-dasharray=".2 .12"':''}/>`;
@@ -925,7 +941,7 @@ function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
-W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';document.querySelectorAll('#modes [data-m]').forEach(b=>{b.classList.toggle('act',b.dataset.m==mode);if(b.dataset.m=='p')b.textContent='Place '+(G.pool||0)});
+W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
 // Fill the info row: player name, round (and online status); Fuel left goes to the gauge (fuelUi).
  $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(fl);
 // Fill the score chips: one per player with VP and star count.
@@ -934,6 +950,11 @@ W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,rng:rs&&fl>0?{x:Ma
 $('tvp').innerHTML=teamLine(vp);
 // (new) Start the turn transition if the turn has changed (camTurn).
  camTurn();camDef();camFollow();netTick();cpuSched()}
+// (new) modeOff(keep) leaves the current mode: clears any half-finished flow and goes back to nothing selected (the two-button row). keep = leave the bottom message as it is (it says why the tap did nothing).
+function modeOff(keep){resetFlow();mode='';if(!keep)say('');render()}
+// (new) modesUi(me) draws the mode row. At rest (nothing selected) it shows two buttons, Star and Fleet. Selecting a mode opens its pair: Star becomes Set and Multi slides down below it; Fleet becomes Place (with the Fleets left to place) and Move slides down below it. A computer's turn shows the row at rest, so the buttons don't slide open and shut with each computer move; so does a finished game.
+function modesUi(me){const m=cpuOf(me)||G.over?'':mode,oS=m=='s'||m=='x',oF=m=='p'||m=='m',R=$('modes');R.classList.toggle('calm',animMode=='off');
+R.querySelectorAll('[data-m]').forEach(b=>{const k=b.dataset.m;b.classList.toggle('act',k==m);if(k=='s')b.textContent=oS?'Set':'Star';if(k=='p')b.textContent=oF?'Place '+(G.pool||0):'Fleet';if(k=='x'||k=='m'){const sh=k=='x'?!oS:!oF;b.classList.toggle('shut',sh);b.tabIndex=sh?-1:0}})}
 // apply() applies the current pan and zoom to the drawing and records the zoom level for CSS.
 // (changed) apply() now batches updates to one per screen frame in touch mode (smoother on iPhone); applyNow() does the real work.
 let rafId=0;function apply(){if(useTouch()&&typeof requestAnimationFrame=='function'){if(!rafId)rafId=requestAnimationFrame(()=>{rafId=0;applyNow()})}else applyNow()}
@@ -995,8 +1016,8 @@ bindBoard(svg,st,view,apply,(bx,by)=>tap(bx,by));
 const mid=f=>{const r=st.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)};
 // Hook up the + and - zoom buttons, Fit, the mode buttons (via data-m) and the Concede button.
 // (changed) The mode buttons are ignored while the defender is choosing (see the !(pend&&pend.ph) test).
-$('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=fit;$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over&&!(pend&&pend.ph)&&!lock()){// (changed) Switching mode clears any half-finished flow. Entering Multi creates an empty multi-attack so Undo can step back out of it.
-mode=m;resetFlow();if(m=='x'){multi={t:null,att:[],step:'target'};say('Multi-attack: tap an enemy Star as the target.')}else say('');render()}};
+$('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=fit;$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over&&!(pend&&pend.ph)&&!lock()){// (changed) Switching mode clears any half-finished flow. Entering Multi creates an empty multi-attack so Undo can step back out of it. (new) Tapping the selected mode again deselects it (back to nothing selected, the two-button row).
+mode=m==mode?'':m;resetFlow();if(mode=='x'){multi={t:null,att:[],step:'target'};say('Multi-attack: tap an enemy Star as the target.')}else say('');render()}};
 // End turn button: if Fleets are unplaced and could be placed, warn before ending; otherwise end the turn.
 // (changed) End turn is blocked while the defender is choosing.
 // (changed) End turn is refused while the turn is unfinished (see endBlock): every Fleet must be placed and every Fuel used, whenever that is still possible. (new) A refused tap also points at what is left (endHint).
@@ -1007,7 +1028,7 @@ $('un').onclick=()=>{if(lock())return;
 // (changed) From a hold/retreat prompt of a MULTI-attack, Undo returns to Confirm with the same attackers; for a single attack it cancels as before.
 if(pend&&pend.ph){if(multi){pend=null;hl=[];$('hold').style.display='';multi.step='sel';say(multiMsg('Back to the multi-attack.'))}else{const pp=pend.pv;resetFlow();if(pp){pvRestore(pp);pvSel=pp.i;say('Back to the capture preview.')}else say('Attack cancelled. Nothing was changed.')}return render()}
 // (new) While setting up a multi-attack, Undo removes the last attacker, then the target, then leaves Multi mode.
-if(multi){if(multi.att.length){multi.att.pop();say(multiMsg('Last attacker removed.'))}else if(multi.t!=null){multi.t=null;multi.step='target';say('Target cleared. Tap an enemy Star as the target.')}else{resetFlow();mode='s';say('Multi-attack closed.')}return render()}
+if(multi){if(multi.att.length){multi.att.pop();say(multiMsg('Last attacker removed.'))}else if(multi.t!=null){multi.t=null;multi.step='target';say('Target cleared. Tap an enemy Star as the target.')}else{resetFlow();mode='';say('Multi-attack closed.')}return render()}
 if(G&&!G.over&&undo.length){const tp=undo[undo.length-1];if(!(tp&&tp.pv))mvUndo();const cv=G.cpuV,cb=G.cpuB;G=JSON.parse(undo.pop());if(cv){G.cpuV=cv;if(cb)G.cpuB=cb;else delete G.cpuB}resetFlow();say('Undone');render()}};
 // dl: the download helper, used by Save file when the page allows it.
 let dl=null;try{window.claude&&claude.use('downloads').then(d=>{dl=d}).catch(()=>{})}catch(e){}
@@ -1096,7 +1117,7 @@ delete n.history;if(n.gid!=null&&(typeof n.gid!='string'||n.gid.length>40))delet
 if(n.out!=null){const o={};if(typeof n.out=='object'&&!Array.isArray(n.out))n.pl.forEach(c=>{const e=n.out[c];if(e&&typeof e=='object'&&['d','z','c'].includes(e.w)&&I(e.r,1,RMAX)&&!n.alive[c]){o[c]={w:e.w,r:e.r};if(e.w=='z'&&n.pl.includes(e.by)&&e.by!==c)o[c].by=e.by}});if(Object.keys(o).length)n.out=o;else delete n.out}
 return n}
 // loadObj(o) loads a game: validate first (prepG), then replace the live game and reset every half-finished interaction.
-function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='s';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';camKey=null;camSnap=null;fit();say('Game loaded');render();
+function loadObj(o){if(net.on)throw new Error('Leave the online game first.');const n=prepG(o);G=n;adoptHistory(o&&o.history);mode='';resetFlow();undo=[];$('ov').onclick=null;$('ov').style.display='none';camKey=null;camSnap=null;fit();say('Game loaded');render();
 // (new) A finished game opens on its end screen (Save file, New game, History).
 if(G.over)overDlg()}
 // lm(t,err) shows a status line inside the Menu dialog (or the bottom message if the Menu is closed).
@@ -1523,7 +1544,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-27-a';
+const BUILD='2026-10-27-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1665,7 +1686,7 @@ function animCycle(b){animMode=animMode=='on'?'fast':animMode=='fast'?'off':'on'
 const soundLabel=()=>'Sound: '+(soundOn?'On':'Off');
 function soundToggle(b){soundOn=!soundOn;try{localStorage.setItem(SKEY2,soundOn?'1':'0')}catch(e){}b.textContent=soundLabel()}
 // ===== Turn and round transitions: camera moves, round screen and end screen reveals =====
-// (new) Shmorden's request 2026-10-26. On every change of turn the board zooms out to Fit, then zooms in on the player whose turn it is (camBox). At the end of a round it zooms out and the round screen plays its reveal (roundPop, rpSeq); the zoom in waits until that screen is closed. At the end of the game it zooms out and the end screen plays its reveal (overDlg, endSeq). Animations Off (or the phone's reduce-motion setting) turns all of it off. With CPU speed Instant a computer's turn only zooms out. A touch, drag or wheel on the board stops a camera move where it is. All timings come from the Animations speed (animMs) and are placeholders.
+// (new) Shmorden's request 2026-10-26. On every change of turn the board moves to the player whose turn it is (camBox): within a round it pans and zooms there in one move; at a new round it zooms out to Fit first. At the end of a round it zooms out and the round screen plays its reveal (roundPop, rpSeq); the zoom in waits until that screen is closed. At the end of the game it zooms out and the end screen plays its reveal (overDlg, endSeq). Animations Off (or the phone's reduce-motion setting) turns all of it off. With CPU speed Instant a computer's turn only zooms out. A touch, drag or wheel on the board stops a camera move where it is. All timings come from the Animations speed (animMs) and are placeholders.
 // calm() = no animations wanted. camMs() = how long one camera move takes. camRaf = the running camera frame, camT = the pause before the zoom in, camWait = the zoom in waits for the round screen to close, camEnd = when the running camera move ends (performance.now() time; the screens wait for it), camKey = the turn last seen by camTurn (null = do not animate the next change: a new or loaded game). rpOn = the round screen is showing.
 const calm=()=>animMode=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
 const camMs=()=>Math.round(animMs()*1.5);
@@ -1693,9 +1714,9 @@ function camFitBox(x0,y0,x1,y1){const N=NSYS(G),M=Math.min(N,9),grow=(a,b)=>{if(
 const r=st.getBoundingClientRect(),F=camFit(),k=Math.max(F.min,Math.min(90,r.width/(x1-x0+.2),r.height/(y1-y0+.2)));
 // ax(lo,hi,W) = the board's offset along one axis for a box lo..hi (see camAx).
 const ax=(lo,hi,W)=>camAx((lo+hi)/2,k,W);return{k,x:ax(x0,x1,r.width),y:ax(y0,y1,r.height)}}
-// camTurn() runs after every redraw (render) and starts the transition when the turn has changed since the last call: zoom out to Fit, a short pause, then zoom in (camIn), unless the game is over or the round screen is showing (closeRound zooms in when it closes).
+// camTurn() runs after every redraw (render) and starts the transition when the turn has changed since the last call. (changed, Shmorden 2026-10-26) A change of turn within a round pans and zooms straight to the player whose turn it is (camIn), in one move, with no zoom out first. A new round, the end of the game, and a computer's turn at CPU speed Instant or with the Dev switch camCpu off still zoom out to Fit; after a new round the zoom in follows a short pause, or waits for the round screen to close (closeRound).
 function camTurn(){if(!G)return;const k=G.over?'over':G.round+'/'+G.ti+'/'+cur();if(k==camKey)return;const p=camKey;camKey=k;if(p==null||calm())return;
-camStop();const F=camFit();view.min=F.min;camGo(F,camMs(),()=>{if(G&&!G.over&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))camT=setTimeout(()=>{camT=null;if(rpOn)camWait=true;else camIn()},Math.round(animMs()*.5))})}
+camStop();const F=camFit();view.min=F.min;if(!G.over&&p.split('/')[0]==String(G.round)&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))return camIn();camGo(F,camMs(),()=>{if(G&&!G.over&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))camT=setTimeout(()=>{camT=null;if(rpOn)camWait=true;else camIn()},Math.round(animMs()*.5))})}
 // camBusy() = a camera move is running or about to start; computers wait for it (cpuTick) so they never move while the board is still zooming.
 const camBusy=()=>!!camRaf||!!camT;
 // camDefView(a) = the view for a Defence call, a = {att: attacking star ids, b: target star id}: the middle of the attack line(s) (the middle of the box around the target and the attackers) is the middle of the screen, zoomed out as far as needed that the sector of the target and of every attacker is fully in view (never closer than 9 systems across, like camBox), and the board edge stays at the screen edge (camAx).
@@ -1831,7 +1852,7 @@ t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});se
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=14,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=15,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
@@ -1862,7 +1883,7 @@ if(lkOpen&&lkCtx=='net')lkDrawCol()}
 function netSave(){try{if(!net.on)return localStorage.removeItem(SKEY);localStorage.setItem(SKEY,JSON.stringify({role:net.role,room:net.room,n:net.n,sz:net.sz,pm:net.pm,team:net.team||null,look:net.look||null,tok:net.tok,started:net.started,seats:net.role=='host'?net.seats.map(s=>({c:s.c,kind:s.kind,tok:s.tok,took:!!s.took})):null}))}catch(e){}}
 function netSess(){try{return JSON.parse(localStorage.getItem(SKEY))}catch(e){return null}}
 // netClearFlow() resets the half-finished things on THIS device when the board is replaced from outside: selection, multi-attack, pending attack. It keeps the ringed Retreat choices if a question for this device is waiting.
-function netClearFlow(){sel=null;flow=null;multi=null;pend=null;undo=[];mode='s';hl=net.rq?net.rq.nb:[];$('hold').style.display=net.rq&&net.rq.hOK&&!net.rq.sent?'block':''}
+function netClearFlow(){sel=null;flow=null;multi=null;pend=null;undo=[];mode='';hl=net.rq?net.rq.nb:[];$('hold').style.display=net.rq&&net.rq.hOK&&!net.rq.sent?'block':''}
 // ---- Sending ----
 // relay(m,skip) sends m to every connected guest except the one it came from.
 function relay(m,skip){net.seats.forEach(s=>{if(s.conn&&s.conn!==skip)nsend(s.conn,m)})}
@@ -1884,7 +1905,7 @@ const gs=JSON.stringify(G);
 if(gs!==net.lastG){net.lastG=gs;const m={t:'st',g:gs};if(H&&H.gid===G.gid&&H.snaps.length!==net.hsent){m.h={gid:H.gid,n:H.snaps.length,add:H.snaps.slice(net.hsent)};net.hsent=H.snaps.length}if(H&&H.gid===G.gid&&H.mv){const b=H.snaps.length?(H.snaps[H.snaps.length-1].m||0):0;m.mv={b,add:H.mv.slice(b)}}netOut(m)}
 askSync();if(!mine)net.acting=false}
 // askSync() keeps the defender's device in step: while an attack waits on a remote defender, send the question; when it is gone, send a clear.
-function askSync(){let ask=null;if(pend&&pend.ph&&pend.rem)ask={nb:pend.nb,hOK:!!(pend.hOK||pend.hX),hX:!!pend.hX,i:pend.dec.length+1,D:pend.D,att:pend.att.map(x=>x.a),b:pend.b};const def=ask?pend.def:net.lastDef,key=JSON.stringify([def,ask]);if(key===net.lastAsk)return;net.lastAsk=key;if(!ask&&net.lastDef==null)return;net.lastDef=ask?def:null;netOut({t:'ask',def,ask})}
+function askSync(){let ask=null;if(pend&&pend.ph&&pend.rem)ask={nb:pend.nb,hOK:!!(pend.hOK||pend.hX),hX:!!pend.hX,i:pend.dec.length+1,D:pend.D,att:pend.att.map(x=>x.a),b:pend.b,u:pend.att.map(x=>x.use||0),dec:pend.dec.slice()};const def=ask?pend.def:net.lastDef,key=JSON.stringify([def,ask]);if(key===net.lastAsk)return;net.lastAsk=key;if(!ask&&net.lastDef==null)return;net.lastDef=ask?def:null;netOut({t:'ask',def,ask})}
 // ---- Receiving ----
 // mergeHist(h) adds the history snapshots that came with a state message; false means they did not line up, so a full copy is needed.
 function mergeHist(h){if(!h||typeof h.gid!='string'||!Array.isArray(h.add))return false;const base=H&&H.gid===h.gid?H.snaps:[];const all=base.length+h.add.length===h.n?base.concat(h.add):(h.add.length===h.n?h.add:null);if(!all)return false;const ph=prepHist({v:1,gid:h.gid,pl:G.pl,snaps:all,mv:H&&H.gid===h.gid?H.mv:[]});if(!ph)return false;H=ph;histSave();net.hsent=H.snaps.length;return true}
@@ -1899,13 +1920,13 @@ function applyFull(m){let g;try{g=prepG(JSON.parse(m.g))}catch(e){return nsend(n
 ov2Close(1);G=g;adoptHistory(m.h);if(m.seats)net.seats=m.seats;net.started=true;net.lobby=false;net.rq=null;net.acting=false;netClearFlow();net.lastG=JSON.stringify(G);net.hsent=H?H.snaps.length:0;
 $('ov').onclick=null;$('ov').style.display='none';camKey=null;camSnap=null;fit();if(m.start)camWait=true;say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
 // netAsk(m) arrives on the DEFENDER's device: show the ringed Retreat spots and Hold button, or clear them.
-function netAsk(m){if(!net.my.includes(m.def))return;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,sent:false}:null;
+function netAsk(m){if(!net.my.includes(m.def))return;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,u:m.ask.u,dec:m.ask.dec,sent:false}:null;
 if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display=net.rq.hOK?'block':'';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX))}else{hl=[];$('hold').style.display='';say('')}render()}
 // netAns(v) arrives on the ATTACKER's device: the defender chose Hold ('H') or a Retreat star (its id). Apply it exactly like a local choice.
 function netAns(v){if(!pend||!pend.ph||!pend.rem)return;if(v==='H')defHold();else if(typeof v=='number'&&pend.nb.includes(v)&&by(v))defTap(by(v),true)}
 // netAnswer(v) sends this device's answer and waits; netDefTap(x,y) turns a board tap into an answer; holdBtn() is the Hold button for both local and remote defenders.
-function netAnswer(v){net.rq.sent=true;$('hold').style.display='';netOut({t:'ans',v});say('Answer sent. Waiting for '+NM[cur()]+'.');render()}
-function netDefTap(x,y){const cx=Math.floor(x),cy=Math.floor(y),t=cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null;if(!t||!net.rq.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX));if(t.o!=net.rq.def){holdGive=t.id;return holdAsk(t)}netAnswer(t.id)}
+function netAnswer(v){net.rq.sent=true;if(Array.isArray(net.rq.dec))net.rq.dec=net.rq.dec.concat([v]);$('hold').style.display='';netOut({t:'ans',v});say('Answer sent. Waiting for '+NM[cur()]+'.');render()}
+function netDefTap(x,y){const cx=Math.floor(x),cy=Math.floor(y),t=cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null;if(t&&t.id==net.rq.b&&net.rq.hOK)return holdBtn();if(!t||!net.rq.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX));if(t.o!=net.rq.def){holdGive=t.id;return holdAsk(t)}netAnswer(t.id)}
 function holdBtn(){if(net.on&&net.rq&&!net.rq.sent&&!net.my.includes(cur())){if(net.rq.hOK)netAnswer('H');return}if(pend&&pend.rem)return;defHold()}
 // netWaitMsg() is the note the ATTACKER sees while a remote defender decides.
 function netWaitMsg(){const d=pend.def;return 'Waiting for '+NM[d]+' to make the Defence call.'+(seatUp(d)?'':' '+NM[d]+' is offline: Undo cancels the attack, or wait for them to return.')}
