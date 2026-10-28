@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-27-l",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-28-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -124,6 +124,8 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 @keyframes ovpop{from{transform:scaleY(.05);opacity:0}to{transform:scaleY(1);opacity:1}}
 /* (new) Reveals (round and end screens): #ov.rvh hides the dialog layer while it waits for the board to zoom out. .scr = a number being counted up: its real digits are see-through and data-s is drawn over them, right-aligned. */
 #ov.rvh{opacity:0}
+/* (new, hitchhiking) #ov.lite: the board stays undimmed and the dialog sits at the bottom, so what it asks about stays in view (the Hitchhike? question). Placeholder look. */
+#ov.lite{background:transparent;align-items:flex-end!important;padding-bottom:12px}#ov.lite>div{box-shadow:0 6px 28px rgba(0,0,0,.6)}
 /* (new) .pchip: a player line on the round and end screens drawn as a player chip: a border in the player's color (--c) around a dull tint of it (22% of the color over the panel; plain panel on browsers without color-mix). Placeholder look, the place for chip cosmetics later. */
 .ord{min-width:30px;font-weight:700}.pchip{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;border:2px solid var(--c);border-radius:8px;background:var(--panel);background:color-mix(in srgb,var(--c) 22%,var(--panel));color:var(--ink)}
 :root[data-theme="cgreen"] .pchip,:root[data-theme="ccyan"] .pchip,:root[data-theme="corange"] .pchip{border-radius:0}.scr{position:relative;color:transparent}.scr::after{content:attr(data-s);position:absolute;right:0;top:0;color:var(--ink)}
@@ -271,7 +273,7 @@ const say=t=>{$('msg').textContent=t||''};
 // ov(h) shows a pop-up dialog containing the HTML text h. (new) It first ends a reveal that is still playing (seqSkip) and unhides the layer (rvh), see Turn and round transitions.
 // (new) ovDir = which way the NEXT ov() call should slide its content in when a dialog that is already open changes page: 1 = from the right (forward / next page), -1 = from the left (back), 0 = no slide. Callers set it just before calling ov(); ov() reads it once and clears it.
 let ovDir=0,ovClosing=null,ovWasClosing=false,ovPrev='';
-function ov(h){const o=$('ov');seqSkip();dfStop();o.classList.remove('rvh');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=(o.firstChild.querySelector(':scope>.ovb')||o.firstChild).scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
+function ov(h){const o=$('ov');seqSkip();dfStop();o.classList.remove('rvh','lite');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=(o.firstChild.querySelector(':scope>.ovb')||o.firstChild).scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
 o.innerHTML='<div>'+h+'</div>';o.style.display='flex';o.style.alignItems='';if(o.dataset)o.dataset.page='';ovSc(o.firstChild);
 // (new) Redrawing the SAME dialog (a tap that changes a choice) keeps its scroll position instead of jumping to the top; a different dialog starts at the top.
 try{const n=o.firstChild;if(top&&was&&n&&n.querySelector&&((n.querySelector('h1')||{}).textContent||'')==was)(n.querySelector(':scope>.ovb')||n).scrollTop=top}catch(e){}
@@ -359,7 +361,9 @@ function placeF(t){if(G.pool<1)return say('No Fleets left to place.');const ok=p
 // (new) resetFlow() is the ONE place that clears every half-finished interaction: the selected star, a move group in progress, a pending attack, retreat rings and the Hold button. Undo, mode switches, End turn, new game, load and every Cancel call it, so no stale selection or count can survive.
 // (new, drag and drop) ddFl = the path (star ids) drawn while "Move how many Fleets?" waits after a Fleet drag (ddFleetDrop). A var, so resetFlow can clear it before the drag section has run.
 var ddFl=null;
-function resetFlow(){sel=null;pvSel=null;flow=null;multi=null;pend=null;hl=[];ddFl=null;$('hold').style.display=''}
+// (new, hitchhiking) hhS = the hitchhike question in progress (see hhAsk). A var for the same reason as ddFl.
+var hhS=null;
+function resetFlow(){sel=null;pvSel=null;flow=null;multi=null;pend=null;hl=[];ddFl=null;hhS=null;$('hold').style.display=''}
 // (new) badgeAt(bx,by) finds the star whose Fleet-count badge is under the board point (bx,by), with a little extra touch tolerance. Used only in Move mode so tapping the Fleets selects their star.
 function badgeAt(bx,by){const pad=Math.min(.12,Math.max(.04,8/view.k));return G.stars.find(q=>(q.f||0)>0&&bx>=q.x+BADGE.dx-pad&&bx<=q.x+BADGE.dx+BADGE.w+pad&&by>=q.y+BADGE.dy-pad&&by<=q.y+BADGE.dy+BADGE.h+pad)||null}
 // moveF(t) handles taps in Move mode. The step is decided by flow (the group chosen so far), never by sel alone, and the group size always comes from an explicit choice.
@@ -380,16 +384,56 @@ const a=by(flow.src),n=flow.n;if(!a||fFree(a)<n){resetFlow();say('That group is 
 if(t&&isAlly(t.o)){const e=fgErr(a,t,n);if(e){resetFlow();say(e);return render()}return fgAsk(a,t,n)}
 // Tapping nothing, the same star or someone else's star cancels the move.
 if(!t||t===a||t.o!=me){resetFlow();say('');return render()}
-// Breadth-first search: from a, walk along your own connections up to n steps, recording each star's distance in d.
-const d=new Map([[a.id,0]]),par=new Map(),q=[a];while(q.length){const x=q.shift();if(d.get(x.id)>=n)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u.o==me&&!d.has(u.id)){d.set(u.id,d.get(x.id)+1);par.set(u.id,x.id);q.push(u)}}})}
+// Breadth-first search (fBfs): from a, walk along your own connections up to n steps, recording each star's distance in d. (hitchhiking) For a person the path goes through as many Stars with Fleets that may ride as a shortest path can.
+const B=fBfs(a,n,hhOK()),d=B.d;
 // Out of reach: explain AND cancel, so no stale selection is left behind.
 if(!d.has(t.id)){resetFlow();say('Out of reach. '+n+' Fleet'+(n>1?'s travel':' travels')+' up to '+n+' Connection'+(n>1?'s':'')+' along your network. Selection cleared.');return render()}
+// (new, hitchhiking) Fleets on the Stars along the path that may ride along: ask about them first (hhAsk); the move is made when the last one is answered (hhDone).
+const path=fPathOf(B,a,t),hc=hhCands(a,path);if(hc.length){resetFlow();return hhAsk({a:a.id,b:t.id,n,path,c:hc,i:0,pk:[]})}
 // Valid: save undo, move exactly n Fleets (marked moved on arrival), clear the flow, say so.
 // (new) With Move preview on, the Fleet move becomes a preview along the path the Fleets would travel.
-if(pvOn()){const path=[t.id];while(path[0]!=a.id)path.unshift(par.get(path[0]));return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.')}
+if(pvOn())return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.');
 undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n});resetFlow();say('Moved '+n+'.');render()}
 // pickN(id,n) runs when a size button is tapped: it creates the move group (star id, n Fleets) and waits for a destination tap.
 function pickN(id,n){$('ov').style.display='none';sel=id;flow={src:id,n};say('Tap a Star within '+n+' Connection'+(n>1?'s':'')+(teamsOn()?', or a teammate\'s Star to give them.':''));render()}
+// ===== Hitchhiking (RULES.md 5.4) =====
+// A moving group may carry other Fleets of yours that sit on the Stars along its path, whether they moved this turn or not (Shmorden, 2026-10-28). They ride to the end, add nothing to the group's range, and count as moved. On the group's own Star only Fleets that already moved can ride (rule 5.4's second case: the group moves on and carries the Fleet that just arrived); the ones that can still move join the group itself instead. Fleets used in a Take this turn can't move again (4.10), so they never ride.
+// After a person picks the destination (tap, drag, or a preview), each Star on the path with Fleets that may ride is asked about, in path order. While the question is open the board shows the group at its destination, the dashed path, and a dashed circle round the Fleets being asked about. Computers never hitchhike yet (human-only first; CPU play is unchanged).
+// MAP: fSpent, fMoved, hhFree, hhOK = counts and who may | fBfs, fPathOf = the path | hhCands, hhAsk, hhDraw, hhCam, hhPick, hhCancel, hhDone = the question | hhApply, hhRec, hhTxt = carry them, log and message.
+// fSpent(s) = Fleets on s used in a Take this turn (fa). fMoved(s) = Fleets on s that moved this turn and may still ride.
+const fSpent=s=>Math.min(s.fa||0,s.f||0),fMoved=s=>Math.max(0,Math.min(s.fm||0,s.f||0)-fSpent(s));
+// hhFree(s,o) = how many Fleets on Star s may ride with a group passing through: every Fleet there except those used in a Take and those already promised to a pending Fleet move (as a group or as hitchhikers). o = s is the group's own Star: only its moved Fleets.
+function hhFree(s,o){return Math.max(0,o?fMoved(s)-hhOut(s.id):(s.f||0)-fSpent(s)-pvOut0(s.id)-hhOut(s.id))}
+const hhOK=()=>!!G&&!cpuRun&&!cpuOf(cur());
+// fBfs(a,n,hh) = the Stars a group of n on Star a can reach along your own Connections: d = distance, par = the Star before it on the path. hh = among equally short paths prefer the one through the most Stars with Fleets that may ride (a placeholder rule; without it, the first path found, as before). The distances are the same either way. fPathOf(B,a,t) = the path from a to t as star ids.
+function fBfs(a,n,hh){const me=cur(),d=new Map([[a.id,0]]),par=new Map(),w=new Map([[a.id,0]]),q=[a];while(q.length){const x=q.shift(),dx=d.get(x.id);if(dx>=n)continue;G.conns.forEach(c=>{if(c[0]!=x.id&&c[1]!=x.id)return;const u=by(c[0]==x.id?c[1]:c[0]);if(!u||u.o!=me)return;
+// A Star is reached first from the earliest Star of the layer before; a later one of that layer replaces it only when its path passes more Stars with Fleets that may ride (the queue holds a whole layer before the next, so this always happens before u is used).
+const v=w.get(x.id)+(hh&&hhFree(u,false)>0?1:0);if(!d.has(u.id)){d.set(u.id,dx+1);w.set(u.id,v);par.set(u.id,x.id);q.push(u)}else if(d.get(u.id)==dx+1&&v>w.get(u.id)){w.set(u.id,v);par.set(u.id,x.id)}})}return {d,par}}
+function fPathOf(B,a,t){const p=[t.id];while(p[0]!=a.id)p.unshift(B.par.get(p[0]));return p}
+// hhCands(a,path) = the Stars on the path (the group's own Star first, never the destination) with Fleets that may ride, as {id, k: how many}. Empty for computers.
+function hhCands(a,path){if(!hhOK())return [];const out=[];path.slice(0,-1).forEach((id,i)=>{const s=by(id),k=s?hhFree(s,i==0):0;if(k>0)out.push({id,k})});return out}
+// hhAsk(h) starts the question: h = {a: the group's Star, b: destination, n: group size, path, c: the candidates (hhCands), i: the one being asked about, pk: the answers so far as [star id, Fleets]}.
+function hhAsk(h){hhS=h;hhDraw()}
+// hhDraw() asks about candidate h.c[h.i]: None or how many ride (Bring / Leave when there is one), or Cancel move. The dialog sits low and leaves the board undimmed (#ov.lite) so the group at its destination, the path and the ringed Fleets stay in view.
+function hhDraw(){const h=hhS;if(!h)return;const c=h.c[h.i],k=c.k,o=c.id==h.a,F=k>1?'Fleets':'Fleet';render();
+ov('<h1>Hitchhike?</h1><p>'+k+' '+F+' on the ringed Star'+(o?', already moved,':'')+' can ride with your group to its destination. '+(k>1?'They add':'It adds')+' nothing to the group\'s range and '+(k>1?'count':'counts')+' as moved.'+(h.c.length>1?' (Star '+(h.i+1)+' of '+h.c.length+' on the path)':'')+'</p><div class="r" style="flex-wrap:wrap">'+(k==1?'<button onclick="hhPick(1)">Bring it</button><button onclick="hhPick(0)">Leave it</button>':'<button onclick="hhPick(0)">None</button>'+[...Array(k)].map((_,j)=>'<button onclick="hhPick('+(j+1)+')">'+(j+1)+'</button>').join(''))+'</div><div class="r" style="margin-top:8px"><button onclick="hhCancel()">Cancel move</button></div>');$('ov').classList.add('lite');hhCam()}
+// hhCam() pans (and zooms out if it must) so the whole path is in view above the dialog; it does nothing when it already is.
+function hhCam(){const h=hhS,box=$('ov').firstChild;if(!h||!box)return;const ps=h.path.map(by).filter(Boolean);if(!ps.length)return;const r=st.getBoundingClientRect(),H=Math.max(40,Math.min(r.height,box.getBoundingClientRect().top-r.top)),pd=.8,
+x0=Math.min(...ps.map(p=>p.x))-pd,x1=Math.max(...ps.map(p=>p.x))+pd,y0=Math.min(...ps.map(p=>p.y))-pd,y1=Math.max(...ps.map(p=>p.y))+pd;
+if(view.x+x0*view.k>=0&&view.x+x1*view.k<=r.width&&view.y+y0*view.k>=0&&view.y+y1*view.k<=H)return;
+camStop();view.k=Math.max(view.min*.9,Math.min(view.k,r.width/(x1-x0),H/(y1-y0)));view.x=r.width/2-(x0+x1)/2*view.k;view.y=H/2-(y0+y1)/2*view.k;apply()}
+function hhPick(m){const h=hhS;if(!h)return;if(m>0)h.pk.push([h.c[h.i].id,m]);h.i++;if(h.i<h.c.length)return hhDraw();hhDone()}
+function hhCancel(){$('ov').style.display='none';resetFlow();say('Fleet move cancelled.');render()}
+// hhDone() makes the move with the Fleets chosen to ride: a Fleet move preview carrying them (hh) with Move preview on, otherwise at once (one Undo takes back all of it).
+function hhDone(){const h=hhS;hhS=null;$('ov').style.display='none';const a=by(h.a),t=by(h.b),me=cur();if(!a||!t||a.o!=me||t.o!=me||fFree(a)<h.n){resetFlow();say('That group is no longer available.');return render()}
+const N=h.n+' Fleet'+(h.n>1?'s':''),k=h.pk.reduce((m,x)=>m+x[1],0);
+if(pvOn()){const p={k:'f',a:a.id,b:t.id,n:h.n,c:0,path:h.path};if(h.pk.length)p.hh=h.pk;return pvAdd(p,'Fleet move preview: '+N+(k?', '+k+' hitchhiking':'')+'. Confirm or Cancel.')}
+undo.push(JSON.stringify(G));a.f-=h.n;t.f=(t.f||0)+h.n;t.fm=(t.fm||0)+h.n;const hs=hhApply(a,t,h.pk);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:h.n},hs));resetFlow();say('Moved '+h.n+'.'+hhTxt(hs));render()}
+// hhApply(a,t,pk) moves the riders pk ([star id, n], ...) of a group that has just gone from Star a to Star t, each count cut to what may still ride. Moved Fleets leave first, so Fleets that could still move stay behind when they can. Returns {hp: their Stars' points, hn: how many from each} for the log.
+function hhApply(a,t,pk){const o={hp:[],hn:[]};(pk||[]).forEach(([id,n])=>{const s=by(id);if(!s||s===t||s.o!=t.o)return;const k=Math.min(n,hhFree(s,s===a));if(k<1)return;const m=Math.min(k,fMoved(s));s.f-=k;s.fm=(s.fm||0)-m;t.f=(t.f||0)+k;t.fm=(t.fm||0)+k;o.hp.push(mvPos(s));o.hn.push(k)});return o}
+// hhRec(r,hs) adds the riders to a Fleet move log record (hp, hn), when there are any. hhTxt(hs) = the end of the bottom message.
+const hhRec=(r,hs)=>hs&&hs.hn.length?Object.assign(r,{hp:hs.hp,hn:hs.hn}):r;
+const hhTxt=hs=>{const k=hs?hs.hn.reduce((m,x)=>m+x,0):0;return k?' '+k+' Fleet'+(k>1?'s':'')+' hitchhiked.':''};
 // ===== Move preview =====
 // With Move preview on, a human player's new Star or capture is first a dashed PREVIEW kept in G.pv (so saves, Undo and online play carry it): {i: id, k: 's' new Star at x,y | 't' capture of star b with `use` committed Fleets | 'f' Fleet move of n Fleets from star a to star b along `path` (star ids), costs no Fuel and changes nothing on the board until Confirm, a: origin star, c: Fuel}. The Fuel is paid when the preview is made, and the origin counts as having acted. Tapping the end of a dashed move selects it and shows Cancel / Confirm. Cancel refunds the Fuel and frees the origin. Confirm re-checks the move; a Star is then placed, and a capture goes through the normal attack code (resolve), so the Hold / Retreat choices happen only now. MAP: pvOn, pvToggle = switch | pvAdd, pvAttack, atkGo = make a preview | pvAt, pvSelect, pvUi = pick one | pvCancel, pvConfirm, pvErr, pvRestore = finish one | pvLineOK, pvSpotErr = previews block other placements | pvTag = marks Undo entries that recorded no move. Computers never use previews.
 const pvTag=s=>Object.assign(new String(s),{pv:1});
@@ -398,8 +442,9 @@ const pvLabel=()=>'Move preview: '+(pvPref?'On':'Off');
 function pvToggle(b){pvPref=!pvPref;try{localStorage.setItem('constellate-preview',pvPref?'1':'0')}catch(e){}b.textContent=pvLabel()}
 const pvOn=()=>pvPref&&!!G&&!cpuRun&&!cpuOf(cur());
 const pvTarget=id=>(G.pv||[]).some(p=>p.k=='t'&&p.b==id),pvOrigin=id=>(G.pv||[]).some(p=>p.k!='f'&&p.k!='h'&&p.a==id),pvFind=()=>(G.pv||[]).find(p=>p.i==pvSel);
-// pvOut(id) = Fleets promised to leave star id by pending Fleet moves; fFree(s) = Fleets on s that can still be moved; pvFleetStar(id) = star id is the start or end of a pending Fleet move (it cannot act until that is settled).
-const pvOut=id=>(G.pv||[]).reduce((m,p)=>m+((p.k=='f'||p.k=='h')&&p.a==id?p.n:0),0),fFree=s=>(s.f||0)-(s.fm||0)-pvOut(s.id),pvFleetStar=id=>(G.pv||[]).some(p=>(p.k=='f'||p.k=='h')&&(p.a==id||p.b==id));
+// pvOut(id) = Fleets promised to leave star id by pending Fleet moves; fFree(s) = Fleets on s that can still be moved; pvFleetStar(id) = star id is the start or end of a pending Fleet move, or has Fleets promised to one as hitchhikers (it cannot act until that is settled).
+// (new, hitchhiking) pvOut0(id) = the group sizes only; hhOut(id) = Fleets on star id promised to pending Fleet moves as hitchhikers (p.hh = [[star id, n], ...]). Hitchhikers leave moved Fleets first (hhApply), so only the part of hhOut beyond the moved Fleets there (fMoved) is taken from the Fleets that could still move.
+const pvOut0=id=>(G.pv||[]).reduce((m,p)=>m+((p.k=='f'||p.k=='h')&&p.a==id?p.n:0),0),hhOut=id=>(G.pv||[]).reduce((m,p)=>m+(p.k=='f'&&p.hh?p.hh.reduce((k,h)=>k+(h[0]==id?h[1]:0),0):0),0),pvOut=id=>{const h=hhOut(id),s=h&&by(id);return pvOut0(id)+(s?Math.max(0,h-fMoved(s)):0)},fFree=s=>(s.f||0)-(s.fm||0)-pvOut(s.id),pvFleetStar=id=>(G.pv||[]).some(p=>(p.k=='f'||p.k=='h')&&(p.a==id||p.b==id))||hhOut(id)>0;
 // pvAdd(p,msg) makes a preview: pays the Fuel, marks the origin as acted, selects the new preview.
 function pvAdd(p,msg){undo.push(pvTag(JSON.stringify(G)));const L=G.pv||(G.pv=[]);p.i=L.reduce((m,q)=>Math.max(m,q.i),0)+1;L.push(p);if(p.k!='f'&&p.k!='h'){G.ap-=p.c;G.used.push(p.a)}sel=null;flow=null;pvSel=p.i;say(msg||'');render()}
 // atkGo(n) = the attack's Fleet choice is made: with Move preview on it becomes a preview, otherwise it resolves at once. pvAttack(n) builds the capture preview from the pending attack.
@@ -429,7 +474,7 @@ if(!clear(a,b))return 'The line passes too close to another Star.';if(cs(a)+p.us
 function pvConfirm(){if(!G||G.over||lock()||pend)return;const p=pvFind();if(!p)return;const a=by(p.a),e=pvErr(p);
 if(e){undo.push(pvTag(JSON.stringify(G)));pvDrop(p);pvSel=null;say('No longer possible: '+e+' Preview cancelled'+(p.c?', '+p.c+' Fuel refunded.':'.'));return render()}
 pvSel=null;
-if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n});say('Moved '+p.n+'.');return render()}
+if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;const hs=hhApply(a,t,p.hh);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n},hs));say('Moved '+p.n+'.'+hhTxt(hs));return render()}
 if(p.k=='c'||p.k=='g'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const b=by(p.b);tmApply(p.k=='c'?'conn':'gift',a,b);say(p.k=='c'?'Connected to '+NM[b.o]+'\'s Star for '+p.c+'.':'Gave the Star to '+NM[b.o]+' for '+p.c+'.');return render()}
 if(p.k=='h'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;say('Gave '+p.n+' Fleet'+(p.n>1?'s':'')+' to '+NM[t.o]+'.');return render()}
 if(p.k=='s'){const u=new String(JSON.stringify(G));undo.push(u);G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(n.id);nwAdd(n,a);mvRec({k:'s',a:mvPos(a),b:mvPos(p),c:p.c});
@@ -925,7 +970,8 @@ function boardSVG(S,ctl,L){let s='';
  // (new) Deficit Elimination animation (live board only): the eliminated players' connections still on show (dgSVG), under the Stars. The group is always there so dfPrep and dfRun can fill it without a full redraw.
  if(L)s+='<g id="dgh">'+dgSVG()+'</g>';
  // (new, drag and drop) L.ddf = the path of a dragged Fleet group while "Move how many Fleets?" waits, drawn like a Fleet move preview.
- if(L&&L.ddf){const ps=L.ddf.map(by).filter(Boolean);if(ps.length>1)s+=`<polyline points="${ps.map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`}
+ // (new, hitchhiking) L.hk = the Hitchhike? question (hhS): its group's path is drawn the same way.
+ if(L&&(L.ddf||L.hk)){const ps=(L.ddf||L.hk.path).map(by).filter(Boolean);if(ps.length>1)s+=`<polyline points="${ps.map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`}
  // (new) Multi-attack preview: a dashed line from each chosen attacker to the target (they turn solid when the attack lands).
  if(L&&L.multi&&L.multi.t!=null)L.multi.att.forEach(x=>{const a=by(x.id),b=by(L.multi.t);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round"/>`});
 // For each star: op = opacity (dimmed if it already acted this turn), f = the shared style text.
@@ -934,7 +980,10 @@ function boardSVG(S,ctl,L){let s='';
   s+=q.cap?`<polygon points="${sp(q.x,q.y,R_CAP,R_CAP_IN)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r="${R_STAR}" ${f}/>`;
 // If the star holds Fleets, draw a small badge showing the number. (new) L.fd = changes shown during a Defence call (defLive).
   // (new) Fleet badge styles (live board only): spent (half strength, like a spent Star) when Fleets arrived by an attack this turn or a Fleet move is previewed onto the Star; dashed border when Fleets here already moved this turn. A previewed move also shows the new Fleet counts.
-  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}})}
+  // (new, hitchhiking) A previewed move's riders (p.hh) leave their Stars and show at the destination too. While the Hitchhike? question is open (L.hk) the group and the riders chosen so far show at the destination, and the Fleets being asked about get a dashed circle.
+  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;const K=L&&L.hk,hs=a=>a.reduce((m,h)=>m+h[1],0);if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}if(p.hh){p.hh.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(p.b==q.id)fl+=hs(p.hh)}})}
+  if(K){if(K.a==q.id)fl-=K.n;K.pk.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(K.b==q.id){fl+=K.n+hs(K.pk);spent=true}}
+  if(K&&K.c[K.i]&&K.c[K.i].id==q.id)s+=`<circle cx="${q.x+BADGE.dx+BADGE.w/2}" cy="${q.y+BADGE.dy+BADGE.h/2}" r=".42" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".14 .09"/>`;
   if(fl>0)s+=`<g opacity="${spent?.5:1}"><rect x="${q.x+BADGE.dx}" y="${q.y+BADGE.dy}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${COL[q.o]}" stroke="${dash?COL[q.o]:'var(--ink)'}" stroke-width=".04"${dash?' stroke-dasharray=".07 .05"':''}/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${fl}</text></g>`}
 // Draw the strength number (visible only when zoomed in).
   s+=`<text class="t" x="${q.x+.3}" y="${q.y-.22}" font-size=".3" font-weight="700" fill="var(--ink)">${S.conns.filter(c=>c[0]==q.id||c[1]==q.id).length+(q.f||0)+(L&&L.fd&&L.fd[q.id]||0)}</text>`;
@@ -982,7 +1031,7 @@ function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
 const da=dg&&ddStar(dg.k)&&by(dg.a);
-W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:dg&&by(dg.a)?{id:dg.id,i:dg.i}:null,ddf:ddFl,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&(pend.ph||!multi))?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
+W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:dg&&by(dg.a)?{id:dg.id,i:dg.i}:null,ddf:ddFl,hk:hhS,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&(pend.ph||!multi))?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
 // Fill the info row: player name, round (and online status); Fuel left goes to the gauge (fuelUi).
  $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(da&&dg.e?Math.max(0,dg.n-dg.e.c):fl);
 // Fill the score chips: one per player with VP and star count.
@@ -1120,6 +1169,8 @@ try{return JSON.parse(json)}catch(e){throw new Error('This code is damaged. Noth
 // parseInput(text) accepts old plain-JSON saves, a new code, or a full share link; whitespace and line breaks are ignored.
 async function parseInput(text){const t=String(text||'').trim();if(!t)throw new Error('Nothing to load. Paste a save code, a share link or save JSON.');
 if(t[0]=='{'){try{return JSON.parse(t)}catch(e){throw new Error('That save is cut off or damaged, so nothing was loaded.')}}
+// (new) A position text (posIs) is read by posParse.
+if(posIs(t))return posParse(t);
 const s=t.replace(/\s+/g,''),i=s.indexOf('#g=');return decodeCode(i>=0?s.slice(i+3):s)}
 // prepG(o) checks a loaded game completely and returns a cleaned copy, or throws. Nothing in the live game is touched, so bad input can never half-load. It also fills in defaults for older saves.
 function prepG(o){const bad=m=>{throw new Error(m)};if(!o||typeof o!='object'||Array.isArray(o))bad('That is not a Constellate game.');
@@ -1157,6 +1208,8 @@ if(!Array.isArray(n.used)||n.used.some(i=>!ids.has(i)))bad('The used-star list i
 if(n.pv==null)delete n.pv;else{if(!Array.isArray(n.pv)||n.pv.length>40||n.pv.some(p=>!p||!['s','t','f','c','g','h'].includes(p.k)||!ids.has(p.a)||!I(p.c,0,99)||!I(p.i,1,1e6)||(p.k=='s'?!(F(p.x)&&F(p.y)&&p.x>=0&&p.x<=NS&&p.y>=0&&p.y<=NS):p.k=='t'?!(ids.has(p.b)&&I(p.use,0,9999)):p.k=='c'||p.k=='g'?!ids.has(p.b):p.k=='h'?!(ids.has(p.b)&&I(p.n,1,9999)):!(ids.has(p.b)&&I(p.n,1,9999)&&Array.isArray(p.path)&&p.path.length<=40&&p.path.every(i=>ids.has(i))))))bad('The move previews are invalid.');if(!n.pv.length)delete n.pv}
 // (new, Fleet ask) A Star preview may carry fl = the Fleets that go with it on Confirm; a bad value is dropped.
 if(n.pv)n.pv.forEach(p=>{if(p.fl!=null&&!(Number.isInteger(p.fl)&&p.fl>=0&&p.fl<=9999))delete p.fl});
+// (new, hitchhiking) A Fleet move preview may carry hh = the Fleets riding along, [[star id, n], ...]; a bad list is dropped (the move itself still loads, without riders).
+if(n.pv)n.pv.forEach(p=>{if(p.hh!=null&&!(p.k=='f'&&Array.isArray(p.hh)&&p.hh.length<=40&&p.hh.every(h=>Array.isArray(h)&&h.length==2&&ids.has(h[0])&&I(h[1],1,9999))))delete p.hh});
 // (new, drag and drop) Stars set this turn (G.nw = [[new Star id, origin Star id]]): only lets them be moved again this turn, so a bad list is dropped rather than refusing the file.
 if(n.nw!=null&&!(Array.isArray(n.nw)&&n.nw.length<=400&&n.nw.every(q=>Array.isArray(q)&&q.length==2&&ids.has(q[0])&&ids.has(q[1]))))delete n.nw;
 if(!I(n.nid,1,1e7)||[...ids].some(i=>i>=n.nid))n.nid=Math.max(0,...ids)+1;
@@ -1167,6 +1220,8 @@ const savedG=G;G=n;try{n.rank=(n.rank&&typeof n.rank=='object')?n.rank:rankSnap(
 if(n.pl.some(c=>n.alive[c]&&!I(n.rank[c],1,4)))bad('The ranks are invalid.');
 if(!n.pl.includes(n.first))n.first=n.order[0];
 // history is a separate optional field: it is checked by prepHist and kept outside the game state; a game id must be a short text.
+// (new, position text) note = {t: title, x: notes, one paragraph per line}; a bad one is dropped.
+if(n.note!=null){const o=n.note;if(o&&typeof o=='object'&&typeof(o.t||'')=='string'&&typeof(o.x||'')=='string'&&(o.t||'').length<=100&&(o.x||'').length<=3000&&(o.t||o.x))n.note={t:o.t||'',x:o.x||''};else delete n.note}
 delete n.history;if(n.gid!=null&&(typeof n.gid!='string'||n.gid.length>40))delete n.gid;
 // (new) Turn and round transitions: po / lo = the turn order this round / the last round started with, out = {color: {w: why ('d' Deficit, 'z' no Stars left, 'c' conceded), r: round, by: who took the last Star (only with 'z'); (new 2026-10-27-i, only with 'd') v: their VP at the elimination, g: how far behind the next score level they were, a: the players on that level, p: that level's place (1 = 1st)}} for eliminated players. They only change what the round and end screens show, so a bad value is dropped instead of refusing the file (older saves have none).
 ['po','lo'].forEach(f=>{if(n[f]!=null&&(!Array.isArray(n[f])||n[f].length>4||new Set(n[f]).size!=n[f].length||n[f].some(c=>!n.pl.includes(c))))delete n[f]});
@@ -1180,7 +1235,8 @@ if(G.over)overDlg()}
 // lm(t,err) shows a status line inside the Menu dialog (or the bottom message if the Menu is closed).
 function lm(t,err){const e=$('lm');if(e){e.textContent=t||'';e.style.color=err?'#ff6b6b':'var(--mut)'}else say(t)}
 // loadText(text) is the one path used by Load box, Paste & load and Load file: parse, validate, load, or show the problem.
-async function loadText(text){try{loadObj(await parseInput(text))}catch(e){lm(e&&e.message?e.message:'Could not load that.',1)}}
+// (new) A position text with computers gets this device's computer settings, as a new game does (cpuGameSync). A game with a Title or Notes shows them once it has opened (posNoteDlg).
+async function loadText(text){try{loadObj(await parseInput(text));if(posIs(text)&&G.cpu)cpuGameSync();if(G.note&&!G.over)posNoteDlg()}catch(e){lm(e&&e.message?e.message:'Could not load that.',1)}}
 // The Menu's import box is always empty at first; these are its buttons.
 function fromText(){loadText($('sc').value)}
 function clearBox(){$('sc').value='';lm('')}
@@ -1201,6 +1257,108 @@ $('sc').value=t;$('sc').focus();$('sc').select();lm('Copying is blocked here. Th
 async function shareLink(){if(!menuCodes.link)await menuCodes.p;const u=menuCodes.link;if(!u)return lm('Could not build the link.',1);
 if(navigator.share){try{await navigator.share({title:'Constellate',text:'Your move in Constellate:',url:u});return lm('Shared.')}catch(e){if(e&&e.name=='AbortError')return lm('Share cancelled.')}}
 return copyOut('link')}
+// ===== Position text: write a position out, or set a game up from one =====
+// A position text describes a game at one moment in plain words, so a person can write one by hand (tutorial scenarios, test setups for new features) or copy one from a game (Menu > Save/Load: Copy position, Edit position) and change it. Loading it goes through the same path as a save code (parseInput, prepG, loadObj), so a bad text never half-loads: posParse stops at the first problem and names its line. The format is explained for players in docs/POSITIONS.md. One item per line, case doesn't matter, # starts a comment:
+//   CONSTELLATE POSITION            the first line
+//   Title: ... / Note: ...          optional, shown when the position opens (G.note); Note may repeat (one paragraph each)
+//   Board: 7x7 | 5x5 | 3x3          default 7x7
+//   Players: Red, Blue              2 players = Red and Blue, 4 = Red, Blue, Orange, Purple (any order), or just 2 / 4; default 2
+//   Computers: Blue Hard            optional: Easy, Medium, Hard, or a level number 1-6
+//   Teams: Red 1, Blue 2, ...       optional, 4 players
+//   Placement: free | fixed         optional; default each player's choice
+//   Round: 5                        default 1
+//   Scores: Red 3, Blue 1           VP at the start of this round (they set positions); default 0
+//   Order: Blue, Red                this round's turn order; default by position, ties in seat order
+//   Turn: Red                       whose turn it is; default the first in Order (the players before them have played this round)
+//   Fuel: 4                         Fuel left; default the round's Fuel
+//   Fleets to place: 1              default the player's position
+//   Out: Purple                     eliminated players (they keep their Stars, with no Connections or Fleets)
+//   Stars:                          then one Star per line: label owner where [fleets N] [moved N] [spent N] [acted]
+//     R1 Red D4·b2·S5 fleets 3 moved 1     where = sector, system, spot (S1-S9, L1-L12, V1-V4; no spot = S5, the middle) or @x,y inside the system
+//     RC Red capital                a Capital at its usual place; "capital Blue" = Blue's Capital, held by Red. Capitals not listed are added for their players (labels RC, BC, OC, PC)
+//   Connections:                    then labels (or places) joined by -, separated by commas or spaces; a chain R1-R2-R3 is R1-R2 and R2-R3. A link between teammates is drawn in the first Star's color.
+// fleets = Fleets on the Star; moved = how many of them moved this turn; spent = how many arrived with a Take this turn (they can't move again, and count as moved); acted = the Star already made a Move, or was set or taken, this turn.
+// MAP: posIs = is this text a position | posSpot, posName = places | posParse = text to game | posText = game to text | posCopy, posEdit = Save/Load buttons | posNoteDlg = the Title and Notes dialog.
+const POS_HEAD=/^\s*CONSTELLATE POSITION\b/i,posIs=t=>POS_HEAD.test(String(t||'')),POS_NM=['Red','Purple','Blue','Orange'],POS_INI='RPBO',POS_SEAT={red:0,r:0,purple:1,p:1,blue:2,b:2,orange:3,o:3},
+POS_KEYS=['title','board','players','computers','teams','placement','round','scores','order','turn','fuel','fleets to place','out'];
+// posSpot(t,N) = the board point named by t on a board of N systems per side, or null. t = sector letter and number, system letter and number, then optionally a fixed spot (S1-S9, L1-L12, V1-V4) or @x,y (the point inside the system, each from MARG to 1-MARG); · or . may separate the parts. No spot = S5, the middle of the system.
+function posSpot(t,N){const m=/^([A-Ga-g])([1-7])[·.]?([abcABC])([1-3])(?:[·.]?(?:([SLVslv])(\d{1,2})|@(\d*\.?\d+),(\d*\.?\d+)))?$/.exec(t);if(!m)return null;
+const sx=m[1].toUpperCase().charCodeAt(0)-65,sy=+m[2]-1;if(sx*3>=N||sy*3>=N)return null;const cx=sx*3+'abc'.indexOf(m[3].toLowerCase()),cy=sy*3+(+m[4]-1);
+if(m[7]!=null){const ox=+m[7],oy=+m[8];return ox>=MARG-1e-9&&ox<=1-MARG+1e-9&&oy>=MARG-1e-9&&oy<=1-MARG+1e-9?{x:cx+ox,y:cy+oy}:null}
+const q=FX.find(z=>z.k==(m[5]?m[5].toUpperCase()+(+m[6]):'S5'));return q?fxPos(cx,cy,q):null}
+// posName(x,y) = the name posSpot reads back: a fixed spot (D4·b2·S5) or, off the lattice, the point inside the system to 3 decimals (D4·b2·@0.371,0.620).
+function posName(x,y){const n=mvName([x,y]);if(!n.includes('@'))return n;const cx=Math.floor(x+1e-9),cy=Math.floor(y+1e-9);return fxSys(cx,cy).replace(/ /g,'')+'·@'+(x-cx).toFixed(3)+','+(y-cy).toFixed(3)}
+// posParse(text) = the game object a position text describes (checked again by prepG when it loads), or throws an Error naming the line and the problem.
+function posParse(text){const bad=(i,m)=>{throw new Error((i!=null?'Line '+(i+1)+': ':'')+m)},kv={},SL=[],CL=[],note=[];let sec='',head=false;
+String(text).replace(/\r/g,'').split('\n').forEach((raw,i)=>{const line=raw.replace(/(^|\s)(#|\/\/).*$/,'').trim();if(!line)return;
+if(!head){if(!POS_HEAD.test(line))bad(i,'The first line must be CONSTELLATE POSITION.');head=true;return}
+const m=/^([A-Za-z][A-Za-z ]*?)\s*:\s*(.*)$/.exec(line);
+if(m){const k=m[1].toLowerCase().replace(/\s+/g,' ');if(k=='stars'||k=='connections'){sec=k;if(m[2])(k=='stars'?SL:CL).push([i,m[2]]);return}sec='';
+if(k=='note'){if(m[2])note.push(m[2]);return}if(!POS_KEYS.includes(k))bad(i,'"'+m[1]+'" is not a heading this game knows.');if(kv[k])bad(i,m[1]+' is given twice.');kv[k]=[i,m[2].trim()];return}
+if(sec=='stars')SL.push([i,line]);else if(sec=='connections')CL.push([i,line]);else bad(i,'This line is not under Stars: or Connections:.')});
+if(!head)bad(null,'The first line must be CONSTELLATE POSITION.');
+const V=k=>kv[k]?kv[k][1]:'',Li=k=>kv[k]?kv[k][0]:null,words=k=>V(k).split(/[,\s]+/).filter(Boolean),
+seat=(w,i)=>{const c=POS_SEAT[String(w).toLowerCase()];if(c==null)bad(i,'"'+w+'" is not a player. Use Red, Blue, Orange or Purple.');return c},
+num=(v,i,lo,hi,what)=>{if(!/^\d+$/.test(String(v))||+v<lo||+v>hi)bad(i,what+' must be a whole number from '+lo+' to '+hi+'.');return +v};
+let sz=7;if(V('board')){const b=/^(\d)\s*(?:x\s*(\d))?$/i.exec(V('board'));if(!b||![3,5,7].includes(+b[1])||(b[2]&&b[2]!=b[1]))bad(Li('board'),'Board must be 7x7, 5x5 or 3x3.');sz=+b[1]}
+const N=sz*3;let pl;
+if(!V('players')||V('players')=='2')pl=[0,2];else if(V('players')=='4')pl=[0,2,3,1];else{const s=new Set(words('players').map(w=>seat(w,Li('players'))));if(s.size==2&&s.has(0)&&s.has(2))pl=[0,2];else if(s.size==4)pl=[0,2,3,1];else bad(Li('players'),'Players must be Red and Blue (2 players) or Red, Blue, Orange and Purple (4 players).')}
+const inG=(c,i)=>{if(!pl.includes(c))bad(i,POS_NM[c]+' is not in this game.');return c},
+pairs=k=>{const i=Li(k),o={};V(k).split(',').map(x=>x.trim()).filter(Boolean).forEach(x=>{const m=/^(\S+)\s+(\S+)$/.exec(x);if(!m)bad(i,'Write each one as a player and a value, like "Red 3", separated by commas.');const c=inG(seat(m[1],i),i);if(c in o)bad(i,POS_NM[c]+' is listed twice.');o[c]=m[2]});return o};
+let cpu=null;{const o=pairs('computers'),lv={easy:1,medium:2,hard:3};Object.keys(o).forEach(c=>{const v=o[c].toLowerCase(),l=lv[v]||(/^[1-6]$/.test(v)?+v:0);if(!l)bad(Li('computers'),'A computer level is Easy, Medium, Hard or a number from 1 to 6.');(cpu=cpu||{})[c]=l})}
+let team=null;if(V('teams')){if(pl.length!=4)bad(Li('teams'),'Teams need 4 players.');const o=pairs('teams');team={};pl.forEach(c=>{if(!(c in o))bad(Li('teams'),POS_NM[c]+' has no team.');team[c]=num(o[c],Li('teams'),1,3,'A team')})}
+let pm=null;if(V('placement')){pm=V('placement').toLowerCase();if(pm!='free'&&pm!='fixed')bad(Li('placement'),'Placement is free or fixed.')}
+const round=V('round')?num(V('round'),Li('round'),1,RMAX,'Round'):1,score={};pl.forEach(c=>{score[c]=0});{const o=pairs('scores');Object.keys(o).forEach(c=>{score[c]=num(o[c],Li('scores'),0,9999,'A score')})}
+const alive={};pl.forEach(c=>{alive[c]=true});words('out').forEach(w=>{alive[inG(seat(w,Li('out')),Li('out'))]=false});const al=pl.filter(c=>alive[c]);if(al.length<2||(team&&new Set(al.map(c=>team[c])).size<2))bad(Li('out'),'At least two sides must still be in the game.');
+// Positions: dense ranks of this round's starting scores (RULES.md 2.2), as rankSnap gives.
+const ds=[...new Set(al.map(c=>score[c]))].sort((a,b)=>b-a),rk=c=>ds.indexOf(score[c])+1;
+let order=al.slice().sort((a,b)=>rk(a)-rk(b));if(V('order')){order=words('order').map(w=>inG(seat(w,Li('order')),Li('order')));if(new Set(order).size!=order.length||order.length!=al.length||order.some(c=>!alive[c]))bad(Li('order'),'Order must list every player still in the game once.')}
+const turn=V('turn')?inG(seat(V('turn'),Li('turn')),Li('turn')):order[0];if(!order.includes(turn))bad(Li('turn'),POS_NM[turn]+' is out of the game.');
+const ap=V('fuel')?num(V('fuel'),Li('fuel'),0,99,'Fuel'):acts(round),pool=V('fleets to place')?num(V('fleets to place'),Li('fleets to place'),0,99,'Fleets to place'):rk(turn);
+// Stars. Capitals sit where start() puts them for this board and player count.
+const e=N-2,mm=(N-1)/2,caps=pl.length==2?{0:[e,1],2:[1,e]}:{0:[mm,1],1:[1,mm],2:[e,mm],3:[mm,e]},S=[],lab=new Map(),sys=new Map(),used=[],skey=s=>Math.floor(s.x)+','+Math.floor(s.y);let nid=1;
+const place=(s,i)=>{const k=skey(s),q=sys.get(k);if(q)bad(i,'System '+fxSys(Math.floor(s.x),Math.floor(s.y)).replace(/ /g,'')+' already has a Star ('+q.lb+'). A System holds one Star.');sys.set(k,s);S.push(s)};
+SL.forEach(([i,line])=>{const t=line.split(/\s+/);if(t.length<3)bad(i,'Write a Star as label, owner, place (and Fleets), like "R1 Red D4·b2·S5 fleets 2".');
+const lb=t[0];if(!/^[A-Za-z0-9_]{1,12}$/.test(lb))bad(i,'"'+lb+'" can\'t be a label: use up to 12 letters, digits or _.');if(lab.has(lb.toLowerCase()))bad(i,'The label '+lb+' is used twice.');
+const s={id:nid++,o:inG(seat(t[1],i),i),f:0,fm:0,lb};let k=2,at=null,cap=null,mv=0,sp=0;
+while(k<t.length){const w=t[k].toLowerCase();
+if(w=='capital'){if(cap!=null||at)bad(i,'A Star is a capital or has a place, not both.');cap=s.o;k++;if(k<t.length&&POS_SEAT[t[k].toLowerCase()]!=null)cap=inG(seat(t[k++],i),i);continue}
+if(w=='fleets'||w=='fleet'){s.f=num(t[k+1],i,0,9999,'Fleets');k+=2;continue}
+if(w=='moved'){mv=num(t[k+1],i,0,9999,'Moved');k+=2;continue}
+if(w=='spent'){sp=num(t[k+1],i,0,9999,'Spent');k+=2;continue}
+if(w=='acted'){used.push(s.id);k++;continue}
+if(at||cap!=null)bad(i,'"'+t[k]+'" is not understood here.');at=posSpot(t[k],N);if(!at)bad(i,'"'+t[k]+'" is not a place on this board. Write sector, system and spot, like D4·b2·S5'+(/@/.test(t[k])?' (each @ number from '+MARG.toFixed(3)+' to '+(1-MARG).toFixed(3)+')':'')+'.');k++}
+if(cap==null&&!at)bad(i,'Say where the Star is (like D4·b2·S5), or that it is a capital.');
+if(cap!=null){if(S.some(q=>q.co===cap))bad(i,POS_NM[cap]+'\'s Capital is listed twice.');Object.assign(s,{cap:1,co:cap,x:caps[cap][0]+.5,y:caps[cap][1]+.5})}else Object.assign(s,at);
+if(mv>s.f||sp>s.f)bad(i,'More Fleets moved or spent than there are on the Star.');s.fm=Math.max(mv,sp);if(sp)s.fa=sp;
+if(!alive[s.o]&&s.f)bad(i,POS_NM[s.o]+' is out, so their Stars have no Fleets.');lab.set(lb.toLowerCase(),s);place(s,i)});
+pl.forEach(c=>{if(S.some(q=>q.co===c))return;const lb=POS_INI[c]+'C',s={id:nid++,o:c,cap:1,co:c,x:caps[c][0]+.5,y:caps[c][1]+.5,f:0,fm:0,lb},q=sys.get(skey(s));if(q)bad(null,'Star '+q.lb+' is in '+POS_NM[c]+'\'s Capital system ('+fxSys(caps[c][0],caps[c][1]).replace(/ /g,'')+'). List the Capital, or move the Star.');place(s,null);if(!lab.has(lb.toLowerCase()))lab.set(lb.toLowerCase(),s)});
+// Connections: each end is a label or a place (the Star in that System). Same owner or teammates only, and the line must keep clear of every other Star (RULES.md 4.5; with a hair of slack, as posName rounds free points to 3 decimals).
+const ref=(w,i)=>{const s=lab.get(w.toLowerCase());if(s)return s;const p=posSpot(w,N),q=p&&sys.get(skey(p));if(q)return q;bad(i,'"'+w+'" is not a Star label or the place of a Star.')},C=[],seen=new Set();
+CL.forEach(([i,line])=>line.replace(/\s*[-–—]\s*/g,'-').split(/[,;\s]+/).filter(Boolean).forEach(ch=>{const ps=ch.split('-').filter(Boolean);if(ps.length<2)bad(i,'Write a Connection as two labels joined by -, like R1-R2.');
+for(let j=0;j+1<ps.length;j++){const a=ref(ps[j],i),b=ref(ps[j+1],i),nm=a.lb+'-'+b.lb;if(a===b)bad(i,'A Star can\'t connect to itself ('+nm+').');const k=Math.min(a.id,b.id)+'-'+Math.max(a.id,b.id);if(seen.has(k))continue;seen.add(k);
+if(!alive[a.o]||!alive[b.o])bad(i,'The Connection '+nm+' belongs to a player who is out.');if(a.o!==b.o&&!(team&&team[a.o]===team[b.o]))bad(i,'The Connection '+nm+' joins Stars of two players who are not teammates.');
+const z=S.find(s=>s!==a&&s!==b&&dseg(s,a,b)<outerR(s)+LINE_W/2+PAD-.002);if(z)bad(i,'The Connection '+nm+' passes over Star '+z.lb+'. A line can\'t cross a Star: move one of them or use another spot.');C.push([a.id,b.id])}}));
+const g={pl,caps,alive,stars:S.map(s=>{const q=Object.assign({},s);delete q.lb;return q}),conns:C,round,order,ti:order.indexOf(turn),ap,used,score,nid,over:null,first:order[0],po:order.slice(),pool,gid:newGid()};
+const cp=g.stars.find(s=>s.cap&&s.co===turn);g.capOnly=!!cp&&cp.o!==turn;if(sz!=7)g.sz=sz;if(pm)g.pm=pm;if(cpu)g.cpu=cpu;if(team)g.team=team;
+if(V('title')||note.length)g.note={t:V('title'),x:note.join('\n')};return g}
+// posText() = the current game as a position text (posParse reads it back to the same position). Player look, history, move previews and a multi-attack being set up are not included.
+function posText(){const g=G,nm=c=>POS_NM[c],L=['CONSTELLATE POSITION'];if(g.note&&g.note.t)L.push('Title: '+g.note.t);if(g.note&&g.note.x)g.note.x.split('\n').forEach(x=>L.push('Note: '+x));
+L.push('Board: '+(g.sz||7)+'x'+(g.sz||7),'Players: '+g.pl.map(nm).join(', '));
+if(g.cpu)L.push('Computers: '+Object.keys(g.cpu).map(c=>nm(+c)+' '+(['','Easy','Medium','Hard'][g.cpu[c]]||g.cpu[c])).join(', '));
+if(g.team)L.push('Teams: '+g.pl.map(c=>nm(c)+' '+g.team[c]).join(', '));if(g.pm)L.push('Placement: '+g.pm);
+L.push('Round: '+g.round,'Scores: '+g.pl.map(c=>nm(c)+' '+(g.score[c]||0)).join(', '),'Order: '+g.order.filter(c=>g.alive[c]).map(nm).join(', '),'Turn: '+nm(cur()),'Fuel: '+g.ap,'Fleets to place: '+(g.pool||0));
+const out=g.pl.filter(c=>!g.alive[c]);if(out.length)L.push('Out: '+out.map(nm).join(', '));if(g.pv&&g.pv.length)L.push('# Move previews are not included.');
+const lb=new Map(),taken=new Set();g.stars.forEach(s=>{if(s.cap){const k=POS_INI[s.co]+'C';lb.set(s.id,k);taken.add(k)}});const cnt={};
+const W=g.stars.slice().sort((a,b)=>g.pl.indexOf(a.o)-g.pl.indexOf(b.o)||(b.cap?1:0)-(a.cap?1:0)||a.id-b.id);
+W.forEach(s=>{if(s.cap)return;let n=cnt[s.o]||0,k;do{k=POS_INI[s.o]+(++n)}while(taken.has(k));cnt[s.o]=n;taken.add(k);lb.set(s.id,k)});
+L.push('','Stars:');W.forEach(s=>{const f=s.f||0,m=Math.min(s.fm||0,f),sp=Math.min(s.fa||0,f);L.push((lb.get(s.id)+' ').padEnd(5)+(nm(s.o)+' ').padEnd(8)+(s.cap?'capital'+(s.co!==s.o?' '+nm(s.co):''):posName(s.x,s.y))+(f?' fleets '+f:'')+(m?' moved '+m:'')+(sp?' spent '+sp:'')+(g.used.includes(s.id)?' acted':''))});
+L.push('','Connections:');const cs=g.conns.map(([a,b])=>lb.get(a)+'-'+lb.get(b));for(let i=0;i<cs.length;i+=6)L.push(cs.slice(i,i+6).join(', '));return L.join('\n')+'\n'}
+// posCopy() = Save/Load's Copy position (into the box when copying is blocked). posEdit() = Edit position: puts it in the box to change, then Load box opens the changed one.
+async function posCopy(){const t=posText();if(await copyText(t))return lm('Position copied ('+t.split('\n').length+' lines).');$('sc').value=t;lm('Copying is blocked here. The position is in the box: select it all and copy it by hand.',1)}
+function posEdit(){$('sc').value=posText();$('sc').focus();lm('The position is in the box. Change it, then press Load box.')}
+// posNoteDlg() shows the position's Title and Notes (G.note): when a position text, a code or a link that has them opens, and from the Menu's Game page.
+function posNoteDlg(){const n=G&&G.note;if(!n)return;ov('<h1>'+esc(n.t||'Notes')+'</h1>'+(n.x||'').split('\n').filter(Boolean).map(p=>'<p style="color:var(--ink);margin:0 0 10px">'+esc(p)+'</p>').join('')+'<div class="r" style="margin-top:12px"><button onclick="$(\'ov\').style.display=\'none\'">OK</button></div>')}
 // ===== History: look back at past turns =====
 // H = the history (kept OUTSIDE the game state G, in its own storage key). histMute stops a second snapshot while a concession ends the turn.
 let H=null,histMute=false;const HIST_KEY='constellate-history';
@@ -1213,7 +1371,7 @@ function histSnap(kind,who){if(!G)return;if(!H||H.gid!==G.gid)H=newHist();const 
 H.snaps.push({k:kind,r:G.round,w:who==null?null:who,o:G.order.slice(),al:G.pl.filter(c=>G.alive[c]),vp:vp.slice(),rk:Object.assign({},G.rank),ap:acts(G.round),st:G.stars.map(q=>[q.id,+q.x.toFixed(3),+q.y.toFixed(3),q.o,q.f||0,q.cap?1:0]),cn:G.conns.map(q=>[q[0],q[1]]),m:(H.mv||(H.mv=[])).length});
 if(H.snaps.length>400)H.snaps.splice(0,H.snaps.length-400)}
 // ===== Move log (every game type) =====
-// H.mv = one record per move, in order, kept beside the turn snapshots: {r: round, w: player, k: kind, ..., d: delta}. Kinds: p place a Fleet (a = star), f move Fleets (a, b, n), s set a new Star (a = origin, b = new spot, c = Fuel), c connect (a, b, c), a take (a = attacker, b = target, n = Fleets used, c, D = defending Fleets, o = [retreated, held, destroyed]), m multi-attack (as a, plus ys = the other attackers, u = Fleets used by each), x concede, e game ended. Positions are board points rounded to 3 decimals; stars never move, so a point names a star. d = what the move changed, {s: stars that changed or appeared as [id,x,y,owner,fleets,capital], a: connections added, r: connections removed}, so the viewer can rebuild the board after any move from the snapshot before it. Every snapshot carries m = how many moves existed when it was taken, which is how moves are matched to turns. mvRec(info,before) is called by every move right after it changes the board (before = the board before it; by default the top of the Undo stack, which every move pushes first); mvUndo() drops the last record when Undo takes a move back.
+// H.mv = one record per move, in order, kept beside the turn snapshots: {r: round, w: player, k: kind, ..., d: delta}. Kinds: p place a Fleet (a = star), f move Fleets (a, b, n; hp, hn = Fleets that hitchhiked: their Stars and how many from each), s set a new Star (a = origin, b = new spot, c = Fuel), c connect (a, b, c), a take (a = attacker, b = target, n = Fleets used, c, D = defending Fleets, o = [retreated, held, destroyed]), m multi-attack (as a, plus ys = the other attackers, u = Fleets used by each), x concede, e game ended. Positions are board points rounded to 3 decimals; stars never move, so a point names a star. d = what the move changed, {s: stars that changed or appeared as [id,x,y,owner,fleets,capital], a: connections added, r: connections removed}, so the viewer can rebuild the board after any move from the snapshot before it. Every snapshot carries m = how many moves existed when it was taken, which is how moves are matched to turns. mvRec(info,before) is called by every move right after it changes the board (before = the board before it; by default the top of the Undo stack, which every move pushes first); mvUndo() drops the last record when Undo takes a move back.
 const MV_MAX=20000,mvPos=s=>[+s.x.toFixed(3),+s.y.toFixed(3)];
 function mvComp(S){const st=new Map(),cn=new Set();S.stars.forEach(q=>st.set(q.id,[q.id,+q.x.toFixed(3),+q.y.toFixed(3),q.o,q.f||0,q.cap?1:0]));S.conns.forEach(q=>cn.add(q[0]<q[1]?q[0]+'-'+q[1]:q[1]+'-'+q[0]));return{st,cn}}
 function mvDelta(b,a){const s=[],ca=[],cr=[];a.st.forEach((v,id)=>{const o=b.st.get(id);if(!o||o.join()!==v.join())s.push(v)});a.cn.forEach(k=>{if(!b.cn.has(k))ca.push(k.split('-').map(Number))});b.cn.forEach(k=>{if(!a.cn.has(k))cr.push(k.split('-').map(Number))});return{s,a:ca,r:cr}}
@@ -1227,7 +1385,9 @@ const o={r:q.r,w:q.w,k:q.k,d:{s:q.d.s,a:q.d.a,r:q.d.r}};
 if(q.a!=null){if(!P(q.a))return [];o.a=q.a}if(q.b!=null){if(!P(q.b))return [];o.b=q.b}
 if(q.ys!=null){if(!Array.isArray(q.ys)||q.ys.length>3||!q.ys.every(P))return [];o.ys=q.ys}
 ['n','c','D'].forEach(k=>{if(I(q[k],0,9999))o[k]=q[k]});
-if(Array.isArray(q.u)&&q.u.length<=4&&q.u.every(v=>I(v,0,9999)))o.u=q.u;if(Array.isArray(q.o)&&q.o.length==3&&q.o.every(v=>I(v,0,9999)))o.o=q.o;
+if(Array.isArray(q.u)&&q.u.length<=4&&q.u.every(v=>I(v,0,9999)))o.u=q.u;
+// (new, hitchhiking) A Fleet move's riders: hp = their Stars' points, hn = how many from each (dropped if they don't match).
+if(Array.isArray(q.hp)&&Array.isArray(q.hn)&&q.hp.length==q.hn.length&&q.hp.length<=40&&q.hp.every(P)&&q.hn.every(v=>I(v,1,9999))){o.hp=q.hp;o.hn=q.hn}if(Array.isArray(q.o)&&q.o.length==3&&q.o.every(v=>I(v,0,9999)))o.o=q.o;
 out.push(o)}return out}
 // mvApply(x) (online guests): x = {b, add}: keep my first b records and replace the rest with the sender's current turn; false = my log is too short, ask for a full copy.
 function mvApply(x){if(!H||!x||!Array.isArray(x.add)||!Number.isInteger(x.b)||x.b<0||!H.mv||H.mv.length<x.b)return false;H.mv=H.mv.slice(0,x.b).concat(mvClean(x.add));return true}
@@ -1237,7 +1397,7 @@ if(i>=1&&i<=5&&j>=1&&j<=5){const q=FX.find(z=>z.i==i&&z.j==j);if(q&&Math.hypot(o
 return fxSys(cx,cy).replace(/ /g,'')+'·'+(sp||'@'+ox.toFixed(2)+','+oy.toFixed(2))}
 // mvText(m) = one move as a line of text (used by the history viewer and the transcription).
 function mvText(m){const N=mvName,F=n=>n+' Fleet'+(n==1?'':'s'),C=m.c?' ['+m.c+' Fuel]':'';
-if(m.k=='p')return 'Place 1 Fleet at '+N(m.a);if(m.k=='f')return 'Move '+F(m.n||0)+' '+N(m.a)+' → '+N(m.b);if(m.k=='s')return 'Set '+N(m.a)+' → '+N(m.b)+C;if(m.k=='c')return 'Connect '+N(m.a)+' — '+N(m.b)+C;
+if(m.k=='p')return 'Place 1 Fleet at '+N(m.a);if(m.k=='f')return 'Move '+F(m.n||0)+' '+N(m.a)+' → '+N(m.b)+(m.hp&&m.hn?', '+m.hp.map((p,i)=>m.hn[i]+' hitchhiking from '+N(p)).join(', '):'');if(m.k=='s')return 'Set '+N(m.a)+' → '+N(m.b)+C;if(m.k=='c')return 'Connect '+N(m.a)+' — '+N(m.b)+C;
 if(m.k=='a'||m.k=='m'){const o=m.o||[0,0,0],r=[o[0]?o[0]+' retreated':'',o[1]?o[1]+' held':'',o[2]?o[2]+' destroyed':''].filter(Boolean).join(', ');return (m.k=='m'?'Multi-attack ':'Take ')+[m.a].concat(m.ys||[]).map(N).join(' + ')+' x '+N(m.b)+(m.n?' with '+F(m.n):'')+C+(m.D?' (defending Fleets: '+(r||m.D)+')':'')}
 if(m.k=='x')return 'Concedes';if(m.k=='e')return 'Ends the game (highest score wins)';return ''}
 // histSave() writes the history (compressed when the browser can) to its own storage key. It runs only when a turn is committed, a game starts or is loaded, or the game ends: never from render() or persist(). Writes are queued so an older one can never overwrite a newer one.
@@ -1340,9 +1500,9 @@ let sharedPending=null;
 async function shareOnLoad(){const m=/^#g=(.+)$/.exec((location.hash||'').replace(/\s+/g,''));if(!m)return;
 let o;try{o=await decodeCode(m[1]);prepG(o)}catch(e){clearHash();return ov('<h1>Could not open this link</h1><p>'+esc(e&&e.message?e.message:'Unknown problem.')+'</p><div class="r"><button onclick="menu()">OK</button></div>')}
 let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}
-if(!sv&&!G){clearHash();loadObj(o);return say('Opened a shared game. '+NM[cur()]+' to move.')}
+if(!sv&&!G){clearHash();loadObj(o);say('Opened a shared game. '+NM[cur()]+' to move.');if(G.note&&!G.over)posNoteDlg();return}
 sharedPending=o;ov('<h1>Open the shared game?</h1><p>This replaces your current game in this browser.</p><div class="r"><button onclick="openShared()">Open shared game</button><button onclick="keepMine()">Keep my game</button></div>')}
-function openShared(){const o=sharedPending;sharedPending=null;clearHash();try{loadObj(o);say('Opened a shared game. '+NM[cur()]+' to move.')}catch(e){menu()}}
+function openShared(){const o=sharedPending;sharedPending=null;clearHash();try{loadObj(o);say('Opened a shared game. '+NM[cur()]+' to move.');if(G.note&&!G.over)posNoteDlg()}catch(e){menu()}}
 function keepMine(){sharedPending=null;clearHash();if(G)$('ov').style.display='none';else menu()}
 // saveUI() opens the Menu. (changed) The Menu now has pages: Game (quick save, controls, haptics, concede, and the room if online), Save/Load, and Dev. During a Hold/Retreat choice only a limited save/share Menu is offered.
 function saveUI(){if(!G)return;if(G.over)return overDlg();
@@ -1373,7 +1533,7 @@ function endGameDlg(){if(!G||G.over)return;if(pend&&pend.ph)return say('Finish t
 // doEndGame() = scores the board exactly as it stands with the end-of-round-30 scoring (finish) and shows the end screen. Online it is offered only on your own turn, and the final state then goes to everyone like any other change.
 function doEndGame(){if(!G||G.over)return;if(net.on&&!net.my.includes(cur()))return;$('ov').style.display='none';delete G.pv;mvRec({k:'e'},G);resetFlow();undo=[];finish()}
 function gamePage(){const on=net.on;
-let h='<div class="r"><button onclick="saveFile(this)">Quick save</button></div>';
+let h='<div class="r"><button onclick="saveFile(this)">Quick save</button>'+(G.note?'<button onclick="posNoteDlg()">Notes</button>':'')+'</div>';
 if(on)h+='<p style="margin:10px 0 2px">Room <b style="color:var(--ink)">'+esc(net.room)+'</b>. '+esc(net.status||'Connected.')+'</p>'+seatRows(true);
 h+='<div class="r" style="margin-top:8px"><button onclick="placeToggle(this)"'+(G.pm?' disabled':'')+'>'+placeLabel()+'</button>'+(G.cpu?'<button onclick="cpuSpeedCycle(this)">'+cpuSpeedLabel()+'</button>':'')+'<button onclick="themeCycle(this)">'+themeLabel()+'</button></div><div class="r" style="margin-top:8px"><button onclick="cycleControls(this)">'+ctlLabel()+'</button><button onclick="pvToggle(this)">'+pvLabel()+'</button></div>';
 if(on)h+='<div class="r" style="margin-top:8px"><button onclick="netCopy()">Copy room link</button><button onclick="netLeave()">'+(net.role=='host'?'End online game':'Leave game')+'</button></div><p id="nm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>';
@@ -1386,7 +1546,7 @@ return h}
 function slPage(){if(net.on)return '<p>Online games can be saved. Loading files and share codes are off so everyone\'s board stays identical. The file name includes the room code.</p><div class="r"><button onclick="saveFile(this)">Save file</button></div>';
 let host=SHARE_BASE;try{host=new URL(SHARE_BASE).host}catch(e){}
 const shareBtn=navigator.share?'<button onclick="shareLink()">Share link</button>':'';prepCodes();
-return `<p style="margin:0 0 8px;color:var(--mut)">Links open ${esc(host)}.</p><div class="r"><button onclick="toFile()">Save file</button><button onclick="$('lf').click()">Load file</button></div><div class="r" style="margin-top:8px">${shareBtn}<button onclick="copyOut('link')">Copy link</button><button onclick="copyOut('code')">Copy code</button></div><label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="ih" onchange="prepCodes()" style="width:22px;height:22px;flex:none"><span>Include history in link and code <small id="hl2" style="color:var(--mut)"></small></span></label><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="3" placeholder="Paste a save code, a share link or save JSON here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>`}
+return `<p style="margin:0 0 8px;color:var(--mut)">Links open ${esc(host)}.</p><div class="r"><button onclick="toFile()">Save file</button><button onclick="$('lf').click()">Load file</button></div><div class="r" style="margin-top:8px">${shareBtn}<button onclick="copyOut('link')">Copy link</button><button onclick="copyOut('code')">Copy code</button></div><div class="r" style="margin-top:8px"><button onclick="posCopy()">Copy position</button><button onclick="posEdit()">Edit position</button></div><label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="ih" onchange="prepCodes()" style="width:22px;height:22px;flex:none"><span>Include history in link and code <small id="hl2" style="color:var(--mut)"></small></span></label><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="3" placeholder="Paste a save code, a share link, save JSON or a position text here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>`}
 // devPage() = Dev page: developer tools. Add new tools here.
 function devPage(){return '<p style="margin:0 0 8px;color:var(--mut)">Developer tools. More will be added here.</p><div class="r" style="align-items:center"><span style="flex:1">Set round</span><input id="dr" type="number" min="1" max="'+RMAX+'" value="'+G.round+'" style="width:64px;font:inherit;min-height:44px;box-sizing:border-box"><button onclick="setRound()">Set</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Range border</span><button onclick="rngToggle(this)">'+(rngOn?'On':'Off')+'</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Zoom in on computers</span><button onclick="camCpuToggle(this)">'+(camCpu?'On':'Off')+'</button></div>'+holdRows()+'<div class="r" style="margin-top:8px"><button onclick="cpuDlg(null,\'menu\')">CPU Designer</button></div>'}
 // (new) rngToggle(b) = the Dev page's Range border switch (rngOn, on by default): flips it, relabels the button and redraws. It moves to the in-game settings when the Settings menu is reworked.
@@ -1575,7 +1735,7 @@ function ddUp(x,y){ddFired=false;if(!dg)return;tapAt=Date.now();ddPrecOff();canc
 // ddRoom(d,cx,cy) = ddSysOK for drag d, remembered per system (it tries many spots).
 function ddRoom(d,cx,cy){const k=cx+','+cy;if(!(k in d.sc))d.sc[k]=ddSysOK(by(d.a),cx,cy,d.m);return d.sc[k]}
 // ddBfs(a,n) = from Star a along your own Connections, up to n steps: {d: distance of each Star reached, par: the Star before it} (the same search as moveF, so a drop goes where a tap would).
-function ddBfs(a,n){const me=cur(),d=new Map([[a.id,0]]),par=new Map(),q=[a];while(q.length){const x=q.shift();if(d.get(x.id)>=n)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u&&u.o==me&&!d.has(u.id)){d.set(u.id,d.get(x.id)+1);par.set(u.id,x.id);q.push(u)}}})}return {d,par}}
+function ddBfs(a,n){return fBfs(a,n,hhOK())}
 // ddEval(d,x,y) = where drag d would be with the finger at board point (x,y): {x,y: the point drawn, cx,cy: its system, c: Fuel from the origin, out: past the Fuel range (the point is then the nearest one inside the range), err: why it can't go there ('' = it can), t: the Star it snapped to}.
 // Fleets snap to the Star they can reach in the finger's system, or the nearest one within 0.8 of a system. A new Star snaps to a Star in the finger's system: yours (connect), a teammate's (Connect / Gift) or an opponent's (take), checked as a tap would. Otherwise the Star is kept inside its system's legal area; with fixed positions the question is only whether the system has room, as the menu chooses the spot.
 function ddEval(d,x,y){x+=d.ox;y+=d.oy;const a=by(d.a),N=NSYS(G);let cx=Math.floor(x),cy=Math.floor(y);
@@ -1802,7 +1962,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-27-l';
+const BUILD='2026-10-28-a';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2126,7 +2286,7 @@ t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});se
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=19,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=20,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
