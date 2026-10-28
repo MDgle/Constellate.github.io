@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-28-f",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-28-g",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -204,6 +204,70 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvq button{min-height:46px;padding:0 14px;font-weight:600;color:#000;border-color:transparent}#hvq button.cur{outline:3px solid var(--ink);outline-offset:1px}
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
 </style></head><body>
+<script type="text/plain" id="ptext">
+PLAYER TEXT: the words on the How to play page and in the tutorial lessons. Edit them here; the game reads them as they are.
+How it works:
+- A line that starts and ends with === begins a section. Keep those lines as they are, except the name after the colon, which you may change
+  (after "TUTORIAL:" it is the page heading; after "LESSON N:" it is the lesson's name on the Tutorial page and its heading).
+- Every other line is one paragraph. Empty lines are skipped. Lines up here, before the first section, are never shown.
+- Plain text only: no HTML. Any characters work, except the word made of < / script >, which would end this block.
+- The lessons are checked by tools/mini_tests.py (it finds each lesson by its section, not by the words), and the steps must still
+  match what each lesson's position lets the player do. The positions are in docs/scenarios/mini-*.txt.
+
+=== HOW TO PLAY ===
+To place a new Star, tap one of your Stars, then tap where the new Star goes. Or drag from your Star and let go there.
+Hold while dragging, or hold newly placed Stars, for precise positioning.
+Crossing grid lines costs 1 Fuel each. Crossing diagonally counts as 2 grid lines.
+Place Fleets on Stars connected to your Capital to make them stronger.
+You can move your Fleets along your Connections.
+Stronger Stars can capture weaker Stars.
+Watch out! After each round, the lowest score that is more than 3 points behind the next score above it is eliminated.
+Each Sector you control gives you 1 point. The center Sector gives you 3 points.
+Each full row or column of Sectors you control gives you 1 bonus point.
+
+=== TUTORIAL: Tutorial ===
+Each lesson sets up a short game and tells you what to do. Menu > Game > Notes shows the steps again.
+
+=== LESSON 1: Setting Stars ===
+You are Blue, bottom left. Your Capital is in the middle of the bottom left Sector, and your other Star is just right of it. You have 3 Fuel.
+New Stars and captures first show as a dashed preview. Press Confirm (bottom right) to make the Move. If you turned Move preview off in the Menu, Moves happen straight away.
+1. Tap your Capital, then tap the empty System just above it, and press Confirm. A new Star is set there. Its line crosses 1 grid line, so it costs 1 Fuel.
+2. Each Star can start only one Move per turn, and a new Star waits until next turn. So use your other Star: press it, drag one System up and to the right (diagonally), let go, and press Confirm. Crossing diagonally counts as 2 grid lines: 2 Fuel.
+3. Your Fuel is used up. Tap End turn.
+
+=== LESSON 2: Connections ===
+You are Blue, bottom left: your Capital, and one more Star just above it. You have 1 Fuel.
+1. Press Strength on the side of the screen. It shows each Star's Strength: both of yours are 0.
+2. Tap your Capital, then tap your Star above it. This draws a Connection between them, for 1 Fuel.
+3. Both Stars are now Strength 1. A Star's Strength is its Connections plus the Fleets on it.
+4. Tap End turn.
+
+=== LESSON 3: Fleets and Taking Stars ===
+You are Blue, bottom left. Your Capital is connected to your Star on its right (Strength 1). Just right of that is a Red Star, connected to another Red Star (Strength 1). Press Strength on the side to see the numbers.
+1. Tap your Star on the right, then tap the Red Star next to it. You can't take it: your Star must be stronger than the Star it takes, and 1 is not more than 1.
+2. Tap Fleets (it shows Place 2), then tap your Star on the right twice. Each Fleet adds 1 Strength. Fleets go only on Stars connected to your Capital.
+3. Now tap your Star, then the Red Star again. The game asks how many Fleets join the attack: pick one, then press Confirm. The Red Star becomes yours, the Fleets you used move onto it, and its Connection to the other Red Star is erased.
+4. Tap End turn.
+
+=== LESSON 4: Using all your Fuel ===
+You are Blue, bottom left. You have 2 Fuel and 2 Fleets to place.
+1. Tap End turn. It won't end yet: you must use your Fuel while you have a Move you can make. The game switches to Stars and rings the Stars that can still move.
+2. Use the Fuel: set new Stars from your ringed Stars (press Confirm for each) until the Fuel is gone.
+3. Tap End turn again. It still won't end: you have Fleets to place. The game switches to Place. Tap your Stars to place both Fleets.
+4. Tap End turn.
+
+=== LESSON 5: Scoring Sectors ===
+The board has 9 Sectors (the big squares). A Sector is yours when you have more Stars in it than everyone else put together. Each Sector you control is worth 1 point, and the middle one 3. Red has 6 points, with the middle Sector. You (Blue) have 2: the bottom left and middle left Sectors.
+1. Tap your upper Star in the middle left Sector, then tap the empty System just right of it, in the middle Sector, and press Confirm. It is 1 Star against 1 there, so nobody controls the middle Sector.
+2. Tap your other Star in the middle left Sector, then the empty System just right of it, and press Confirm. Now it's 2 against 1: the middle Sector is yours.
+3. Tap End turn. You play last this round, so the round is scored now. On the round screen you have 5 points and Red has 3.
+
+=== LESSON 6: Deficit Elimination ===
+After each round, the lowest score that is more than 3 points behind the next score above it is eliminated. Red has 4 points (the middle Sector is worth 3). You (Blue) have 2.
+1. Tap Fleets (Place 2), then tap your Star in the middle left Sector twice.
+2. Tap that Star, then the Red Star just right of it, in the middle Sector. Pick how many Fleets join the attack and press Confirm: the Star is yours.
+3. Tap End turn. You play last this round, so the round is scored now: you have 5 points and Red has 1. Red is 4 behind, more than 3. Watch what happens.
+</script>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
 <div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
@@ -341,9 +405,28 @@ return '<div class="mq" style="color:'+ink+'"><span style="animation-duration:'+
 // (2026-10-28-b, Shmorden) loadDlg() = the start screen's Load game page: File (a save file, or a transcript saved as .txt) or Transcript (loadTrDlg: load a .txt file or paste one, from a message for example). Back returns to the start screen.
 function loadDlg(){ovDir=1;ov('<h1>Load game</h1><p>A save file, or a transcript (the text of a game, from a file or pasted).</p><div class="r"><button onclick="$(\'lf\').click()">File</button><button onclick="loadTrDlg()">Transcript</button></div><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r" style="margin-top:12px"><button onclick="menu()">Back</button></div>')}
 function loadTrDlg(){ovDir=1;ov('<h1>Load a transcript</h1><p>Load a transcript saved as a text file, or paste one.</p><div class="r"><button onclick="$(\'lf\').click()">Load .txt file</button></div><input id="lf" type="file" accept=".txt,text/plain" hidden onchange="fromFile(this)"><textarea id="sc" rows="6" placeholder="Paste a transcript here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r" style="margin-top:12px"><button onclick="loadDlg()">Back</button></div>')}
-// howToDlg() = the How to play page opened from the start menu. Back returns to the start menu.
-// Its text must say what this build actually does (Shmorden, 2026-10-28), like the tutorial; a rule or control change updates it in the same pull request.
-function howToDlg(){ovDir=1;ov('<h1>How to play</h1>'+['To place a new Star, tap one of your Stars, then tap where the new Star goes. Or drag from your Star and let go there.','Hold while dragging, or hold newly placed Stars, for precise positioning.','Crossing grid lines costs 1 Fuel each. Crossing diagonally counts as 2 grid lines.','Place Fleets on Stars connected to your Capital to make them stronger.','Move them strategically. Moving Fleets can pick up Fleets on the Stars they pass and carry them along (hitchhiking).','Stronger Stars can capture weaker Stars.','Watch out! At the end of each round, scores are checked from the bottom up. The first score more than 3 points behind the next score above it is eliminated, along with everyone tied on it. Only one score is eliminated per round.','Each Sector you control gives you 1 point.','The center Sector gives you 3 points.','Each full row or column of Sectors you control gives you 1 bonus point.'].map(t=>'<p style="color:var(--ink);margin:0 0 10px">'+t+'</p>').join('')+'<div class="r" style="margin-top:12px"><button onclick="menu()">Back</button></div>')}
+// ptSec(h) reads section h ('HOW TO PLAY', 'TUTORIAL', 'LESSON 2', ...) of the PLAYER TEXT block (#ptext, right after <body>), which Shmorden edits
+// by hand: t = the words after the colon on its === line, p = its paragraphs (one per non-empty line).
+function ptSec(h){let on=0,t='';const p=[];for(const l of ($('ptext')?$('ptext').textContent:'').split('\n')){const m=/^===\s*(.*?)\s*===$/.exec(l.trim());
+ if(m){const k=m[1].split(':');on=k[0].trim().toUpperCase()==h;if(on)t=k.slice(1).join(':').trim();continue}if(on&&l.trim())p.push(l.trim())}return {t,p}}
+const ptP=t=>'<p style="color:var(--ink);margin:0 0 10px">'+esc(t)+'</p>';
+// howToDlg(b) = the How to play page opened from the start menu: a quick start (Shmorden, 2026-10-28), with Tutorial and Back (to the start menu).
+// b = coming back from the Tutorial page (the page swipes the other way). The text is the PLAYER TEXT block's HOW TO PLAY section.
+// It must say what this build actually does (Shmorden, 2026-10-28), like the tutorial; a rule or control change updates it in the same pull request.
+// The full rulebook and a video tutorial get their own buttons here later.
+function howToDlg(b){ovDir=b?-1:1;ov('<h1>How to play</h1>'+ptSec('HOW TO PLAY').p.map(ptP).join('')+'<div class="r" style="margin-top:12px"><button onclick="tutDlg()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Tutorial</button><button onclick="menu()">Back</button></div>')}
+// ===== Tutorial =====
+// TUT_POS = each lesson's position as a save code (no Notes; the words come from the PLAYER TEXT block's LESSON N sections).
+// Written by tools/tutorial_codes.py from docs/scenarios/mini-*.txt: run it again whenever a lesson's position changes.
+const TUT_POS=["CL4.d.31e13f82.fZDLboMwFET_ZdZXCDsg1PsT3XWDWFg8KhTHpjZEIcj_XtmQtFKjrvyYmXvs2TBpcJ2TbAitmjx4Qw6uKxINQYJrQVUTCEqP1_5QZ7f0SYybQPCzch5cbxg7sCBYsCQM4JwwXNLSqilJ7a7dwCIrCSu4yspAe1S-jN7A8q_3lLz5P5g9Wh1R8RMtXkZ_eYusDLEQa0z8V0NwdjEH1HW9e3Y2jwkXqSfC4vtu9_vWukddMnUlAsFEekmw1zjCLFoThtH5OT1gss-xk7U63X3GBNbT1-UsijekD74bvYIHpX1P8PdEbqfloEWOU-b8OCa4DMnyAd5C-AY", "CL4.d.b73d3bf7.fZDJboQwEET_pc4thB0Ikn8it1wQB4tlhOLYxIbRMMj_PnLDLIdRTl6qql93b5gMVJ2TbAitngLUhhyqrkg0BAlVC6qaSNBmPPeHOvulZzFdIiHM2geoesPYQQmCg5KEASonDL98tHpiqd21C5TISsIKVWVlpD0q30ZfvJ9P7wd7838we7Q6ouIZLd5GX7xFVsa0EGdtmqsheLfYA-q73j92No-MO6hL6LvdH1rn7-uSvCsRCTbRS4I7pxJ2MYYwjD7M3MDkHmUn5wz_nVICa1nMl-vpDzzglzUr1KBN6Anhyl2103LQEsdr-3N_MlxGtnxDbTHeAA", "CL4.d.127e517b.dZDBboMwEET_Zc4rhJ1Q1P2J3nqxOLgEKhTXRjZESZD_vbIhUSXSE0bzZnY0C0YDViXJhtDqMYAXlGBVk2gIEqwE1U0kaDNcuk2d_NxlMT0iIUzaB7BaMJzAguDAktCDS0L_kz-tHrPUrtoVLIqKcAPXRRVptcqX1itY7tlDZss9e9izx__Y456tXrJ_66_WerOKooppPGdt2kCJtKU60LFpCN7NduvqT51_Tj0NOW0LnUN3AquGEFrnHyvLPLGIBJt6vRHcJUXY2RhCP_gw5S6je8aOzpls_E4O1Ppiztevd-T-H9bcwL02oSOEe27VjvN2Ld3x2p4fv_m4jBn5BC8x_gI", "CL4.d.856d547e.fZDNasMwEITfZc5LsFQbw75Eb70YH4R_gqkqCck2TozevUh20kJDT5KY-TS7s8NpcFOQbAmdcgG8owA3NYmWIMGNoLqNBKWndTjV2S9DFtMlEsKsfAA3O6YeLAgWLAkjuCCMX_nolMtSd2gbWFwqwg1cX6pIBypfohtY_vW-ZW_xT8yB1icqftDyJfrLW16qmAqxxqS9GkGybQneLuZM9v3gn8XNU85M0ZKwhKEHNy0hdNY_OpO5MBEJJo1QEeyavjCL1oRx8mHOUzj7_NZZqzN4TQTsVW-rKCXylu9G38Cj0mEghHueqnPLmZZyvDKfj2cOlzFbPsB7jN8", "CL4.d.48feb880.hZHLboMwEEX_5a5HEbgQKv9Ed90gFpaBFtWxLRuiUOR_r2xIiNS0Wfkx5955LbAKvM6INQQprAdfkIHXFeUNgYHXOVVNIAg1nLstOrqpS8F4CQQ_CufB6wVDC54TDDgj9OAZoT-lQwqbQnKNXcDzQ0mYwatDGWiVsofSCzjb2GJnX56x5c4Wic3-KWmVVps036XlQ-kde1fS8S-2-O1bPWOjb1yK0TrOtiE4M-mtcdd27ra3cUhtxG4YYfJdu_JeGndd2THtiwWCjtlfCeYcLfSkFKEfnB9TAdbcbK0xKv19RAWK8iQFmz-RBvem1QzeC-U7gv9OVUk7bdnyQHBCf12ft-TSTu_gSwg_", "CL4.d.94f8b346.fZC9boQwEITfZerVCXMgkn2JdGksCsJPhOLYlg0nCPK7RzYcl-KUyrZmP8_sbLAKLDPKa0LbWA_ekIFlRaIm5GApqKoDoVHjrT_Uyc19EuMlEPzUOA-WG8YOLAgGnBMGcEYYvtPRNjZJ7a4tYHEpCSu4upSBdjR_ii7g_JgtHrPXNJv9Y7Oj1YGKB1o8RRfw9Y9NLMRoHfeSIvYjr1TUNcGZWR_-ruvdWd80JucjwOz7Dixrgm-NuzdXpNryQNAxSEkwt_iFnpUiDKPzU8pizfmtNUalTj4jAfP6YvyqP5B2fdNqBQ-N8j3B_6RUrZ0PNxEIrtFf9-dp3tr5HbyF8As"];
+// tutDlg() = the Tutorial page: the intro paragraphs, one button per lesson (named in its LESSON N line), and Back to How to play.
+function tutDlg(){ovDir=1;const s=ptSec('TUTORIAL');ov('<h1>'+esc(s.t||'Tutorial')+'</h1>'+s.p.map(ptP).join('')+TUT_POS.map((_,i)=>'<div class="r" style="margin-top:8px"><button onclick="tutAsk('+i+')">'+esc(ptSec('LESSON '+(i+1)).t||'Lesson '+(i+1))+'</button></div>').join('')+'<div class="r" style="margin-top:12px"><button onclick="howToDlg(1)">Back</button></div>')}
+// tutAsk(i) starts lesson i, first asking when that would replace a saved game (as opening a shared link does).
+function tutAsk(i){let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}if(!sv)return tutGo(i);ovDir=1;ov('<h1>Start this lesson?</h1><p>It replaces your saved game in this browser.</p><div class="r"><button onclick="tutGo('+i+')">Start lesson</button><button onclick="tutDlg()">Back</button></div>')}
+// tutGo(i) opens lesson i like a shared link: its position from TUT_POS, with the lesson's name and steps as the game's Notes (G.note), shown at once.
+// After the steps it is an ordinary game against the computer; there is no lesson checking, Retry or Next yet (docs/TUTORIAL.md).
+async function tutGo(i){const s=ptSec('LESSON '+(i+1));let o;try{o=await decodeCode(TUT_POS[i]);prepG(o)}catch(e){return ov('<h1>Could not open this lesson</h1><p>'+esc(e&&e.message?e.message:'Unknown problem.')+'</p><div class="r"><button onclick="tutDlg()">OK</button></div>')}
+ o.note={t:s.t||'Lesson '+(i+1),x:s.p.join('\n')};loadObj(o);say(s.t||'Lesson '+(i+1));posNoteDlg()}
 // start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
 // (changed) start(n,sz): n players on a board of sz sectors per side (default 7). Capitals sit the same distance from the edges on every size: one system in (e = far side, m = middle).
 function start(n,sz,pm,cpu,team,look){sz=[3,5,7].includes(sz)?sz:7;const N=sz*3,e=N-2,m=(N-1)/2,pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[e,1],2:[1,e]}:{0:[m,1],1:[1,m],2:[e,m],3:[m,e]};
@@ -2089,7 +2172,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-28-f';
+const BUILD='2026-10-28-g';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
