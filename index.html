@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-27-l",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-29-e",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -85,6 +85,7 @@ svg .t{display:none}svg[data-z="1"] .t{display:block}
 #msg:empty{display:none}
 /* #bar: the bottom button bar. */
 #bar{display:flex;gap:6px;padding:8px 10px;background:var(--panel);border-top:1px solid var(--line)}
+
 /* button: the shared look for all buttons, at least 44px so they are easy to tap. */
 button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:0 12px}
 /* #en: the End turn button takes the spare width and is dark. */
@@ -124,6 +125,12 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 @keyframes ovpop{from{transform:scaleY(.05);opacity:0}to{transform:scaleY(1);opacity:1}}
 /* (new) Reveals (round and end screens): #ov.rvh hides the dialog layer while it waits for the board to zoom out. .scr = a number being counted up: its real digits are see-through and data-s is drawn over them, right-aligned. */
 #ov.rvh{opacity:0}
+/* (new, hitchhiking) #ov.lite: the board stays undimmed and the dialog sits at the bottom, so what it asks about stays in view (the Hitchhike? question). Placeholder look. */
+#ov.lite{background:transparent;align-items:flex-end!important;padding-bottom:12px}#ov.lite>div{box-shadow:0 6px 28px rgba(0,0,0,.6)}
+/* (new, 2026-10-28-c) #ov.pass: the Defence call question lets taps through to the board around it, so a ringed Star can still be tapped. svg .blk: the Retreat rings blink 4 times after Retreat is pressed (placeholder look). */
+/* (new, 2026-10-28-d) .sid = a Star's place ID (A1b2) drawn above it, shown only with the IDs side button (body.ids). Placeholder look. */
+
+#ov.pass{pointer-events:none}#ov.pass>div{pointer-events:auto}svg .blk{animation:blk .4s ease-in-out 4}@keyframes blk{50%{opacity:.08}}@media(prefers-reduced-motion:reduce){svg .blk{animation:none}}
 /* (new) .pchip: a player line on the round and end screens drawn as a player chip: a border in the player's color (--c) around a dull tint of it (22% of the color over the panel; plain panel on browsers without color-mix). Placeholder look, the place for chip cosmetics later. */
 .ord{min-width:30px;font-weight:700}.pchip{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;border:2px solid var(--c);border-radius:8px;background:var(--panel);background:color-mix(in srgb,var(--c) 22%,var(--panel));color:var(--ink)}
 :root[data-theme="cgreen"] .pchip,:root[data-theme="ccyan"] .pchip,:root[data-theme="corange"] .pchip{border-radius:0}.scr{position:relative;color:transparent}.scr::after{content:attr(data-s);position:absolute;right:0;top:0;color:var(--ink)}
@@ -198,11 +205,37 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvq button{min-height:46px;padding:0 14px;font-weight:600;color:#000;border-color:transparent}#hvq button.cur{outline:3px solid var(--ink);outline-offset:1px}
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
 </style></head><body>
+<script type="text/plain" id="ptext">
+PLAYER TEXT: the words on the How to play page and in the tutorial lessons. Edit them here; the game reads them as they are.
+How it works:
+- A line that starts and ends with === begins a section. Keep those lines as they are, except the name after the colon, which you may change
+  (after "TUTORIAL:" it is the page heading; after "LESSON N:" it is the lesson's name on the Tutorial page and its heading).
+- Every other line is one paragraph. In a lesson, each paragraph is one page of the tutorial panel (Back / Next). Empty lines are skipped. Lines up here, before the first section, are never shown.
+- LESSON COMPLETE is the page after every lesson's last paragraph (the page with the lesson buttons).
+- The two TUT marker lines (slash-star TUT...) around the tutorial sections mean only the preview has them (the live publish cuts them out). Keep them.
+- Plain text only: no HTML. Any characters work, except the word made of < / script >, which would end this block.
+- The lessons are checked by tools/lesson_tests.py (it finds each lesson by its section, not by the words), and the steps must still
+  match what each lesson's position lets the player do. The positions are in docs/scenarios/lesson-*.txt.
+
+=== HOW TO PLAY ===
+To place a new Star, tap one of your Stars, then tap where the new Star goes. Or drag from your Star and let go there.
+Hold while dragging, or hold newly placed Stars, for precise positioning.
+Crossing grid lines costs 1 Fuel each. Crossing diagonally counts as 2 grid lines.
+Place Fleets on Stars connected to your Capital to make them stronger.
+You can move your Fleets along your Connections.
+Stronger Stars can capture weaker Stars.
+Watch out! After each round, the lowest score that is more than 3 points behind the next score above it is eliminated.
+Each Sector you control gives you 1 point. The center Sector gives you 3 points.
+Each full row or column of Sectors you control gives you 1 bonus point.
+
+
+</script>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
 <div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
+<!---->
 <div id="bar"><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button></div>
 <!-- Empty dialog backdrop that JavaScript fills when it needs a pop-up. -->
 <div id="ov"></div><div id="ov2"></div>
@@ -271,7 +304,14 @@ const say=t=>{$('msg').textContent=t||''};
 // ov(h) shows a pop-up dialog containing the HTML text h. (new) It first ends a reveal that is still playing (seqSkip) and unhides the layer (rvh), see Turn and round transitions.
 // (new) ovDir = which way the NEXT ov() call should slide its content in when a dialog that is already open changes page: 1 = from the right (forward / next page), -1 = from the left (back), 0 = no slide. Callers set it just before calling ov(); ov() reads it once and clears it.
 let ovDir=0,ovClosing=null,ovWasClosing=false,ovPrev='';
-function ov(h){const o=$('ov');seqSkip();dfStop();o.classList.remove('rvh');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=(o.firstChild.querySelector(':scope>.ovb')||o.firstChild).scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
+// (new, 2026-10-28-b) ovQ(h,pts) = ov for a question about the board (how many Fleets, Hitchhike?, Connect / Gift, a Fleet gift, a Retreat gift...): the board stays undimmed and the dialog sits at the bottom (#ov.lite, Shmorden's hitchhike look for every board question), and qCam keeps pts (Stars, star ids or {x,y} points) in view above it.
+function ovQ(h,pts){ov(h);$('ov').classList.add('lite');qCam(pts)}
+// qCam(pts,force) pans (and zooms out only if it must); force = center them even when they are already in view (Retreat, defRet) so every point, with a little room around it, is inside the board area above the dialog; nothing moves when they already are. The dialog's layout box is read (offsetTop), not its drawn box, since it is still growing in.
+function qCam(pts,force){const box=$('ov').firstChild;if(!G||!box||!pts)return;const ps=pts.map(p=>typeof p=='number'?by(p):p).filter(p=>p&&isFinite(p.x)&&isFinite(p.y));if(!ps.length)return;
+const r=st.getBoundingClientRect(),H=Math.max(60,Math.min(r.height,box.offsetTop-r.top-8)),pd=.8,x0=Math.min(...ps.map(p=>p.x))-pd,x1=Math.max(...ps.map(p=>p.x))+pd,y0=Math.min(...ps.map(p=>p.y))-pd,y1=Math.max(...ps.map(p=>p.y))+pd;
+if(!force&&view.x+x0*view.k>=0&&view.x+x1*view.k<=r.width&&view.y+y0*view.k>=0&&view.y+y1*view.k<=H)return;
+const k=Math.max(view.min*.9,Math.min(view.k,r.width/(x1-x0),H/(y1-y0)));camStop();camGo({k,x:r.width/2-(x0+x1)/2*k,y:H/2-(y0+y1)/2*k},calm()?0:camMs())}
+function ov(h){const o=$('ov');seqSkip();dfStop();o.classList.remove('rvh','lite','pass');if(ovClosing){ovClosing.forEach(a=>{try{a.cancel()}catch(e){}});ovClosing=null;o.style.pointerEvents='';obsFlush()}const wasOpen=o.style.display=='flex'&&!ovWasClosing;ovWasClosing=false;const dir=ovDir;ovDir=0;let oldH=0,oldInner='';if(wasOpen&&dir){try{const b=o.firstChild;if(b&&b.children){oldH=ovCH(b);oldInner=Array.from(b.children).filter(c=>!c.classList.contains('gh')).map(c=>c.outerHTML).join('')}}catch(e){}}let top=0,was='';try{if(o.style.display=='flex'&&o.firstChild&&o.firstChild.querySelector){top=(o.firstChild.querySelector(':scope>.ovb')||o.firstChild).scrollTop;was=(o.firstChild.querySelector('h1')||{}).textContent||''}}catch(e){}
 o.innerHTML='<div>'+h+'</div>';o.style.display='flex';o.style.alignItems='';if(o.dataset)o.dataset.page='';ovSc(o.firstChild);
 // (new) Redrawing the SAME dialog (a tap that changes a choice) keeps its scroll position instead of jumping to the top; a different dialog starts at the top.
 try{const n=o.firstChild;if(top&&was&&n&&n.querySelector&&((n.querySelector('h1')||{}).textContent||'')==was)(n.querySelector(':scope>.ovb')||n).scrollTop=top}catch(e){}
@@ -317,16 +357,29 @@ function creditsDlg(){ovDir=1;const P=t=>'<p style="margin:0 0 12px">'+t+'</p>';
 function menu(){ovDir=-1;let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}
 // (new) Online: while in an online game the start menu is replaced by the online one.
 if(net.on)return netMenuGame();
-// (changed) The start screen: New game (opens the New game page), Continue if a save was found, Load game file (so a saved game, including a finished one with its history, can be opened without starting a new game first), Join online game, and Rejoin if this browser was in a room.
- ov('<h1 style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;">Constellate</h1><p style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;font-size:calc(26px*10/17);margin:0 0 12px">Created by Matthew D. Yglesias</p><div class="r" style="margin-bottom:12px"><button onclick="howToDlg()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">How to play</button></div><div class="r"><button id="mnew" onclick="menuNew()">New game</button></div>'+(sv?'<div class="r" style="margin-top:8px"><button onclick="cont()">Continue saved game</button></div>':'')+'<div class="r" style="margin-top:8px"><button onclick="$(\'lf\').click()">Load game file</button><button onclick="netMenuOpen()">Join online game</button></div>'+'<div class="r" style="margin-top:8px"><button onclick="settingsDlg()">Settings</button>'+(netSess()?'<button onclick="netResume()">Rejoin online game</button>':'')+'</div>'+'<div class="r" style="margin-top:8px"><button onclick="creditsDlg()">Credits</button></div>'+'<input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>'+menuBanner())}
+// (changed) The start screen: New game (opens the New game page), Continue if a save was found, Load game (2026-10-28-b: a page with File and Transcript, see loadDlg; so a saved game, including a finished one with its history, can be opened without starting a new game first), Join online game, and Rejoin if this browser was in a room.
+ ov('<h1 style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;">Constellate</h1><p style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;font-size:calc(26px*10/17);margin:0 0 12px">Created by Matthew D. Yglesias</p><div class="r" style="margin-bottom:12px"><button onclick="howToDlg()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">How to play</button></div><div class="r"><button id="mnew" onclick="menuNew()">New game</button></div>'+(sv?'<div class="r" style="margin-top:8px"><button onclick="cont()">Continue saved game</button></div>':'')+'<div class="r" style="margin-top:8px"><button onclick="loadDlg()">Load game</button><button onclick="netMenuOpen()">Join online game</button></div>'+'<div class="r" style="margin-top:8px"><button onclick="settingsDlg()">Settings</button>'+(netSess()?'<button onclick="netResume()">Rejoin online game</button>':'')+'</div>'+'<div class="r" style="margin-top:8px"><button onclick="creditsDlg()">Credits</button></div>'+'<input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>'+menuBanner())}
 // (new) menuBanner() = the scrolling tip strip at the bottom of the main menu, in the theme's selected-button border color (--sel-line), italic, with black or white text chosen by how light that color is so it reads on every theme. MENU_TIPS = the messages (add more here). Each time the main menu is drawn a different tip is shown (never the same one twice in a row). The scroll time grows with the text length so the speed stays steady. With reduced motion on, the tip is shown still instead of scrolling.
 const MENU_TIPS=['Customize your theme in the settings menu!','Make a custom opponent in the CPU Designer!','Hone your skills on smaller board sizes!'];
 let tipLast=-1;
 function menuBanner(){let i;do{i=Math.floor(Math.random()*MENU_TIPS.length)}while(i==tipLast&&MENU_TIPS.length>1);tipLast=i;const t=MENU_TIPS[i];
 let ink='#000';try{const c=getComputedStyle(document.documentElement).getPropertyValue('--sel-line').trim(),h=hexNorm(c);if(h){const v=parseInt(h.slice(1),16);if(((v>>16&255)*.299+(v>>8&255)*.587+(v&255)*.114)<140)ink='#fff'}}catch(e){}
 return '<div class="mq" style="color:'+ink+'"><span style="animation-duration:'+(6+t.length*.22).toFixed(1)+'s">'+esc(t)+'</span></div>'}
-// howToDlg() = the How to play page opened from the start menu. Back returns to the start menu.
-function howToDlg(){ovDir=1;ov('<h1>How to play</h1>'+['Tap one of your Stars, then tap a target to place a new star.','Tap and hold for drag and drop, and hold newly placed stars for precise positioning.','Crossing grid lines costs 1 Fuel each.','Place units on stars connected to your capital to make them stronger.','Move them strategically.','Stronger stars can capture weaker stars.','Watch out! If you fall more than 3 points behind the player ahead of you, you are instantly eliminated!','Each sector you control gives you 1 point.','The center sector gives you 3 points.','Each full row or column of Sectors you control gives you 1 bonus point.'].map(t=>'<p style="color:var(--ink);margin:0 0 10px">'+t+'</p>').join('')+'<div class="r" style="margin-top:12px"><button onclick="menu()">Back</button></div>')}
+// (2026-10-28-b, Shmorden) loadDlg() = the start screen's Load game page: File (a save file, or a transcript saved as .txt) or Transcript (loadTrDlg: load a .txt file or paste one, from a message for example). Back returns to the start screen.
+function loadDlg(){ovDir=1;ov('<h1>Load game</h1><p>A save file, or a transcript (the text of a game, from a file or pasted).</p><div class="r"><button onclick="$(\'lf\').click()">File</button><button onclick="loadTrDlg()">Transcript</button></div><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r" style="margin-top:12px"><button onclick="menu()">Back</button></div>')}
+function loadTrDlg(){ovDir=1;ov('<h1>Load a transcript</h1><p>Load a transcript saved as a text file, or paste one.</p><div class="r"><button onclick="$(\'lf\').click()">Load .txt file</button></div><input id="lf" type="file" accept=".txt,text/plain" hidden onchange="fromFile(this)"><textarea id="sc" rows="6" placeholder="Paste a transcript here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r" style="margin-top:12px"><button onclick="loadDlg()">Back</button></div>')}
+// ptSec(h) reads section h ('HOW TO PLAY', 'TUTORIAL', 'LESSON 2', ...) of the PLAYER TEXT block (#ptext, right after <body>), which Shmorden edits
+// by hand: t = the words after the colon on its === line, p = its paragraphs (one per non-empty line). Marker lines (the TUT markers) are skipped.
+function ptSec(h){let on=0,t='';const p=[];for(const l of ($('ptext')?$('ptext').textContent:'').split('\n')){if(/^\/\*.*\*\/$/.test(l.trim()))continue;const m=/^===\s*(.*?)\s*===$/.exec(l.trim());
+ if(m){const k=m[1].split(':');on=k[0].trim().toUpperCase()==h;if(on)t=k.slice(1).join(':').trim();continue}if(on&&l.trim())p.push(l.trim())}return {t,p}}
+const ptP=t=>'<p style="color:var(--ink);margin:0 0 10px">'+esc(t)+'</p>';
+// howToDlg(b) = the How to play page opened from the start menu: a quick start (Shmorden, 2026-10-28), with Tutorial and Back (to the start menu).
+// b = coming back from the Tutorial page (the page swipes the other way). The text is the PLAYER TEXT block's HOW TO PLAY section.
+// It must say what this build actually does (Shmorden, 2026-10-28), like the tutorial; a rule or control change updates it in the same pull request.
+// The full rulebook and a video tutorial get their own buttons here later. The Tutorial button is preview only for now (Shmorden,
+// 2026-10-29): it and all the tutorial code sit between TUT markers, which the live publish cuts out (tools/strip_craft.py).
+function howToDlg(b){ovDir=b?-1:1;ov('<h1>How to play</h1>'+ptSec('HOW TO PLAY').p.map(ptP).join('')+'<div class="r" style="margin-top:12px">'+'<button onclick="menu()">Back</button></div>')}
+
 // start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
 // (changed) start(n,sz): n players on a board of sz sectors per side (default 7). Capitals sit the same distance from the edges on every size: one system in (e = far side, m = middle).
 function start(n,sz,pm,cpu,team,look){sz=[3,5,7].includes(sz)?sz:7;const N=sz*3,e=N-2,m=(N-1)/2,pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[e,1],2:[1,e]}:{0:[m,1],1:[1,m],2:[e,m],3:[m,e]};
@@ -348,6 +401,8 @@ if(team&&!teamErr(pl,team,cpu)){G.team={};pl.forEach(c=>{G.team[c]=team[c]})}
 overHidden=false;H=newHist();histSnap('s');histSave();camKey=null;camSnap=null;render();camWait=true;roundPop()}
 // sysStar(x,y) finds the star in system column x, row y (or nothing).
 const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
+// (new 2026-10-29-d) secNear(cx,cy,bx,by,L) = the Sector rule for taps, "Touch assist" (Shmorden, 2026-10-29: Fleets were too hard to place on iPhone, where a System is about 18 px wide). (2026-10-29-e) Only with Touch assist on (HOLD.ta, Dev page; off by default: it can pick the wrong Star in a crowded Sector). When the tapped system (cx,cy) is empty (no Star, no Star preview), the Star of list L in the same Sector that is nearest the tap point (bx,by), or null. Used to select your Star and to place a Fleet (tap).
+function secNear(cx,cy,bx,by,L){if(!HOLD.ta||!sysFree(cx,cy))return null;const X=Math.floor(cx/3),Y=Math.floor(cy/3);let b=null,d=1e9;L.forEach(s=>{if(Math.floor(s.x/3)==X&&Math.floor(s.y/3)==Y){const e=Math.hypot(s.x-bx,s.y-by);if(e<d){d=e;b=s}}});return b}
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
 const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
 // beginTurn() resets per-turn things: used stars, Fuel, mode (nothing selected). pool = Fleets to place = your rank from the round-start snapshot (G.rank): 1 + the number of distinct scores higher than yours, so tied players share a rank (dense ranks, RULES.md 2.2). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
@@ -359,7 +414,9 @@ function placeF(t){if(G.pool<1)return say('No Fleets left to place.');const ok=p
 // (new) resetFlow() is the ONE place that clears every half-finished interaction: the selected star, a move group in progress, a pending attack, retreat rings and the Hold button. Undo, mode switches, End turn, new game, load and every Cancel call it, so no stale selection or count can survive.
 // (new, drag and drop) ddFl = the path (star ids) drawn while "Move how many Fleets?" waits after a Fleet drag (ddFleetDrop). A var, so resetFlow can clear it before the drag section has run.
 var ddFl=null;
-function resetFlow(){sel=null;pvSel=null;flow=null;multi=null;pend=null;hl=[];ddFl=null;$('hold').style.display=''}
+// (new, hitchhiking) hhS = the hitchhike question in progress (see hhAsk). A var for the same reason as ddFl.
+var hhS=null;
+function resetFlow(){sel=null;pvSel=null;flow=null;multi=null;pend=null;hl=[];ddFl=null;hhS=null;$('hold').style.display='';defClose()}
 // (new) badgeAt(bx,by) finds the star whose Fleet-count badge is under the board point (bx,by), with a little extra touch tolerance. Used only in Move mode so tapping the Fleets selects their star.
 function badgeAt(bx,by){const pad=Math.min(.12,Math.max(.04,8/view.k));return G.stars.find(q=>(q.f||0)>0&&bx>=q.x+BADGE.dx-pad&&bx<=q.x+BADGE.dx+BADGE.w+pad&&by>=q.y+BADGE.dy-pad&&by<=q.y+BADGE.dy+BADGE.h+pad)||null}
 // moveF(t) handles taps in Move mode. The step is decided by flow (the group chosen so far), never by sel alone, and the group size always comes from an explicit choice.
@@ -373,23 +430,58 @@ if(fr<1)return say('All Fleets here already moved this turn.');
 // Exactly 1 Fleet on the star: no prompt is needed, the group is that Fleet.
 if(t.f==1){sel=t.id;flow={src:t.id,n:1};say('Tap a Star within 1 Connection'+(teamsOn()?', or a teammate\'s Star to give the Fleet.':'.'));return render()}
 // 2 or more Fleets on the star: ALWAYS ask how many (1 to fr), noting how many already moved, with a Cancel button.
-return ov(`<h1>Move how many Fleets?</h1><p>A group of n travels up to n Connections.${t.fm?' '+t.fm+' Fleet'+(t.fm>1?'s':'')+' here already moved this turn and cannot move again.':''}</p><div class="r" style="flex-wrap:wrap">${[...Array(fr)].map((_,i)=>`<button onclick="pickN(${t.id},${i+1})">${i+1}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow()">Cancel</button></div>`)}
+return ovQ(`<h1>Move how many Fleets?</h1><p>A group of n travels up to n Connections.${t.fm?' '+t.fm+' Fleet'+(t.fm>1?'s':'')+' here already moved this turn and cannot move again.':''}</p><div class="r" style="flex-wrap:wrap">${[...Array(fr)].map((_,i)=>`<button onclick="pickN(${t.id},${i+1})">${i+1}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow()">Cancel</button></div>`,[t])}
 // Step 2, a group is chosen: a = its star, n = its size. If the group is no longer there, cancel.
 const a=by(flow.src),n=flow.n;if(!a||fFree(a)<n){resetFlow();say('That group is no longer available.');return render()}
 // (step 5) A living teammate's star: a Fleet gift (range checked, then a Yes / No popup).
 if(t&&isAlly(t.o)){const e=fgErr(a,t,n);if(e){resetFlow();say(e);return render()}return fgAsk(a,t,n)}
 // Tapping nothing, the same star or someone else's star cancels the move.
 if(!t||t===a||t.o!=me){resetFlow();say('');return render()}
-// Breadth-first search: from a, walk along your own connections up to n steps, recording each star's distance in d.
-const d=new Map([[a.id,0]]),par=new Map(),q=[a];while(q.length){const x=q.shift();if(d.get(x.id)>=n)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u.o==me&&!d.has(u.id)){d.set(u.id,d.get(x.id)+1);par.set(u.id,x.id);q.push(u)}}})}
+// Breadth-first search (fBfs): from a, walk along your own connections up to n steps, recording each star's distance in d. (hitchhiking) For a person the path goes through as many Stars with Fleets that may ride as a shortest path can.
+const B=fBfs(a,n,hhOK()),d=B.d;
 // Out of reach: explain AND cancel, so no stale selection is left behind.
 if(!d.has(t.id)){resetFlow();say('Out of reach. '+n+' Fleet'+(n>1?'s travel':' travels')+' up to '+n+' Connection'+(n>1?'s':'')+' along your network. Selection cleared.');return render()}
+// (new, hitchhiking) Fleets on the Stars along the path that may ride along: ask about them first (hhAsk); the move is made when the last one is answered (hhDone).
+const path=fPathOf(B,a,t),hc=hhCands(a,path);if(hc.length){resetFlow();return hhAsk({a:a.id,b:t.id,n,path,c:hc,i:0,pk:[]})}
 // Valid: save undo, move exactly n Fleets (marked moved on arrival), clear the flow, say so.
 // (new) With Move preview on, the Fleet move becomes a preview along the path the Fleets would travel.
-if(pvOn()){const path=[t.id];while(path[0]!=a.id)path.unshift(par.get(path[0]));return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.')}
+if(pvOn())return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.');
 undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n});resetFlow();say('Moved '+n+'.');render()}
 // pickN(id,n) runs when a size button is tapped: it creates the move group (star id, n Fleets) and waits for a destination tap.
 function pickN(id,n){$('ov').style.display='none';sel=id;flow={src:id,n};say('Tap a Star within '+n+' Connection'+(n>1?'s':'')+(teamsOn()?', or a teammate\'s Star to give them.':''));render()}
+// ===== Hitchhiking (RULES.md 5.4) =====
+// A moving group may carry other Fleets of yours that sit on the Stars along its path, whether they moved this turn or not (Shmorden, 2026-10-28). They ride to the end, add nothing to the group's range, and count as moved. On the group's own Star only Fleets that already moved can ride (rule 5.4's second case: the group moves on and carries the Fleet that just arrived); the ones that can still move join the group itself instead. Fleets used in a Take this turn can't move again (4.10), so they never ride.
+// After a person picks the destination (tap, drag, or a preview), each Star on the path with Fleets that may ride is asked about, in path order. While the question is open the board shows the group at its destination, the dashed path, and a dashed circle round the Fleets being asked about. Computers never hitchhike yet (human-only first; CPU play is unchanged).
+// MAP: fSpent, fMoved, hhFree, hhOK = counts and who may | fBfs, fPathOf = the path | hhCands, hhAsk, hhDraw, hhPick, hhCancel, hhDone = the question | hhApply, hhRec, hhTxt = carry them, log and message.
+// fSpent(s) = Fleets on s used in a Take this turn (fa). fMoved(s) = Fleets on s that moved this turn and may still ride.
+const fSpent=s=>Math.min(s.fa||0,s.f||0),fMoved=s=>Math.max(0,Math.min(s.fm||0,s.f||0)-fSpent(s));
+// hhFree(s,o) = how many Fleets on Star s may ride with a group passing through: every Fleet there except those used in a Take and those already promised to a pending Fleet move (as a group or as hitchhikers). o = s is the group's own Star: only its moved Fleets.
+function hhFree(s,o){return Math.max(0,o?fMoved(s)-hhOut(s.id):(s.f||0)-fSpent(s)-pvOut0(s.id)-hhOut(s.id))}
+const hhOK=()=>!!G&&!cpuRun&&!cpuOf(cur());
+// fBfs(a,n,hh) = the Stars a group of n on Star a can reach along your own Connections: d = distance, par = the Star before it on the path. hh = among equally short paths prefer the one through the most Stars with Fleets that may ride (a placeholder rule; without it, the first path found, as before). The distances are the same either way. fPathOf(B,a,t) = the path from a to t as star ids.
+function fBfs(a,n,hh){const me=cur(),d=new Map([[a.id,0]]),par=new Map(),w=new Map([[a.id,0]]),q=[a];while(q.length){const x=q.shift(),dx=d.get(x.id);if(dx>=n)continue;G.conns.forEach(c=>{if(c[0]!=x.id&&c[1]!=x.id)return;const u=by(c[0]==x.id?c[1]:c[0]);if(!u||u.o!=me)return;
+// A Star is reached first from the earliest Star of the layer before; a later one of that layer replaces it only when its path passes more Stars with Fleets that may ride (the queue holds a whole layer before the next, so this always happens before u is used).
+const v=w.get(x.id)+(hh&&hhFree(u,false)>0?1:0);if(!d.has(u.id)){d.set(u.id,dx+1);w.set(u.id,v);par.set(u.id,x.id);q.push(u)}else if(d.get(u.id)==dx+1&&v>w.get(u.id)){w.set(u.id,v);par.set(u.id,x.id)}})}return {d,par}}
+function fPathOf(B,a,t){const p=[t.id];while(p[0]!=a.id)p.unshift(B.par.get(p[0]));return p}
+// hhCands(a,path) = the Stars on the path (the group's own Star first, never the destination) with Fleets that may ride, as {id, k: how many}. Empty for computers.
+function hhCands(a,path){if(!hhOK())return [];const out=[];path.slice(0,-1).forEach((id,i)=>{const s=by(id),k=s?hhFree(s,i==0):0;if(k>0)out.push({id,k})});return out}
+// hhAsk(h) starts the question: h = {a: the group's Star, b: destination, n: group size, path, c: the candidates (hhCands), i: the one being asked about, pk: the answers so far as [star id, Fleets]}.
+function hhAsk(h){hhS=h;hhDraw()}
+// hhDraw() asks about candidate h.c[h.i]: None or how many ride (Bring / Leave when there is one), or Cancel move. Like every question on the board it is a low dialog over an undimmed board (ovQ), with the whole path kept in view above it.
+function hhDraw(){const h=hhS;if(!h)return;const c=h.c[h.i],k=c.k,o=c.id==h.a,F=k>1?'Fleets':'Fleet';render();
+ovQ('<h1>Hitchhike?</h1><p>'+k+' '+F+' on the ringed Star'+(o?', already moved,':'')+' can ride with your group to its destination. '+(k>1?'They add':'It adds')+' nothing to the group\'s range and '+(k>1?'count':'counts')+' as moved.'+(h.c.length>1?' (Star '+(h.i+1)+' of '+h.c.length+' on the path)':'')+'</p><div class="r" style="flex-wrap:wrap">'+(k==1?'<button onclick="hhPick(1)">Bring it</button><button onclick="hhPick(0)">Leave it</button>':'<button onclick="hhPick(0)">None</button>'+[...Array(k)].map((_,j)=>'<button onclick="hhPick('+(j+1)+')">'+(j+1)+'</button>').join(''))+'</div><div class="r" style="margin-top:8px"><button onclick="hhCancel()">Cancel move</button></div>',h.path)}
+function hhPick(m){const h=hhS;if(!h)return;if(m>0)h.pk.push([h.c[h.i].id,m]);h.i++;if(h.i<h.c.length)return hhDraw();hhDone()}
+function hhCancel(){$('ov').style.display='none';resetFlow();say('Fleet move cancelled.');render()}
+// hhDone() makes the move with the Fleets chosen to ride: a Fleet move preview carrying them (hh) with Move preview on, otherwise at once (one Undo takes back all of it).
+function hhDone(){const h=hhS;hhS=null;$('ov').style.display='none';const a=by(h.a),t=by(h.b),me=cur();if(!a||!t||a.o!=me||t.o!=me||fFree(a)<h.n){resetFlow();say('That group is no longer available.');return render()}
+const N=h.n+' Fleet'+(h.n>1?'s':''),k=h.pk.reduce((m,x)=>m+x[1],0);
+if(pvOn()){const p={k:'f',a:a.id,b:t.id,n:h.n,c:0,path:h.path};if(h.pk.length)p.hh=h.pk;return pvAdd(p,'Fleet move preview: '+N+(k?', '+k+' hitchhiking':'')+'. Confirm or Cancel.')}
+undo.push(JSON.stringify(G));a.f-=h.n;t.f=(t.f||0)+h.n;t.fm=(t.fm||0)+h.n;const hs=hhApply(a,t,h.pk);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:h.n},hs));resetFlow();say('Moved '+h.n+'.'+hhTxt(hs));render()}
+// hhApply(a,t,pk) moves the riders pk ([star id, n], ...) of a group that has just gone from Star a to Star t, each count cut to what may still ride. Moved Fleets leave first, so Fleets that could still move stay behind when they can. Returns {hp: their Stars' points, hn: how many from each} for the log.
+function hhApply(a,t,pk){const o={hp:[],hn:[]};(pk||[]).forEach(([id,n])=>{const s=by(id);if(!s||s===t||s.o!=t.o)return;const k=Math.min(n,hhFree(s,s===a));if(k<1)return;const m=Math.min(k,fMoved(s));s.f-=k;s.fm=(s.fm||0)-m;t.f=(t.f||0)+k;t.fm=(t.fm||0)+k;o.hp.push(mvPos(s));o.hn.push(k)});return o}
+// hhRec(r,hs) adds the riders to a Fleet move log record (hp, hn), when there are any. hhTxt(hs) = the end of the bottom message.
+const hhRec=(r,hs)=>hs&&hs.hn.length?Object.assign(r,{hp:hs.hp,hn:hs.hn}):r;
+const hhTxt=hs=>{const k=hs?hs.hn.reduce((m,x)=>m+x,0):0;return k?' '+k+' Fleet'+(k>1?'s':'')+' hitchhiked.':''};
 // ===== Move preview =====
 // With Move preview on, a human player's new Star or capture is first a dashed PREVIEW kept in G.pv (so saves, Undo and online play carry it): {i: id, k: 's' new Star at x,y | 't' capture of star b with `use` committed Fleets | 'f' Fleet move of n Fleets from star a to star b along `path` (star ids), costs no Fuel and changes nothing on the board until Confirm, a: origin star, c: Fuel}. The Fuel is paid when the preview is made, and the origin counts as having acted. Tapping the end of a dashed move selects it and shows Cancel / Confirm. Cancel refunds the Fuel and frees the origin. Confirm re-checks the move; a Star is then placed, and a capture goes through the normal attack code (resolve), so the Hold / Retreat choices happen only now. MAP: pvOn, pvToggle = switch | pvAdd, pvAttack, atkGo = make a preview | pvAt, pvSelect, pvUi = pick one | pvCancel, pvConfirm, pvErr, pvRestore = finish one | pvLineOK, pvSpotErr = previews block other placements | pvTag = marks Undo entries that recorded no move. Computers never use previews.
 const pvTag=s=>Object.assign(new String(s),{pv:1});
@@ -398,8 +490,9 @@ const pvLabel=()=>'Move preview: '+(pvPref?'On':'Off');
 function pvToggle(b){pvPref=!pvPref;try{localStorage.setItem('constellate-preview',pvPref?'1':'0')}catch(e){}b.textContent=pvLabel()}
 const pvOn=()=>pvPref&&!!G&&!cpuRun&&!cpuOf(cur());
 const pvTarget=id=>(G.pv||[]).some(p=>p.k=='t'&&p.b==id),pvOrigin=id=>(G.pv||[]).some(p=>p.k!='f'&&p.k!='h'&&p.a==id),pvFind=()=>(G.pv||[]).find(p=>p.i==pvSel);
-// pvOut(id) = Fleets promised to leave star id by pending Fleet moves; fFree(s) = Fleets on s that can still be moved; pvFleetStar(id) = star id is the start or end of a pending Fleet move (it cannot act until that is settled).
-const pvOut=id=>(G.pv||[]).reduce((m,p)=>m+((p.k=='f'||p.k=='h')&&p.a==id?p.n:0),0),fFree=s=>(s.f||0)-(s.fm||0)-pvOut(s.id),pvFleetStar=id=>(G.pv||[]).some(p=>(p.k=='f'||p.k=='h')&&(p.a==id||p.b==id));
+// pvOut(id) = Fleets promised to leave star id by pending Fleet moves; fFree(s) = Fleets on s that can still be moved; pvFleetStar(id) = star id is the start or end of a pending Fleet move, or has Fleets promised to one as hitchhikers (it cannot act until that is settled).
+// (new, hitchhiking) pvOut0(id) = the group sizes only; hhOut(id) = Fleets on star id promised to pending Fleet moves as hitchhikers (p.hh = [[star id, n], ...]). Hitchhikers leave moved Fleets first (hhApply), so only the part of hhOut beyond the moved Fleets there (fMoved) is taken from the Fleets that could still move.
+const pvOut0=id=>(G.pv||[]).reduce((m,p)=>m+((p.k=='f'||p.k=='h')&&p.a==id?p.n:0),0),hhOut=id=>(G.pv||[]).reduce((m,p)=>m+(p.k=='f'&&p.hh?p.hh.reduce((k,h)=>k+(h[0]==id?h[1]:0),0):0),0),pvOut=id=>{const h=hhOut(id),s=h&&by(id);return pvOut0(id)+(s?Math.max(0,h-fMoved(s)):0)},fFree=s=>(s.f||0)-(s.fm||0)-pvOut(s.id),pvFleetStar=id=>(G.pv||[]).some(p=>(p.k=='f'||p.k=='h')&&(p.a==id||p.b==id))||hhOut(id)>0;
 // pvAdd(p,msg) makes a preview: pays the Fuel, marks the origin as acted, selects the new preview.
 function pvAdd(p,msg){undo.push(pvTag(JSON.stringify(G)));const L=G.pv||(G.pv=[]);p.i=L.reduce((m,q)=>Math.max(m,q.i),0)+1;L.push(p);if(p.k!='f'&&p.k!='h'){G.ap-=p.c;G.used.push(p.a)}sel=null;flow=null;pvSel=p.i;say(msg||'');render()}
 // atkGo(n) = the attack's Fleet choice is made: with Move preview on it becomes a preview, otherwise it resolves at once. pvAttack(n) builds the capture preview from the pending attack.
@@ -429,9 +522,9 @@ if(!clear(a,b))return 'The line passes too close to another Star.';if(cs(a)+p.us
 function pvConfirm(){if(!G||G.over||lock()||pend)return;const p=pvFind();if(!p)return;const a=by(p.a),e=pvErr(p);
 if(e){undo.push(pvTag(JSON.stringify(G)));pvDrop(p);pvSel=null;say('No longer possible: '+e+' Preview cancelled'+(p.c?', '+p.c+' Fuel refunded.':'.'));return render()}
 pvSel=null;
-if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n});say('Moved '+p.n+'.');return render()}
-if(p.k=='c'||p.k=='g'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const b=by(p.b);tmApply(p.k=='c'?'conn':'gift',a,b);say(p.k=='c'?'Connected to '+NM[b.o]+'\'s Star for '+p.c+'.':'Gave the Star to '+NM[b.o]+' for '+p.c+'.');return render()}
-if(p.k=='h'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;say('Gave '+p.n+' Fleet'+(p.n>1?'s':'')+' to '+NM[t.o]+'.');return render()}
+if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;const hs=hhApply(a,t,p.hh);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n},hs));say('Moved '+p.n+'.'+hhTxt(hs));return render()}
+if(p.k=='c'||p.k=='g'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const b=by(p.b),A0=mvPos(a);tmApply(p.k=='c'?'conn':'gift',a,b);mvRec({k:p.k=='c'?'c':'g',a:A0,b:mvPos(b),c:p.c});say(p.k=='c'?'Connected to '+NM[b.o]+'\'s Star for '+p.c+'.':'Gave the Star to '+NM[b.o]+' for '+p.c+'.');return render()}
+if(p.k=='h'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;mvRec({k:'h',a:mvPos(a),b:mvPos(t),n:p.n});say('Gave '+p.n+' Fleet'+(p.n>1?'s':'')+' to '+NM[t.o]+'.');return render()}
 if(p.k=='s'){const u=new String(JSON.stringify(G));undo.push(u);G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(n.id);nwAdd(n,a);mvRec({k:'s',a:mvPos(a),b:mvPos(p),c:p.c});
 // (new, Fleet ask) The Fleets chosen for the preview (fl) go with it, as many as can still move.
 const k=Math.min(p.fl||0,fFree(a));if(k>0)fwMove(a,n,k,u);const m=elim();say('Star set for '+p.c+' Fuel.'+(k>0?' '+k+' Fleet'+(k>1?'s':'')+' moved with it.':'')+m);return render()}
@@ -467,7 +560,7 @@ const e=attErr(t,b);if(e)return say(e);
 if((t.f||0)>0&&!faAuto())return fleetUI(t,null);
 multi.att.push({id:t.id,use:fask()=='all'?(t.f||0):0});if(fask()=='min')mcMin();say(multiMsg('Added.'));render()}
 // fleetUI(a,old) asks how many of star a's Fleets to use, with one button per number (0 up to all of them), like a normal attack's choice. old = the existing attacker entry when re-editing.
-function fleetUI(a,old){ov(`<h1>Use how many Fleets?</h1><p>This Star has ${a.f} Fleet${a.f>1?'s':''}.${old?' Currently using '+(old.use||0)+'.':''} Fleets used move onto the target if the attack succeeds.</p><div class="r" style="flex-wrap:wrap">${[...Array((a.f||0)+1)].map((_,i)=>`<button onclick="mcUse(${a.id},${i})">${i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="${old?'mcRemove('+a.id+')':"$('ov').style.display='none'"}">${old?'Remove this Star':'Cancel'}</button></div>`)}
+function fleetUI(a,old){ovQ(`<h1>Use how many Fleets?</h1><p>This Star has ${a.f} Fleet${a.f>1?'s':''}.${old?' Currently using '+(old.use||0)+'.':''} Fleets used move onto the target if the attack succeeds.</p><div class="r" style="flex-wrap:wrap">${[...Array((a.f||0)+1)].map((_,i)=>`<button onclick="mcUse(${a.id},${i})">${i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="${old?'mcRemove('+a.id+')':"$('ov').style.display='none'"}">${old?'Remove this Star':'Cancel'}</button></div>`,[a,multi&&multi.t])}
 // mcUse(id,n) records the choice: adds the star as an attacker using n Fleets, or changes n for an existing attacker, then updates the readout.
 function mcUse(id,n){$('ov').style.display='none';const x=multi.att.find(q=>q.id==id);if(x)x.use=n;else multi.att.push({id,use:n});say(multiMsg(n+' Fleet'+(n==1?'':'s')+' chosen.'));render()}
 // mcRemove(id) removes an attacker from the multi-attack.
@@ -495,7 +588,7 @@ function resolve(A){$('ov').style.display='none';
 // b = the target star, D = its defending Fleets, def = the defender's color, nb = retreat spots: the defender's other stars joined to the target by a connection, plus (team game, T3) a living teammate's star joined to it by a Connect link.
 const b=by(pend.b),D=b.f||0,def=b.o,nb=G.conns.filter(q=>q.includes(b.id)).map(q=>by(q[0]==b.id?q[1]:q[0])).filter(x=>(x.o==def||isAlly(x.o,def))&&x!==b);
 // Store on pend: A attackers, nb retreat spot ids, D defenders, dec = the decision for each defending Fleet so far, hold = Holds so far, ph = 1 marks that the defender is mid-decision (other input is blocked).
-if(A!=null)pend.att[0].use=A;pend.A=pend.att.reduce((t,x)=>t+x.use,0);pend.nb=nb.map(x=>x.id);pend.D=D;pend.dec=[];pend.hold=0;pend.ph=1;
+defCamK=null;if(A!=null)pend.att[0].use=A;pend.A=pend.att.reduce((t,x)=>t+x.use,0);pend.nb=nb.map(x=>x.id);pend.D=D;pend.dec=[];pend.hold=0;pend.ph=1;
 // Start stepping through the defending Fleets (finishes straight away if there are none).
 defNext()}
 // defNext() walks through the defending Fleets one at a time. It decides by itself only when there is no real choice; otherwise it stops and waits for the defender.
@@ -515,18 +608,21 @@ if(hOK&&!rOK){pend.dec.push('H');pend.hold++;continue}
 pend.hOK=hOK;pend.hX=hX;pend.def=by(pend.b).o;
 // (new) A computer defender on this device chooses Hold or Retreat at once.
 if(cpuHere(pend.def)){const v=cpuPick({nb:pend.nb,hOK,lvl:cpuEff(G.cpu[pend.def])});if(v==='H'){pend.dec.push('H');pend.hold++}else pend.dec.push(v);continue}
-pend.rem=net.on&&!net.my.includes(pend.def);if(!pend.rem&&!pend.bz){pend.bz=1;buzz([120,70,120])}hl=pend.nb;$('hold').style.display=(hOK||hX)&&!pend.rem?'block':'';
+// (2026-10-28-c, Shmorden) A person with no Hold and exactly one Retreat spot has no choice: the Fleet goes there by itself (computers keep their own pick above, so their play is unchanged).
+if(!hOK&&!hX&&pend.nb.length==1){pend.dec.push(pend.nb[0]);continue}
+// (2026-10-28-c) The choice is a question at the bottom of the screen (defDlg: Hold / Retreat); the bar's Hold button is no longer used. Tapping a ringed Star (Retreat) or the attacked Star (Hold) still works.
+pend.rem=net.on&&!net.my.includes(pend.def);if(!pend.rem&&!pend.bz){pend.bz=1;buzz([120,70,120])}hl=pend.nb;$('hold').style.display='';
 say(pend.rem?netWaitMsg():NM[by(pend.b).o]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(hOK,hX));
-// Redraw (to show the rings) and wait for a tap or the Hold button.
-return render()}
+// Redraw (to show the rings), ask (defDlg) and wait for an answer or a tap.
+render();return defDlg()}
 // Every Fleet has a decision, so apply the whole attack at once.
 fin()}
 // holdTxt(hOK,hX) = the end of the Defence call message. (T3) holdGive = the Retreat onto a teammate's star asks 'Give 1 Fleet to Blue?' first (Yes sends the Fleet, No goes back to the choice).
 const holdTxt=(h,x)=>h?', or press Hold.':x?', or press Hold to lose this Fleet.':'.';
 let holdGive=null;
-function holdAsk(t){holdGive=t.id;ov('<h1>Give 1 Fleet to '+NM[t.o]+'?</h1><p>It retreats to '+NM[t.o]+'\'s Star.</p><div class="r"><button onclick="holdYes()">Yes</button><button onclick="holdNo()">No</button></div>')}
+function holdAsk(t){holdGive=t.id;const tg=pend&&pend.b!=null?pend.b:net.rq&&net.rq.b;ovQ('<h1>Give 1 Fleet to '+NM[t.o]+'?</h1><p>It retreats to '+NM[t.o]+'\'s Star.</p><div class="r"><button onclick="holdYes()">Yes</button><button onclick="holdNo()">No</button></div>',[t,tg])}
 function holdYes(){const id=holdGive;holdGive=null;$('ov').style.display='none';if(net.on&&net.rq&&!net.rq.sent&&!net.my.includes(cur())){if(net.rq.nb.includes(id))netAnswer(id);return}if(!pend||!pend.ph||!pend.nb.includes(id))return;defTap(by(id),true)}
-function holdNo(){holdGive=null;$('ov').style.display='none'}
+function holdNo(){holdGive=null;$('ov').style.display='none';defDlg()}
 // defTap(t,ok) handles a board tap while the defender is choosing: a ringed star sends the current Fleet there (a teammate's star asks first; ok = already answered Yes). (new) Tapping the attacked Star is the same as the Hold button, when Hold is offered.
 function defTap(t,ok){if(t&&t.id==pend.b&&(pend.hOK||pend.hX))return defHold();
 // Anything that is not a ringed star is rejected with a hint.
@@ -536,6 +632,19 @@ if(!ok&&t.o!=pend.def)return holdAsk(t);
 pend.dec.push(t.id);defNext()}
 // defHold() is the Hold button: only valid mid-decision and only when Hold is allowed. It records a Hold and moves on.
 function defHold(){if(pend&&pend.ph&&(pend.hOK||pend.hX)){if(pend.hOK){pend.dec.push('H');pend.hold++}else pend.dec.push('X');defNext()}}
+// ----- (2026-10-28-c, Shmorden) The Defence call question -----
+// defQ() = the Defence call waiting for an answer on THIS device, or null: {def, b: attacked Star, att: attacking Stars, nb: Retreat spots, hold: Hold is offered, hx: Hold only loses the Fleet, i, D: which Fleet of how many}. Local (pend, not answered from another device) or online (net.rq, not yet sent).
+function defQ(){if(pend&&pend.ph&&!pend.rem&&pend.dec.length<pend.D)return {def:pend.def,b:pend.b,att:pend.att.map(x=>x.a),nb:pend.nb,hold:!!(pend.hOK||pend.hX),hx:!pend.hOK&&!!pend.hX,i:pend.dec.length+1,D:pend.D,loc:1};
+if(net.on&&net.rq&&!net.rq.sent)return {def:net.rq.def,b:net.rq.b,att:net.rq.att||[],nb:net.rq.nb,hold:!!net.rq.hOK,hx:!!net.rq.hX,i:net.rq.i,D:net.rq.D,loc:0};return null}
+// defDlg() asks it like every board question (ovQ: at the bottom, board undimmed, the attack in view above), with Hold and Retreat; the board can still be tapped through it (#ov.pass), so a ringed Star or the attacked Star answers as before. defOpen = this question is the one on show (defClose hides it when the call is over or answered elsewhere).
+// defCamK = the call the camera was fitted for: when a call begins (on the device that answers it) the board glides and zooms out only as far as needed to fit the attacked Star, every attacker and every Retreat spot above the question; Hold, Retreat and the next Fleet's question then leave the board where it is (Shmorden, 2026-10-28).
+let defOpen=false,hlBl=0,defCamK=null;
+function defDlg(){const q=defQ();if(!q)return defClose();defOpen=true;const F='Fleet '+q.i+' of '+q.D;
+const K=q.b+'/'+q.att.join(',')+'/'+G.round+'/'+G.ti;ovQ('<h1>Defence call</h1><p>'+esc(NM[q.def])+': '+F+' on the attacked Star. <b>Hold</b>: it is lost'+(q.hx?'':' and takes one attacking Fleet with it')+'. <b>Retreat</b>: it moves to a ringed Star.</p><div class="r"><button onclick="holdBtn()"'+(q.hold?'':' disabled')+'>Hold</button><button onclick="defRet()"'+(q.nb.length?'':' disabled')+'>Retreat</button></div>',null);$('ov').classList.add('pass');if(K!==defCamK){defCamK=K;qCam([q.b].concat(q.att,q.nb),true)}}
+function defClose(){if(!defOpen)return;defOpen=false;if($('ov').style.display=='flex')$('ov').style.display='none'}
+// defRet() = Retreat: with one spot of the defender's own the Fleet goes there; otherwise the ringed Stars blink (hlBl), without moving the board (the call already fitted them in, defDlg), and a tap on one answers. A teammate's Star still asks Give 1 Fleet first.
+function defRet(){const q=defQ();if(!q||!q.nb.length)return;if(q.nb.length==1){const t=by(q.nb[0]);if(t&&t.o==q.def)return q.loc?defTap(t,true):netAnswer(t.id)}
+hlBl=Date.now();render();say('Tap a ringed Star to Retreat there.')}
 // (new) defLive() = how the Fleet badges look while a Defence call is being answered, so each choice shows at once: {star id: change}. Every decided defending Fleet leaves the target; a Retreat adds it to the Star it went to; each Hold also removes one committed attacking Fleet (from the first attacker that still has one; fin takes them from the shared pool, so only the badges differ). Nothing on the board changes until fin. Source: pend on the device running the attack, net.rq (sent with the question) on an online defender's device. null = no Defence call.
 function defLive(){const q=pend&&pend.ph?{b:pend.b,a:pend.att.map(x=>x.a),u:pend.att.map(x=>x.use||0),dec:pend.dec}:net.on&&net.rq&&Array.isArray(net.rq.dec)&&Array.isArray(net.rq.u)&&Array.isArray(net.rq.att)?{b:net.rq.b,a:net.rq.att,u:net.rq.u,dec:net.rq.dec}:null;if(!q||!q.dec.length)return null;
 const d={},add=(id,n)=>{d[id]=(d[id]||0)+n};add(q.b,-q.dec.length);let h=0;q.dec.forEach(v=>{if(v==='H')h++;else if(typeof v=='number')add(v,1)});
@@ -543,7 +652,7 @@ q.a.forEach((id,i)=>{const k=Math.min(h,q.u[i]||0);if(k){add(id,-k);h-=k}});retu
 // fin() applies the finished attack in one go (one attacker or several): settle every defending Fleet from pend.dec, capture the star, draw a connection from each attacker, spend the total Fuel.
 function fin(){const {b:bi,att,A,dec}=pend,b=by(bi),D=b.f||0,c=att.reduce((t,x)=>t+x.c,0);
 // Clear the rings and hide the Hold button, remember the current player me, end the pending state, and save ONE undo snapshot so a single Undo reverses the whole attack.
-hl=[];$('hold').style.display='';const me=cur();pend=null;undo.push(JSON.stringify(G));
+defClose();hl=[];$('hold').style.display='';const me=cur();pend=null;undo.push(JSON.stringify(G));
 // Count outcomes: holds (each destroys one attacker from the combined pool), lost (no option left), rets (destination star ids of retreating Fleets); surv = committed Fleets that survive.
 const holds=dec.filter(x=>x=='H').length,lost=dec.filter(x=>x=='X').length,rets=dec.filter(x=>typeof x=='number'),surv=A-holds;
 // Each retreating Fleet joins the star the defender chose for it.
@@ -552,7 +661,8 @@ rets.forEach(id=>{const d=by(id);d.f=(d.f||0)+1});
 att.forEach(x=>{const a=by(x.a),free=(a.f||0)-(a.fm||0);a.fm=(a.fm||0)-Math.max(0,x.use-free);a.f=(a.f||0)-x.use;G.used.push(a.id)});
 // The capture: erase the target's connections, change its owner, set the survivors on it (marked moved), draw a connection from EACH attacker, mark the target used, spend the total Fuel, clear selection and multi-attack. (changed) A finished multi-attack also deselects Multi (back to nothing selected).
 G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;b.fa=surv;att.forEach(x=>G.conns.push([x.a,b.id]));G.used.push(b.id);G.ap-=c;sel=null;multi=null;if(mode=='x')mode='';
-mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost]});
+// (2026-10-28-b) rt = where each retreating Fleet went (a Star's point, in the order chosen), so a transcript can rebuild the board.
+mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost],rt:rets.map(id=>mvPos(by(id)))});
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+c+' Fuel.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
 // ===== Team mode: data model and helpers (team project step 2) =====
@@ -601,7 +711,7 @@ return ''}
 // tmOpen(a,b) = a tap with star a selected on a teammate's star b: say why nothing is possible, or open the Connect / Gift popup (a button the situation rules out is greyed out, with the reason).
 function tmOpen(a,b){const e=tmErr(a,b,'');if(e)return say(e);const ec=tmErr(a,b,'conn'),eg=tmErr(a,b,'gift');if(ec&&eg)return say(ec+' '+eg);
 tm={a:a.id,b:b.id};const c=cost(a,b),to=NM[b.o],nf=a.f||0,off=' disabled style="background:var(--dis);color:var(--dis-ink);border-color:var(--line);cursor:not-allowed"';
-ov('<h1>'+to+'\'s Star</h1><p style="margin:0 0 8px">Either move costs '+c+' Fuel'+'.</p><p style="margin:0 0 6px"><b>Connect</b>: link your Star to it. Both Stars get stronger.'+(ec?' ('+esc(ec)+')':'')+'</p><p style="margin:0 0 10px"><b>Gift</b>: give this Star to '+to+(nf?' with its '+nf+' Fleet'+(nf>1?'s':''):'')+'. Its other connections are erased and '+to+' can use it next turn.'+(eg?' ('+esc(eg)+')':'')+'</p><div class="r"><button onclick="tmDo(\'conn\')"'+(ec?off:'')+'>Connect</button><button onclick="tmDo(\'gift\')"'+(eg?off:'')+'>Gift</button></div><div class="r" style="margin-top:8px"><button onclick="tmCancel()">Cancel</button></div>')}
+ovQ('<h1>'+to+'\'s Star</h1><p style="margin:0 0 8px">Either move costs '+c+' Fuel'+'.</p><p style="margin:0 0 6px"><b>Connect</b>: link your Star to it. Both Stars get stronger.'+(ec?' ('+esc(ec)+')':'')+'</p><p style="margin:0 0 10px"><b>Gift</b>: give this Star to '+to+(nf?' with its '+nf+' Fleet'+(nf>1?'s':''):'')+'. Its other connections are erased and '+to+' can use it next turn.'+(eg?' ('+esc(eg)+')':'')+'</p><div class="r"><button onclick="tmDo(\'conn\')"'+(ec?off:'')+'>Connect</button><button onclick="tmDo(\'gift\')"'+(eg?off:'')+'>Gift</button></div><div class="r" style="margin-top:8px"><button onclick="tmCancel()">Cancel</button></div>',[a,b])}
 function tmCancel(){tm=null;$('ov').style.display='none';say('')}
 // tmDo(kind) = the popup's Connect / Gift. Connect = a normal connection, drawn from the acting star (so it has the acting player's color). Gift = the star is given as if the teammate had captured it: every connection of the star is erased, it changes owner (and color), its Fleets stay on it (marked as moved), and ONE new connection is drawn from the teammate's star to it; the Fuel are the normal line cost. The teammate can use it on their next turn (the used list is cleared every turn).
 function tmDo(kind){if(lock())return;const a=tm&&by(tm.a),b=tm&&by(tm.b);tm=null;$('ov').style.display='none';if(!G||G.over)return;
@@ -609,7 +719,7 @@ const e=tmErr(a,b,kind);if(e){say(e);return render()}
 const c=cost(a,b),to=b.o;
 // (T3) With Move preview on, the transfer is first a dashed preview (Fuel paid, Star marked used); Confirm applies it (pvConfirm).
 if(pvOn())return pvAdd({k:kind=='conn'?'c':'g',a:a.id,b:b.id,c},(kind=='conn'?'Connect':'Gift')+' preview for '+c+' Fuel. Confirm or Cancel.');
-undo.push(JSON.stringify(G));tmApply(kind,a,b);G.ap-=c;if(kind=='conn')G.used.push(a.id);sel=null;say(kind=='conn'?'Connected to '+NM[to]+'\'s Star for '+c+'.':'Gave the Star to '+NM[to]+' for '+c+'.');render()}
+undo.push(JSON.stringify(G));const A0=mvPos(a);tmApply(kind,a,b);G.ap-=c;if(kind=='conn')G.used.push(a.id);mvRec({k:kind=='conn'?'c':'g',a:A0,b:mvPos(b),c});sel=null;say(kind=='conn'?'Connected to '+NM[to]+'\'s Star for '+c+'.':'Gave the Star to '+NM[to]+' for '+c+'.');render()}
 // tmApply(kind,a,b) = the board change of a Connect or a Gift of own star a to teammate star b (Fuel and the used list are handled by the caller, since a preview pays them earlier). Connect: link a-b. Gift: erase a's connections, change its owner, mark its Fleets moved, draw one link b-a.
 function tmApply(kind,a,b){if(kind=='conn'){G.conns.push([a.id,b.id]);return}
 G.conns=G.conns.filter(q=>q[0]!=a.id&&q[1]!=a.id);a.o=b.o;a.fm=a.f||0;G.conns.push([b.id,a.id])}
@@ -618,12 +728,12 @@ function fgErr(a,t,n){const me=cur();if(!a||!t||a.o!=me||!isAlly(t.o))return 'Th
 if(fFree(a)<n)return 'That group is no longer available.';
 if(!tmSector(a,t)&&!tmLinked(a,t))return 'Out of range. Fleets can be given to a teammate\'s Star in the same sector, or one directly connected to this Star. Selection cleared.';return ''}
 // fgAsk / fgNo / fgDo = the Yes / No popup and its two answers. Giving costs no Fuel. The Fleets join the teammate's star (marked as moved) and cannot be taken back except by Undo.
-function fgAsk(a,t,n){fg={a:a.id,t:t.id,n};ov('<h1>Give '+n+' Fleet'+(n>1?'s':'')+' to '+NM[t.o]+'?</h1><p>They join '+NM[t.o]+'\'s Star.</p><div class="r"><button onclick="fgDo()">Yes</button><button onclick="fgNo()">No</button></div>')}
+function fgAsk(a,t,n){fg={a:a.id,t:t.id,n};ovQ('<h1>Give '+n+' Fleet'+(n>1?'s':'')+' to '+NM[t.o]+'?</h1><p>They join '+NM[t.o]+'\'s Star.</p><div class="r"><button onclick="fgDo()">Yes</button><button onclick="fgNo()">No</button></div>',[a,t])}
 function fgNo(){fg=null;$('ov').style.display='none';resetFlow();say('');render()}
 function fgDo(){if(lock())return;const f=fg;fg=null;$('ov').style.display='none';if(!f||!G||G.over)return;const a=by(f.a),t=by(f.t),e=fgErr(a,t,f.n);
 if(e){resetFlow();say(e);return render()}
 if(pvOn())return pvAdd({k:'h',a:a.id,b:t.id,n:f.n,c:0},'Fleet gift preview: '+f.n+' Fleet'+(f.n>1?'s':'')+'. Confirm or Cancel.');
-undo.push(JSON.stringify(G));a.f-=f.n;t.f=(t.f||0)+f.n;t.fm=(t.fm||0)+f.n;resetFlow();say('Gave '+f.n+' Fleet'+(f.n>1?'s':'')+' to '+NM[t.o]+'.');render()}
+undo.push(JSON.stringify(G));a.f-=f.n;t.f=(t.f||0)+f.n;t.fm=(t.fm||0)+f.n;mvRec({k:'h',a:mvPos(a),b:mvPos(t),n:f.n});resetFlow();say('Gave '+f.n+' Fleet'+(f.n>1?'s':'')+' to '+NM[t.o]+'.');render()}
 // deficit(vp): al = alive players; t = the distinct scores sorted low to high.
 // (step 6) giftMsg(g) = the words for the stars an elimination passed to teammates (g = kill's result for one or more players), e.g. ' 2 Stars passed to Blue.'; empty without gifts.
 function giftMsg(g){const n={};(g||[]).forEach(x=>{n[x.to]=(n[x.to]||0)+1});return Object.keys(n).map(t=>' '+n[t]+' Star'+(n[t]>1?'s':'')+' passed to '+NM[t]+'.').join('')}
@@ -701,17 +811,87 @@ function rematch(){if(!G||!G.over)return;if(net.on)return net.role=='host'?netSt
 const o={n:G.pl.length,sz:G.sz||7,pm:G.pm,cpu:G.cpu?Object.assign({},G.cpu):null,team:G.team?Object.assign({},G.team):null,cv:G.cpuV,cb:G.cpuB,look:{pc:G.pc,pn:G.pn}};
 start(o.n,o.sz,o.pm,o.cpu,o.team,o.look);if(o.cpu&&o.cv){G.cpuV=JSON.parse(JSON.stringify(o.cv));if(o.cb)G.cpuB=o.cb;else delete G.cpuB;cpuPC={}}}
 // ===== Transcription (fixed-position games) =====
-// transcript() = the whole game as text, move by move like a chess score: a header (date, board, players, how to read the spots), then for every round each player's moves in order, numbered from 1 in each turn, with the scores at the start of each round and the result at the end. It is built from the move log (H.mv); transDlg() shows it on the end screen of a fixed-positions game (Transcribe Game) with Copy and Save .txt.
-function transcript(){const L=[],mv=(H&&H.mv)||[],N=G.sz||7,lv=c=>(CPU_LEVELS[G.cpu[c]]||'CPU');
-L.push('CONSTELLATE - GAME TRANSCRIPTION','Date: '+new Date().toISOString().slice(0,10),'Board: '+N+'x'+N+' sectors ('+NSYS(G)+'x'+NSYS(G)+' systems), fixed positions','Players: '+G.pl.map(c=>NM[c]+(cpuOf(c)?' (computer, '+lv(c)+')':'')+(teamsOn()?' [Team '+teamOf(c)+']':'')).join(', '),'',
-'How to read it: a spot is sector (letter column, number row), system (letter column, number row inside the sector) and spot on the 5x5 lattice: S = space, L = line, V = vertex. D4·b2·S5 is the middle of system b2 in sector D4.','Set = new Star, Connect = connection between two of your Stars, Take = capture (x), [n Fuel] = Fuel spent.','');
-if(!H||!H.snaps.length||H.snaps[0].k=='l'||(mv.length&&mv[0].r>1))L.push('(Moves before this game was loaded were not recorded, so this transcription starts later than round 1.)','');
+// transcript() = the whole game as text, move by move like a chess score: a header (date, board, players, how to read the spots), then for every round each player's moves in order, numbered from 1 in each turn, with the scores at the start of each round, and the result at the end of a finished game. It is built from the move log (H.mv).
+// (2026-10-28-b, Shmorden's design) A transcript is also the save format people can read, copy into a message and paste back: a game that is not finished ends with a "Current state" section (posText) holding everything needed to carry on, whose turn it is included. Loading (trLoad) uses only what follows that line for the game, and rebuilds the history from the moves above it. When the history does not start at the beginning of the game (it was loaded part way, or is very long), a "Start state" section before the first round gives the board the moves start from. Every game has one now, not only fixed-position games.
+function transcript(){const L=[],mv=(H&&H.mv)||[],N=G.sz||7,sn=(H&&H.snaps)||[],q0=sn[0],m0=q0&&Number.isInteger(q0.m)?q0.m:0;
+L.push('CONSTELLATE - GAME TRANSCRIPTION','Date: '+new Date().toISOString().slice(0,10),'Board: '+N+'x'+N+' sectors ('+NSYS(G)+'x'+NSYS(G)+' systems), '+(G.pm=='fixed'?'fixed positions':G.pm=='free'?'free placement':'placement chosen by each player'),'Players: '+trPlayers(G),'',
+'How to read it: a spot is sector (letter column, number row), system (letter column, number row inside the sector) and spot on the 5x5 lattice: S = space, L = line, V = vertex. D4·b2·S5 is the middle of system b2 in sector D4; D4·b2·@0.300,0.700 is a point 30% across and 70% down that system.','Set = new Star, Connect = connection between two Stars, Take = capture (x), Gift = a Star given to a teammate, Give = Fleets given to a teammate, [n Fuel] = Fuel spent.','');
+// The Start state: the first snapshot, unless it is the very start of the game.
+if(q0&&!(q0.k=='s'&&q0.r==1&&m0==0)){const w=mv[m0]?mv[m0].w:null;L.push(posText(trSnapG(q0,w),'Start state').trim(),'')}
 let r=0,w=-1,n=0;
-mv.forEach(m=>{if(m.r!=r){r=m.r;w=-1;if(L.length&&L[L.length-1]!=='')L.push('');L.push(rdName(r).toUpperCase()+' ('+acts(r)+' Fuel)');const sc=H.snaps.find(x=>x.k=='s'&&x.r==r&&x.vp);if(sc&&r>1)L.push('Scores: '+G.pl.map(c=>NM[c]+' '+sc.vp[c]).join(', '))}
+mv.slice(m0).forEach(m=>{if(m.r!=r){r=m.r;w=-1;if(L.length&&L[L.length-1]!=='')L.push('');L.push(rdName(r).toUpperCase()+' ('+acts(r)+' Fuel)');const sc=sn.find(x=>x.k=='s'&&x.r==r&&x.vp);if(sc&&r>1)L.push('Scores: '+G.pl.map(c=>NM[c]+' '+sc.vp[c]).join(', '))}
 if(m.w!=w){w=m.w;n=0;L.push(NM[w]+':')}L.push('  '+(++n)+'. '+mvText(m))});
-const vp=calc().vp;L.push('','RESULT','Final scores: '+G.pl.map(c=>NM[c]+' '+vp[c]+(G.alive[c]?'':' (eliminated)')).join(', '));
-if(G.over){const top=G.over;L.push(teamsOn()?(new Set(top.map(teamOf)).size>1?'Tie game.':'Winner: Team '+teamOf(top[0])+' ('+top.map(c=>NM[c]).join(', ')+')'):(top.length>1?'Tied: ':'Winner: ')+top.map(c=>NM[c]).join(', '))}
+if(G.over){const vp=calc().vp,top=G.over;L.push('','RESULT','Final scores: '+G.pl.map(c=>NM[c]+' '+vp[c]+(G.alive[c]?'':' (eliminated)')).join(', '));L.push(teamsOn()?(new Set(top.map(teamOf)).size>1?'Tie game.':'Winner: Team '+teamOf(top[0])+' ('+top.map(c=>NM[c]).join(', ')+')'):(top.length>1?'Tied: ':'Winner: ')+top.map(c=>NM[c]).join(', '))}
+else L.push('',posText(G,'Current state').trim());
 return L.join('\n')+'\n'}
+// trPlayers(g) = the Players line: each player's name, then in brackets what the name alone doesn't say (their seat when the name is not the seat's color name, their color when it was changed and the name doesn't say it, computer and level), then [Team n]. trPlayersRead reads it back.
+function trPlayers(g){const lv=c=>({1:'Easy',2:'Medium',3:'Hard',6:'Custom'})[g.cpu[c]]||'level '+g.cpu[c];
+return g.pl.map(c=>{const nm=lkNm(g,c),col=lkP(g,c).n,t=[];if(nm!=POS_NM[c])t.push('seat '+POS_NM[c]);if(lkKey(g,c)!=DEFCOL[c]&&nm!=col)t.push(col);if(g.cpu&&g.cpu[c])t.push('computer',lv(c));return nm+(t.length?' ('+t.join(', ')+')':'')+(g.team?' [Team '+g.team[c]+']':'')}).join(', ')}
+// trPlayersRead(line,i) = {pl, cpu, team, pc, pn, nm: {lower-case name: seat}} from a Players line (i = its line number for errors).
+function trPlayersRead(line,i){const bad=m=>{throw new Error('Line '+(i+1)+': '+m)},E=[];let d=0,cur='';for(const ch of line){if(ch=='('||ch=='[')d++;if(ch==')'||ch==']')d--;if(ch==','&&!d){E.push(cur);cur=''}else cur+=ch}E.push(cur);
+const o={cpu:{},team:{},pc:{},pn:{},nm:{}},seats=[],lvl={easy:1,medium:2,hard:3,custom:6};
+E.map(x=>x.trim()).filter(Boolean).forEach(x=>{const m=/^(.+?)\s*(?:\(([^)]*)\))?\s*(?:\[Team (\d)\])?$/.exec(x);if(!m)bad('"'+x+'" is not a player.');const nm=m[1].trim(),tk=(m[2]||'').split(',').map(t=>t.trim()).filter(Boolean);
+let seat=null,col=null,cp=null;tk.forEach((t,j)=>{const lt=t.toLowerCase(),sm=/^seat (\w+)$/.exec(lt),pc=PCOL.find(p=>p.n.toLowerCase()==lt);if(sm){seat=POS_SEAT[sm[1]];if(seat==null||sm[1].length<3)bad('"'+t+'" is not a seat.')}else if(lt=='computer')cp=cp||1;else if(lvl[lt]||/^level [1-6]$/.test(lt))cp=lvl[lt]||+lt.slice(6);else if(pc)col=pc.k;else bad('"'+t+'" is not understood.')});
+const pn=PCOL.find(p=>p.n.toLowerCase()==nm.toLowerCase());if(seat==null)seat=pn&&POS_NM.includes(pn.n)&&!(pn.k!=DEFCOL[POS_NM.indexOf(pn.n)])?POS_NM.indexOf(pn.n):null;if(seat==null)bad('Say which seat '+nm+' plays, like "'+nm+' (seat Red)".');
+if(seats.includes(seat))bad('Two players have the seat '+POS_NM[seat]+'.');seats.push(seat);if(!col&&pn&&pn.k!=DEFCOL[seat])col=pn.k;if(col&&col!=DEFCOL[seat])o.pc[seat]=col;if(!pn)o.pn[seat]=nm;if(cp)o.cpu[seat]=cp;if(m[3])o.team[seat]=+m[3];o.nm[nm.toLowerCase()]=seat});
+const s=new Set(seats);if(s.size==2&&s.has(0)&&s.has(2))o.pl=[0,2];else if(s.size==4)o.pl=[0,2,3,1];else bad('A game has Red and Blue, or Red, Blue, Orange and Purple.');return o}
+// trSnapG(q,w) = a game-like object for posText from history snapshot q, with w (or the first in the snapshot's order) to move: Capitals get their first owner back from where they sit (G.caps), Fleets count as not moved, the scores are the board's VP then.
+function trSnapG(q,w){const S=snapState(q),al={};G.pl.forEach(c=>{al[c]=q.al.includes(c)});const co=s=>G.pl.find(c=>G.caps[c]&&G.caps[c][0]==Math.floor(s.x)&&G.caps[c][1]==Math.floor(s.y));
+const order=q.o.filter(c=>al[c]),sc={};G.pl.forEach(c=>{sc[c]=q.vp[c]||0});const t=order.includes(w)?w:order[0];
+return {pl:G.pl,caps:G.caps,alive:al,stars:S.stars.map(s=>Object.assign({},s,s.cap?{co:co(s)}:{})),conns:S.conns,round:q.r,order,ti:Math.max(0,order.indexOf(t)),ap:q.ap,used:[],score:sc,pool:(q.rk&&q.rk[t])||1,sz:G.sz,team:G.team,cpu:G.cpu,pm:G.pm}}
+// ----- Reading a transcript back (trLoad) -----
+// (2026-10-28-e, Shmorden) The Scenario Crafter's code: opening a Current state as a game (a scenario, a test setup, a game carried on from a transcript) and the IDs button. It is the paid Scenario Crafter's; Basic, 1.0 and the live game must not CONTAIN it, not merely switch it off. Every piece sits between the markers  (in the script and the style sheet); the live publish runs tools/strip_craft.py, which cuts everything between them out and refuses to publish if a marker is unpaired or a crafter name is left. The preview keeps it all. Without it, a transcript simply opens its history in the History viewer, as if it had no Current state (the moves part is read, the rest is skipped like any other line). Write new crafter code inside markers, and check it with tools/live_tests.py. The tutorial will load its lessons from a library built into the game, not through this.
+// TR_START = the Start state; TR_RND = a round heading (ROUND 5, OVERTIME 1 · ROUND 5); TR_HEAD = the transcript's first line. trIs(t) = t is a transcript or a bare state (posIs) rather than a save code.
+
+const TR_START=/^\s*start state\s*:?\s*$/i,TR_RND=/^(?:ROUND (\d+)|OVERTIME (\d+) · ROUND (\d+))\b/i,TR_HEAD=/^\s*CONSTELLATE - GAME TRANSCRIPTION/i;
+const trIs=t=>{const f=(String(t||'').split('\n').find(l=>l.trim())||'');return TR_HEAD.test(f)};
+// trReplay(L) rebuilds the history of the moves in the lines L ([line number, text], everything above the Current state): it starts from the Start state section or, without one, from the usual start for the board and players in the header, plays every move on that board with the game's own rules code (G and H are swapped for the copy while it runs, so kill, deficit, rankSnap, turnOrder, histSnap and mvRec work as in play), takes a snapshot after each turn and at each round start, and scores each round end (Deficit Elimination included). cs = {r: round, w: player to move} from the Current state: the history is carried on to the start of that round, and that player's last block of moves is the turn in progress, so it gets no end-of-turn snapshot. Returns {G: the board after the last move, H: the history, over: the game ended}. A move it can't read throws 'Line N: ...'. It does not check that moves were legal: a transcript records what happened.
+function trReplay(L,cs){const bad=(i,m)=>{throw new Error('Line '+(i+1)+': '+m)};let sz=7,pm=null,P=null,si=-1;
+let bd=false;L.forEach(([i,t])=>{let m;if(!bd&&(m=/^Board:\s*(\d)\s*x/i.exec(t))){bd=true;sz=+m[1];pm=/fixed positions/i.test(t)?'fixed':/free placement/i.test(t)?'free':null}else if(/^Players:/i.test(t)&&!P)P=trPlayersRead(t.replace(/^Players:\s*/i,''),i);else if(TR_START.test(t)&&si<0)si=i});
+if(!P)bad(0,'The transcript has no Players line.');if(![3,5,7].includes(sz))bad(0,'The board must be 7x7, 5x5 or 3x3.');
+const ri=L.findIndex(([,t])=>TR_RND.test(t.trim()));let S;
+if(si>=0){const sec=L.filter(([i])=>i>=si&&(ri<0||i<L[ri][0])).map(x=>x[1]).join('\n');S=posParse(sec,si)}else S=posParse('Start state\nBoard: '+sz+'x'+sz+'\nPlayers: '+P.pl.length);
+['cpu','team','pc','pn'].forEach(k=>{if(Object.keys(P[k]).length)S[k]=P[k];else delete S[k]});if(pm)S.pm=pm;if(S.team){const e=teamErr(S.pl,S.team,S.cpu);if(e)bad(0,e)}
+S.gid=newGid();S.over=null;S.out=S.out||{};const Hx={v:1,gid:S.gid,pl:S.pl.slice(),snaps:[],mv:[]},g0=G,h0=H;let over=false;G=S;H=Hx;
+try{G.rank=rankSnap(G.score);histSnap(si>=0?'l':'s');let w=null,nm=0;
+const N=NSYS(G),SP='([A-Ga-g]\\d·?[abc]\\d(?:·?(?:[SLV]\\d{1,2}|@[\\d.]+,[\\d.]+))?)',R=x=>new RegExp('^'+x.replace(/SP/g,SP)+'$');
+const pt=(x,i)=>{const p=posSpot(x,N);if(!p)bad(i,'"'+x+'" is not a place on this board.');return p},st=(x,i)=>{const p=pt(x,i),s=sysStar(Math.floor(p.x),Math.floor(p.y));if(!s)bad(i,'There is no Star at '+x+'.');return s};
+// endT() closes a player's turn with a snapshot (if they made a move); outs(by) eliminates anyone left with no Stars (RULES.md 7.2), as elim does in play.
+const endT=()=>{if(w!=null&&nm>0&&G.alive[w])histSnap('t',w);w=null;nm=0},outs=by=>{G.pl.forEach(c=>{if(G.alive[c]&&!G.stars.some(s=>s.o==c)){kill(c);if(by!=null&&by!=c)G.out[c].by=by}});G.order=G.order.filter(c=>G.alive[c]);if(sidesLeft()<2)over=true};
+const rEnd=()=>{const vp=calc().vp;G.score=vp;deficit(vp);G.lo=G.order.slice();G.rank=rankSnap(vp);G.order=turnOrder(G.first);G.first=G.order[0];G.round++;G.ti=0;G.po=G.order.slice();histSnap('s')};
+for(const [i,raw] of L){if(over)break;const t=raw.trim();if(!t||i<=si&&si>=0)continue;let m;
+if(si>=0&&ri>=0&&i<L[ri][0])continue;
+if((m=TR_RND.exec(t))){const r=m[1]?+m[1]:31+(+m[2]-1)*30+(+m[3]-1);if(r<G.round)bad(i,'The rounds are out of order.');endT();while(G.round<r&&!over)rEnd();continue}
+// RESULT: a game that did not end on the board (a last Star taken, a concession, End game) ended at a round end, by Deficit Elimination unless round 30 or an overtime round had a clear winner, as endTurn does.
+if(/^RESULT$/i.test(t)){endT();if(!over&&sidesLeft()>=2){const vp=calc().vp;if(!(G.round>=30&&clearWin(winners(vp))))deficit(vp)}over=true;break}
+if(/^Scores:/i.test(t)||/^\(/.test(t))continue;
+if((m=/^(.+):$/.exec(t))&&P.nm[m[1].toLowerCase()]!=null){endT();w=P.nm[m[1].toLowerCase()];if(!G.alive[w])bad(i,POS_NM[w]+' is out of the game here.');if(!G.order.includes(w))G.order.push(w);G.ti=G.order.indexOf(w);continue}
+if(!(m=/^\d+\.\s+(.*)$/.exec(t)))continue;if(w==null)bad(i,'A move with no player before it.');const x=m[1],B=JSON.parse(JSON.stringify(G));nm++;
+if((m=R('Place 1 Fleet at SP').exec(x))){const s=st(m[1],i);s.f=(s.f||0)+1;mvRec({k:'p',a:mvPos(s)},B);continue}
+if((m=R('Move (\\d+) Fleets? SP → SP((?:, \\d+ hitchhiking from SP)*)').exec(x))){const a=st(m[2],i),b=st(m[3],i),n=+m[1],hp=[],hn=[];a.f=Math.max(0,(a.f||0)-n);b.f=(b.f||0)+n;
+for(const h of m[4].matchAll(new RegExp('(\\d+) hitchhiking from '+SP,'g'))){const s=st(h[2],i),k=+h[1];s.f=Math.max(0,(s.f||0)-k);b.f+=k;hp.push(mvPos(s));hn.push(k)}mvRec(Object.assign({k:'f',a:mvPos(a),b:mvPos(b),n},hn.length?{hp,hn}:{}),B);continue}
+if((m=R('Set SP → SP(?: \\[(\\d+) Fuel\\])?').exec(x))){const a=st(m[1],i),p=pt(m[2],i);if(sysStar(Math.floor(p.x),Math.floor(p.y)))bad(i,'There is already a Star at '+m[2]+'.');const s={id:G.nid++,x:p.x,y:p.y,o:w};G.stars.push(s);G.conns.push([a.id,s.id]);mvRec({k:'s',a:mvPos(a),b:mvPos(s),c:+(m[3]||0)},B);continue}
+if((m=R('Connect SP — SP(?: \\[(\\d+) Fuel\\])?').exec(x))){const a=st(m[1],i),b=st(m[2],i);G.conns.push([a.id,b.id]);mvRec({k:'c',a:mvPos(a),b:mvPos(b),c:+(m[3]||0)},B);continue}
+if((m=R('Gift SP → SP(?: \\[(\\d+) Fuel\\])?').exec(x))){const a=st(m[1],i),b=st(m[2],i),A0=mvPos(a);tmApply('gift',a,b);mvRec({k:'g',a:A0,b:mvPos(b),c:+(m[3]||0)},B);outs(null);continue}
+if((m=R('Give (\\d+) Fleets? SP → SP').exec(x))){const a=st(m[2],i),b=st(m[3],i),n=+m[1];a.f=Math.max(0,(a.f||0)-n);b.f=(b.f||0)+n;mvRec({k:'h',a:mvPos(a),b:mvPos(b),n},B);continue}
+if((m=R('(Take|Multi-attack) SP((?: \\+ SP)*) x SP(?: with (\\d+) Fleets?(?: \\(([\\d +]+)\\))?)?(?: \\[(\\d+) Fuel\\])?(?: \\(defending Fleets: (.*)\\))?').exec(x))){
+const att=[st(m[2],i)].concat([...m[3].matchAll(new RegExp(SP,'g'))].map(h=>st(h[1],i))),b=st(m[5],i),n=+(m[6]||0),D=b.f||0;let u=m[7]?m[7].split('+').map(v=>+v.trim()):null;
+if(!u||u.length!=att.length){let k=n;u=att.map(a=>{const v=Math.min(k,a.f||0);k-=v;return v})}
+let held=0,lost=0,rets=[];(m[9]||'').split(',').map(v=>v.trim()).filter(Boolean).forEach(v=>{let q;if((q=new RegExp('^(\\d+) retreated to '+SP+'$').exec(v)))for(let j=0;j<+q[1];j++)rets.push(st(q[2],i));else if((q=/^(\d+) held$/.exec(v)))held=+q[1];else if((q=/^(\d+) destroyed$/.exec(v)))lost=+q[1];else if(!/^\d+( retreated)?$/.test(v))bad(i,'"'+v+'" is not understood.')});
+rets.forEach(s=>{s.f=(s.f||0)+1});att.forEach((a,j)=>{a.f=Math.max(0,(a.f||0)-u[j])});G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=w;b.f=Math.max(0,n-held);att.forEach(a=>G.conns.push([a.id,b.id]));
+const rec={k:att.length>1?'m':'a',a:mvPos(att[0]),ys:att.slice(1).map(mvPos),b:mvPos(b),n,u,c:+(m[8]||0),D,o:[rets.length,held,lost]};if(rets.length)rec.rt=rets.map(mvPos);mvRec(rec,B);outs(w);continue}
+if(/^Concedes$/i.test(x)){kill(w);G.out[w].w='c';mvRec({k:'x'},B);G.order=G.order.filter(c=>G.alive[c]);histSnap('c',w);w=null;nm=0;if(sidesLeft()<2)over=true;continue}
+if(/^Ends the game/i.test(x)){mvRec({k:'e'},B);endT();over=true;break}
+bad(i,'"'+x+'" is not a move this game knows.')}
+if(cs&&!over&&G.round<cs.r){endT();while(G.round<cs.r)rEnd()}if(!cs||w!==cs.w||over)endT();if(over){const vp=calc().vp;G.score=vp;G.over=winners(vp);histSnap('f')}}finally{G=g0;H=h0}return {G:S,H:Hx,over}}
+// trLoad(text) loads a transcript (Shmorden's rules, 2026-10-28). Everywhere: the moves part opens in the history viewer only (hvOnly, button Main menu), and anything else in the text is skipped (the preview's crafter code, inside the markers, can set a game up from a Current state instead). Throws an Error with a message for the player.
+function trLoad(text){const L=String(text).replace(/\r/g,'').split('\n');
+
+const A=L.map((t,i)=>[i,t]);if(!A.some(([,t])=>TR_RND.test(t.trim())))throw new Error('This transcript has no moves, so there is nothing to open.');return hvOnly(trReplay(A))}
+
+// hvRO = the history viewer is showing a transcript with no Current state (hvOnly): the game and history that were open are kept here and put back when it closes (Main menu), and nothing is saved or drawn on the live board meanwhile.
+let hvRO=null;
+function hvOnly(rep){if(net.on)throw new Error('Leave the online game first.');hvRO={G,H};G=rep.G;H=rep.H;setLook(G);$('ov').style.display='none';$('hvx').textContent='Main menu';hvOpen()}
 let transTxt='';
 function transDlg(){transTxt=transcript();ov('<h1>Transcription</h1><p style="margin:0 0 8px">Every move of the game, in order.</p><textarea id="tt" readonly rows="14" wrap="off" spellcheck="false" style="width:100%;box-sizing:border-box;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;white-space:pre"></textarea><div class="r" style="margin-top:8px"><button onclick="transCopy()">Copy</button><button onclick="transSave(this)">Save .txt</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r"><button onclick="overDlg()">Back</button></div>');$('tt').value=transTxt}
 async function transCopy(){lm(await copyText(transTxt)?'Copied.':'Copying is blocked here. Select the text and copy it by hand.',0)}
@@ -723,7 +903,7 @@ function overDlg(anim){overHidden=false;const {vp}=calc(),top=G.over,sys=c=>star
 // (changed 2026-10-27-k) The line is centered, and when several players were tied on the level ahead it names their place instead ("4 behind 1st"; o.p, saved with the elimination; older saves without it name the players).
 const outLine=c=>{const o=G.out&&G.out[c];return o&&o.w=='d'&&o.v!=null?'<span style="flex-basis:100%;text-align:center;font-size:.88em;line-height:1.15;color:var(--mut)">On elimination: <b style="color:var(--ink)">'+o.v+'</b> VP · <b style="color:var(--ink)">'+o.g+'</b> behind '+(o.a.length>1&&o.p?ordTxt(o.p):o.a.map(x=>NM[x]).join(' and '))+'</span>':''};
 const erow=(c,t,ind,r)=>'<div class="erow pchip" style="'+pchipS(c)+(ind?';margin-left:14px':'')+(G.alive[c]?'':';flex-wrap:wrap;row-gap:0')+'">'+(ind?'':ordH(r))+dotH(c,12)+'<span>'+(G.alive[c]?t:NM[c])+'</span>'+(G.alive[c]?'':outX(c)+outLine(c))+'</div>',trow=t=>'<div class="erow" style="margin:8px 0 2px;color:var(--ink);font-weight:700">'+t+'</div>';
-const btn='<div class="ovft" style="margin-top:14px">'+(!net.on||net.role=='host'?'<div class="r" style="margin-bottom:8px"><button onclick="rematch()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Instant rematch</button></div>':'')+'<div class="r"><button onclick="saveFile(this)">Save file</button><button onclick="newGame()">New game</button><button onclick="hvOpen()">History</button></div><div class="r" style="margin-top:8px">'+(G.pm=='fixed'?'<button onclick="transDlg()">Transcribe Game</button>':'')+'<button onclick="overHide()">Hide this screen</button></div></div>';
+const btn='<div class="ovft" style="margin-top:14px">'+(!net.on||net.role=='host'?'<div class="r" style="margin-bottom:8px"><button onclick="rematch()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Instant rematch</button></div>':'')+'<div class="r"><button onclick="saveFile(this)">Save file</button><button onclick="newGame()">New game</button><button onclick="hvOpen()">History</button></div><div class="r" style="margin-top:8px">'+'<button onclick="transDlg()">Transcribe Game</button>'+'<button onclick="overHide()">Hide this screen</button></div></div>';
 // (step 6) Team game: 'Team N wins' (with its members and why); the scores are grouped by team, each team with its combined VP and Stars. (T4) via = the leaders were tied on VP and the Stars tiebreaker decided: the title says 'wins via Stars'. A tie that is left after the tiebreaker is a 'Perfect Tie!' (Stars equal); it can end a game only through End game, since otherwise overtime follows. A game won in overtime says in which round.
 const tie='<p style="margin:0 0 8px">The game was ended before the tie was broken.</p>';
 if(teamsOn()){const wt=[...new Set(top.map(teamOf))],tk=t=>(wt.includes(t)?1e6:0)+teamVp(t,vp)*100+teamStars(t),ts=[...new Set(G.pl.map(teamOf))].sort((a,b)=>tk(b)-tk(a)||a-b),nm=l=>l.map(c=>NM[c]).join(' and '),m=Math.max(...ts.map(t=>teamVp(t,vp))),via=wt.length==1&&sidesLeft()>1&&ts.filter(t=>teamVp(t,vp)==m).length>1;
@@ -762,7 +942,8 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
  // (new) In the Fleets pair, a tap that doesn't place a Fleet, choose a group, finish a move or open a Fleet popup leaves the mode (back to nothing selected); placeF / moveF have already said why.
   // (changed) In Place, a tap on one of your Stars only ever places a Fleet: when it can't, it says why and Place stays on (it never selects the Star). Anything else leaves Place, as before.
   // (2026-10-27-j) With a Star selected the tap aims, and aims at the system tapped (whatever is in it), never at a Fleet badge reaching in from a neighbor.
-  const t=((mode=='m'||(onB&&!(mode=='s'&&sel!=null)))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
+  // (new 2026-10-29-d) Sector rule (secNear): in Place, a tap on an empty system places on the nearest Star in its Sector that can take a Fleet.
+  let t=((mode=='m'||(onB&&!(mode=='s'&&sel!=null)))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);if(!t&&G.pool>0){const q=secNear(cx,cy,bx,by,placeable());if(q)return placeF(q)}placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
   if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}const u=undo.length;moveF(t);if(!flow&&undo.length==u&&$('ov').style.display!='flex')modeOff(1);return}
   // (new) Multi mode has its own tap handler. (new) An empty system before a target is chosen leaves Multi.
   // (changed) An empty system leaves Multi even with a target chosen (Shmorden, 2026-10-27).
@@ -770,6 +951,8 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
   // (new) Move preview: tapping the end of a dashed move selects it (Confirm / Cancel appear); any other tap drops that selection and carries on.
   if((mode=='s'||!mode)&&!np){const pp=pvAt(cx,cy,t,bx,by);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}
 // Nothing selected yet: tapping your own unused star selects it; anything else shows a hint.
+ // (new 2026-10-29-d) Sector rule (secNear): a tap on an empty system selects your nearest Star in its Sector that has not acted (Set mode).
+ if(!sel&&!t){const q=secNear(cx,cy,bx,by,G.stars.filter(s=>s.o==me&&!G.used.includes(s.id)));if(q){t=q;mode='s'}}
  if(!sel){if(t&&t.o==me){if(G.used.includes(t.id))say('That Star already acted, or is new, this turn.');else{sel=t.id;say('Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets). Tap an empty system to set a Star, your Star to connect, or an enemy Star to take'+(teamsOn()?', or a teammate\'s Star to connect or gift.':'.'))}}else if(!t&&mode)return modeOff();else say(mode?'Tap one of your Stars to start a move.':'Tap one of your Stars or Fleets to start a move.');return render()}
 // a = the selected star. Tapping it again deselects.
  const a=G.stars.find(s=>s.id==sel);if(t===a){sel=null;say('');return render()}
@@ -797,7 +980,7 @@ const cb=str(b),fr=a.f||0,m=Math.max(0,cb+1-cs(a));if(str(a)<=cb)return say('Too
   if(pvTarget(b.id))return say('That Star already has a pending capture. Confirm or cancel it first.');pend={b:b.id,att:[{a:a.id,use:0,c}]};if(fr==0||m==fr||faAuto())return atkGo(fask()=='all'?fr:m);
 // Otherwise ask how many Fleets to commit (from the minimum m up to all free ones). (new) Fleet ask 'all' commits every Fleet and 'min' the minimum, without asking (above).
   // (changed) Redraw first, so the dashed attack line shows while the Fleets are chosen.
-  render();return ov(`<h1>Use Fleets in the attack?</h1><p>Used Fleets move onto the Star if you win.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr-m+1)].map((_,i)=>`<button onclick="atkGo(${m+i})">Use ${m+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow()">Cancel</button></div>`)}
+  render();return ovQ(`<h1>Use Fleets in the attack?</h1><p>Used Fleets move onto the Star if you win.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr-m+1)].map((_,i)=>`<button onclick="atkGo(${m+i})">Use ${m+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow()">Cancel</button></div>`,[a,b])}
 // Set and connect moves: save an undo snapshot.
  // (new) With Move preview on, a new Star becomes a dashed preview instead of being placed.
  // (changed, Fleet ask) Both go through pvStar / starSet, which also move the Fleets that go along with the new Star.
@@ -925,7 +1108,8 @@ function boardSVG(S,ctl,L){let s='';
  // (new) Deficit Elimination animation (live board only): the eliminated players' connections still on show (dgSVG), under the Stars. The group is always there so dfPrep and dfRun can fill it without a full redraw.
  if(L)s+='<g id="dgh">'+dgSVG()+'</g>';
  // (new, drag and drop) L.ddf = the path of a dragged Fleet group while "Move how many Fleets?" waits, drawn like a Fleet move preview.
- if(L&&L.ddf){const ps=L.ddf.map(by).filter(Boolean);if(ps.length>1)s+=`<polyline points="${ps.map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`}
+ // (new, hitchhiking) L.hk = the Hitchhike? question (hhS): its group's path is drawn the same way.
+ if(L&&(L.ddf||L.hk)){const ps=(L.ddf||L.hk.path).map(by).filter(Boolean);if(ps.length>1)s+=`<polyline points="${ps.map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`}
  // (new) Multi-attack preview: a dashed line from each chosen attacker to the target (they turn solid when the attack lands).
  if(L&&L.multi&&L.multi.t!=null)L.multi.att.forEach(x=>{const a=by(x.id),b=by(L.multi.t);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round"/>`});
 // For each star: op = opacity (dimmed if it already acted this turn), f = the shared style text.
@@ -934,8 +1118,13 @@ function boardSVG(S,ctl,L){let s='';
   s+=q.cap?`<polygon points="${sp(q.x,q.y,R_CAP,R_CAP_IN)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r="${R_STAR}" ${f}/>`;
 // If the star holds Fleets, draw a small badge showing the number. (new) L.fd = changes shown during a Defence call (defLive).
   // (new) Fleet badge styles (live board only): spent (half strength, like a spent Star) when Fleets arrived by an attack this turn or a Fleet move is previewed onto the Star; dashed border when Fleets here already moved this turn. A previewed move also shows the new Fleet counts.
-  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}})}
+  // (new, hitchhiking) A previewed move's riders (p.hh) leave their Stars and show at the destination too. While the Hitchhike? question is open (L.hk) the group and the riders chosen so far show at the destination, and the Fleets being asked about get a dashed circle.
+  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;const K=L&&L.hk,hs=a=>a.reduce((m,h)=>m+h[1],0);if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}if(p.hh){p.hh.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(p.b==q.id)fl+=hs(p.hh)}})}
+  if(K){if(K.a==q.id)fl-=K.n;K.pk.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(K.b==q.id){fl+=K.n+hs(K.pk);spent=true}}
+  if(K&&K.c[K.i]&&K.c[K.i].id==q.id)s+=`<circle cx="${q.x+BADGE.dx+BADGE.w/2}" cy="${q.y+BADGE.dy+BADGE.h/2}" r=".42" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".14 .09"/>`;
   if(fl>0)s+=`<g opacity="${spent?.5:1}"><rect x="${q.x+BADGE.dx}" y="${q.y+BADGE.dy}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${COL[q.o]}" stroke="${dash?COL[q.o]:'var(--ink)'}" stroke-width=".04"${dash?' stroke-dasharray=".07 .05"':''}/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${fl}</text></g>`}
+// (crafter, 2026-10-28-d) The Star's ID: its sector and system (A1b2), above it, shown with the IDs button.
+  
 // Draw the strength number (visible only when zoomed in).
   s+=`<text class="t" x="${q.x+.3}" y="${q.y-.22}" font-size=".3" font-weight="700" fill="var(--ink)">${S.conns.filter(c=>c[0]==q.id||c[1]==q.id).length+(q.f||0)+(L&&L.fd&&L.fd[q.id]||0)}</text>`;
 // If the star is in the highlight list, ring it.
@@ -943,7 +1132,8 @@ function boardSVG(S,ctl,L){let s='';
   if(L&&L.multi&&(q.id==L.multi.t||L.multi.att.some(x=>x.id==q.id)))s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="${q.id==L.multi.t?'var(--ink)':COL[q.o]}" stroke-width=".09"${q.id==L.multi.t?' stroke-dasharray=".2 .12"':''}/>`;
   // (new) Move mode with a group chosen: every Star the group can end on (any distance up to its range) gets a dashed ring.
   if(L&&L.fr&&L.fr.includes(q.id))s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`;
-  if(L&&L.hl.includes(q.id))s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".1"/>`;
+  // (2026-10-28-c) L.hb = ms since Retreat was pressed: the rings blink (svg .blk), the negative delay keeps the blink going across redraws.
+  if(L&&L.hl.includes(q.id))s+=`<circle${L.hb!=null?` class="blk" style="animation-delay:-${L.hb}ms"`:''} cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".1"/>`;
   // (new) End turn hint (L.hint = {ids, age in ms}): a dashed ring on each Star that can still use Fuel, fading out (CSS .hint); the negative delay keeps the fade going across redraws.
   if(L&&L.hint&&L.hint.ids.includes(q.id))s+=`<circle class="hint" style="animation-delay:-${L.hint.age}ms" cx="${q.x}" cy="${q.y}" r=".55" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`;
 // If it is the selected star, draw a dashed ring.
@@ -975,14 +1165,14 @@ function fuelUi(n){const tot=Math.max(1,acts(G.round),n),pct=Math.max(0,Math.min
 if(tot!=fuelTot){fuelTot=tot;let h='';for(let k=1;k<tot;k++)h+='<i style="left:'+(k/tot*100)+'%"></i>';$('fdiv').innerHTML=h}
 if(pct==fuelPct)return;const ms=fuelPct<0||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)?0:animMs();fuelPct=pct;fuelGo(pct/100,ms)}
 // persist() autosaves the game in the browser (silently ignores errors).
-function persist(){try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
+function persist(){if(hvRO)return;try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 // render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
 // (new) rs = the selected Star in Stars mode (its Fuel range is outlined); none while an attack is being resolved (pend: Fleet choice and the Defence call) or with the range border switched off (rngOn). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. (new) While a Star is dragged (dg), the outline is drawn round its origin with the Fuel the drag may spend (dg.n), and the Fuel shown is what would be left after the drop. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
-function render(){if(!G)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
+function render(){if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
 const da=dg&&ddStar(dg.k)&&by(dg.a);
-W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:dg&&by(dg.a)?{id:dg.id,i:dg.i}:null,ddf:ddFl,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&(pend.ph||!multi))?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
+W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:dg&&by(dg.a)?{id:dg.id,i:dg.i}:null,ddf:ddFl,hk:hhS,hb:Date.now()-hlBl<1600?Date.now()-hlBl:null,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&(pend.ph||!multi))?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
 // Fill the info row: player name, round (and online status); Fuel left goes to the gauge (fuelUi).
  $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(da&&dg.e?Math.max(0,dg.n-dg.e.c):fl);
 // Fill the score chips: one per player with VP and star count.
@@ -1003,7 +1193,8 @@ function applyNow(){W.setAttribute('transform',`translate(${view.x} ${view.y}) s
 // fit() sizes the whole board to the screen and centers it. (new) It stops a camera move first (camStop).
 function fitTo(V,box,ap){const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
-function fit(){camStop();fitTo(view,st,apply)}
+// (2026-10-28-c, Shmorden) Fitting pans and zooms there with the camera animation (camGo, Animations speed) instead of jumping; (-d) a window resize or turning the phone glides too. now = jump (the first drawing, tests); Animations off or reduced motion (the phone's "remove animations" setting) jump too.
+function fit(now){camStop();if(now||!G||calm())return fitTo(view,st,apply);camGo(camFit(),camMs())}
 // zoomAt(f,px,py) zooms by factor f while keeping point (px,py) still, within zoom limits. (new) On the live board it first stops a turn-change camera move (camStop), so the + and - buttons win.
 function zoomAt(f,px,py,V,ap){V=V||view;ap=ap||apply;if(V===view)camStop();const nk=Math.max(V.min*.9,Math.min(90,V.k*f)),r=nk/V.k;V.x=px-(px-V.x)*r;V.y=py-(py-V.y)*r;V.k=nk;ap()}
 // P keeps track of fingers touching the screen. moved = distance dragged, multi = a second finger was used, last = previous gesture.
@@ -1033,18 +1224,21 @@ function bindBoard(svgEl,box,V,ap,onTap0,hk){const onTap=(x,y)=>{tapAt=Date.now(
 // (new) Any touch, click or wheel on the live board stops a turn-change camera move (camStop), so the player is never fought for the view.
 ['touchstart','pointerdown','wheel'].forEach(n=>svgEl.addEventListener(n,()=>{if(V===view)camStop()},{passive:true}));
 let tMoved=0,tMulti=0,tPrev=null,tLast=null,t0p=null;
+// (new 2026-10-29-d, urgent iPhone fix) A touch's later events (move, lift) go to the element the finger first touched, and never reach the board if a redraw has removed that element (as when a held Star starts a drag): the board then missed the lift and stayed in a drag no one was making. So each touched element gets the move and lift handlers too (tTg = those elements, removed when the last finger lifts), and once() makes sure each event is handled only once when it also bubbles up to the board.
+let tE=null;const tTg=new Set(),once=f=>e=>{if(e===tE)return;tE=e;f(e)},tOpt={passive:false};
 // Touch events (used on Apple devices): take over the touch so Safari cannot scroll or zoom the page.
-svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;t0p=ts[0];if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
-svgEl.addEventListener('touchmove',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length)return;
+svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const g=e.target;if(g&&g!==svgEl&&!tTg.has(g)){tTg.add(g);g.addEventListener('touchmove',tMv,tOpt);g.addEventListener('touchend',tEd,tOpt);g.addEventListener('touchcancel',tEd,tOpt)}const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;t0p=ts[0];if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
+const tMv=once(e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length)return;
 if(hk&&hk.owns()){tPrev=ts[0];if(ts.length==1)bxy(ts[0].x,ts[0].y,hk.move);return}
 if(ts.length==1){const dx=ts[0].x-tPrev.x,dy=ts[0].y-tPrev.y;tPrev=ts[0];if(tMoved<=TAP_TOL&&t0p)tMoved=Math.hypot(ts[0].x-t0p.x,ts[0].y-t0p.y);if(tMoved>TAP_TOL){if(hk&&bxy(ts[0].x,ts[0].y,hk.pan))return;V.x+=dx;V.y+=dy;ap()}}
-else{const g=gestOf(ts),r=box.getBoundingClientRect();V.x+=g.cx-tLast.cx;V.y+=g.cy-tLast.cy;zoomAt(g.d/tLast.d,g.cx-r.left,g.cy-r.top,V,ap);tLast=g}},{passive:false});
-const tEnd=e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);
+else{const g=gestOf(ts),r=box.getBoundingClientRect();V.x+=g.cx-tLast.cx;V.y+=g.cy-tLast.cy;zoomAt(g.d/tLast.d,g.cx-r.left,g.cy-r.top,V,ap);tLast=g}});
+svgEl.addEventListener('touchmove',tMv,tOpt);
+const tEnd=e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length){tTg.forEach(g=>{g.removeEventListener('touchmove',tMv,tOpt);g.removeEventListener('touchend',tEd,tOpt);g.removeEventListener('touchcancel',tEd,tOpt)});tTg.clear()}
 if(hk&&hk.owns()){if(!ts.length){if(e.type=='touchend'&&e.changedTouches.length){const t=e.changedTouches[0];bxy(t.clientX,t.clientY,hk.up)}else hk.cancel(1)}if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}return}
 if(hk&&!ts.length)hk.cancel();
 if(e.type=='touchend'&&!ts.length&&!tMulti&&tMoved<=TAP_TOL&&e.changedTouches.length){const t=t0p||{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY},r=box.getBoundingClientRect();onTap((t.x-r.left-V.x)/V.k,(t.y-r.top-V.y)/V.k)}
 if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}};
-svgEl.addEventListener('touchend',tEnd,{passive:false});svgEl.addEventListener('touchcancel',tEnd,{passive:false});
+const tEd=once(tEnd);svgEl.addEventListener('touchend',tEd,tOpt);svgEl.addEventListener('touchcancel',tEd,tOpt);
 // Pointer events (used everywhere else: mouse, Android, Quest): same behaviour.
 const P=new Map();let moved=0,twoFinger=0,last=null,p0={x:0,y:0,tol:8};
 const gest=()=>{const v=[...P.values()],a=v[0],b=v[1]||v[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
@@ -1065,10 +1259,10 @@ bindBoard(svg,st,view,apply,(bx,by)=>tap(bx,by),{down:ddDown,owns:ddOwns,move:dd
 // (new, drag and drop) A long press on the board must not open the browser's own menu.
 svg.addEventListener('contextmenu',e=>e.preventDefault());
 // mid(f) zooms around the center of the board area.
-const mid=f=>{const r=st.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)};
+const mid=f=>camZoom(f);
 // Hook up the + and - zoom buttons, Fit, the mode buttons (via data-m) and the Concede button.
 // (changed) The mode buttons are ignored while the defender is choosing (see the !(pend&&pend.ph) test).
-$('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=fit;$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over&&!(pend&&pend.ph)&&!lock()){// (changed) Switching mode clears any half-finished flow. Entering Multi creates an empty multi-attack so Undo can step back out of it. (new) Tapping the selected mode again deselects it (back to nothing selected, the two-button row).
+$('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=()=>fit();$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over&&!(pend&&pend.ph)&&!lock()){// (changed) Switching mode clears any half-finished flow. Entering Multi creates an empty multi-attack so Undo can step back out of it. (new) Tapping the selected mode again deselects it (back to nothing selected, the two-button row).
 mode=m==mode?'':m;resetFlow();if(mode=='x'){multi={t:null,att:[],step:'target'};say('Multi-attack: tap an enemy Star as the target.')}else say('');render()}};
 // End turn button: if Fleets are unplaced and could be placed, warn before ending; otherwise end the turn.
 // (changed) End turn is blocked while the defender is choosing.
@@ -1157,6 +1351,8 @@ if(!Array.isArray(n.used)||n.used.some(i=>!ids.has(i)))bad('The used-star list i
 if(n.pv==null)delete n.pv;else{if(!Array.isArray(n.pv)||n.pv.length>40||n.pv.some(p=>!p||!['s','t','f','c','g','h'].includes(p.k)||!ids.has(p.a)||!I(p.c,0,99)||!I(p.i,1,1e6)||(p.k=='s'?!(F(p.x)&&F(p.y)&&p.x>=0&&p.x<=NS&&p.y>=0&&p.y<=NS):p.k=='t'?!(ids.has(p.b)&&I(p.use,0,9999)):p.k=='c'||p.k=='g'?!ids.has(p.b):p.k=='h'?!(ids.has(p.b)&&I(p.n,1,9999)):!(ids.has(p.b)&&I(p.n,1,9999)&&Array.isArray(p.path)&&p.path.length<=40&&p.path.every(i=>ids.has(i))))))bad('The move previews are invalid.');if(!n.pv.length)delete n.pv}
 // (new, Fleet ask) A Star preview may carry fl = the Fleets that go with it on Confirm; a bad value is dropped.
 if(n.pv)n.pv.forEach(p=>{if(p.fl!=null&&!(Number.isInteger(p.fl)&&p.fl>=0&&p.fl<=9999))delete p.fl});
+// (new, hitchhiking) A Fleet move preview may carry hh = the Fleets riding along, [[star id, n], ...]; a bad list is dropped (the move itself still loads, without riders).
+if(n.pv)n.pv.forEach(p=>{if(p.hh!=null&&!(p.k=='f'&&Array.isArray(p.hh)&&p.hh.length<=40&&p.hh.every(h=>Array.isArray(h)&&h.length==2&&ids.has(h[0])&&I(h[1],1,9999))))delete p.hh});
 // (new, drag and drop) Stars set this turn (G.nw = [[new Star id, origin Star id]]): only lets them be moved again this turn, so a bad list is dropped rather than refusing the file.
 if(n.nw!=null&&!(Array.isArray(n.nw)&&n.nw.length<=400&&n.nw.every(q=>Array.isArray(q)&&q.length==2&&ids.has(q[0])&&ids.has(q[1]))))delete n.nw;
 if(!I(n.nid,1,1e7)||[...ids].some(i=>i>=n.nid))n.nid=Math.max(0,...ids)+1;
@@ -1167,6 +1363,8 @@ const savedG=G;G=n;try{n.rank=(n.rank&&typeof n.rank=='object')?n.rank:rankSnap(
 if(n.pl.some(c=>n.alive[c]&&!I(n.rank[c],1,4)))bad('The ranks are invalid.');
 if(!n.pl.includes(n.first))n.first=n.order[0];
 // history is a separate optional field: it is checked by prepHist and kept outside the game state; a game id must be a short text.
+// (new, position text) note = {t: title, x: notes, one paragraph per line}, from a Current state's Title and Note lines; a bad one is dropped.
+if(n.note!=null){const o=n.note;if(o&&typeof o=='object'&&typeof(o.t||'')=='string'&&typeof(o.x||'')=='string'&&(o.t||'').length<=100&&(o.x||'').length<=3000&&(o.t||o.x))n.note={t:o.t||'',x:o.x||''};else delete n.note}
 delete n.history;if(n.gid!=null&&(typeof n.gid!='string'||n.gid.length>40))delete n.gid;
 // (new) Turn and round transitions: po / lo = the turn order this round / the last round started with, out = {color: {w: why ('d' Deficit, 'z' no Stars left, 'c' conceded), r: round, by: who took the last Star (only with 'z'); (new 2026-10-27-i, only with 'd') v: their VP at the elimination, g: how far behind the next score level they were, a: the players on that level, p: that level's place (1 = 1st)}} for eliminated players. They only change what the round and end screens show, so a bad value is dropped instead of refusing the file (older saves have none).
 ['po','lo'].forEach(f=>{if(n[f]!=null&&(!Array.isArray(n[f])||n[f].length>4||new Set(n[f]).size!=n[f].length||n[f].some(c=>!n.pl.includes(c))))delete n[f]});
@@ -1180,7 +1378,9 @@ if(G.over)overDlg()}
 // lm(t,err) shows a status line inside the Menu dialog (or the bottom message if the Menu is closed).
 function lm(t,err){const e=$('lm');if(e){e.textContent=t||'';e.style.color=err?'#ff6b6b':'var(--mut)'}else say(t)}
 // loadText(text) is the one path used by Load box, Paste & load and Load file: parse, validate, load, or show the problem.
-async function loadText(text){try{loadObj(await parseInput(text))}catch(e){lm(e&&e.message?e.message:'Could not load that.',1)}}
+// (new) A game with a Title or Notes shows them once it has opened (posNoteDlg).
+// (2026-10-28-b) A transcript or a bare Current state (trIs) goes to trLoad.
+async function loadText(text){try{if(trIs(text))return trLoad(text);loadObj(await parseInput(text));if(G.note&&!G.over)posNoteDlg()}catch(e){lm(e&&e.message?e.message:'Could not load that.',1)}}
 // The Menu's import box is always empty at first; these are its buttons.
 function fromText(){loadText($('sc').value)}
 function clearBox(){$('sc').value='';lm('')}
@@ -1201,6 +1401,111 @@ $('sc').value=t;$('sc').focus();$('sc').select();lm('Copying is blocked here. Th
 async function shareLink(){if(!menuCodes.link)await menuCodes.p;const u=menuCodes.link;if(!u)return lm('Could not build the link.',1);
 if(navigator.share){try{await navigator.share({title:'Constellate',text:'Your move in Constellate:',url:u});return lm('Shared.')}catch(e){if(e&&e.name=='AbortError')return lm('Share cancelled.')}}
 return copyOut('link')}
+// ===== Position text (a transcript's Current state section): write a position out, or set a game up from one =====
+// A state section describes a game at one moment in plain words, so a person can write one by hand (tutorial scenarios, test setups for new features) or copy one from a game (it ends every transcript of an unfinished game: Menu > Save/Load: Copy transcript, Save transcript, Edit) and change it. It is loaded by trLoad (Transcription section) and checked again by prepG and loadObj, so a bad text never half-loads: posParse stops at the first problem and names its line. The format is explained for players in docs/TRANSCRIPTS.md. One item per line, case doesn't matter, # starts a comment:
+//   Current state                   the first line (Start state inside a transcript; the preview also takes the old first line from before 2026-10-28-b)
+//   Title: ... / Note: ...          optional, shown when the position opens (G.note); Note may repeat (one paragraph each)
+//   Board: 7x7 | 5x5 | 3x3          default 7x7
+//   Players: Red, Blue              2 players = Red and Blue, 4 = Red, Blue, Orange, Purple (any order), or just 2 / 4; default 2
+//   Computers: Blue Hard            optional: Easy, Medium, Hard, or a level number 1-6
+//   Teams: Red 1, Blue 2, ...       optional, 4 players
+//   Placement: free | fixed         optional; default each player's choice
+//   Round: 5                        default 1
+//   Scores: Red 3, Blue 1           VP at the start of this round (they set positions); default 0
+//   Order: Blue, Red                this round's turn order; default by position, ties in seat order
+//   Turn: Red                       whose turn it is; default the first in Order (the players before them have played this round)
+//   Fuel: 4                         Fuel left; default the round's Fuel
+//   Fleets to place: 1              default the player's position
+//   Out: Purple                     eliminated players (they keep their Stars, with no Connections or Fleets)
+//   Stars:                          then one Star per line: label owner where [fleets N] [moved N] [spent N] [acted]
+//     R1 Red D4·b2·S5 fleets 3 moved 1     where = sector, system, spot (S1-S9, L1-L12, V1-V4; no spot = S5, the middle) or @x,y inside the system
+//     RC Red capital                a Capital at its usual place; "capital Blue" = Blue's Capital, held by Red. Capitals not listed are added for their players (labels RC, BC, OC, PC)
+//   Connections:                    then labels (or places) joined by -, separated by commas or spaces; a chain R1-R2-R3 is R1-R2 and R2-R3. A link between teammates is drawn in the first Star's color.
+// fleets = Fleets on the Star; moved = how many of them moved this turn; spent = how many arrived with a Take this turn (they can't move again, and count as moved); acted = the Star already made a Move, or was set or taken, this turn.
+// MAP: posIs = does this text start a state section | posSpot, posName = places | posParse = text to game | posText = game to text | trCopy, trSave, trEdit = Save/Load buttons | posNoteDlg = the Title and Notes dialog.
+const POS_HEAD=new RegExp('^\\s*(?:(?:start'+') state\\s*:?\\s*$'+')','i'),posIs=t=>POS_HEAD.test(String(t||'')),POS_NM=['Red','Purple','Blue','Orange'],POS_INI='RPBO',POS_SEAT={red:0,r:0,purple:1,p:1,blue:2,b:2,orange:3,o:3},
+POS_KEYS=['title','board','players','computers','teams','placement','round','scores','order','turn','fuel','fleets to place','out'];
+// posSpot(t,N) = the board point named by t on a board of N systems per side, or null. t = sector letter and number, system letter and number, then optionally a fixed spot (S1-S9, L1-L12, V1-V4) or @x,y (the point inside the system, each from MARG to 1-MARG); · or . may separate the parts. No spot = S5, the middle of the system.
+function posSpot(t,N){const m=/^([A-Ga-g])([1-7])[·.]?([abcABC])([1-3])(?:[·.]?(?:([SLVslv])(\d{1,2})|@(\d*\.?\d+),(\d*\.?\d+)))?$/.exec(t);if(!m)return null;
+const sx=m[1].toUpperCase().charCodeAt(0)-65,sy=+m[2]-1;if(sx*3>=N||sy*3>=N)return null;const cx=sx*3+'abc'.indexOf(m[3].toLowerCase()),cy=sy*3+(+m[4]-1);
+if(m[7]!=null){const ox=+m[7],oy=+m[8];return ox>=MARG-1e-9&&ox<=1-MARG+1e-9&&oy>=MARG-1e-9&&oy<=1-MARG+1e-9?{x:cx+ox,y:cy+oy}:null}
+const q=FX.find(z=>z.k==(m[5]?m[5].toUpperCase()+(+m[6]):'S5'));return q?fxPos(cx,cy,q):null}
+// posName(x,y) = the name posSpot reads back: a fixed spot (D4·b2·S5) or, off the lattice, the point inside the system to 3 decimals (D4·b2·@0.371,0.620).
+function posName(x,y){const n=mvName([x,y]);if(!n.includes('@'))return n;const cx=Math.floor(x+1e-9),cy=Math.floor(y+1e-9);return fxSys(cx,cy).replace(/ /g,'')+'·@'+(x-cx).toFixed(3)+','+(y-cy).toFixed(3)}
+// posParse(text) = the game object a position text describes (checked again by prepG when it loads), or throws an Error naming the line and the problem.
+function posParse(text,off){off=off||0;const bad=(i,m)=>{throw new Error((i!=null?'Line '+(i+1+off)+': ':'')+m)},kv={},SL=[],CL=[],note=[];let sec='',head=false;
+String(text).replace(/\r/g,'').split('\n').forEach((raw,i)=>{const line=raw.replace(/(^|\s)(#|\/\/).*$/,'').trim();if(!line)return;
+if(!head){if(!POS_HEAD.test(line))bad(i,'The first line must be Current state.');head=true;return}
+const m=/^([A-Za-z][A-Za-z ]*?)\s*:\s*(.*)$/.exec(line);
+if(m){const k=m[1].toLowerCase().replace(/\s+/g,' ');if(k=='stars'||k=='connections'){sec=k;if(m[2])(k=='stars'?SL:CL).push([i,m[2]]);return}sec='';
+if(k=='note'){if(m[2])note.push(m[2]);return}if(!POS_KEYS.includes(k))bad(i,'"'+m[1]+'" is not a heading this game knows.');if(kv[k])bad(i,m[1]+' is given twice.');kv[k]=[i,m[2].trim()];return}
+if(sec=='stars')SL.push([i,line]);else if(sec=='connections')CL.push([i,line]);else bad(i,'This line is not under Stars: or Connections:.')});
+if(!head)bad(null,'The first line must be Current state.');
+const V=k=>kv[k]?kv[k][1]:'',Li=k=>kv[k]?kv[k][0]:null,words=k=>V(k).split(/[,\s]+/).filter(Boolean),
+seat=(w,i)=>{const c=POS_SEAT[String(w).toLowerCase()];if(c==null)bad(i,'"'+w+'" is not a player. Use Red, Blue, Orange or Purple.');return c},
+num=(v,i,lo,hi,what)=>{if(!/^\d+$/.test(String(v))||+v<lo||+v>hi)bad(i,what+' must be a whole number from '+lo+' to '+hi+'.');return +v};
+let sz=7;if(V('board')){const b=/^(\d)\s*(?:x\s*(\d))?$/i.exec(V('board'));if(!b||![3,5,7].includes(+b[1])||(b[2]&&b[2]!=b[1]))bad(Li('board'),'Board must be 7x7, 5x5 or 3x3.');sz=+b[1]}
+const N=sz*3;let pl;
+if(!V('players')||V('players')=='2')pl=[0,2];else if(V('players')=='4')pl=[0,2,3,1];else{const s=new Set(words('players').map(w=>seat(w,Li('players'))));if(s.size==2&&s.has(0)&&s.has(2))pl=[0,2];else if(s.size==4)pl=[0,2,3,1];else bad(Li('players'),'Players must be Red and Blue (2 players) or Red, Blue, Orange and Purple (4 players).')}
+const inG=(c,i)=>{if(!pl.includes(c))bad(i,POS_NM[c]+' is not in this game.');return c},
+pairs=k=>{const i=Li(k),o={};V(k).split(',').map(x=>x.trim()).filter(Boolean).forEach(x=>{const m=/^(\S+)\s+(\S+)$/.exec(x);if(!m)bad(i,'Write each one as a player and a value, like "Red 3", separated by commas.');const c=inG(seat(m[1],i),i);if(c in o)bad(i,POS_NM[c]+' is listed twice.');o[c]=m[2]});return o};
+let cpu=null;{const o=pairs('computers'),lv={easy:1,medium:2,hard:3};Object.keys(o).forEach(c=>{const v=o[c].toLowerCase(),l=lv[v]||(/^[1-6]$/.test(v)?+v:0);if(!l)bad(Li('computers'),'A computer level is Easy, Medium, Hard or a number from 1 to 6.');(cpu=cpu||{})[c]=l})}
+let team=null;if(V('teams')){if(pl.length!=4)bad(Li('teams'),'Teams need 4 players.');const o=pairs('teams');team={};pl.forEach(c=>{if(!(c in o))bad(Li('teams'),POS_NM[c]+' has no team.');team[c]=num(o[c],Li('teams'),1,3,'A team')})}
+let pm=null;if(V('placement')){pm=V('placement').toLowerCase();if(pm!='free'&&pm!='fixed')bad(Li('placement'),'Placement is free or fixed.')}
+const round=V('round')?num(V('round'),Li('round'),1,RMAX,'Round'):1,score={};pl.forEach(c=>{score[c]=0});{const o=pairs('scores');Object.keys(o).forEach(c=>{score[c]=num(o[c],Li('scores'),0,9999,'A score')})}
+const alive={};pl.forEach(c=>{alive[c]=true});words('out').forEach(w=>{alive[inG(seat(w,Li('out')),Li('out'))]=false});const al=pl.filter(c=>alive[c]);if(al.length<2||(team&&new Set(al.map(c=>team[c])).size<2))bad(Li('out'),'At least two sides must still be in the game.');
+// Positions: dense ranks of this round's starting scores (RULES.md 2.2), as rankSnap gives.
+const ds=[...new Set(al.map(c=>score[c]))].sort((a,b)=>b-a),rk=c=>ds.indexOf(score[c])+1;
+let order=al.slice().sort((a,b)=>rk(a)-rk(b));if(V('order')){order=words('order').map(w=>inG(seat(w,Li('order')),Li('order')));if(new Set(order).size!=order.length||order.length!=al.length||order.some(c=>!alive[c]))bad(Li('order'),'Order must list every player still in the game once.')}
+const turn=V('turn')?inG(seat(V('turn'),Li('turn')),Li('turn')):order[0];if(!order.includes(turn))bad(Li('turn'),POS_NM[turn]+' is out of the game.');
+const ap=V('fuel')?num(V('fuel'),Li('fuel'),0,99,'Fuel'):acts(round),pool=V('fleets to place')?num(V('fleets to place'),Li('fleets to place'),0,99,'Fleets to place'):rk(turn);
+// Stars. Capitals sit where start() puts them for this board and player count.
+const e=N-2,mm=(N-1)/2,caps=pl.length==2?{0:[e,1],2:[1,e]}:{0:[mm,1],1:[1,mm],2:[e,mm],3:[mm,e]},S=[],lab=new Map(),sys=new Map(),used=[],skey=s=>Math.floor(s.x)+','+Math.floor(s.y);let nid=1;
+const place=(s,i)=>{const k=skey(s),q=sys.get(k);if(q)bad(i,'System '+fxSys(Math.floor(s.x),Math.floor(s.y)).replace(/ /g,'')+' already has a Star ('+q.lb+'). A System holds one Star.');sys.set(k,s);S.push(s)};
+SL.forEach(([i,line])=>{const t=line.split(/\s+/);if(t.length<3)bad(i,'Write a Star as label, owner, place (and Fleets), like "R1 Red D4·b2·S5 fleets 2".');
+const lb=t[0];if(!/^[A-Za-z0-9_]{1,12}$/.test(lb))bad(i,'"'+lb+'" can\'t be a label: use up to 12 letters, digits or _.');if(lab.has(lb.toLowerCase()))bad(i,'The label '+lb+' is used twice.');
+const s={id:nid++,o:inG(seat(t[1],i),i),f:0,fm:0,lb};let k=2,at=null,cap=null,mv=0,sp=0;
+while(k<t.length){const w=t[k].toLowerCase();
+if(w=='capital'){if(cap!=null||at)bad(i,'A Star is a capital or has a place, not both.');cap=s.o;k++;if(k<t.length&&POS_SEAT[t[k].toLowerCase()]!=null)cap=inG(seat(t[k++],i),i);continue}
+if(w=='fleets'||w=='fleet'){s.f=num(t[k+1],i,0,9999,'Fleets');k+=2;continue}
+if(w=='moved'){mv=num(t[k+1],i,0,9999,'Moved');k+=2;continue}
+if(w=='spent'){sp=num(t[k+1],i,0,9999,'Spent');k+=2;continue}
+if(w=='acted'){used.push(s.id);k++;continue}
+if(at||cap!=null)bad(i,'"'+t[k]+'" is not understood here.');at=posSpot(t[k],N);if(!at)bad(i,'"'+t[k]+'" is not a place on this board. Write sector, system and spot, like D4·b2·S5'+(/@/.test(t[k])?' (each @ number from '+MARG.toFixed(3)+' to '+(1-MARG).toFixed(3)+')':'')+'.');k++}
+if(cap==null&&!at)bad(i,'Say where the Star is (like D4·b2·S5), or that it is a capital.');
+if(cap!=null){if(S.some(q=>q.co===cap))bad(i,POS_NM[cap]+'\'s Capital is listed twice.');Object.assign(s,{cap:1,co:cap,x:caps[cap][0]+.5,y:caps[cap][1]+.5})}else Object.assign(s,at);
+if(mv>s.f||sp>s.f)bad(i,'More Fleets moved or spent than there are on the Star.');s.fm=Math.max(mv,sp);if(sp)s.fa=sp;
+if(!alive[s.o]&&s.f)bad(i,POS_NM[s.o]+' is out, so their Stars have no Fleets.');lab.set(lb.toLowerCase(),s);place(s,i)});
+pl.forEach(c=>{if(S.some(q=>q.co===c))return;const lb=POS_INI[c]+'C',s={id:nid++,o:c,cap:1,co:c,x:caps[c][0]+.5,y:caps[c][1]+.5,f:0,fm:0,lb},q=sys.get(skey(s));if(q)bad(null,'Star '+q.lb+' is in '+POS_NM[c]+'\'s Capital system ('+fxSys(caps[c][0],caps[c][1]).replace(/ /g,'')+'). List the Capital, or move the Star.');place(s,null);if(!lab.has(lb.toLowerCase()))lab.set(lb.toLowerCase(),s)});
+// Connections: each end is a label or a place (the Star in that System). Same owner or teammates only, and the line must keep clear of every other Star (RULES.md 4.5; with a hair of slack, as posName rounds free points to 3 decimals).
+const ref=(w,i)=>{const s=lab.get(w.toLowerCase());if(s)return s;const p=posSpot(w,N),q=p&&sys.get(skey(p));if(q)return q;bad(i,'"'+w+'" is not a Star label or the place of a Star.')},C=[],seen=new Set();
+CL.forEach(([i,line])=>line.replace(/\s*[-–—]\s*/g,'-').split(/[,;\s]+/).filter(Boolean).forEach(ch=>{const ps=ch.split('-').filter(Boolean);if(ps.length<2)bad(i,'Write a Connection as two labels joined by -, like R1-R2.');
+for(let j=0;j+1<ps.length;j++){const a=ref(ps[j],i),b=ref(ps[j+1],i),nm=a.lb+'-'+b.lb;if(a===b)bad(i,'A Star can\'t connect to itself ('+nm+').');const k=Math.min(a.id,b.id)+'-'+Math.max(a.id,b.id);if(seen.has(k))continue;seen.add(k);
+if(!alive[a.o]||!alive[b.o])bad(i,'The Connection '+nm+' belongs to a player who is out.');if(a.o!==b.o&&!(team&&team[a.o]===team[b.o]))bad(i,'The Connection '+nm+' joins Stars of two players who are not teammates.');
+const z=S.find(s=>s!==a&&s!==b&&dseg(s,a,b)<outerR(s)+LINE_W/2+PAD-.002);if(z)bad(i,'The Connection '+nm+' passes over Star '+z.lb+'. A line can\'t cross a Star: move one of them or use another spot.');C.push([a.id,b.id])}}));
+const g={pl,caps,alive,stars:S.map(s=>{const q=Object.assign({},s);delete q.lb;return q}),conns:C,round,order,ti:order.indexOf(turn),ap,used,score,nid,over:null,first:order[0],po:order.slice(),pool,gid:newGid()};
+const cp=g.stars.find(s=>s.cap&&s.co===turn);g.capOnly=!!cp&&cp.o!==turn;if(sz!=7)g.sz=sz;if(pm)g.pm=pm;if(cpu)g.cpu=cpu;if(team)g.team=team;
+if(V('title')||note.length)g.note={t:V('title'),x:note.join('\n')};return g}
+// posText(g,head) = game g (default the live game) as a state section headed head ('Current state', or 'Start state' in a transcript); posParse reads it back to the same position. Player look (it is in the transcript's Players line), history, move previews and a multi-attack being set up are not included.
+function posText(g,head){g=g||G;const nm=c=>POS_NM[c],L=[head||'Current state'];if(g.note&&g.note.t)L.push('Title: '+g.note.t);if(g.note&&g.note.x)g.note.x.split('\n').forEach(x=>L.push('Note: '+x));
+L.push('Board: '+(g.sz||7)+'x'+(g.sz||7),'Players: '+g.pl.map(nm).join(', '));
+if(g.cpu)L.push('Computers: '+Object.keys(g.cpu).map(c=>nm(+c)+' '+(['','Easy','Medium','Hard'][g.cpu[c]]||g.cpu[c])).join(', '));
+if(g.team)L.push('Teams: '+g.pl.map(c=>nm(c)+' '+g.team[c]).join(', '));if(g.pm)L.push('Placement: '+g.pm);
+L.push('Round: '+g.round,'Scores: '+g.pl.map(c=>nm(c)+' '+(g.score[c]||0)).join(', '),'Order: '+g.order.filter(c=>g.alive[c]).map(nm).join(', '),'Turn: '+nm(g.order[g.ti]),'Fuel: '+g.ap,'Fleets to place: '+(g.pool||0));
+const out=g.pl.filter(c=>!g.alive[c]);if(out.length)L.push('Out: '+out.map(nm).join(', '));if(g.pv&&g.pv.length)L.push('# Move previews are not included.');
+const lb=new Map(),taken=new Set();g.stars.forEach(s=>{if(s.cap){const k=POS_INI[s.co]+'C';lb.set(s.id,k);taken.add(k)}});const cnt={};
+const W=g.stars.slice().sort((a,b)=>g.pl.indexOf(a.o)-g.pl.indexOf(b.o)||(b.cap?1:0)-(a.cap?1:0)||a.id-b.id);
+W.forEach(s=>{if(s.cap)return;let n=cnt[s.o]||0,k;do{k=POS_INI[s.o]+(++n)}while(taken.has(k));cnt[s.o]=n;taken.add(k);lb.set(s.id,k)});
+L.push('','Stars:');W.forEach(s=>{const f=s.f||0,m=Math.min(s.fm||0,f),sp=Math.min(s.fa||0,f);L.push((lb.get(s.id)+' ').padEnd(5)+(nm(s.o)+' ').padEnd(8)+(s.cap?'capital'+(s.co!==s.o?' '+nm(s.co):''):posName(s.x,s.y))+(f?' fleets '+f:'')+(m?' moved '+m:'')+(sp?' spent '+sp:'')+(g.used.includes(s.id)?' acted':''))});
+L.push('','Connections:');const cs=g.conns.map(([a,b])=>lb.get(a)+'-'+lb.get(b));for(let i=0;i<cs.length;i+=6)L.push(cs.slice(i,i+6).join(', '));return L.join('\n')+'\n'}
+// posCopy() = Save/Load's Copy position (into the box when copying is blocked). posEdit() = Edit position: puts it in the box to change, then Load box opens the changed one.
+// trCopy() / trSave() / trEdit() = Save/Load's transcript buttons (2026-10-28-b): copy the whole transcript (into the box when copying is blocked), download it as a .txt file, or put it in the box to change and Load box.
+async function trCopy(){const t=transcript();if(await copyText(t))return lm('Transcript copied ('+t.split('\n').length+' lines).');$('sc').value=t;lm('Copying is blocked here. The transcript is in the box: select it all and copy it by hand.',1)}
+function trSave(btn){transTxt=transcript();transSave(btn)}
+function trEdit(){$('sc').value=transcript();$('sc').focus();lm('The transcript is in the box. Change it, then press Load box.')}
+// posNoteDlg() shows the position's Title and Notes (G.note): when a position text, a code or a link that has them opens, and from the Menu's Game page.
+// (2026-10-28-c) From the Menu (m) it opens like a Menu page (the page swipe) and its button goes Back to the Menu; otherwise it opens with the dialog pop and OK closes it.
+function posNoteDlg(m){const n=G&&G.note;if(!n)return;ovDir=m?1:0;ov('<h1>'+esc(n.t||'Notes')+'</h1>'+(n.x||'').split('\n').filter(Boolean).map(p=>'<p style="color:var(--ink);margin:0 0 10px">'+esc(p)+'</p>').join('')+'<div class="r" style="margin-top:12px">'+(m?'<button onclick="ovDir=-1;saveUI()">Back</button>':'<button onclick="$(\'ov\').style.display=\'none\'">OK</button>')+'</div>')}
 // ===== History: look back at past turns =====
 // H = the history (kept OUTSIDE the game state G, in its own storage key). histMute stops a second snapshot while a concession ends the turn.
 let H=null,histMute=false;const HIST_KEY='constellate-history';
@@ -1213,7 +1518,7 @@ function histSnap(kind,who){if(!G)return;if(!H||H.gid!==G.gid)H=newHist();const 
 H.snaps.push({k:kind,r:G.round,w:who==null?null:who,o:G.order.slice(),al:G.pl.filter(c=>G.alive[c]),vp:vp.slice(),rk:Object.assign({},G.rank),ap:acts(G.round),st:G.stars.map(q=>[q.id,+q.x.toFixed(3),+q.y.toFixed(3),q.o,q.f||0,q.cap?1:0]),cn:G.conns.map(q=>[q[0],q[1]]),m:(H.mv||(H.mv=[])).length});
 if(H.snaps.length>400)H.snaps.splice(0,H.snaps.length-400)}
 // ===== Move log (every game type) =====
-// H.mv = one record per move, in order, kept beside the turn snapshots: {r: round, w: player, k: kind, ..., d: delta}. Kinds: p place a Fleet (a = star), f move Fleets (a, b, n), s set a new Star (a = origin, b = new spot, c = Fuel), c connect (a, b, c), a take (a = attacker, b = target, n = Fleets used, c, D = defending Fleets, o = [retreated, held, destroyed]), m multi-attack (as a, plus ys = the other attackers, u = Fleets used by each), x concede, e game ended. Positions are board points rounded to 3 decimals; stars never move, so a point names a star. d = what the move changed, {s: stars that changed or appeared as [id,x,y,owner,fleets,capital], a: connections added, r: connections removed}, so the viewer can rebuild the board after any move from the snapshot before it. Every snapshot carries m = how many moves existed when it was taken, which is how moves are matched to turns. mvRec(info,before) is called by every move right after it changes the board (before = the board before it; by default the top of the Undo stack, which every move pushes first); mvUndo() drops the last record when Undo takes a move back.
+// H.mv = one record per move, in order, kept beside the turn snapshots: {r: round, w: player, k: kind, ..., d: delta}. Kinds: p place a Fleet (a = star), f move Fleets (a, b, n; hp, hn = Fleets that hitchhiked: their Stars and how many from each), s set a new Star (a = origin, b = new spot, c = Fuel), c connect (a, b, c), a take (a = attacker, b = target, n = Fleets used, c, D = defending Fleets, o = [retreated, held, destroyed]), m multi-attack (as a, plus ys = the other attackers, u = Fleets used by each), x concede, e game ended, (2026-10-28-b) g Gift a Star to a teammate (a = the Star, b = the teammate's Star, c), h give Fleets to a teammate (a, b, n); a take also keeps rt = where each retreating Fleet went. Positions are board points rounded to 3 decimals; stars never move, so a point names a star. d = what the move changed, {s: stars that changed or appeared as [id,x,y,owner,fleets,capital], a: connections added, r: connections removed}, so the viewer can rebuild the board after any move from the snapshot before it. Every snapshot carries m = how many moves existed when it was taken, which is how moves are matched to turns. mvRec(info,before) is called by every move right after it changes the board (before = the board before it; by default the top of the Undo stack, which every move pushes first); mvUndo() drops the last record when Undo takes a move back.
 const MV_MAX=20000,mvPos=s=>[+s.x.toFixed(3),+s.y.toFixed(3)];
 function mvComp(S){const st=new Map(),cn=new Set();S.stars.forEach(q=>st.set(q.id,[q.id,+q.x.toFixed(3),+q.y.toFixed(3),q.o,q.f||0,q.cap?1:0]));S.conns.forEach(q=>cn.add(q[0]<q[1]?q[0]+'-'+q[1]:q[1]+'-'+q[0]));return{st,cn}}
 function mvDelta(b,a){const s=[],ca=[],cr=[];a.st.forEach((v,id)=>{const o=b.st.get(id);if(!o||o.join()!==v.join())s.push(v)});a.cn.forEach(k=>{if(!b.cn.has(k))ca.push(k.split('-').map(Number))});b.cn.forEach(k=>{if(!a.cn.has(k))cr.push(k.split('-').map(Number))});return{s,a:ca,r:cr}}
@@ -1221,28 +1526,36 @@ function mvRec(info,before){if(!G||!H||H.gid!==G.gid)return;if(!H.mv)H.mv=[];if(
 function mvUndo(){if(!H||!H.mv)return;const q=H.snaps.length?H.snaps[H.snaps.length-1].m:0;if(H.mv.length>(q||0))H.mv.pop()}
 // mvClean(list) checks a list of move records from a save, link or online message and returns clean copies; one bad record drops the whole list (the viewer then simply has no move data).
 function mvClean(a){const out=[];if(!Array.isArray(a))return out;const I=(x,lo,hi)=>Number.isInteger(x)&&x>=lo&&x<=hi,P=p=>Array.isArray(p)&&p.length==2&&p.every(v=>typeof v=='number'&&isFinite(v)&&v>=0&&v<=30),Q=p=>Array.isArray(p)&&p.length==2&&p.every(v=>I(v,0,1e7));
-for(const q of a){if(out.length>=MV_MAX)break;if(!q||!I(q.r,1,RMAX)||!I(q.w,0,3)||!['p','f','s','c','a','m','x','e'].includes(q.k)||!q.d||!Array.isArray(q.d.s)||!Array.isArray(q.d.a)||!Array.isArray(q.d.r)||q.d.s.length>400||q.d.a.length>400||q.d.r.length>400)return [];
+for(const q of a){if(out.length>=MV_MAX)break;if(!q||!I(q.r,1,RMAX)||!I(q.w,0,3)||!['p','f','s','c','a','m','x','e','g','h'].includes(q.k)||!q.d||!Array.isArray(q.d.s)||!Array.isArray(q.d.a)||!Array.isArray(q.d.r)||q.d.s.length>400||q.d.a.length>400||q.d.r.length>400)return [];
 if(!q.d.s.every(v=>Array.isArray(v)&&v.length==6&&v.every(x=>typeof x=='number'&&isFinite(x)))||!q.d.a.every(Q)||!q.d.r.every(Q))return [];
 const o={r:q.r,w:q.w,k:q.k,d:{s:q.d.s,a:q.d.a,r:q.d.r}};
 if(q.a!=null){if(!P(q.a))return [];o.a=q.a}if(q.b!=null){if(!P(q.b))return [];o.b=q.b}
 if(q.ys!=null){if(!Array.isArray(q.ys)||q.ys.length>3||!q.ys.every(P))return [];o.ys=q.ys}
 ['n','c','D'].forEach(k=>{if(I(q[k],0,9999))o[k]=q[k]});
-if(Array.isArray(q.u)&&q.u.length<=4&&q.u.every(v=>I(v,0,9999)))o.u=q.u;if(Array.isArray(q.o)&&q.o.length==3&&q.o.every(v=>I(v,0,9999)))o.o=q.o;
+if(Array.isArray(q.u)&&q.u.length<=4&&q.u.every(v=>I(v,0,9999)))o.u=q.u;
+if(Array.isArray(q.rt)&&q.rt.length<=9999&&q.rt.every(P))o.rt=q.rt;
+// (new, hitchhiking) A Fleet move's riders: hp = their Stars' points, hn = how many from each (dropped if they don't match).
+if(Array.isArray(q.hp)&&Array.isArray(q.hn)&&q.hp.length==q.hn.length&&q.hp.length<=40&&q.hp.every(P)&&q.hn.every(v=>I(v,1,9999))){o.hp=q.hp;o.hn=q.hn}if(Array.isArray(q.o)&&q.o.length==3&&q.o.every(v=>I(v,0,9999)))o.o=q.o;
 out.push(o)}return out}
 // mvApply(x) (online guests): x = {b, add}: keep my first b records and replace the rest with the sender's current turn; false = my log is too short, ask for a full copy.
 function mvApply(x){if(!H||!x||!Array.isArray(x.add)||!Number.isInteger(x.b)||x.b<0||!H.mv||H.mv.length<x.b)return false;H.mv=H.mv.slice(0,x.b).concat(mvClean(x.add));return true}
-// mvName(p) = the name of the spot a position is, such as D4·b2·S5 (sector letter and number, system letter and number, then S space / L line / V vertex of the fixed-position lattice). A free-placement position that is not on a lattice spot shows its offset inside the system, D4·b2·@0.37,0.62.
+// mvName(p) = the name of the spot a position is, such as D4·b2·S5 (sector letter and number, system letter and number, then S space / L line / V vertex of the fixed-position lattice). A free-placement position that is not on a lattice spot shows its offset inside the system, D4·b2·@0.371,0.620 (3 decimals since 2026-10-28-b, so a transcript can put the Star back).
 function mvName(p){const cx=Math.floor(p[0]+1e-9),cy=Math.floor(p[1]+1e-9),ox=p[0]-cx,oy=p[1]-cy,zw=1-2*MARG,i=1+Math.round((ox-MARG)/zw*4),j=1+Math.round((oy-MARG)/zw*4);let sp='';
 if(i>=1&&i<=5&&j>=1&&j<=5){const q=FX.find(z=>z.i==i&&z.j==j);if(q&&Math.hypot(ox-(MARG+zw*(i-1)/4),oy-(MARG+zw*(j-1)/4))<.004)sp=q.k}
-return fxSys(cx,cy).replace(/ /g,'')+'·'+(sp||'@'+ox.toFixed(2)+','+oy.toFixed(2))}
+return fxSys(cx,cy).replace(/ /g,'')+'·'+(sp||'@'+ox.toFixed(3)+','+oy.toFixed(3))}
 // mvText(m) = one move as a line of text (used by the history viewer and the transcription).
 function mvText(m){const N=mvName,F=n=>n+' Fleet'+(n==1?'':'s'),C=m.c?' ['+m.c+' Fuel]':'';
-if(m.k=='p')return 'Place 1 Fleet at '+N(m.a);if(m.k=='f')return 'Move '+F(m.n||0)+' '+N(m.a)+' → '+N(m.b);if(m.k=='s')return 'Set '+N(m.a)+' → '+N(m.b)+C;if(m.k=='c')return 'Connect '+N(m.a)+' — '+N(m.b)+C;
-if(m.k=='a'||m.k=='m'){const o=m.o||[0,0,0],r=[o[0]?o[0]+' retreated':'',o[1]?o[1]+' held':'',o[2]?o[2]+' destroyed':''].filter(Boolean).join(', ');return (m.k=='m'?'Multi-attack ':'Take ')+[m.a].concat(m.ys||[]).map(N).join(' + ')+' x '+N(m.b)+(m.n?' with '+F(m.n):'')+C+(m.D?' (defending Fleets: '+(r||m.D)+')':'')}
+if(m.k=='p')return 'Place 1 Fleet at '+N(m.a);if(m.k=='f')return 'Move '+F(m.n||0)+' '+N(m.a)+' → '+N(m.b)+(m.hp&&m.hn?', '+m.hp.map((p,i)=>m.hn[i]+' hitchhiking from '+N(p)).join(', '):'');if(m.k=='s')return 'Set '+N(m.a)+' → '+N(m.b)+C;if(m.k=='c')return 'Connect '+N(m.a)+' — '+N(m.b)+C;
+// (2026-10-28-b) A multi-attack shows each attacker's Fleets "(2 + 1)", and Retreats say where they went ("2 retreated to D4·b2·S5"), grouped by Star in the order chosen; older records without rt keep the plain count.
+if(m.k=='a'||m.k=='m'){const o=m.o||[0,0,0],g=[];if(m.rt&&m.rt.length==o[0])m.rt.forEach(p=>{const k=N(p),e=g.find(x=>x[0]==k);if(e)e[1]++;else g.push([k,1])});
+const r=(g.length?g.map(x=>x[1]+' retreated to '+x[0]):[o[0]?o[0]+' retreated':'']).concat([o[1]?o[1]+' held':'',o[2]?o[2]+' destroyed':'']).filter(Boolean).join(', ');
+return (m.k=='m'?'Multi-attack ':'Take ')+[m.a].concat(m.ys||[]).map(N).join(' + ')+' x '+N(m.b)+(m.n?' with '+F(m.n)+(m.k=='m'&&m.u?' ('+m.u.join(' + ')+')':''):'')+C+(m.D?' (defending Fleets: '+(r||m.D)+')':'')}
+// (2026-10-28-b) Team transfers: Gift = a Star given to a teammate (a = the Star, b = the teammate's Star it links to); Give = Fleets given to a teammate's Star.
+if(m.k=='g')return 'Gift '+N(m.a)+' → '+N(m.b)+C;if(m.k=='h')return 'Give '+F(m.n||0)+' '+N(m.a)+' → '+N(m.b);
 if(m.k=='x')return 'Concedes';if(m.k=='e')return 'Ends the game (highest score wins)';return ''}
 // histSave() writes the history (compressed when the browser can) to its own storage key. It runs only when a turn is committed, a game starts or is loaded, or the game ends: never from render() or persist(). Writes are queued so an older one can never overwrite a newer one.
 let hq=Promise.resolve();
-function histSave(){hq=hq.then(async()=>{if(!H)return;try{const json=JSON.stringify(H);let v='j:'+json;try{if(typeof CompressionStream=='function')v='d:'+b64u(await pipe(new TextEncoder().encode(json),new CompressionStream('deflate-raw')))}catch(e){}localStorage.setItem(HIST_KEY,v)}catch(e){}}).catch(()=>{})}
+function histSave(){if(hvRO)return;hq=hq.then(async()=>{if(!H)return;try{const json=JSON.stringify(H);let v='j:'+json;try{if(typeof CompressionStream=='function')v='d:'+b64u(await pipe(new TextEncoder().encode(json),new CompressionStream('deflate-raw')))}catch(e){}localStorage.setItem(HIST_KEY,v)}catch(e){}}).catch(()=>{})}
 // histRead() loads the stored history (or nothing).
 async function histRead(){try{const v=localStorage.getItem(HIST_KEY);if(!v)return null;let json;if(v.startsWith('d:'))json=new TextDecoder().decode(await pipe(ub64(v.slice(2)),new DecompressionStream('deflate-raw')));else if(v.startsWith('j:'))json=v.slice(2);else return null;return JSON.parse(json)}catch(e){return null}}
 // prepHist(h) checks a history completely and returns it, or null if anything is off, so a bad file can never crash the viewer.
@@ -1269,7 +1582,8 @@ function hvFrames(){const sn=hv.snaps,mv=(H&&H.mv)||[],out=[];sn.forEach((q,i)=>
 const hvFi=i=>hv.fl.findIndex(f=>f.i==i&&f.j===null);
 // hvOpen() shows the viewer on the latest position. Nothing in the live game is touched, so it is safe mid-turn.
 function hvOpen(){if(!G)return;hv.snaps=(H&&H.snaps)||[];hv.idx=Math.max(0,hv.snaps.length-1);hv.fl=hvFrames();if(hv.mode=='move'){hv.fr=Math.max(0,hv.fl.length-1);hv.idx=hv.fl.length?hv.fl[hv.fr].i:0}hvEl.classList.add('on');fitTo(hview,hvs,applyH);hvDraw()}
-function hvClose(){hvEl.classList.remove('on')}
+// (2026-10-28-b) Closing a transcript shown on its own (hvRO, button "Main menu") puts back the game and history that were open and goes to the main menu.
+function hvClose(){hvEl.classList.remove('on');if(hvRO){G=hvRO.G;H=hvRO.H;hvRO=null;$('hvx').textContent='Back to game';if(G)setLook(G);menu()}}
 // hvRounds() lists the rounds that have snapshots (skipped rounds simply do not appear).
 const hvRounds=()=>[...new Set(hv.snaps.map(q=>q.r))].sort((a,b)=>a-b);
 // hvLabel(q) names a snapshot: "Round 3, after Red's turn", "Round 4, start of round", and so on.
@@ -1296,11 +1610,11 @@ $('hvq').innerHTML=sn.map((x,i)=>[x,i]).filter(([x])=>x.r==q.r).map(([x,i])=>{co
 let S=null,vp=q.vp;try{S=mf?hvMoveState(mf):snapState(q);if(mf)vp=calc(S).vp}catch(e){S=null}
 $('hvi').innerHTML=(H&&H.pl||[]).map(c=>`<div class="chip ${(mr?mr.w:q.w)===c?'on':''} ${q.al.includes(c)?'':'dead'}" style="--c:${COL[c]}">${chipIn(c,vp[c],q.al.includes(c),q.rk[c])}</div>`).join('');
 try{hw.innerHTML=boardSVG(S,calc(S).ctl,null)+(mr?hvRings(mr):'')}catch(e){hw.innerHTML='';}
-const notes=[],miss=[];if(sn[0].k=='l'||sn[0].r>1)notes.push('History before round '+sn[0].r+' is unavailable'+(sn[0].k=='l'?' (the game was loaded here).':'.'));
+const notes=[],miss=[];if(sn[0].x)notes.push(sn.length==1?'This transcript contains no history.':'The transcript this game was loaded from contains no history.');else if(sn[0].k=='l'||sn[0].r>1)notes.push('History before round '+sn[0].r+' is unavailable'+(sn[0].k=='l'?' (the game was loaded here).':'.'));
 for(let r=rs[0];r<=rs[rs.length-1];r++)if(!rs.includes(r))miss.push(r);if(miss.length)notes.push('No snapshots for round'+(miss.length>1?'s ':' ')+miss.join(', ')+' (skipped).');
 if(hv.mode=='move'&&!hv.fl.some(f=>f.j!==null))notes.push('No move-by-move record exists for this game (it was saved by an older version).');
 if(teamsOn())notes.unshift(teamLine(vp));
-if(G)notes.push('Live game: '+rdName(G.round)+(G.over?', finished.':', '+NM[cur()]+' to move.'));$('hvm').textContent=notes.join(' ')}
+if(G&&!hvRO)notes.push('Live game: '+rdName(G.round)+(G.over?', finished.':', '+NM[cur()]+' to move.'));$('hvm').textContent=notes.join(' ')}
 // hvSet(i) selects snapshot i (in move mode, the frame that is that snapshot itself).
 function hvSet(i){hv.idx=i;if(hv.mode=='move')hv.fr=Math.max(0,hvFi(i));hvDraw()}
 // The big arrows: hvArrow(d) steps one round, one turn or one move (by the mode). The small arrows and the slider above them always step by round.
@@ -1325,13 +1639,16 @@ const huiToggle=()=>{const on=document.body.classList.toggle('noui');$('hui').te
 // (new) Strength button: hides or shows the strength numbers on both boards. With it on they appear only when zoomed in, as before; with it off (button struck through) they never appear. The choice is remembered in this browser.
 const STKEY='constellate-strength';let strOn=true;try{strOn=localStorage.getItem(STKEY)!=='0'}catch(e){}
 const strApply=()=>{try{document.body.classList.toggle('nostr',!strOn);['sbtn','hsbtn'].forEach(i=>{$(i).classList.toggle('off',!strOn);$(i).setAttribute('aria-pressed',strOn?'true':'false')})}catch(e){}};
+
 const strToggle=()=>{strOn=!strOn;try{localStorage.setItem(STKEY,strOn?'1':'0')}catch(e){}strApply()};$('sbtn').onclick=strToggle;$('hsbtn').onclick=strToggle;strApply();
 $('hbtn').onclick=hvOpen;$('hvx').onclick=hvClose;$('hvtp').onclick=()=>hvArrow(-1);$('hvtn').onclick=()=>hvArrow(1);$('hvmd').onclick=hvModeCycle;$('hvsp').onclick=()=>hvSkip(-1);$('hvsn').onclick=()=>hvSkip(1);
 $('hvq').onclick=e=>{const i=e.target&&e.target.dataset&&e.target.dataset.i;if(i!==undefined&&i!=='')hvPick(i)};
-$('hzi').onclick=()=>{const r=hvs.getBoundingClientRect();zoomAt(1.4,r.width/2,r.height/2,hview,applyH)};$('hzo').onclick=()=>{const r=hvs.getBoundingClientRect();zoomAt(1/1.4,r.width/2,r.height/2,hview,applyH)};$('hfi').onclick=()=>fitTo(hview,hvs,applyH);
+$('hzi').onclick=()=>vZoom(1.4);$('hzo').onclick=()=>vZoom(1/1.4);$('hfi').onclick=vFit;
+// (2026-10-28-d) A finger on the viewer's board stops its glide, as on the live board.
+hvs.addEventListener('pointerdown',()=>{cancelAnimationFrame(hvCam.raf);hvCam.raf=0;hvCam.to=null},true);hvs.addEventListener('touchstart',()=>{cancelAnimationFrame(hvCam.raf);hvCam.raf=0;hvCam.to=null},{capture:true,passive:true});
 // The viewer board gets the same pan and zoom controls as the live one, with taps ignored (read-only).
 bindBoard(hsvg,hvs,hview,applyH,()=>{});
-addEventListener('resize',()=>{if(hvEl.classList.contains('on'))fitTo(hview,hvs,applyH)});
+addEventListener('resize',()=>{if(hvEl.classList.contains('on'))vFit()});
 // ===== Opening a shared link =====
 // clearHash() removes #g=... from the address bar so a refresh cannot reload the old state over later play.
 function clearHash(){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
@@ -1340,9 +1657,9 @@ let sharedPending=null;
 async function shareOnLoad(){const m=/^#g=(.+)$/.exec((location.hash||'').replace(/\s+/g,''));if(!m)return;
 let o;try{o=await decodeCode(m[1]);prepG(o)}catch(e){clearHash();return ov('<h1>Could not open this link</h1><p>'+esc(e&&e.message?e.message:'Unknown problem.')+'</p><div class="r"><button onclick="menu()">OK</button></div>')}
 let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}
-if(!sv&&!G){clearHash();loadObj(o);return say('Opened a shared game. '+NM[cur()]+' to move.')}
+if(!sv&&!G){clearHash();loadObj(o);say('Opened a shared game. '+NM[cur()]+' to move.');if(G.note&&!G.over)posNoteDlg();return}
 sharedPending=o;ov('<h1>Open the shared game?</h1><p>This replaces your current game in this browser.</p><div class="r"><button onclick="openShared()">Open shared game</button><button onclick="keepMine()">Keep my game</button></div>')}
-function openShared(){const o=sharedPending;sharedPending=null;clearHash();try{loadObj(o);say('Opened a shared game. '+NM[cur()]+' to move.')}catch(e){menu()}}
+function openShared(){const o=sharedPending;sharedPending=null;clearHash();try{loadObj(o);say('Opened a shared game. '+NM[cur()]+' to move.');if(G.note&&!G.over)posNoteDlg()}catch(e){menu()}}
 function keepMine(){sharedPending=null;clearHash();if(G)$('ov').style.display='none';else menu()}
 // saveUI() opens the Menu. (changed) The Menu now has pages: Game (quick save, controls, haptics, concede, and the room if online), Save/Load, and Dev. During a Hold/Retreat choice only a limited save/share Menu is offered.
 function saveUI(){if(!G)return;if(G.over)return overDlg();
@@ -1373,7 +1690,7 @@ function endGameDlg(){if(!G||G.over)return;if(pend&&pend.ph)return say('Finish t
 // doEndGame() = scores the board exactly as it stands with the end-of-round-30 scoring (finish) and shows the end screen. Online it is offered only on your own turn, and the final state then goes to everyone like any other change.
 function doEndGame(){if(!G||G.over)return;if(net.on&&!net.my.includes(cur()))return;$('ov').style.display='none';delete G.pv;mvRec({k:'e'},G);resetFlow();undo=[];finish()}
 function gamePage(){const on=net.on;
-let h='<div class="r"><button onclick="saveFile(this)">Quick save</button></div>';
+let h='<div class="r"><button onclick="saveFile(this)">Quick save</button>'+(G.note?'<button onclick="posNoteDlg(1)">Notes</button>':'')+'</div>';
 if(on)h+='<p style="margin:10px 0 2px">Room <b style="color:var(--ink)">'+esc(net.room)+'</b>. '+esc(net.status||'Connected.')+'</p>'+seatRows(true);
 h+='<div class="r" style="margin-top:8px"><button onclick="placeToggle(this)"'+(G.pm?' disabled':'')+'>'+placeLabel()+'</button>'+(G.cpu?'<button onclick="cpuSpeedCycle(this)">'+cpuSpeedLabel()+'</button>':'')+'<button onclick="themeCycle(this)">'+themeLabel()+'</button></div><div class="r" style="margin-top:8px"><button onclick="cycleControls(this)">'+ctlLabel()+'</button><button onclick="pvToggle(this)">'+pvLabel()+'</button></div>';
 if(on)h+='<div class="r" style="margin-top:8px"><button onclick="netCopy()">Copy room link</button><button onclick="netLeave()">'+(net.role=='host'?'End online game':'Leave game')+'</button></div><p id="nm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>';
@@ -1386,7 +1703,7 @@ return h}
 function slPage(){if(net.on)return '<p>Online games can be saved. Loading files and share codes are off so everyone\'s board stays identical. The file name includes the room code.</p><div class="r"><button onclick="saveFile(this)">Save file</button></div>';
 let host=SHARE_BASE;try{host=new URL(SHARE_BASE).host}catch(e){}
 const shareBtn=navigator.share?'<button onclick="shareLink()">Share link</button>':'';prepCodes();
-return `<p style="margin:0 0 8px;color:var(--mut)">Links open ${esc(host)}.</p><div class="r"><button onclick="toFile()">Save file</button><button onclick="$('lf').click()">Load file</button></div><div class="r" style="margin-top:8px">${shareBtn}<button onclick="copyOut('link')">Copy link</button><button onclick="copyOut('code')">Copy code</button></div><label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="ih" onchange="prepCodes()" style="width:22px;height:22px;flex:none"><span>Include history in link and code <small id="hl2" style="color:var(--mut)"></small></span></label><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="3" placeholder="Paste a save code, a share link or save JSON here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>`}
+return `<p style="margin:0 0 8px;color:var(--mut)">Links open ${esc(host)}.</p><div class="r"><button onclick="toFile()">Save file</button><button onclick="$('lf').click()">Load file</button></div><div class="r" style="margin-top:8px">${shareBtn}<button onclick="copyOut('link')">Copy link</button><button onclick="copyOut('code')">Copy code</button></div><div class="r" style="margin-top:8px"><button onclick="trCopy()">Copy transcript</button><button onclick="trSave(this)">Save transcript</button><button onclick="trEdit()">Edit</button></div><label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="ih" onchange="prepCodes()" style="width:22px;height:22px;flex:none"><span>Include history in link and code <small id="hl2" style="color:var(--mut)"></small></span></label><input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><textarea id="sc" rows="3" placeholder="Paste a transcript, a save code, a share link or save JSON here" spellcheck="false" autocapitalize="off" autocomplete="off" style="width:100%;box-sizing:border-box;font:12px monospace;margin-top:8px"></textarea><div class="r" style="margin-top:8px"><button onclick="pasteLoad()">Paste &amp; load</button><button onclick="fromText()">Load box</button><button onclick="clearBox()">Clear</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>`}
 // devPage() = Dev page: developer tools. Add new tools here.
 function devPage(){return '<p style="margin:0 0 8px;color:var(--mut)">Developer tools. More will be added here.</p><div class="r" style="align-items:center"><span style="flex:1">Set round</span><input id="dr" type="number" min="1" max="'+RMAX+'" value="'+G.round+'" style="width:64px;font:inherit;min-height:44px;box-sizing:border-box"><button onclick="setRound()">Set</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Range border</span><button onclick="rngToggle(this)">'+(rngOn?'On':'Off')+'</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Zoom in on computers</span><button onclick="camCpuToggle(this)">'+(camCpu?'On':'Off')+'</button></div>'+holdRows()+'<div class="r" style="margin-top:8px"><button onclick="cpuDlg(null,\'menu\')">CPU Designer</button></div>'}
 // (new) rngToggle(b) = the Dev page's Range border switch (rngOn, on by default): flips it, relabels the button and redraws. It moves to the in-game settings when the Settings menu is reworked.
@@ -1495,7 +1812,7 @@ const k=fwAuto(a);if(k>0)fwMove(a,n,k,u);const m=elim();say(txt+' for '+c+' Fuel
 // pvStar(a,p,c,msg) makes a Star preview (Move preview on) carrying fl = the Fleets that go along when it is confirmed (fwAuto now; with 'ask' and Fleets that can move, fwAsk asks first).
 function pvStar(a,p,c,msg){const k=fwAuto(a),q={k:'s',a:a.id,x:p.x,y:p.y,c};if(k)q.fl=k;pvAdd(q,msg+(k?' '+k+' Fleet'+(k>1?'s':'')+' will go with it.':''));if(fask()=='ask'&&fFree(a)>0)fwAsk(a.id,null,q.i)}
 // fwAsk(aid,nid,pi) asks how many of Star aid's Fleets go with the Star just set from it: nid = that Star (they move at once, fwGo), or pi = the Star preview (the number is kept on it as fl, and they move when it is confirmed).
-function fwAsk(aid,nid,pi){const a=by(aid),f=a?fFree(a):0;if(f<1)return;ov(`<h1>Move Fleets with the new Star?</h1><p>This Star has ${f} Fleet${f>1?'s':''} that can move. Fleets that go count as moved this turn.</p><div class="r" style="flex-wrap:wrap">${[...Array(f+1)].map((_,i)=>`<button onclick="fwGo(${aid},${nid},${pi},${i})">${i?i:'None'}</button>`).join('')}</div>`)}
+function fwAsk(aid,nid,pi){const a=by(aid),f=a?fFree(a):0;if(f<1)return;const q=pi!=null&&(G.pv||[]).find(z=>z.i==pi);ovQ(`<h1>Move Fleets with the new Star?</h1><p>This Star has ${f} Fleet${f>1?'s':''} that can move. Fleets that go count as moved this turn.</p><div class="r" style="flex-wrap:wrap">${[...Array(f+1)].map((_,i)=>`<button onclick="fwGo(${aid},${nid},${pi},${i})">${i?i:'None'}</button>`).join('')}</div>`,[a,nid!=null?nid:q])}
 function fwGo(aid,nid,pi,k){$('ov').style.display='none';if(pi!=null){const q=(G.pv||[]).find(z=>z.i==pi);if(q){if(k)q.fl=k;else delete q.fl;say(k?k+' Fleet'+(k>1?'s':'')+' will go with the Star when it is confirmed.':'The Fleets stay.')}return render()}
 const a=by(aid),n=by(nid);if(k>0&&a&&n&&fFree(a)>=k){undo.push(JSON.stringify(G));fwMove(a,n,k,null);say(k+' Fleet'+(k>1?'s':'')+' moved with the Star.')}render()}
 // mcMin() ('min') spreads as few Fleets as the multi-attack needs over its attackers, in the order they were added; while even every Fleet is not enough, every Fleet is used.
@@ -1505,16 +1822,16 @@ function mcMin(){if(!multi||multi.t==null)return;let need=str(by(multi.t))+1-mul
 // Holding still over a system that has room for HOLD.prec seconds opens the precision placement menu there: for the last HOLD.ring seconds the crosshair doubles in size and a ring goes round it from the top. A placement with fixed positions opens the menu on every drop. Stars set this turn (G.nw) and Star previews can be pressed and dragged the same way to move them, inside their system or, as the Fuel allows, to another one (the Fuel is worked out again from the origin). With a Star selected, holding an empty system in its Fuel range opens the menu too (same crosshair and ring, at the finger). Your Fleets can be dragged by their badge too: they snap to the Stars they can reach, and letting go moves them (asking how many when more could go than the distance needs).
 // (2026-10-27-h) In Place, Move or Multi, holding a Star leaves that mode and drags it. Holding an opponent's Star starts a multi-attack on it; then dragging from the target to one of your Stars, or from your Star to the target, adds that Star as an attacker (as tapping it would). Near an edge of the board area the board scrolls under the drag (ddEdge).
 // MAP: HOLD, holdSet, holdToggle = timings and Dev switches | ddDown, ddOwns, ddMove, ddUp, ddCancel, ddPan = the board's hooks (bindBoard) | ddCan, ddStar, ddMul = may a drag start, kinds | ddPick = what a press would drag | ddEdge = edge scrolling | ddEval = where the dragged thing would go and why it can't | ddSettle, ddPrec, ddqTick = hold still for precision | ddDrop, ddPlace, ddFleetDrop, ddFleetGo = letting go | stMove = move a Star or Star preview | ddSVG, ddCross, ddPaint = what is drawn | nwAdd, nwOf = Stars set this turn | exRun = check a spot with the moved Star off the board | mvFix = keep the move log true when a Star moves. Computers never drag.
-// HOLD = the timings and switches (Dev page, remembered on this device under HKEY2; placeholders): drag = seconds to hold a Star or Fleet badge before it lifts, prec = seconds of holding still before the precision placement menu opens, ring = the last part of prec, when the crosshair doubles and the ring goes round, inst = a press on a Star or Fleet badge that moves starts the drag at once (panning starts from anywhere else; holding still still works), pon = holding still opens the precision placement menu at all (the "precision view"; fixed positions open it on a drop regardless). It moves to the controls settings later.
-const HKEY2='constellate-holds';let HOLD={drag:.25,prec:1.5,ring:.5,inst:1,pon:1};try{const o=JSON.parse(localStorage.getItem(HKEY2)||'{}');['drag','prec','ring'].forEach(k=>{if(typeof o[k]=='number'&&o[k]>=0&&o[k]<=10)HOLD[k]=o[k]});['inst','pon'].forEach(k=>{if(o[k]===0||o[k]===1)HOLD[k]=o[k]})}catch(e){}
+// HOLD = the timings and switches (Dev page, remembered on this device under HKEY2; placeholders): drag = seconds to hold a Star or Fleet badge before it lifts, prec = seconds of holding still before the precision placement menu opens, ring = the last part of prec, when the crosshair doubles and the ring goes round, inst = a press on a Star or Fleet badge that moves starts the drag at once (panning starts from anywhere else; holding still still works), pon = holding still opens the precision placement menu at all (the "precision view"; fixed positions open it on a drop regardless), ta = Touch assist, the Sector rule for taps (secNear; off unless switched on, Shmorden 2026-10-29). It moves to the controls settings later.
+const HKEY2='constellate-holds';let HOLD={drag:.25,prec:1.5,ring:.5,inst:1,pon:1,ta:0};try{const o=JSON.parse(localStorage.getItem(HKEY2)||'{}');['drag','prec','ring'].forEach(k=>{if(typeof o[k]=='number'&&o[k]>=0&&o[k]<=10)HOLD[k]=o[k]});['inst','pon','ta'].forEach(k=>{if(o[k]===0||o[k]===1)HOLD[k]=o[k]})}catch(e){}
 const holdMs=()=>HOLD.drag*1000,precMs=()=>Math.max(100,HOLD.prec*1000),ringMs=()=>Math.min(precMs(),HOLD.ring*1000);
 function holdSave(){try{localStorage.setItem(HKEY2,JSON.stringify(HOLD))}catch(e){}}
 // holdSet(k,inp) = a Dev page number box changed: seconds for HOLD[k] (0 to 10; anything else puts the box back). holdToggle(k,b) flips a Dev page switch and relabels its button.
 function holdSet(k,inp){const v=parseFloat(inp.value);if(isFinite(v)&&v>=0&&v<=10){HOLD[k]=v;holdSave()}inp.value=HOLD[k]}
-function holdToggle(k,b){HOLD[k]=HOLD[k]?0:1;holdSave();if(b)b.textContent=k=='inst'?(HOLD.inst?'Instant':'Hold'):(HOLD.pon?'On':'Off')}
-// holdRows() = the Dev page rows for the above, and the Fleet ask switch (FASK: Ask, All, Min).
+function holdToggle(k,b){HOLD[k]=HOLD[k]?0:1;holdSave();if(b)b.textContent=k=='inst'?(HOLD.inst?'Instant':'Hold'):(HOLD[k]?'On':'Off')}
+// holdRows() = the Dev page rows for the above (Touch assist among them), and the Fleet ask switch (FASK: Ask, All, Min).
 function holdRows(){const num=(k,t)=>'<div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">'+t+'</span><input type="number" min="0" max="10" step="0.05" value="'+HOLD[k]+'" onchange="holdSet(\''+k+'\',this)" style="width:72px;font:inherit;min-height:44px;box-sizing:border-box"></div>';
-return '<div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Fleet ask</span><button onclick="faCycle(this)">'+faLabel()+'</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Drag starts</span><button onclick="holdToggle(\'inst\',this)">'+(HOLD.inst?'Instant':'Hold')+'</button></div>'+num('drag','Drag hold (s)')+'<div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Precision view</span><button onclick="holdToggle(\'pon\',this)">'+(HOLD.pon?'On':'Off')+'</button></div>'+num('prec','Precision hold (s)')+num('ring','Precision ring (s)')}
+return '<div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Fleet ask</span><button onclick="faCycle(this)">'+faLabel()+'</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Drag starts</span><button onclick="holdToggle(\'inst\',this)">'+(HOLD.inst?'Instant':'Hold')+'</button></div>'+num('drag','Drag hold (s)')+'<div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Touch assist</span><button onclick="holdToggle(\'ta\',this)">'+(HOLD.ta?'On':'Off')+'</button></div><div class="r" style="margin-top:8px;align-items:center"><span style="flex:1">Precision view</span><button onclick="holdToggle(\'pon\',this)">'+(HOLD.pon?'On':'Off')+'</button></div>'+num('prec','Precision hold (s)')+num('ring','Precision ring (s)')}
 // ddP = a press that may become a drag or a hold: {x,y: board point, cx,cy: its system, k: 'drag' (pk = the Star or Fleets to drag, from ddPick) or 'prec' (an empty system to open the menu on), inst: the press was right on what it would drag, so moving starts the drag (HOLD.inst), t0: when it began}. dg = the drag in progress: ddPick's fields ({k: 'new' a new Star from origin a | 'pv' Star preview i | 'st' Star id set this turn | 'fl' the free Fleets on Star a, a: origin id, c0: Fuel the moved Star already cost, m: what exRun takes off the board, x,y: where it was}) plus n = Fuel the drag may spend (Fuel left + c0; for Fleets: how many), ox,oy = offset from the finger (a moved Star does not jump to the finger), e = ddEval of the last finger point, h = where the finger last settled, sc = which systems have room (worked out once each), p0 = when the finger settled over a system with room (precision timing; null otherwise), z = crosshair size (1 or growing to 2), arc = how far the ring has gone round (0 to 1). ddT = the press timer, ddPT = the precision timer, ddRaf = the crosshair animation, ddFired = a hold opened the menu and the finger is still down (its lift must not tap). ddFl (declared beside resetFlow, which clears it) = the path drawn while "Move how many Fleets?" waits after a Fleet drag.
 let ddP=null,dg=null,ddT=0,ddPT=0,ddRaf=0,ddFired=false,ddBarT=0,ddBarA=null;
 // nwAdd(n,a) remembers that Star n was set this turn from Star a (G.nw = [[new id, origin id]], cleared by beginTurn; saves and online games carry it). nwOf(id) = the origin of Star id when it was set this turn and may still be moved: both still yours, not a Capital, and its only Connection is the line it was set with (a later Connection to it would change that line's Fuel too, so then it stays put; Undo can still take it back).
@@ -1550,8 +1867,8 @@ const ms=holdMs();if(ms>300)ddBar('Hold to drag',ms);ddT=setTimeout(ddFire,ms)}
 function ddOwns(){return !!dg||ddFired}
 function ddDisarm(){clearTimeout(ddT);ddT=0;ddP=null;if(!dg){ddBarHide();cancelAnimationFrame(ddRaf);ddRaf=0;const q=document.getElementById('ddq');if(q)q.remove()}}
 function ddCancel(all){ddDisarm();if(all&&dg)ddStop('Drag cancelled.')}
-// ddPan(x,y): the finger moved far enough to pan. With an Instant press on something to drag, the drag starts here instead and the board does not pan (returns true); otherwise the press is forgotten and the board pans.
-function ddPan(x,y){if(ddP&&ddP.inst&&ddP.k=='drag'){clearTimeout(ddT);ddT=0;ddFire();if(dg){ddMove(x,y);return true}}ddDisarm();return false}
+// ddPan(x,y): the finger moved far enough to pan. With an Instant press on something to drag, the drag starts here instead and the board does not pan (returns true; mvd: it has moved, so it is never a tap); otherwise the press is forgotten and the board pans.
+function ddPan(x,y){if(ddP&&ddP.inst&&ddP.k=='drag'){clearTimeout(ddT);ddT=0;ddFire();if(dg){dg.mvd=1;ddMove(x,y);return true}}ddDisarm();return false}
 // ddqTick() = the crosshair and ring for a 'prec' press (a Star selected, holding an empty system): nothing at first, then for the last HOLD.ring seconds the crosshair at the press point (kept inside the system) grows to double size and the ring goes round. It draws into #ddq on the board.
 function ddqTick(){ddRaf=0;if(!ddP||ddP.k!='prec')return;const el=performance.now()-ddP.t0,s=precMs()-ringMs();if(el>=s){let q=document.getElementById('ddq');if(!q){W.insertAdjacentHTML('beforeend','<g id="ddq"></g>');q=document.getElementById('ddq')}
 const X=Math.min(ddP.cx+1-MARG,Math.max(ddP.cx+MARG,ddP.x)),Y=Math.min(ddP.cy+1-MARG,Math.max(ddP.cy+MARG,ddP.y));q.innerHTML=ddCross(X,Y,R_STAR+R_STROKE+.05,1+Math.min(1,(el-s)/150),Math.min(1,(el-s)/ringMs()),false)}ddRaf=requestAnimationFrame(ddqTick)}
@@ -1559,23 +1876,28 @@ const X=Math.min(ddP.cx+1-MARG,Math.max(ddP.cx+MARG,ddP.x)),Y=Math.min(ddP.cy+1-
 function ddFire(){ddT=0;const P0=ddP;ddP=null;ddBarHide();cancelAnimationFrame(ddRaf);ddRaf=0;const q=document.getElementById('ddq');if(q)q.remove();if(!P0||!ddCan())return;tapAt=Date.now();buzz(30);
 if(P0.k=='prec'){const a=by(sel);if(!a)return;ddFired=true;return fxOpen(a,P0.cx,P0.cy,cost(a,{x:P0.x,y:P0.y}))}
 // (new) A held opponent's Star becomes the target of a new multi-attack, and the drag goes on from it ('mt'). Any other drag that is not part of a multi-attack leaves the mode it was in (Place, Move, Multi) first.
+// (new 2026-10-29-d) tp = the press point and the state before the drag (mode, selection, flows), so letting go without moving can still count as a tap (ddUp). Not for an opponent's Star (holding it is how a multi-attack starts), nor for a Star set this turn or a Star preview unless the hold left Place, Move or Multi (a hold and a few pixels is how one is nudged inside its system).
+const tp=P0.pk.k=='mx'||((P0.pk.k=='st'||P0.pk.k=='pv')&&!['p','m','x'].includes(mode))?null:{x:P0.x,y:P0.y,mode,sel,flow,multi,pvSel,hl,ddFl,hhS};
 const k=Object.assign({},P0.pk);if(k.k=='mx'){resetFlow();mode='x';multi={t:k.a,att:[],step:'sel'};k.k='mt'}else if(!ddMul(k.k)){resetFlow();mode=k.k=='fl'?'m':'s'}
 const fl=k.k=='fl',mv=k.k=='pv'||k.k=='st';sel=null;pvSel=null;hint=null;
-dg=Object.assign({},k,{n:fl?fFree(by(k.a)):ddMul(k.k)?0:G.ap+k.c0,ox:mv?k.x-P0.x:0,oy:mv?k.y-P0.y:0,e:null,h:null,sc:{},p0:null,z:1,arc:0});if(fl)dg.bfs=ddBfs(by(k.a),dg.n);
+dg=Object.assign({},k,{n:fl?fFree(by(k.a)):ddMul(k.k)?0:G.ap+k.c0,ox:mv?k.x-P0.x:0,oy:mv?k.y-P0.y:0,tp,mvd:0,e:null,h:null,sc:{},p0:null,z:1,arc:0});if(fl)dg.bfs=ddBfs(by(k.a),dg.n);
 dg.e=ddEval(dg,P0.x,P0.y);render();ddMsg();ddSettle(P0.x,P0.y)}
 // ddMove(x,y): the finger moved during a drag. The dragged thing follows (ddEval, ddPaint); a move of more than 8 pixels from where the finger settled starts the precision timing again from here.
-function ddMove(x,y){if(!dg)return;dg.e=ddEval(dg,x,y);ddPaint();if(!dg.h||Math.hypot(x-dg.h.x,y-dg.h.y)*view.k>8)ddSettle(x,y);dg.sx=x*view.k+view.x;dg.sy=y*view.k+view.y;if(!ddEdgeRaf)ddEdgeRaf=requestAnimationFrame(ddEdge)}
+function ddMove(x,y){if(!dg)return;if(dg.tp&&!dg.mvd&&Math.hypot(x-dg.tp.x,y-dg.tp.y)*view.k>TAP_TOL)dg.mvd=1;dg.e=ddEval(dg,x,y);ddPaint();if(!dg.h||Math.hypot(x-dg.h.x,y-dg.h.y)*view.k>8)ddSettle(x,y);dg.sx=x*view.k+view.x;dg.sy=y*view.k+view.y;if(!ddEdgeRaf)ddEdgeRaf=requestAnimationFrame(ddEdge)}
 // (new) Edge scrolling (Shmorden, 2026-10-27). ddEdge() runs each frame while a drag's finger (dg.sx,sy: its point in the board area) is within EDGE px of an edge of the board area: the board scrolls that way, faster the closer the finger is to the edge (up to EDGE_V px a frame), and the drag follows the board point now under the finger. It stops when the finger leaves the edge zone, or once that side of the board is EDGE px inside the screen.
 const EDGE=44,EDGE_V=12;let ddEdgeRaf=0;
 function ddEdge(){ddEdgeRaf=0;if(!dg||dg.sx==null)return;const r=$('st').getBoundingClientRect(),sp=v=>v<EDGE?(EDGE-Math.max(0,v))/EDGE*EDGE_V:0,N=NSYS(G)*view.k;let vx=sp(dg.sx)-sp(r.width-dg.sx),vy=sp(dg.sy)-sp(r.height-dg.sy);
 if(vx>0&&view.x>=EDGE)vx=0;if(vx<0&&view.x+N<=r.width-EDGE)vx=0;if(vy>0&&view.y>=EDGE)vy=0;if(vy<0&&view.y+N<=r.height-EDGE)vy=0;if(!vx&&!vy)return;
 view.x+=vx;view.y+=vy;apply();const x=(dg.sx-view.x)/view.k,y=(dg.sy-view.y)/view.k;dg.e=ddEval(dg,x,y);ddPaint();ddSettle(x,y);ddEdgeRaf=requestAnimationFrame(ddEdge)}
 // ddUp(x,y): the finger lifted. Ends the gesture; a drag drops where the finger was (ddDrop).
-function ddUp(x,y){ddFired=false;if(!dg)return;tapAt=Date.now();ddPrecOff();cancelAnimationFrame(ddEdgeRaf);ddEdgeRaf=0;const d=dg,e=ddEval(d,x,y);dg=null;ddDrop(d,e)}
+function ddUp(x,y){ddFired=false;if(!dg)return;tapAt=Date.now();ddPrecOff();cancelAnimationFrame(ddEdgeRaf);ddEdgeRaf=0;const d=dg;dg=null;
+// (new 2026-10-29-d, urgent iPhone fix) A press that never moved past TAP_TOL is a tap, however long it was held: the drag is dropped, the state from before it is put back and the tap runs where the finger went down. Before this, a tap held over HOLD.drag (0.25 s, a normal tap on iPhone) started a drag and placed nothing, so Fleets seemed impossible to place.
+if(d.tp&&!d.mvd){({mode,sel,flow,multi,pvSel,hl,ddFl,hhS}=d.tp);return tap(d.tp.x,d.tp.y)}
+ddDrop(d,ddEval(d,x,y))}
 // ddRoom(d,cx,cy) = ddSysOK for drag d, remembered per system (it tries many spots).
 function ddRoom(d,cx,cy){const k=cx+','+cy;if(!(k in d.sc))d.sc[k]=ddSysOK(by(d.a),cx,cy,d.m);return d.sc[k]}
 // ddBfs(a,n) = from Star a along your own Connections, up to n steps: {d: distance of each Star reached, par: the Star before it} (the same search as moveF, so a drop goes where a tap would).
-function ddBfs(a,n){const me=cur(),d=new Map([[a.id,0]]),par=new Map(),q=[a];while(q.length){const x=q.shift();if(d.get(x.id)>=n)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u&&u.o==me&&!d.has(u.id)){d.set(u.id,d.get(x.id)+1);par.set(u.id,x.id);q.push(u)}}})}return {d,par}}
+function ddBfs(a,n){return fBfs(a,n,hhOK())}
 // ddEval(d,x,y) = where drag d would be with the finger at board point (x,y): {x,y: the point drawn, cx,cy: its system, c: Fuel from the origin, out: past the Fuel range (the point is then the nearest one inside the range), err: why it can't go there ('' = it can), t: the Star it snapped to}.
 // Fleets snap to the Star they can reach in the finger's system, or the nearest one within 0.8 of a system. A new Star snaps to a Star in the finger's system: yours (connect), a teammate's (Connect / Gift) or an opponent's (take), checked as a tap would. Otherwise the Star is kept inside its system's legal area; with fixed positions the question is only whether the system has room, as the menu chooses the spot.
 function ddEval(d,x,y){x+=d.ox;y+=d.oy;const a=by(d.a),N=NSYS(G);let cx=Math.floor(x),cy=Math.floor(y);
@@ -1611,7 +1933,7 @@ starSet(a,p,c,'Star set')}
 // ddFleetDrop(d,a,e): Fleets let go on a Star they can reach move there through moveF (a preview with Move preview on). A group of n travels up to n Connections, so when more Fleets could go than the distance needs, "Move how many Fleets?" asks (from the distance up to all of them) while the path stays drawn (ddFl); otherwise all of them go. Anywhere else nothing moves.
 function ddFleetDrop(d,a,e){const t=e.t!=null&&by(e.t);if(!t)return say(e.err+' Nothing moved.');const dist=d.bfs.d.get(t.id),n=d.n;if(n<=dist)return ddFleetGo(a.id,t.id,n);
 const path=[t.id];while(path[0]!=a.id)path.unshift(d.bfs.par.get(path[0]));ddFl=path;render();
-ov(`<h1>Move how many Fleets?</h1><p>The Star is ${dist} Connection${dist>1?'s':''} away, so at least ${dist} must go together.</p><div class="r" style="flex-wrap:wrap">${[...Array(n-dist+1)].map((_,i)=>`<button onclick="ddFleetGo(${a.id},${t.id},${dist+i})">${dist+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow();render()">Cancel</button></div>`)}
+ovQ(`<h1>Move how many Fleets?</h1><p>The Star is ${dist} Connection${dist>1?'s':''} away, so at least ${dist} must go together.</p><div class="r" style="flex-wrap:wrap">${[...Array(n-dist+1)].map((_,i)=>`<button onclick="ddFleetGo(${a.id},${t.id},${dist+i})">${dist+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow();render()">Cancel</button></div>`,path)}
 function ddFleetGo(aid,tid,n){$('ov').style.display='none';ddFl=null;const a=by(aid),t=by(tid);if(!a||!t)return render();mode='m';sel=aid;flow={src:aid,n};moveF(t)}
 // stMove(m,a,p,c,nm) moves Star preview or Star m (from origin a) to point p, which now costs c Fuel: the Fuel it cost before is given back and c is paid (the caller has checked it fits and the spot is legal). nm = the spot's name for the message, or ''. A Star preview stays a preview and is selected (Undo puts it back; nothing is logged). A Star set this turn moves on the board, its Fleets with it; the move log is rewritten to match (mvFix) and Undo puts both back.
 function stMove(m,a,p,c,nm){const at=nm?' to '+nm:'';
@@ -1802,7 +2124,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-27-l';
+const BUILD='2026-10-29-e';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -1948,16 +2270,25 @@ function soundToggle(b){soundOn=!soundOn;try{localStorage.setItem(SKEY2,soundOn?
 // calm() = no animations wanted. camMs() = how long one camera move takes. camRaf = the running camera frame, camT = the pause before the zoom in, camWait = the zoom in waits for the round screen to close, camEnd = when the running camera move ends (performance.now() time; the screens wait for it), camKey = the turn last seen by camTurn (null = do not animate the next change: a new or loaded game). rpOn = the round screen is showing.
 const calm=()=>animMode=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
 const camMs=()=>Math.round(animMs()*1.5);
-let camRaf=0,camT=null,camWait=false,camEnd=0,camKey=null,rpOn=false;
+let camRaf=0,camT=null,camWait=false,camEnd=0,camKey=null,rpOn=false,camTo=null;
 // camStop() stops any camera move and cancels a waiting zoom in (the player took over the view, or the board was refitted).
-function camStop(){cancelAnimationFrame(camRaf);camRaf=0;clearTimeout(camT);camT=null;camWait=false;camEnd=0}
+function camStop(){cancelAnimationFrame(camRaf);camRaf=0;clearTimeout(camT);camT=null;camWait=false;camEnd=0;camTo=null}
 // camGo(to,ms,then) moves the live view to to = {k,x,y} in ms (eased in and out), then calls then. The zoom changes evenly in scale steps (log k) while the board point in the middle of the screen slides in a straight line, so it reads as one camera move rather than a drift plus a zoom. A view that is already there finishes at once.
-function camGo(to,ms,then){cancelAnimationFrame(camRaf);camRaf=0;const r=st.getBoundingClientRect(),cx=r.width/2,cy=r.height/2,k0=view.k,p0={x:(cx-view.x)/k0,y:(cy-view.y)/k0},p1={x:(cx-to.x)/to.k,y:(cy-to.y)/to.k};
-const done=()=>{camRaf=0;camEnd=0;if(then)then()},set=()=>{view.k=to.k;view.x=to.x;view.y=to.y;applyNow()};
+// (2026-10-28-d) camTo = where the running move ends, so a quick second press of + or - zooms on from there (camZoom).
+function camGo(to,ms,then){cancelAnimationFrame(camRaf);camRaf=0;camTo={k:to.k,x:to.x,y:to.y};const r=st.getBoundingClientRect(),cx=r.width/2,cy=r.height/2,k0=view.k,p0={x:(cx-view.x)/k0,y:(cy-view.y)/k0},p1={x:(cx-to.x)/to.k,y:(cy-to.y)/to.k};
+const done=()=>{camRaf=0;camEnd=0;camTo=null;if(then)then()},set=()=>{view.k=to.k;view.x=to.x;view.y=to.y;applyNow()};
 if(ms<=0||(Math.abs(k0-to.k)<.01*k0&&Math.abs(view.x-to.x)<1&&Math.abs(view.y-to.y)<1)){set();return done()}
 const t0=performance.now(),ease=t=>t<.5?4*t*t*t:1-Math.pow(2-2*t,3)/2,l0=Math.log(k0),l1=Math.log(to.k);camEnd=t0+ms;
 const step=now=>{const t=Math.min(1,(now-t0)/ms),e=ease(t),k=Math.exp(l0+(l1-l0)*e);view.k=k;view.x=cx-(p0.x+(p1.x-p0.x)*e)*k;view.y=cy-(p0.y+(p1.y-p0.y)*e)*k;applyNow();if(t<1)camRaf=requestAnimationFrame(step);else{set();done()}};
 camRaf=requestAnimationFrame(step)}
+// (2026-10-28-d, Shmorden: every fit and board movement glides) camZoom(f) = the + and - buttons: zoom by f around the middle of the board area, from where a running move is heading, as a camera move. vAnim(V,box,ap,to,ms,h) = the same glide for another view (the History viewer: hview), h = {raf} its own frame handle; vZoom / vFit = its buttons.
+function camZoom(f){const r=st.getBoundingClientRect(),b=camRaf&&camTo?camTo:view,px=r.width/2,py=r.height/2,nk=Math.max(view.min*.9,Math.min(90,b.k*f)),q=nk/b.k;camGo({k:nk,x:px-(px-b.x)*q,y:py-(py-b.y)*q},calm()?0:animMs())}
+function vAnim(V,box,ap,to,ms,h){cancelAnimationFrame(h.raf);h.raf=0;h.to=to;const r=box.getBoundingClientRect(),cx=r.width/2,cy=r.height/2,k0=V.k,p0={x:(cx-V.x)/k0,y:(cy-V.y)/k0},p1={x:(cx-to.x)/to.k,y:(cy-to.y)/to.k},set=()=>{V.k=to.k;V.x=to.x;V.y=to.y;h.to=null;ap()};
+if(ms<=0||calm()){h.raf=0;return set()}const t0=performance.now(),ease=t=>t<.5?4*t*t*t:1-Math.pow(2-2*t,3)/2,l0=Math.log(k0),l1=Math.log(to.k);
+const step=now=>{const t=Math.min(1,(now-t0)/ms),e=ease(t),k=Math.exp(l0+(l1-l0)*e);V.k=k;V.x=cx-(p0.x+(p1.x-p0.x)*e)*k;V.y=cy-(p0.y+(p1.y-p0.y)*e)*k;ap();if(t<1)h.raf=requestAnimationFrame(step);else{h.raf=0;set()}};h.raf=requestAnimationFrame(step)}
+const hvCam={raf:0,to:null};
+function vZoom(f){const r=hvs.getBoundingClientRect(),b=hvCam.raf&&hvCam.to?hvCam.to:hview,px=r.width/2,py=r.height/2,nk=Math.max(hview.min*.9,Math.min(90,b.k*f)),q=nk/b.k;vAnim(hview,hvs,applyH,{k:nk,x:px-(px-b.x)*q,y:py-(py-b.y)*q},animMs(),hvCam)}
+function vFit(){const T={};fitTo(T,hvs,()=>{});hview.min=T.min;vAnim(hview,hvs,applyH,T,camMs(),hvCam)}
 // camFit() = the Fit view (see fitTo) without applying it.
 function camFit(){const V={};fitTo(V,st,()=>{});return V}
 // camAx(c,k,W) = the board's offset along one axis of the screen (width or height W) so that board position c is in the middle at zoom k: centered when the whole board fits that way, else clamped so no empty space shows past a board edge (the board edge stays at the screen edge).
@@ -1996,7 +2327,7 @@ if(secs.every(([x,y])=>x>=vx0-e&&y>=vy0-e&&x+3<=vx1+e&&y+3<=vy1+e))return;
 const x0=Math.min(vx0,...secs.map(q=>q[0])),y0=Math.min(vy0,...secs.map(q=>q[1])),x1=Math.max(vx1,...secs.map(q=>q[0]+3)),y1=Math.max(vy1,...secs.map(q=>q[1]+3)),F=camFit(),kk=Math.max(F.min,Math.min(view.k,r.width/(x1-x0+.2),r.height/(y1-y0+.2)));
 camStop();camGo({k:kk,x:camAx((x0+x1)/2,kk,r.width),y:camAx((y0+y1)/2,kk,r.height)},camMs())}
 function camDef(){const a=(pend&&pend.ph)?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null;if(!a){camDefKey=null;return}
-const k=a.b+'/'+a.att.join(',')+'/'+G.round+'/'+G.ti;if(k==camDefKey)return;camDefKey=k;if(calm())return;const v=camDefView(a);if(!v)return;camStop();camGo(v,camMs())}
+const k=a.b+'/'+a.att.join(',')+'/'+G.round+'/'+G.ti;if(k==camDefKey)return;camDefKey=k;if(calm()||defQ())return;const v=camDefView(a);if(!v)return;camStop();camGo(v,camMs())}
 // camIn() zooms in on the player whose turn it is (camBox); not for a computer while CPU speed is Instant or the Dev switch camCpu is off (it then only zooms out).
 function camIn(){camWait=false;if(!G||G.over||calm())return;const c=cur();if(cpuOf(c)&&(cpuMs==0||!camCpu))return;const t=camBox(c);if(t)camGo(t,camMs())}
 // ----- Why a player is out (round and end screens) -----
@@ -2126,7 +2457,7 @@ t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});se
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=19,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=21,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
@@ -2157,7 +2488,7 @@ if(lkOpen&&lkCtx=='net')lkDrawCol()}
 function netSave(){try{if(!net.on)return localStorage.removeItem(SKEY);localStorage.setItem(SKEY,JSON.stringify({role:net.role,room:net.room,n:net.n,sz:net.sz,pm:net.pm,team:net.team||null,look:net.look||null,tok:net.tok,started:net.started,seats:net.role=='host'?net.seats.map(s=>({c:s.c,kind:s.kind,tok:s.tok,took:!!s.took})):null}))}catch(e){}}
 function netSess(){try{return JSON.parse(localStorage.getItem(SKEY))}catch(e){return null}}
 // netClearFlow() resets the half-finished things on THIS device when the board is replaced from outside: selection, multi-attack, pending attack. It keeps the ringed Retreat choices if a question for this device is waiting.
-function netClearFlow(){sel=null;flow=null;multi=null;pend=null;undo=[];mode='';hl=net.rq?net.rq.nb:[];$('hold').style.display=net.rq&&net.rq.hOK&&!net.rq.sent?'block':''}
+function netClearFlow(){sel=null;flow=null;multi=null;pend=null;undo=[];mode='';hl=net.rq?net.rq.nb:[];$('hold').style.display=''}
 // ---- Sending ----
 // relay(m,skip) sends m to every connected guest except the one it came from.
 function relay(m,skip){net.seats.forEach(s=>{if(s.conn&&s.conn!==skip)nsend(s.conn,m)})}
@@ -2194,12 +2525,12 @@ function applyFull(m){let g;try{g=prepG(JSON.parse(m.g))}catch(e){return nsend(n
 ov2Close(1);G=g;adoptHistory(m.h);if(m.seats)net.seats=m.seats;net.started=true;net.lobby=false;net.rq=null;net.acting=false;netClearFlow();net.lastG=JSON.stringify(G);net.hsent=H?H.snaps.length:0;
 $('ov').onclick=null;$('ov').style.display='none';camKey=null;camSnap=null;fit();if(m.start)camWait=true;say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
 // netAsk(m) arrives on the DEFENDER's device: show the ringed Retreat spots and Hold button, or clear them.
-function netAsk(m){if(!net.my.includes(m.def))return;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,u:m.ask.u,dec:m.ask.dec,sent:false}:null;
-if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display=net.rq.hOK?'block':'';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX))}else{hl=[];$('hold').style.display='';say('')}render()}
+function netAsk(m){if(!net.my.includes(m.def))return;if(m.ask&&!(m.ask.dec&&m.ask.dec.length))defCamK=null;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,u:m.ask.u,dec:m.ask.dec,sent:false}:null;
+if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display='';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX))}else{hl=[];$('hold').style.display='';say('')}render();defDlg()}
 // netAns(v) arrives on the ATTACKER's device: the defender chose Hold ('H') or a Retreat star (its id). Apply it exactly like a local choice.
 function netAns(v){if(!pend||!pend.ph||!pend.rem)return;if(v==='H')defHold();else if(typeof v=='number'&&pend.nb.includes(v)&&by(v))defTap(by(v),true)}
 // netAnswer(v) sends this device's answer and waits; netDefTap(x,y) turns a board tap into an answer; holdBtn() is the Hold button for both local and remote defenders.
-function netAnswer(v){net.rq.sent=true;if(Array.isArray(net.rq.dec))net.rq.dec=net.rq.dec.concat([v]);$('hold').style.display='';netOut({t:'ans',v});say('Answer sent. Waiting for '+NM[cur()]+'.');render()}
+function netAnswer(v){net.rq.sent=true;defClose();if(Array.isArray(net.rq.dec))net.rq.dec=net.rq.dec.concat([v]);$('hold').style.display='';netOut({t:'ans',v});say('Answer sent. Waiting for '+NM[cur()]+'.');render()}
 function netDefTap(x,y){const cx=Math.floor(x),cy=Math.floor(y),t=cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null;if(t&&t.id==net.rq.b&&net.rq.hOK)return holdBtn();if(!t||!net.rq.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX));if(t.o!=net.rq.def){holdGive=t.id;return holdAsk(t)}netAnswer(t.id)}
 function holdBtn(){if(net.on&&net.rq&&!net.rq.sent&&!net.my.includes(cur())){if(net.rq.hOK)netAnswer('H');return}if(pend&&pend.rem)return;defHold()}
 // netWaitMsg() is the note the ATTACKER sees while a remote defender decides.
@@ -2255,7 +2586,7 @@ function netCpuLvl(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host'
 function netToggleSeat(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host')return;if(s.kind=='open')s.kind='local';else if(s.kind=='local'&&!s.took)s.kind='open';netPush()}
 // netTakeover(c) (host): play an offline player's color from this device. They get it back automatically if they return.
 function netTakeover(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host'||s.online)return;s.kind='local';s.took=true;netPush();
-if(pend&&pend.ph&&pend.def===c){pend.rem=false;$('hold').style.display=pend.hOK||pend.hX?'block':'';say(NM[c]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(pend.hOK,pend.hX))}
+if(pend&&pend.ph&&pend.def===c){pend.rem=false;setTimeout(defDlg,0);say(NM[c]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(pend.hOK,pend.hX))}
 netMenu();render()}
 // ---- Guest side ----
 // netJoin(code): join a room. Keeps the same seat key if this browser was in this room before.
@@ -2766,7 +3097,7 @@ if(cpuStall>3||!endBlock()){cpuStall=0;endTurn();return 'ended'}
 if(++cpuStall>3){cpuStall=0;endTurn();return 'ended'}return 'acted'}
 catch(e){cpuErr=e&&e.message?e.message+' | '+((e.stack||'').split('\n')[1]||''):String(e);cpuStall++;if(cpuStall>3){cpuStall=0;try{endTurn()}catch(x){}return 'ended'}return 'acted'}
 finally{cpuRun=false;cpuTab=null}}
-// The timer: after every redraw, if it is a computer's turn on this device, make its next move after a pause. It waits while a dialog is open (the Menu, the round popup) or a person is answering a Hold/Retreat question.
+// The timer: after every redraw, if it is a computer's turn on this device, make its next move after a pause. It waits while a dialog is open (the Menu, the round popup) or a person is answering a Hold/Retreat question, and (tutorial, preview only) while a lesson's text is still being read.
 function cpuSched(){if(!cpuTimers||cpuTimer||!G||G.over||!cpuHere(cur()))return;cpuTimer=setTimeout(cpuTick,cpuMs)}
 function cpuTick(){cpuTimer=null;if(!G||G.over||!cpuHere(cur()))return;const ovOn=$('ov').style.display&&$('ov').style.display!='none';if(ovOn||dfOn||(pend&&pend.ph)){cpuTimer=setTimeout(cpuTick,250);return}
 // (new) Never move while the board is still zooming (camBusy): look again shortly.
@@ -2776,7 +3107,7 @@ const r=cpuStep();if(r=='wait'&&!cpuTimer)cpuTimer=setTimeout(cpuTick,250);else 
 function cpuAuto(max){let n=0;while(G&&!G.over&&n<max){const o=$('ov');if(o.onclick)o.onclick();o.style.display='none';const r=cpuStep();if(r=='idle'||r=='wait')break;n++}return n}
 
 // On window resize refit the board, fit it now, and show the start menu.
-addEventListener('resize',fit);fit();menu();
+addEventListener('resize',()=>fit());fit(1);menu();
 // (new) If the address carries #g=..., open that shared game (and react if the address changes later).
 addEventListener('hashchange',shareOnLoad);shareOnLoad();
 // (new) A room link (#r=CODE) opens the Join screen with the code filled in.
