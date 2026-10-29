@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-29-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-29-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -566,6 +566,8 @@ if(team&&!teamErr(pl,team,cpu)){G.team={};pl.forEach(c=>{G.team[c]=team[c]})}
 overHidden=false;H=newHist();histSnap('s');histSave();camKey=null;camSnap=null;render();camWait=true;roundPop()}
 // sysStar(x,y) finds the star in system column x, row y (or nothing).
 const sysStar=(x,y)=>G.stars.find(s=>Math.floor(s.x)==x&&Math.floor(s.y)==y);
+// (new 2026-10-29-d) secNear(cx,cy,bx,by,L) = the Sector rule for taps (Shmorden, 2026-10-29: Fleets were too hard to place on iPhone, where a System is about 18 px wide). When the tapped system (cx,cy) is empty (no Star, no Star preview), the Star of list L in the same Sector that is nearest the tap point (bx,by), or null. Used to select your Star and to place a Fleet (tap).
+function secNear(cx,cy,bx,by,L){if(!sysFree(cx,cy))return null;const X=Math.floor(cx/3),Y=Math.floor(cy/3);let b=null,d=1e9;L.forEach(s=>{if(Math.floor(s.x/3)==X&&Math.floor(s.y/3)==Y){const e=Math.hypot(s.x-bx,s.y-by);if(e<d){d=e;b=s}}});return b}
 // Helpers. by(id) = star with that id. cs(s) = how many connections star s has. str(s) = strength = connections + fleets. capStar(c) = color c's capital.
 const by=id=>G.stars.find(q=>q.id==id),cs=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).length,str=s=>cs(s)+(s.f||0),capStar=c=>G.stars.find(s=>s.cap&&s.co==c);
 // beginTurn() resets per-turn things: used stars, Fuel, mode (nothing selected). pool = Fleets to place = your rank from the round-start snapshot (G.rank): 1 + the number of distinct scores higher than yours, so tied players share a rank (dense ranks, RULES.md 2.2). Clears moved-fleet flags. capOnly is true if your capital is held by someone else.
@@ -1113,7 +1115,8 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
  // (new) In the Fleets pair, a tap that doesn't place a Fleet, choose a group, finish a move or open a Fleet popup leaves the mode (back to nothing selected); placeF / moveF have already said why.
   // (changed) In Place, a tap on one of your Stars only ever places a Fleet: when it can't, it says why and Place stays on (it never selects the Star). Anything else leaves Place, as before.
   // (2026-10-27-j) With a Star selected the tap aims, and aims at the system tapped (whatever is in it), never at a Fleet badge reaching in from a neighbor.
-  const t=((mode=='m'||(onB&&!(mode=='s'&&sel!=null)))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
+  // (new 2026-10-29-d) Sector rule (secNear): in Place, a tap on an empty system places on the nearest Star in its Sector that can take a Fleet.
+  let t=((mode=='m'||(onB&&!(mode=='s'&&sel!=null)))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);if(!t&&G.pool>0){const q=secNear(cx,cy,bx,by,placeable());if(q)return placeF(q)}placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
   if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}const u=undo.length;moveF(t);if(!flow&&undo.length==u&&$('ov').style.display!='flex')modeOff(1);return}
   // (new) Multi mode has its own tap handler. (new) An empty system before a target is chosen leaves Multi.
   // (changed) An empty system leaves Multi even with a target chosen (Shmorden, 2026-10-27).
@@ -1121,6 +1124,8 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
   // (new) Move preview: tapping the end of a dashed move selects it (Confirm / Cancel appear); any other tap drops that selection and carries on.
   if((mode=='s'||!mode)&&!np){const pp=pvAt(cx,cy,t,bx,by);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}
 // Nothing selected yet: tapping your own unused star selects it; anything else shows a hint.
+ // (new 2026-10-29-d) Sector rule (secNear): a tap on an empty system selects your nearest Star in its Sector that has not acted (Set mode).
+ if(!sel&&!t){const q=secNear(cx,cy,bx,by,G.stars.filter(s=>s.o==me&&!G.used.includes(s.id)));if(q){t=q;mode='s'}}
  if(!sel){if(t&&t.o==me){if(G.used.includes(t.id))say('That Star already acted, or is new, this turn.');else{sel=t.id;say('Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets). Tap an empty system to set a Star, your Star to connect, or an enemy Star to take'+(teamsOn()?', or a teammate\'s Star to connect or gift.':'.'))}}else if(!t&&mode)return modeOff();else say(mode?'Tap one of your Stars to start a move.':'Tap one of your Stars or Fleets to start a move.');return render()}
 // a = the selected star. Tapping it again deselects.
  const a=G.stars.find(s=>s.id==sel);if(t===a){sel=null;say('');return render()}
@@ -1392,18 +1397,21 @@ function bindBoard(svgEl,box,V,ap,onTap0,hk){const onTap=(x,y)=>{tapAt=Date.now(
 // (new) Any touch, click or wheel on the live board stops a turn-change camera move (camStop), so the player is never fought for the view.
 ['touchstart','pointerdown','wheel'].forEach(n=>svgEl.addEventListener(n,()=>{if(V===view)camStop()},{passive:true}));
 let tMoved=0,tMulti=0,tPrev=null,tLast=null,t0p=null;
+// (new 2026-10-29-d, urgent iPhone fix) A touch's later events (move, lift) go to the element the finger first touched, and never reach the board if a redraw has removed that element (as when a held Star starts a drag): the board then missed the lift and stayed in a drag no one was making. So each touched element gets the move and lift handlers too (tTg = those elements, removed when the last finger lifts), and once() makes sure each event is handled only once when it also bubbles up to the board.
+let tE=null;const tTg=new Set(),once=f=>e=>{if(e===tE)return;tE=e;f(e)},tOpt={passive:false};
 // Touch events (used on Apple devices): take over the touch so Safari cannot scroll or zoom the page.
-svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;t0p=ts[0];if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
-svgEl.addEventListener('touchmove',e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length)return;
+svgEl.addEventListener('touchstart',e=>{if(!useTouch())return;e.preventDefault();const g=e.target;if(g&&g!==svgEl&&!tTg.has(g)){tTg.add(g);g.addEventListener('touchmove',tMv,tOpt);g.addEventListener('touchend',tEd,tOpt);g.addEventListener('touchcancel',tEd,tOpt)}const ts=tPts(e);if(e.touches.length==1){tMoved=0;tMulti=0;t0p=ts[0];if(hk)bxy(ts[0].x,ts[0].y,hk.down)}else{tMulti=1;tMoved=99;if(hk)hk.cancel(1)}tPrev=ts[0];tLast=gestOf(ts)},{passive:false});
+const tMv=once(e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length)return;
 if(hk&&hk.owns()){tPrev=ts[0];if(ts.length==1)bxy(ts[0].x,ts[0].y,hk.move);return}
 if(ts.length==1){const dx=ts[0].x-tPrev.x,dy=ts[0].y-tPrev.y;tPrev=ts[0];if(tMoved<=TAP_TOL&&t0p)tMoved=Math.hypot(ts[0].x-t0p.x,ts[0].y-t0p.y);if(tMoved>TAP_TOL){if(hk&&bxy(ts[0].x,ts[0].y,hk.pan))return;V.x+=dx;V.y+=dy;ap()}}
-else{const g=gestOf(ts),r=box.getBoundingClientRect();V.x+=g.cx-tLast.cx;V.y+=g.cy-tLast.cy;zoomAt(g.d/tLast.d,g.cx-r.left,g.cy-r.top,V,ap);tLast=g}},{passive:false});
-const tEnd=e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);
+else{const g=gestOf(ts),r=box.getBoundingClientRect();V.x+=g.cx-tLast.cx;V.y+=g.cy-tLast.cy;zoomAt(g.d/tLast.d,g.cx-r.left,g.cy-r.top,V,ap);tLast=g}});
+svgEl.addEventListener('touchmove',tMv,tOpt);
+const tEnd=e=>{if(!useTouch())return;e.preventDefault();const ts=tPts(e);if(!ts.length){tTg.forEach(g=>{g.removeEventListener('touchmove',tMv,tOpt);g.removeEventListener('touchend',tEd,tOpt);g.removeEventListener('touchcancel',tEd,tOpt)});tTg.clear()}
 if(hk&&hk.owns()){if(!ts.length){if(e.type=='touchend'&&e.changedTouches.length){const t=e.changedTouches[0];bxy(t.clientX,t.clientY,hk.up)}else hk.cancel(1)}if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}return}
 if(hk&&!ts.length)hk.cancel();
 if(e.type=='touchend'&&!ts.length&&!tMulti&&tMoved<=TAP_TOL&&e.changedTouches.length){const t=t0p||{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY},r=box.getBoundingClientRect();onTap((t.x-r.left-V.x)/V.k,(t.y-r.top-V.y)/V.k)}
 if(ts.length){tPrev=ts[0];tLast=gestOf(ts)}};
-svgEl.addEventListener('touchend',tEnd,{passive:false});svgEl.addEventListener('touchcancel',tEnd,{passive:false});
+const tEd=once(tEnd);svgEl.addEventListener('touchend',tEd,tOpt);svgEl.addEventListener('touchcancel',tEd,tOpt);
 // Pointer events (used everywhere else: mouse, Android, Quest): same behaviour.
 const P=new Map();let moved=0,twoFinger=0,last=null,p0={x:0,y:0,tol:8};
 const gest=()=>{const v=[...P.values()],a=v[0],b=v[1]||v[0];return{cx:(a.x+b.x)/2,cy:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1}};
@@ -2038,8 +2046,8 @@ const ms=holdMs();if(ms>300)ddBar('Hold to drag',ms);ddT=setTimeout(ddFire,ms)}
 function ddOwns(){return !!dg||ddFired}
 function ddDisarm(){clearTimeout(ddT);ddT=0;ddP=null;if(!dg){ddBarHide();cancelAnimationFrame(ddRaf);ddRaf=0;const q=document.getElementById('ddq');if(q)q.remove()}}
 function ddCancel(all){ddDisarm();if(all&&dg)ddStop('Drag cancelled.')}
-// ddPan(x,y): the finger moved far enough to pan. With an Instant press on something to drag, the drag starts here instead and the board does not pan (returns true); otherwise the press is forgotten and the board pans.
-function ddPan(x,y){if(ddP&&ddP.inst&&ddP.k=='drag'){clearTimeout(ddT);ddT=0;ddFire();if(dg){ddMove(x,y);return true}}ddDisarm();return false}
+// ddPan(x,y): the finger moved far enough to pan. With an Instant press on something to drag, the drag starts here instead and the board does not pan (returns true; mvd: it has moved, so it is never a tap); otherwise the press is forgotten and the board pans.
+function ddPan(x,y){if(ddP&&ddP.inst&&ddP.k=='drag'){clearTimeout(ddT);ddT=0;ddFire();if(dg){dg.mvd=1;ddMove(x,y);return true}}ddDisarm();return false}
 // ddqTick() = the crosshair and ring for a 'prec' press (a Star selected, holding an empty system): nothing at first, then for the last HOLD.ring seconds the crosshair at the press point (kept inside the system) grows to double size and the ring goes round. It draws into #ddq on the board.
 function ddqTick(){ddRaf=0;if(!ddP||ddP.k!='prec')return;const el=performance.now()-ddP.t0,s=precMs()-ringMs();if(el>=s){let q=document.getElementById('ddq');if(!q){W.insertAdjacentHTML('beforeend','<g id="ddq"></g>');q=document.getElementById('ddq')}
 const X=Math.min(ddP.cx+1-MARG,Math.max(ddP.cx+MARG,ddP.x)),Y=Math.min(ddP.cy+1-MARG,Math.max(ddP.cy+MARG,ddP.y));q.innerHTML=ddCross(X,Y,R_STAR+R_STROKE+.05,1+Math.min(1,(el-s)/150),Math.min(1,(el-s)/ringMs()),false)}ddRaf=requestAnimationFrame(ddqTick)}
@@ -2047,19 +2055,24 @@ const X=Math.min(ddP.cx+1-MARG,Math.max(ddP.cx+MARG,ddP.x)),Y=Math.min(ddP.cy+1-
 function ddFire(){ddT=0;const P0=ddP;ddP=null;ddBarHide();cancelAnimationFrame(ddRaf);ddRaf=0;const q=document.getElementById('ddq');if(q)q.remove();if(!P0||!ddCan())return;tapAt=Date.now();buzz(30);
 if(P0.k=='prec'){const a=by(sel);if(!a)return;ddFired=true;return fxOpen(a,P0.cx,P0.cy,cost(a,{x:P0.x,y:P0.y}))}
 // (new) A held opponent's Star becomes the target of a new multi-attack, and the drag goes on from it ('mt'). Any other drag that is not part of a multi-attack leaves the mode it was in (Place, Move, Multi) first.
+// (new 2026-10-29-d) tp = the press point and the state before the drag (mode, selection, flows), so letting go without moving can still count as a tap (ddUp). Not for an opponent's Star (holding it is how a multi-attack starts), nor for a Star set this turn or a Star preview unless the hold left Place, Move or Multi (a hold and a few pixels is how one is nudged inside its system).
+const tp=P0.pk.k=='mx'||((P0.pk.k=='st'||P0.pk.k=='pv')&&!['p','m','x'].includes(mode))?null:{x:P0.x,y:P0.y,mode,sel,flow,multi,pvSel,hl,ddFl,hhS};
 const k=Object.assign({},P0.pk);if(k.k=='mx'){resetFlow();mode='x';multi={t:k.a,att:[],step:'sel'};k.k='mt'}else if(!ddMul(k.k)){resetFlow();mode=k.k=='fl'?'m':'s'}
 const fl=k.k=='fl',mv=k.k=='pv'||k.k=='st';sel=null;pvSel=null;hint=null;
-dg=Object.assign({},k,{n:fl?fFree(by(k.a)):ddMul(k.k)?0:G.ap+k.c0,ox:mv?k.x-P0.x:0,oy:mv?k.y-P0.y:0,e:null,h:null,sc:{},p0:null,z:1,arc:0});if(fl)dg.bfs=ddBfs(by(k.a),dg.n);
+dg=Object.assign({},k,{n:fl?fFree(by(k.a)):ddMul(k.k)?0:G.ap+k.c0,ox:mv?k.x-P0.x:0,oy:mv?k.y-P0.y:0,tp,mvd:0,e:null,h:null,sc:{},p0:null,z:1,arc:0});if(fl)dg.bfs=ddBfs(by(k.a),dg.n);
 dg.e=ddEval(dg,P0.x,P0.y);render();ddMsg();ddSettle(P0.x,P0.y)}
 // ddMove(x,y): the finger moved during a drag. The dragged thing follows (ddEval, ddPaint); a move of more than 8 pixels from where the finger settled starts the precision timing again from here.
-function ddMove(x,y){if(!dg)return;dg.e=ddEval(dg,x,y);ddPaint();if(!dg.h||Math.hypot(x-dg.h.x,y-dg.h.y)*view.k>8)ddSettle(x,y);dg.sx=x*view.k+view.x;dg.sy=y*view.k+view.y;if(!ddEdgeRaf)ddEdgeRaf=requestAnimationFrame(ddEdge)}
+function ddMove(x,y){if(!dg)return;if(dg.tp&&!dg.mvd&&Math.hypot(x-dg.tp.x,y-dg.tp.y)*view.k>TAP_TOL)dg.mvd=1;dg.e=ddEval(dg,x,y);ddPaint();if(!dg.h||Math.hypot(x-dg.h.x,y-dg.h.y)*view.k>8)ddSettle(x,y);dg.sx=x*view.k+view.x;dg.sy=y*view.k+view.y;if(!ddEdgeRaf)ddEdgeRaf=requestAnimationFrame(ddEdge)}
 // (new) Edge scrolling (Shmorden, 2026-10-27). ddEdge() runs each frame while a drag's finger (dg.sx,sy: its point in the board area) is within EDGE px of an edge of the board area: the board scrolls that way, faster the closer the finger is to the edge (up to EDGE_V px a frame), and the drag follows the board point now under the finger. It stops when the finger leaves the edge zone, or once that side of the board is EDGE px inside the screen.
 const EDGE=44,EDGE_V=12;let ddEdgeRaf=0;
 function ddEdge(){ddEdgeRaf=0;if(!dg||dg.sx==null)return;const r=$('st').getBoundingClientRect(),sp=v=>v<EDGE?(EDGE-Math.max(0,v))/EDGE*EDGE_V:0,N=NSYS(G)*view.k;let vx=sp(dg.sx)-sp(r.width-dg.sx),vy=sp(dg.sy)-sp(r.height-dg.sy);
 if(vx>0&&view.x>=EDGE)vx=0;if(vx<0&&view.x+N<=r.width-EDGE)vx=0;if(vy>0&&view.y>=EDGE)vy=0;if(vy<0&&view.y+N<=r.height-EDGE)vy=0;if(!vx&&!vy)return;
 view.x+=vx;view.y+=vy;apply();const x=(dg.sx-view.x)/view.k,y=(dg.sy-view.y)/view.k;dg.e=ddEval(dg,x,y);ddPaint();ddSettle(x,y);ddEdgeRaf=requestAnimationFrame(ddEdge)}
 // ddUp(x,y): the finger lifted. Ends the gesture; a drag drops where the finger was (ddDrop).
-function ddUp(x,y){ddFired=false;if(!dg)return;tapAt=Date.now();ddPrecOff();cancelAnimationFrame(ddEdgeRaf);ddEdgeRaf=0;const d=dg,e=ddEval(d,x,y);dg=null;ddDrop(d,e)}
+function ddUp(x,y){ddFired=false;if(!dg)return;tapAt=Date.now();ddPrecOff();cancelAnimationFrame(ddEdgeRaf);ddEdgeRaf=0;const d=dg;dg=null;
+// (new 2026-10-29-d, urgent iPhone fix) A press that never moved past TAP_TOL is a tap, however long it was held: the drag is dropped, the state from before it is put back and the tap runs where the finger went down. Before this, a tap held over HOLD.drag (0.25 s, a normal tap on iPhone) started a drag and placed nothing, so Fleets seemed impossible to place.
+if(d.tp&&!d.mvd){({mode,sel,flow,multi,pvSel,hl,ddFl,hhS}=d.tp);return tap(d.tp.x,d.tp.y)}
+ddDrop(d,ddEval(d,x,y))}
 // ddRoom(d,cx,cy) = ddSysOK for drag d, remembered per system (it tries many spots).
 function ddRoom(d,cx,cy){const k=cx+','+cy;if(!(k in d.sc))d.sc[k]=ddSysOK(by(d.a),cx,cy,d.m);return d.sc[k]}
 // ddBfs(a,n) = from Star a along your own Connections, up to n steps: {d: distance of each Star reached, par: the Star before it} (the same search as moveF, so a drop goes where a tap would).
@@ -2290,7 +2303,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-29-c';
+const BUILD='2026-10-29-d';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
