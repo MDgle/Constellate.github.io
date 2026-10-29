@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-29-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-29-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -85,13 +85,18 @@ svg .t{display:none}svg[data-z="1"] .t{display:block}
 #msg:empty{display:none}
 /* #bar: the bottom button bar. */
 #bar{display:flex;gap:6px;padding:8px 10px;background:var(--panel);border-top:1px solid var(--line)}
-/* (new, tutorial) #tut: the tutorial panel above the bottom bar during a lesson: the lesson's name, one paragraph of its text, Back / Next
-   (on the last page: Back; Previous lesson / Next lesson; Tutorials / Main menu). A fixed height so the board does not resize page to page;
-   .off hides it (keeping its space) while a game popup is open. Placeholder look. */
-#tut{display:none;flex-direction:column;height:200px;box-sizing:border-box;padding:10px 12px 8px;background:var(--panel);border-top:2px solid var(--line)}
+/* (new, tutorial) #tut: the tutorial panel above the bottom bar during a lesson (Shmorden, 2026-10-29): as low as its page lets it be.
+   .ti = the page: the lesson's name, Hide, "N of M", one paragraph, Back / Next (the Lesson complete page: Back; Main menu, Tutorials;
+   Previous lesson, Next lesson). Hide slides the panel down (its height shrinks while the page stays pinned to its top) into .tshow,
+   a thin "Show tutorial" strip; tapping it slides the page back up. .off hides it (keeping its space) while a game popup is open.
+   Placeholder look. */
+#tut{display:none;flex-direction:column;justify-content:flex-start;overflow:hidden;box-sizing:border-box;background:var(--panel);border-top:2px solid var(--line)}
 #tut.on{display:flex}#tut.off{visibility:hidden}
-#tut .th{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}#tut .th b{font-size:18px;flex:1}#tut .th span{color:var(--mut);font-size:13px}
-#tut .tx{flex:1;overflow:auto;color:var(--ink);margin-bottom:6px}#tut .r{display:flex;gap:8px}#tut .r button{flex:1;font-weight:500;min-height:36px}
+#tut .ti{padding:8px 12px 8px;flex:none}#tut.hid .ti{display:none}
+#tut .tshow{display:none;width:100%;height:30px;min-height:0;border:0;border-radius:0;background:transparent;color:var(--mut);font-size:13px;padding:0}#tut.hid .tshow{display:block}
+#tut .th{display:flex;align-items:center;gap:8px;margin-bottom:2px}#tut .th b{font-size:17px;flex:1;min-width:0}#tut .th span{color:var(--mut);font-size:13px}
+#tut .th button{min-height:0;height:26px;padding:0 10px;font-size:13px}
+#tut .tx{color:var(--ink);margin-bottom:8px}#tut .r{display:flex;gap:8px}#tut .r+.r{margin-top:6px}#tut .r button{flex:1;font-weight:500;min-height:34px}
 /* button: the shared look for all buttons, at least 44px so they are easy to tap. */
 button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:0 12px}
 /* #en: the End turn button takes the spare width and is dark. */
@@ -217,6 +222,7 @@ How it works:
 - A line that starts and ends with === begins a section. Keep those lines as they are, except the name after the colon, which you may change
   (after "TUTORIAL:" it is the page heading; after "LESSON N:" it is the lesson's name on the Tutorial page and its heading).
 - Every other line is one paragraph. In a lesson, each paragraph is one page of the tutorial panel (Back / Next). Empty lines are skipped. Lines up here, before the first section, are never shown.
+- LESSON COMPLETE is the page after every lesson's last paragraph (the page with the lesson buttons).
 - Plain text only: no HTML. Any characters work, except the word made of < / script >, which would end this block.
 - The lessons are checked by tools/lesson_tests.py (it finds each lesson by its section, not by the words), and the steps must still
   match what each lesson's position lets the player do. The positions are in docs/scenarios/lesson-*.txt.
@@ -234,6 +240,9 @@ Each full row or column of Sectors you control gives you 1 bonus point.
 
 === TUTORIAL: Tutorial ===
 Each lesson sets up a short game and tells you what to do. Menu > Game > Notes shows the steps again.
+
+=== LESSON COMPLETE ===
+Lesson complete
 
 === LESSON 1: Navigation ===
 You are Blue, bottom left. This lesson shows how to look around and select.
@@ -496,22 +505,34 @@ function tutAsk(i){let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}if(!sv
 // so its move doesn't cut in before the lesson has been read. There is no lesson checking yet (docs/TUTORIAL.md).
 async function tutGo(i){const s=ptSec('LESSON '+(i+1));let o;try{o=await decodeCode(TUT_POS[i]);prepG(o)}catch(e){return ov('<h1>Could not open this lesson</h1><p>'+esc(e&&e.message?e.message:'Unknown problem.')+'</p><div class="r"><button onclick="tutDlg()">OK</button></div>')}
  o.note={t:s.t||'Lesson '+(i+1),x:s.p.join('\n')};o.tut={i,p:0,cw:!!(o.cpu&&o.cpu[o.order[o.ti]])};loadObj(o);say(o.note.t);tutSync()}
-// tutHold() = a computer that moves first in a lesson waits: the player has not yet paged to the lesson's last page.
+// tutHold() = a computer that moves first in a lesson waits: the player has not yet paged to the lesson's last paragraph (its Goal).
 const tutHold=()=>!!(G&&G.tut&&G.tut.cw&&G.tut.p<ptSec('LESSON '+(G.tut.i+1)).p.length-1);
-// tutDraw() fills the panel with the current page: the lesson's name, "page of pages", the paragraph, and the buttons.
-function tutDraw(){const t=G.tut,s=ptSec('LESSON '+(t.i+1)),n=s.p.length,p=Math.min(t.p,n-1),last=p>=n-1,B=(f,l,off)=>'<button onclick="'+f+'"'+(off?' disabled':'')+'>'+l+'</button>';
- $('tut').innerHTML='<div class="th"><b>'+esc(s.t||'Lesson '+(t.i+1))+'</b><span>'+(p+1)+' of '+n+'</span></div><div class="tx">'+esc(s.p[p]||'')+'</div>'+
-  (last?'<div class="r">'+B('tutPage(-1)','Back',p==0)+'</div><div class="r" style="margin-top:6px">'+B('tutAsk('+(t.i-1)+')','Previous lesson',t.i==0)+B('tutAsk('+(t.i+1)+')','Next lesson',t.i>=TUT_POS.length-1)+'</div><div class="r" style="margin-top:6px">'+B('tutDlg()','Tutorials')+B('mainMenu()','Main menu')+'</div>'
-  :'<div class="r">'+B('tutPage(-1)','Back',p==0)+B('tutPage(1)','Next')+'</div>')}
-// tutPage(d) = Back (-1) / Next (+1) on the panel. Reaching the last page lets a waiting computer move (cw is cleared).
-function tutPage(d){const t=G&&G.tut;if(!t)return;const n=ptSec('LESSON '+(t.i+1)).p.length;t.p=Math.max(0,Math.min(n-1,t.p+d));if(t.p>=n-1)t.cw=false;persist();tutDraw()}
+// tutDraw() fills the panel with the current page. Pages 0..n-1 are the lesson's paragraphs (Back / Next); page n is the Lesson complete
+// page (its words: the PLAYER TEXT block's LESSON COMPLETE section), with Back; Main menu, Tutorials; Previous lesson, Next lesson.
+// The panel is as tall as its page, so when that changes the board refits to the space left (tutH = the height last fitted to).
+let tutH=0;
+function tutDraw(){const t=G.tut,s=ptSec('LESSON '+(t.i+1)),n=s.p.length,p=Math.min(t.p,n),done=p>=n,B=(f,l,off)=>'<button onclick="'+f+'"'+(off?' disabled':'')+'>'+l+'</button>',el=$('tut');
+ el.innerHTML='<div class="ti"><div class="th"><b>'+esc(s.t||'Lesson '+(t.i+1))+'</b><button onclick="tutHide(1)">Hide</button><span>'+(p+1)+' of '+(n+1)+'</span></div><div class="tx">'+esc(done?(ptSec('LESSON COMPLETE').p[0]||'Lesson complete'):(s.p[p]||''))+'</div>'+
+  (done?'<div class="r">'+B('tutPage(-1)','Back')+'</div><div class="r">'+B('mainMenu()','Main menu')+B('tutDlg()','Tutorials')+'</div><div class="r">'+B('tutAsk('+(t.i-1)+')','Previous lesson',t.i==0)+B('tutAsk('+(t.i+1)+')','Next lesson',t.i>=TUT_POS.length-1)+'</div>'
+  :'<div class="r">'+B('tutPage(-1)','Back',p==0)+B('tutPage(1)','Next')+'</div>')+'</div><button class="tshow" onclick="tutHide(0)">Show tutorial</button>';
+ el.classList.toggle('hid',!!t.hid);if(!tutAnim&&el.offsetHeight!=tutH){tutH=el.offsetHeight;fit()}}
+// tutPage(d) = Back (-1) / Next (+1) on the panel. Reaching the last paragraph lets a waiting computer move (cw is cleared).
+function tutPage(d){const t=G&&G.tut;if(!t)return;const n=ptSec('LESSON '+(t.i+1)).p.length;t.p=Math.max(0,Math.min(n,t.p+d));if(t.p>=n-1)t.cw=false;persist();tutDraw()}
+// tutHide(h) = Hide (h = 1) / Show tutorial (h = 0). The panel's height glides between the page and the thin strip (0.3 s); the page
+// stays pinned to the panel's top, so it slides down behind the bottom bar and back up. Hiding swaps to the strip when the glide ends;
+// showing swaps to the page first. With reduce motion or Animations Off it just jumps. The board refits once it settles.
+let tutAnim=null;
+function tutHide(h){const t=G&&G.tut,el=$('tut');if(!t)return;t.hid=!!h;persist();if(tutAnim){clearTimeout(tutAnim);tutAnim=null}
+ const from=el.offsetHeight,end=()=>{tutAnim=null;el.style.transition='';el.style.height='';el.classList.toggle('hid',t.hid);tutH=el.offsetHeight;fit()};
+ if(calm())return end();
+ el.style.height=from+'px';if(!h)el.classList.remove('hid');const to=h?30:el.scrollHeight;el.offsetHeight;
+ el.style.transition='height .3s ease';el.style.height=to+'px';tutAnim=setTimeout(end,320)}
 // tutSync() shows the panel during a lesson and hides it otherwise; while a game popup (any #ov dialog: a Fleet question, the Defence
 // call, the Menu, the round screen) is open it steps aside (.off, keeping its space) and comes back on the same page when the popup
-// closes. Run whenever #ov opens or closes (a MutationObserver below) and when a lesson starts. The board refits when the panel
-// appears or goes, as the board area changes size.
+// closes. Run whenever #ov opens or closes (a MutationObserver below) and when a lesson starts.
 let tutOn=false;
-function tutSync(){const on=!!(G&&G.tut),el=$('tut');if(!el)return;if(on!=tutOn){tutOn=on;el.classList.toggle('on',on);requestAnimationFrame(()=>fit(1))}
- if(!on)return;el.classList.toggle('off',$('ov').style.display=='flex');tutDraw()}
+function tutSync(){const on=!!(G&&G.tut),el=$('tut');if(!el)return;if(on!=tutOn){tutOn=on;el.classList.toggle('on',on);if(!on){tutH=0;requestAnimationFrame(()=>fit(1))}}
+ if(!on)return;el.classList.toggle('off',$('ov').style.display=='flex');if(!tutAnim)tutDraw()}
 new MutationObserver(tutSync).observe($('ov'),{attributes:true,attributeFilter:['style','class']});
 // start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
 // (changed) start(n,sz): n players on a board of sz sectors per side (default 7). Capitals sit the same distance from the edges on every size: one system in (e = far side, m = middle).
@@ -2258,7 +2279,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-29-a';
+const BUILD='2026-10-29-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
