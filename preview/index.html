@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-28-g",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-28-h",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -211,8 +211,8 @@ How it works:
   (after "TUTORIAL:" it is the page heading; after "LESSON N:" it is the lesson's name on the Tutorial page and its heading).
 - Every other line is one paragraph. Empty lines are skipped. Lines up here, before the first section, are never shown.
 - Plain text only: no HTML. Any characters work, except the word made of < / script >, which would end this block.
-- The lessons are checked by tools/mini_tests.py (it finds each lesson by its section, not by the words), and the steps must still
-  match what each lesson's position lets the player do. The positions are in docs/scenarios/mini-*.txt.
+- The lessons are checked by tools/lesson_tests.py (it finds each lesson by its section, not by the words), and the steps must still
+  match what each lesson's position lets the player do. The positions are in docs/scenarios/lesson-*.txt.
 
 === HOW TO PLAY ===
 To place a new Star, tap one of your Stars, then tap where the new Star goes. Or drag from your Star and let go there.
@@ -228,45 +228,103 @@ Each full row or column of Sectors you control gives you 1 bonus point.
 === TUTORIAL: Tutorial ===
 Each lesson sets up a short game and tells you what to do. Menu > Game > Notes shows the steps again.
 
-=== LESSON 1: Setting Stars ===
-You are Blue, bottom left. Your Capital is in the middle of the bottom left Sector, and your other Star is just right of it. You have 3 Fuel.
-New Stars and captures first show as a dashed preview. Press Confirm (bottom right) to make the Move. If you turned Move preview off in the Menu, Moves happen straight away.
-1. Tap your Capital, then tap the empty System just above it, and press Confirm. A new Star is set there. Its line crosses 1 grid line, so it costs 1 Fuel.
-2. Each Star can start only one Move per turn, and a new Star waits until next turn. So use your other Star: press it, drag one System up and to the right (diagonally), let go, and press Confirm. Crossing diagonally counts as 2 grid lines: 2 Fuel.
-3. Your Fuel is used up. Tap End turn.
+=== LESSON 1: Navigation ===
+You are Blue, bottom left. This lesson shows how to look around and select.
+1. Pan: drag an empty part of the board.
+2. Zoom: pinch with two fingers, or press + and −. Fit shows the whole board again.
+3. Menu (bottom) has the settings, these steps (Notes), saving and Concede. Close it to come back.
+4. Tap your Capital to select it: the Star button becomes Set. Tap Set to put it away.
+5. Tap Fleets, then Move, then tap your Capital to select its 2 Fleets. The game asks how many to move: press Cancel.
+6. Tap End turn.
 
-=== LESSON 2: Connections ===
-You are Blue, bottom left: your Capital, and one more Star just above it. You have 1 Fuel.
-1. Press Strength on the side of the screen. It shows each Star's Strength: both of yours are 0.
-2. Tap your Capital, then tap your Star above it. This draws a Connection between them, for 1 Fuel.
-3. Both Stars are now Strength 1. A Star's Strength is its Connections plus the Fleets on it.
-4. Tap End turn.
+=== LESSON 2: Setting Stars ===
+Each of your Stars can start one Move a turn. You have 4 Stars and 4 Fuel: set one new Star from each.
+1. Tap your Capital, then an empty System next to it. Move preview is on when the game starts, so a dashed preview appears: press Confirm. (Cancel would take it back.)
+2. Open Menu and press "Move preview: On" to turn it Off. Close the Menu. (Settings > Controls on the start screen has it too.)
+3. Tap another of your Stars, then an empty System next to it: the new Star is set at once. Undo takes a Move back.
+4. Press another Star, drag to an empty System next to it, and let go.
+5. Press your last Star, drag to an empty System, and hold still: the precision placement menu opens. Look through Free, Space, Line and Vertex, pick a spot, and press Confirm.
+From here on, the lessons assume Move preview is off.
 
-=== LESSON 3: Fleets and Taking Stars ===
-You are Blue, bottom left. Your Capital is connected to your Star on its right (Strength 1). Just right of that is a Red Star, connected to another Red Star (Strength 1). Press Strength on the side to see the numbers.
-1. Tap your Star on the right, then tap the Red Star next to it. You can't take it: your Star must be stronger than the Star it takes, and 1 is not more than 1.
-2. Tap Fleets (it shows Place 2), then tap your Star on the right twice. Each Fleet adds 1 Strength. Fleets go only on Stars connected to your Capital.
-3. Now tap your Star, then the Red Star again. The game asks how many Fleets join the attack: pick one, then press Confirm. The Red Star becomes yours, the Fleets you used move onto it, and its Connection to the other Red Star is erased.
-4. Tap End turn.
+=== LESSON 3: Fuel ===
+A Move costs 1 Fuel for each grid line its line crosses. Crossing diagonally counts as 2. Each round gives Fuel equal to the round number, up to 15; from round 17 it drops by 1 a round.
+Goal: Use all 5 Fuel: set one Star 2 grid lines away and one 3 grid lines away.
 
-=== LESSON 4: Using all your Fuel ===
-You are Blue, bottom left. You have 2 Fuel and 2 Fleets to place.
-1. Tap End turn. It won't end yet: you must use your Fuel while you have a Move you can make. The game switches to Stars and rings the Stars that can still move.
-2. Use the Fuel: set new Stars from your ringed Stars (press Confirm for each) until the Fuel is gone.
-3. Tap End turn again. It still won't end: you have Fleets to place. The game switches to Place. Tap your Stars to place both Fleets.
-4. Tap End turn.
+=== LESSON 4: One Move per Star ===
+A Star can start one Move per turn. A Star set or taken this turn can't start a Move until next turn.
+Goal: Use your 3 Fuel: set one new Star from each of your 3 Stars.
 
-=== LESSON 5: Scoring Sectors ===
-The board has 9 Sectors (the big squares). A Sector is yours when you have more Stars in it than everyone else put together. Each Sector you control is worth 1 point, and the middle one 3. Red has 6 points, with the middle Sector. You (Blue) have 2: the bottom left and middle left Sectors.
-1. Tap your upper Star in the middle left Sector, then tap the empty System just right of it, in the middle Sector, and press Confirm. It is 1 Star against 1 there, so nobody controls the middle Sector.
-2. Tap your other Star in the middle left Sector, then the empty System just right of it, and press Confirm. Now it's 2 against 1: the middle Sector is yours.
-3. Tap End turn. You play last this round, so the round is scored now. On the round screen you have 5 points and Red has 3.
+=== LESSON 5: Connections ===
+A Connection is a line between two of your Stars. It adds 1 Strength to both. A Star's Strength is its Connections plus its Fleets; Strength on the side shows the numbers.
+Goal: Connect your Capital to both your other Stars, making it Strength 2.
 
-=== LESSON 6: Deficit Elimination ===
-After each round, the lowest score that is more than 3 points behind the next score above it is eliminated. Red has 4 points (the middle Sector is worth 3). You (Blue) have 2.
-1. Tap Fleets (Place 2), then tap your Star in the middle left Sector twice.
-2. Tap that Star, then the Red Star just right of it, in the middle Sector. Pick how many Fleets join the attack and press Confirm: the Star is yours.
-3. Tap End turn. You play last this round, so the round is scored now: you have 5 points and Red has 1. Red is 4 behind, more than 3. Watch what happens.
+=== LESSON 6: Lines and Stars ===
+A line can't pass over a Star.
+Goal: Connect your Capital to your top Star, through your middle Star.
+
+=== LESSON 7: Placing Fleets ===
+Each turn you place Fleets: 1 if you are 1st, 2 if you are 2nd, and so on. They go on Stars connected to your Capital through your own Connections.
+Goal: Place your 2 Fleets on the Star at the end of your chain.
+
+=== LESSON 8: Moving Fleets ===
+Moving Fleets is free and is not a Move. A group moves across 1 Connection per Fleet in it: 1 Fleet 1 Connection, 3 Fleets up to 3. Tap Fleets, then Move.
+Goal: Move the 3 Fleets on your Capital to the Star 3 Connections away.
+
+=== LESSON 9: Hitchhiking ===
+A moving group can pick up Fleets on the Stars it passes. They ride along to the end, and don't let the group go further.
+Goal: Move the 2 Fleets on your Capital to the end of your chain, and bring along the Fleet they pass.
+
+=== LESSON 10: Taking Stars ===
+To take a Red Star, draw a line to it from a stronger Star. Fleets on your Star can join the attack: each adds 1 Strength, and they move onto the Star you take. Its Red Connections are erased.
+Goal: Take the Red Star next to your Fleets.
+
+=== LESSON 11: Multi-attack ===
+Several of your Stars can attack one Star together. Their Strengths, with the Fleets they use, add up and must be more than the target's. Press Star, then Multi; tap the target, then your attackers, then Confirm.
+Goal: Take the Red Star with two of your Stars at once.
+
+=== LESSON 12: Defence call ===
+When a Star with Fleets is taken, its owner decides for each Fleet. Retreat moves it across 1 Connection to another of your Stars. Hold loses it, but the attacker loses one of its Fleets too.
+Goal: Red attacks your Star. Retreat one Fleet and Hold the other.
+
+=== LESSON 13: Using all your Fuel ===
+You must use your Fuel while you have a Move you can make, and place all your Fleets, before your turn can end. A refused End turn shows you what is left.
+Goal: End your turn.
+
+=== LESSON 14: Scoring Sectors ===
+A Sector is yours when you have more Stars in it than everyone else together. Each is worth 1 point, the middle Sector 3. Points are counted when the round ends; you play last this round.
+Goal: Take control of the middle Sector, then end your turn.
+
+=== LESSON 15: Rows and columns ===
+Each full row or column of Sectors you control gives 1 bonus point.
+Goal: Complete the bottom row: set a Star in the bottom right Sector.
+
+=== LESSON 16: Turn order ===
+Players are ranked by points. The leader goes first and places 1 Fleet; 2nd places 2, 3rd 3, 4th 4. Falling behind gets you more Fleets. You are Orange, at the bottom.
+Goal: You're in 4th place: place your 4 Fleets.
+
+=== LESSON 17: Lost Capital ===
+If an opponent holds your Capital when your turn starts, you place no Fleets that turn, unless you retake it. Then they can go only on your Capital.
+Goal: Retake your Capital, then place your 2 Fleets on it.
+
+=== LESSON 18: Deficit Elimination ===
+After each round, the lowest score more than 3 points behind the next score above it is eliminated. Its Connections and Fleets are removed; its Stars stay and can be taken.
+Goal: Take the center Sector to gain 3 points and eliminate the Red player.
+
+=== LESSON 19: Saving yourself ===
+You are 4 points behind Red. If you are still more than 3 behind when the round ends, you are eliminated.
+Goal: Gain 1 point before you end your turn.
+
+=== LESSON 20: The last Star ===
+A player with no Stars left is out at once. When only one player is left, the game ends.
+Goal: Take Red's last Star.
+
+=== LESSON 21: Round 30 and ties ===
+After round 30 the most points wins. Tied players each add their Stars to their points; if still tied, overtime rounds are played until someone wins.
+Goal: It's round 30 and you're tied on points. End the game with more Stars than Red.
+
+=== LESSON 22: Your first game ===
+A whole game on the small board against the Easy computer. Red goes first.
+Goal: Win.
 </script>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
 <div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
@@ -417,16 +475,23 @@ const ptP=t=>'<p style="color:var(--ink);margin:0 0 10px">'+esc(t)+'</p>';
 function howToDlg(b){ovDir=b?-1:1;ov('<h1>How to play</h1>'+ptSec('HOW TO PLAY').p.map(ptP).join('')+'<div class="r" style="margin-top:12px"><button onclick="tutDlg()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Tutorial</button><button onclick="menu()">Back</button></div>')}
 // ===== Tutorial =====
 // TUT_POS = each lesson's position as a save code (no Notes; the words come from the PLAYER TEXT block's LESSON N sections).
-// Written by tools/tutorial_codes.py from docs/scenarios/mini-*.txt: run it again whenever a lesson's position changes.
-const TUT_POS=["CL4.d.31e13f82.fZDLboMwFET_ZdZXCDsg1PsT3XWDWFg8KhTHpjZEIcj_XtmQtFKjrvyYmXvs2TBpcJ2TbAitmjx4Qw6uKxINQYJrQVUTCEqP1_5QZ7f0SYybQPCzch5cbxg7sCBYsCQM4JwwXNLSqilJ7a7dwCIrCSu4yspAe1S-jN7A8q_3lLz5P5g9Wh1R8RMtXkZ_eYusDLEQa0z8V0NwdjEH1HW9e3Y2jwkXqSfC4vtu9_vWukddMnUlAsFEekmw1zjCLFoThtH5OT1gss-xk7U63X3GBNbT1-UsijekD74bvYIHpX1P8PdEbqfloEWOU-b8OCa4DMnyAd5C-AY", "CL4.d.b73d3bf7.fZDJboQwEET_pc4thB0Ikn8it1wQB4tlhOLYxIbRMMj_PnLDLIdRTl6qql93b5gMVJ2TbAitngLUhhyqrkg0BAlVC6qaSNBmPPeHOvulZzFdIiHM2geoesPYQQmCg5KEASonDL98tHpiqd21C5TISsIKVWVlpD0q30ZfvJ9P7wd7838we7Q6ouIZLd5GX7xFVsa0EGdtmqsheLfYA-q73j92No-MO6hL6LvdH1rn7-uSvCsRCTbRS4I7pxJ2MYYwjD7M3MDkHmUn5wz_nVICa1nMl-vpDzzglzUr1KBN6Anhyl2103LQEsdr-3N_MlxGtnxDbTHeAA", "CL4.d.127e517b.dZDBboMwEET_Zc4rhJ1Q1P2J3nqxOLgEKhTXRjZESZD_vbIhUSXSE0bzZnY0C0YDViXJhtDqMYAXlGBVk2gIEqwE1U0kaDNcuk2d_NxlMT0iIUzaB7BaMJzAguDAktCDS0L_kz-tHrPUrtoVLIqKcAPXRRVptcqX1itY7tlDZss9e9izx__Y456tXrJ_66_WerOKooppPGdt2kCJtKU60LFpCN7NduvqT51_Tj0NOW0LnUN3AquGEFrnHyvLPLGIBJt6vRHcJUXY2RhCP_gw5S6je8aOzpls_E4O1Ppiztevd-T-H9bcwL02oSOEe27VjvN2Ld3x2p4fv_m4jBn5BC8x_gI", "CL4.d.856d547e.fZDNasMwEITfZc5LsFQbw75Eb70YH4R_gqkqCck2TozevUh20kJDT5KY-TS7s8NpcFOQbAmdcgG8owA3NYmWIMGNoLqNBKWndTjV2S9DFtMlEsKsfAA3O6YeLAgWLAkjuCCMX_nolMtSd2gbWFwqwg1cX6pIBypfohtY_vW-ZW_xT8yB1icqftDyJfrLW16qmAqxxqS9GkGybQneLuZM9v3gn8XNU85M0ZKwhKEHNy0hdNY_OpO5MBEJJo1QEeyavjCL1oRx8mHOUzj7_NZZqzN4TQTsVW-rKCXylu9G38Cj0mEghHueqnPLmZZyvDKfj2cOlzFbPsB7jN8", "CL4.d.48feb880.hZHLboMwEEX_5a5HEbgQKv9Ed90gFpaBFtWxLRuiUOR_r2xIiNS0Wfkx5955LbAKvM6INQQprAdfkIHXFeUNgYHXOVVNIAg1nLstOrqpS8F4CQQ_CufB6wVDC54TDDgj9OAZoT-lQwqbQnKNXcDzQ0mYwatDGWiVsofSCzjb2GJnX56x5c4Wic3-KWmVVps036XlQ-kde1fS8S-2-O1bPWOjb1yK0TrOtiE4M-mtcdd27ra3cUhtxG4YYfJdu_JeGndd2THtiwWCjtlfCeYcLfSkFKEfnB9TAdbcbK0xKv19RAWK8iQFmz-RBvem1QzeC-U7gv9OVUk7bdnyQHBCf12ft-TSTu_gSwg_", "CL4.d.94f8b346.fZC9boQwEITfZerVCXMgkn2JdGksCsJPhOLYlg0nCPK7RzYcl-KUyrZmP8_sbLAKLDPKa0LbWA_ekIFlRaIm5GApqKoDoVHjrT_Uyc19EuMlEPzUOA-WG8YOLAgGnBMGcEYYvtPRNjZJ7a4tYHEpCSu4upSBdjR_ii7g_JgtHrPXNJv9Y7Oj1YGKB1o8RRfw9Y9NLMRoHfeSIvYjr1TUNcGZWR_-ruvdWd80JucjwOz7Dixrgm-NuzdXpNryQNAxSEkwt_iFnpUiDKPzU8pizfmtNUalTj4jAfP6YvyqP5B2fdNqBQ-N8j3B_6RUrZ0PNxEIrtFf9-dp3tr5HbyF8As"];
+// Written by tools/tutorial_codes.py from docs/scenarios/lesson-*.txt: run it again whenever a lesson's position changes.
+const TUT_POS=["CL4.d.3daa71de.bZDNboUgEIXf5awnN0I1JvMS3XVDWBh_GlMKBvTGW8O7N6DXmrYbAsz55sycDZMBq4KkJrTNFMAbCrCqSWiCBCtBtY6Exoz3_qjOfulzMV0iIcyND2C1YezAguDAkjDs5ye4yM1zqd1rK1jcKsIDXN-qSDsqL2hxoitY_tW-ZG3xS3u12dH6QMUPWv6LXrTlrYopEGdt2ksJkloTvFvsMaXven8GN4_ZM1kXhCX0HVhpQmidf2Ymc2AiEmwaoSK4e2phF2MIw-jDnOnJnW0n50z-e08E1sXLUZYl8pav1jzAQ2NCTwhfOY92Wg635OMb-_F8ZnMZs-QNvMX4DQ", "CL4.d.50d6af99.hZHNboMwEITfZc4rBA6EaF-it14QB8RPRevaxAaUFPndKxtIIjVtT8beb2aW3QWDBBcxiZJQV4MFL4jBRU5JSRDgIqG8dIRK9nO7VUcztaHoPxzBjpWx4GJB34ATggYLQgeOCd1nOOpqCKV6rV3ASZQRruA8yhytUvFUegGLn-zhN3b3Pd7Z9D_fBzYLbPxH-6s036TJXXp8Kn1g0yhzftBaKT-vkmD0pLYGTdOa2y7GPsT51JQw2bZZeVtrs69BhB0kjqB8ek7Qs7dQk5SErjd2DA0M-mY7aC3D25tX4HSeT4e-fUf4wRclr-CukrYl2K8w4nqYtjSfYyr1sV9DuHABeQUvzn0D", "CL4.d.e4a0aef3.fZDLbsMgFET_ZdZXkaGxqO5PdNeN5QXyI7JKAIEdJbH49wrspJUadcVj5tyBWeENuKlItoRO-wheUYEbRaIlSHAjSLWJoM10GXZ1DstQxLxJhDjrEMHNiqkHC4IDS8IIrgjjuSyd9kXqNu0KFoeacAOrQ51oQ-VL9AqWf71vxVv9E7OhakfFD3p8if7yHg91yoU4a_O_WkJwi-3BNcGFfgjPzuapxOXUmrDEod_8sXPhUZcsXYlEsNM-45JH2MUYwjiFOJcHePcc650z5e6UCSgtTuo8v6N88MOaG3jUJg6EeC9VdH7Z03JO0PbrcSzhMhXLJ3hN6Rs", "CL4.d.63e530b3.fZDNboMwEITfZc4rhJ0A7b5Eb70gDoifCsW1kQ1RKPK7VzaQVGrak7FnZr9lVowKXKYkK0JTjw68IgWXBYmKIMGloKLyhFoN125XJzt3UQwfnuCm2jpwuWJowYJgwJLQg1NC_xmPph6j1GzaDSySjLCAiyTztEXl0-gNLH97T395j7n5w3uO3vSflbZosUfFI5o9jf7wnpPMh_KM1qGDimDNrPcFbdvZe7_TEHGBeiLMrms3v2uMPaqVsVfhCTrQc4K5hhF6VorQD9ZNcYHR3MeOxqj49hESyJfXXrwMF8QffNNqAfe1ch3BfUVyM847LXBsrS_HNcKlj5Z38Or9Nw", "CL4.d.a732b255.fVBJboQwEPxLnVsIOwNI_kRuuSAOFkuExrGRDZMQ5L9HbphFyiQnL7V114bJQNU5yYbQ6ilAbcih6opEQ5BQtaCqiQRtxkt_oLNfegbTJRLCrH2AqjeMHZQgOChJGKBywvDBR6snhtod-4ISWUFYoaqsiLRL5VPpA7e8c1_-4srfvifm5v-MtEurQyru0uKp9IF7yoqYynPWpg4agneLPZbxXe9v_c4jx6VUSVhC3-380Dp_rVZyryISbEovCe6SLOxiDGEYfZh5gMndbCfnDP-9JwU-SzcO8ryCF3y1ZoUatAk9IXxzbe20HGkpx2t7vj45XEamvEFtMf4A", "CL4.d.b213e6f1.hZDNbsMgEITfZc6ryBC7lvYleuvF8sH1T2uFAgI7aWrx7hXYiXOI2hOwO9_OMgusAlcZyZrQNtaDF2TgqiRREyS4ElTWgdCo8dxv3cnNfWrGSyD4qXEeXC0YO7AgGLAkDOCMMHylo21sarVr7xssDgXhCi4PRaAVlU_RB22xa4__aY-7Nk_a7I-VVrTcULGjxVP0QZsfihDDM1rHDGqCM7PeTF3Xu3u-05jsomtOmH3frXrfGneLVqZcZSDo6P5CMOc4Qs9KEYbR-SktYM19rDVGpdpHJNC_l5fx9OmQPviq1RU8NMr3BP-TYmvtvLmJQHCNPt2eyTwWWzu_gZcQfgE", "CL4.d.8791ddb7.fZHNbsMgEITfZc6rCHAcR7xEb70gHyzHrqxSQGCipBbvXkGcHylJT8bab3ZHMwuchlSMREvoOxcgFzBI1RBvCQJScWraROj0dBzW6ezjUIb5kQhh7nyAVAumAyQnWEhBGCEZYfwpn75zZdRfZidIvqkJZ8hmUye6SMVL6QlSPLPVO7Z6ZrfvWLayuztbF5b9Y_8ibVYpv0t3L6UP7PbONu_Y7cPeXIo1JmereO5ICaraluBtNGsG_jD4W4XzVFxms4wQw3CAVC0h9NZf26tKdSIRTDayJ9hjXmGi1oRx8mEuamdva521uuT3lRWIe1cLyzxKLh9GnyHHToeBEH7Lgd7F9RpPBN-Z7-vv7Xjv4ifkktIf", "CL4.d.e7e2de8f.dZHLboMwEEX_5a5HETZQS_MT3XVjeYEIRKguRjbkUeR_r-yQNGqanT33nnmumCxYFyQNoW2mAF5RgLUiYQgSrAUpEwmNHY7dps5-6bKYHpEQ5sYHsF4x7MGC4MCS0INLQv8FLnLyLLVX7QwWu5pwAatdHemKyge0uKNnsHz2lq-85bO3euWtnr119hZ_vI_tX1G1oeIXffsXffBWuzqmRbtxTPvSIu1dSyoN6ZIqYwjeLeM2nd93_n6cecj1UxsFYQndHqwNIbTO3-4i81FkJIypHUVwx5RiXKwl9IMPc6Ynd087OWdz7JAIHMJBtV6dkCd-H-0F3Dc2dITwnbtqp2WrJiLBN-Pn7ZuLp2A7LR_gNcYf", "CL4.d.9cc284d0.bZDBboMwEET_Zc6rCJsQqv2J3nqxOFAgFaprIxtQKPK_VzYkRU0vlr07b3c8KwYNVhnJitDUgwevyMCqJFERJFgJKqtAqHU_d3t3dFOXmvESCH6snQerFX0LFgQLloTrdn6BszQ8tZqtdwOLU0FYwOWpCLSh8oCKB3oDy2dtftBmR23-rD0nbfZHe7S0oeWOil-0-Bc9aM-nIsTwrDExAyVilkpSXlUEZyeze3Vt5x5Rj33aHA1khMl3LVhVBN9Yd09ZpohlIJho5EKwcxxhJq0J1975MdGDfYwdrNWp9hEJ5Jf3Ri4vM9JfX41ewNda-47gv5OrZpj2bSIQXG0-78-0PBabYXoDryH8AA", "CL4.d.8f7615c5.hVFLboMwEL3LW48i7IQgzSW668ZigQhUqI6NbIiSIN-98oSkUdOqG2PzfvNZMFqwKUjXhLYZI3hBATYVqZqgwUZRVSdCY4dTt6JTmDsB8yUR4tSECDYLhgNYETxYE3pwQeiP8mmbUaD2hp3BalMSLuBqUya6SfWTVD-kZ7B-5W6FW_yIOYO3r9zdX9zdK7f8z3f_zd3_yn1u9SatVqnalCkP2juX52VUnrvZ0k7Osq4Jwc9u7S4cuvBYzjSI52o9x-4ANjUhtj7c96JlKSoRXK6uIvhTtnCztYR-CHGSikb_sB29t_LvIyvg47GonCsgXbw5ewH3jY0dIV6lqnac17ScExr3eX9KuE5CeQcvKX0B", "CL4.d.de4fca38.bZHLboMwEEX_5a5HETahRPMT3XVjsUA8KlrXRjZEocj_XtkhCVJZ-THnztyZWTFqsMpIVoSmHj14RQZWJYmKIMFKUFkFQq2Ha7dFJzd3KRgvgeCn2nmwWjG0YEGwYEnowRmh_0lHU48p1NxjN7A4FYQFXJ6KQHepPJTewPI_m-9YsWfzjb282HNis8TmR-wub7Fjj-3fpeUmFS_p26F0x55PRYiDtsbEeSkR564k5VVFcHY2W1-u7dxzLdOQKkcDkjD7rgWriuAb6x4bkWkdIhBMNFIS7DWmMLPWhH5wfkpeRvtMO1qr099nVOBrKbPlYiekXt-NXsB9rX1H8L_JVTPOW7VYx9Xm-_FMxWVIyAd4DeEP", "CL4.d.f983ce9a.hZJBj4IwEIX_yztPTFtBdP7E3rwQDiyCIcsW0oLRJf3vGypKd9V4ojDfezNM34iuAaeCVEYo8s6CRwhwmpDMCAqcSkoyR8ib-lTO1d4MpS9OB0ewfW4sOB1RH8CS0IIVoQILQvXtH0Xe-VJxrZ3BchUTLuBkFTu6SlUgVXfpGbyZWbmw66dtzuD4kY0CNgrZZGbFwsbvWLWwm1fs9nGGxLPiHxuu5W-bQLoNpOLZSNHC7t6xwbqleAVHgfGUjFbr6YJTRessI5h20PNazaE09wT1tTeY_2mw5QGcbmlHUmQEW7TmFqHY52ftCNpPMoXmNDnpoWkIVW1s77269u7etW3jvx0nCbqT_oxNcoTf4oduLuAqb2xJsD8-H0U3zO2kI5hcf91efXflPLIHj879Ag", "CL4.d.c0cb63df.fZDNasMwEITfZc6LsdQYw75Eb70IH4x_iokqCckKSYzevUh20kJDT5KY-TS7s8FpsKpJdoShdwG8oQarlkRHkGAlqO0SodfLZTrU1cepiPmSCGHtfQCrDcsIFgQLloQZXBPmr3IMvSvSsGtXsKgawg3cVk2iHZUv0StY_vW-FW_9T8yOtgcqftDTS_SX91Q1KRdijcl7KUGy6wjeRnMk-3Hyz-LWpWTmaEmIYRrBqiOEwfpHZ7IUJhLB5BEagr3kL0zUmjAvPqxlCmef3zprdQE_M4HxvM7RzHeULd-NvoHnXoeJEO5lqsHFIy3n-N6cH88SLlOxfIC3lL4B", "CL4.d.284e805c.hZHLboMwEEX_5a5HEbgQ2vmJ7rpBLBCPCtWxLRuipMj_XtkQiNS0Wfkx5955zTASXCYkKkJTGweekYDLgtKKIMBlSkXlCbUczt0aHe3UxWC4eIIba-vA5YyhBacEDRaEHpwQ-lM8mtrEULPELuD0kBOu4OKQe1qk4qH0AhYrm-3syzM239ksssk_JS3SYpWmuzR_KL1j70o6_sVmv32LZ2zwDUvRSoXZVgSrJ7U2btvObnsbh9hG6EYQJte1C-8abW8rO8Z9CU9QIfsrQZ-DhZqkJPSDdWMswOjN1mgt499nUKA_yXF40xpxcO9KXsF9LV1HcN-xqsZMa7bUE2ytvm7PLXljpg_w7P0P", "CL4.d.7d162857.fVDLioMwFP2Xs74UY3WE-xOzm424EB-DTJqExJS2kn8vidYWpjOrPM6Ts8BIcJ1R3hC61jjwggxcVyQaQg6uBVVNILRyOg8bOls_JDBeAsHNrXXgesHUgwVBg3PCCM4I4ykdXWsS1K3YBSwOJeEKrg5loFWav5VewOVv7jFxs39iVmm1ScVTWryVvnCLJ7f8i1u8-MbxtFJxg4ZgtVdbQdsPdt93nlK1raF3Q7_yXaftY9pj2jUPBBXTPwj6HC2Ul5IwTtbNqYDRu63RWqa_76jAZG4nWR0t0hifSl7BYyvdQHC3FNAZv6WJQLCt-nk89_DO-C_wEsId", "CL4.d.dacce5ef.fZLNboMwEITfZc6rCBsntH6J3nqxOCB-KlQXIxuipIh3r7wkCig0J1bsfDsLOxN6C20SkpSSyAll0QfoCQm0UfxGQBtBKidIaJNxlXI3y2dCYdtzfSMGP9YMLIW8F-lSzIQwFD5AmwltBS0IDjolNNAJofnhR1n03CqX3gVaHY6EK3R2OM60oHIXXWlPD23K2uSFzRYVD1TtoiutemiPrBUvbASj4hk97aIr7Wql7D9t9qx9Y618sZLcoKuV3nfRlTYeIwbGdV28qBEk85zg3djdfpyvas_hEjFeOWFo-RjRPiGMoa6gTU4IpfP3DCkOUMrpkRwdMRM6jktCcOc4sxutJTStDwOP6t3Gp3fO8qSviKE6yUvZ-gH86R-dvUI3hQ01IfyyV9mPN3vB9oLto7Evuu9NS3Ir5c3UzOgn9DTPfw", "CL4.d.19686dca.bZHNboMwEITfZc6rCBwI6r5Eb70gDoifCpXalg1RUuR3r7yBBLXcduX5POPxAjuCy4RURWhq68ELEnBZUFoRFLhMqagCoR6Ha7eeTm7u5DAOgeCn2nlwuWBowSnBgBNCL3P_LUtTW1kbA1aEGzg95YQ7uDjlgR6oElT9QW9g9V973mmTI-3lpc12kZLDSA-0WNH0heaH6E6bnfIQyzNaxw5KReeqIjgz6zWlazv3LHkaxHO1nn3XgsuK4Bvjtn6VlJsGgo4RLgRzjVfoeRwJ_eD8JCmseV5rjRkF_IwE5jeb9Z3tIa981-N9-zX_I6EaO69m0cbV-mtbxVsFkXyAlxB-AQ", "CL4.d.0d9cb113.dZLLboMwEEX_5a5HkU14xT_RXTeWF4hAhUoB2RAlRf73ygN5qISNecy5M5fhzhhaKC0oMoSyGBzUDAGlM5KGEEFpSZnxhKJtLtVaHe1UcTHceIIbC-ug9IzmDCUJPVREqJfzB0pwcy6VS-0KJQ8J4QaVHRJPizR6kYqH9AoVrWz8ZI977L2vfLLxHhtvPSR7rNh6SJkV_9jXT12k2dZS9lZ6hTpux-R7bLZlT3tsvPUgxR6cv4HlHpy-uAgx6rsupEHLkCotKTakIzrymRjSKUnBlxOfuSGdk5SBDWEzBNtP3bpee67sI6Fjw4td9zu56gylDcGVvb2HM-VkJp7Qse2QqUvo0U1tS6gb60Z2PvSPvkPft_zuK0hQt7GbivII_pcfXXuDqovWVQT3y8krh2kdJz3BFt33_ZGnR56RT6jZ-z8", "CL4.d.c01d1d4a.hVHJboMwEP2Xdx5FmCZQzU_01gviQA1UNK5t2RAlRf73yoYsUpL25GXeMjNvhlXgKqO8JsjGevCMDFyVJGpCDq4ElXUgNGo4dGt1dFOXivESCH5snAdXM4YWLAgGnBN6cEbov9MhG5tKcqkdwWKzI5zA5WYXaKHmD6lHcH6PfXmGPetur9htwmZ_tLRQy5UqrtTdQ-oN9sameIbd3uuW_2GjbgzFaB13WxOcmfTakWs7d8ltHNIY6zST79oF76Vx58iKlFceCDq6vxLMIUroSSlCPzg_pgasuchaY1T6-4wMfH3sMy0Lj7S4N61O4L5RviP4nxSHtNPqJgLBNXp_fl7MpZ3ewXMIvw", "CL4.d.4ae095ce.hZDNboMwEITfZc6rCBso0r5Eb70gDshAherYlg0RCfK7VxiSVEqrnvwz83nWs8JpcJ2RbAiqdQG8IgPXFYmGIMG1oKqJhFaPl_5QJz_3Sdw2kRCm1gdwvWLswIJgwZIwgDPCcE6Lal2S1K4tYHEqCVdwdSoj7aj8FV3A-eGVT2_-l1e-eot_R9rR6kDFEy0Tmr3GFD9itvKsMVsHtaS8aQjezubAfdf7R8nTmDKP6Dn0HbguGkJQ1t8LzlO7MhLMNsMbwV62N8ysNWEYfZjSGM4-3nXW6nT3uRFY9NSX6iyQvvlu9BU8tDr0hHBLAcrNR5qIBN-ar_vxEa7c_AFeY_wG", "CL4.d.e55a8fea.fZDNbsMgEITfZc6rCGgsS7xEb71YPiBsV1YJUDBREot3r8DOzyHqCdjZb4edFd5AdoxET9DKR8gVDLJrifcEAdlxavtMUGY-j7u6hDRWsVwyIS4qRMhuxTxAcoKDFIQJkhGmUz208lXSm3aB5IeGcIVsD02mDRVv0Zfe47P3o_ayf2w2tN1R_kSPb9GX3mJTAnHWlr16QnDJFlNGcGEYwyO0Za5-u22K47ABUbtwz0vUsEQm2GLfENy5jLDJGMI0h7jUH3j3GOudM7X2XQgkczn9BsFQN_y05go5KRNHQrzVLLRPuxvPhKDsz_1ZzUtR-_QFueb8Bw", "CL4.d.eced35ed.XY_LasMwEEX_5a6HIrkUw_xEd90YL4wfqRNVEnqkTY3-PWjsBNqVNI9z79wN3oA7RU1PGAcfwRsUuGtJ94QG3Glq-0IYzHqdj2kKeZZh_RRCTEOI4G7DOoE1wYGV6Ek17uUPuH15I9zAur6LdJcvsCq0o42gzV-0EVQfaPsfrYc7a6t_Twgu2-OGMM3hmS2tghyyOc7Tvh9HFx6xlGRShWDrMa8Ed60SNhtDWNYQkyx595T1zhlRPFUC5894vnz7BEnwbs0NvAwmzoT4K4qjz4ebLoQw2MujFPPaHH3-AG-l3AE"];
 // tutDlg() = the Tutorial page: the intro paragraphs, one button per lesson (named in its LESSON N line), and Back to How to play.
 function tutDlg(){ovDir=1;const s=ptSec('TUTORIAL');ov('<h1>'+esc(s.t||'Tutorial')+'</h1>'+s.p.map(ptP).join('')+TUT_POS.map((_,i)=>'<div class="r" style="margin-top:8px"><button onclick="tutAsk('+i+')">'+esc(ptSec('LESSON '+(i+1)).t||'Lesson '+(i+1))+'</button></div>').join('')+'<div class="r" style="margin-top:12px"><button onclick="howToDlg(1)">Back</button></div>')}
 // tutAsk(i) starts lesson i, first asking when that would replace a saved game (as opening a shared link does).
 function tutAsk(i){let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}if(!sv)return tutGo(i);ovDir=1;ov('<h1>Start this lesson?</h1><p>It replaces your saved game in this browser.</p><div class="r"><button onclick="tutGo('+i+')">Start lesson</button><button onclick="tutDlg()">Back</button></div>')}
 // tutGo(i) opens lesson i like a shared link: its position from TUT_POS, with the lesson's name and steps as the game's Notes (G.note), shown at once.
+// When a computer moves first (the Defence call lesson, the first game) the Notes show BEFORE the game loads, and OK loads it (tutLoad):
+// a computer starts playing as soon as its game loads, and its attack would replace the Notes before they could be read.
 // After the steps it is an ordinary game against the computer; there is no lesson checking, Retry or Next yet (docs/TUTORIAL.md).
+let tutPend=null;
 async function tutGo(i){const s=ptSec('LESSON '+(i+1));let o;try{o=await decodeCode(TUT_POS[i]);prepG(o)}catch(e){return ov('<h1>Could not open this lesson</h1><p>'+esc(e&&e.message?e.message:'Unknown problem.')+'</p><div class="r"><button onclick="tutDlg()">OK</button></div>')}
- o.note={t:s.t||'Lesson '+(i+1),x:s.p.join('\n')};loadObj(o);say(s.t||'Lesson '+(i+1));posNoteDlg()}
+ o.note={t:s.t||'Lesson '+(i+1),x:s.p.join('\n')};
+ if(o.cpu&&o.cpu[o.order[o.ti]]){tutPend=o;ovDir=1;return ov('<h1>'+esc(o.note.t)+'</h1>'+s.p.map(ptP).join('')+'<div class="r" style="margin-top:12px"><button onclick="tutLoad()">OK</button></div>')}
+ loadObj(o);say(o.note.t);posNoteDlg()}
+// tutLoad() = OK on the Notes of a lesson where a computer moves first: load it now, and the computer starts.
+function tutLoad(){const o=tutPend;tutPend=null;if(!o)return;$('ov').style.display='none';loadObj(o);say(o.note.t)}
 // start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
 // (changed) start(n,sz): n players on a board of sz sectors per side (default 7). Capitals sit the same distance from the edges on every size: one system in (e = far side, m = middle).
 function start(n,sz,pm,cpu,team,look){sz=[3,5,7].includes(sz)?sz:7;const N=sz*3,e=N-2,m=(N-1)/2,pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[e,1],2:[1,e]}:{0:[m,1],1:[1,m],2:[e,m],3:[m,e]};
@@ -2172,7 +2237,7 @@ settingsDlg('c'); // redraw (this also clears cpdel)
 presetMsg('Deleted '+nm+'. Your current colors are unchanged.'); // tell the player
 }
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home with three buttons (CPU = cpuDlg, Theme, Controls); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs; 'k' = Controls (placement, controls, haptics). OLD DESCRIPTION: two tabs. spage 's' = Settings: Theme choices and the same device settings as the in-game Game page (placement, controls, haptics, computer speed). spage 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-28-g';
+const BUILD='2026-10-28-h';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,s:1,c:2,k:1},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
