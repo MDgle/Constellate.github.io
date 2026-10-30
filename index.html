@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-30-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-30-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -449,11 +449,14 @@ if(t&&isAlly(t.o)){const e=fgErr(a,t,n);if(e){resetFlow();say(e);return render()
 // Tapping nothing, the same star or someone else's star cancels the move.
 if(!t||t===a||t.o!=me){resetFlow();say('');return render()}
 // Breadth-first search (fBfs): from a, walk along your own connections up to n steps, recording each star's distance in d. (hitchhiking) For a person the path goes through as many Stars with Fleets that may ride as a shortest path can.
-const B=fBfs(a,n,hhOK()),d=B.d;
+const B=fBfs(a,n,hhAny()),d=B.d;
 // Out of reach: explain AND cancel, so no stale selection is left behind.
 if(!d.has(t.id)){resetFlow();say('Out of reach. '+n+' Fleet'+(n>1?'s travel':' travels')+' up to '+n+' Connection'+(n>1?'s':'')+' along your network. Selection cleared.');return render()}
 // (new, hitchhiking) Fleets on the Stars along the path that may ride along: ask about them first (hhAsk); the move is made when the last one is answered (hhDone).
-const path=fPathOf(B,a,t),hc=hhCands(a,path);if(hc.length){resetFlow();return hhAsk({a:a.id,b:t.id,n,path,c:hc,i:0,pk:[]})}
+const path=fPathOf(B,a,t),hc=hhCands(a,path);
+// (2026-10-30) A computer is not asked: the Fleets that may ride come along (Shmorden: "if moving a fleet gives a hitchhike opportunity the cpu takes it"), except those a Star needs to stay safe (cpuHhTake, 2026-10-30-b). Logged like a person's hitchhike, one Undo for all of it.
+if(hc.length&&hhCpu()){const pk=hc.map(c=>[c.id,cpuHhTake(by(c.id),c.k,c.id==a.id?n:0)]).filter(x=>x[1]>0);undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;const hs=hhApply(a,t,pk);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n},hs));resetFlow();say('Moved '+n+'.'+hhTxt(hs));return render()}
+if(hc.length){resetFlow();return hhAsk({a:a.id,b:t.id,n,path,c:hc,i:0,pk:[]})}
 // Valid: save undo, move exactly n Fleets (marked moved on arrival), clear the flow, say so.
 // (new) With Move preview on, the Fleet move becomes a preview along the path the Fleets would travel.
 if(pvOn())return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.');
@@ -462,20 +465,25 @@ undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;mvRec({k:'f'
 function pickN(id,n){$('ov').style.display='none';sel=id;flow={src:id,n};say('Tap a Star within '+n+' Connection'+(n>1?'s':'')+(teamsOn()?', or a teammate\'s Star to give them.':''));render()}
 // ===== Hitchhiking (RULES.md 5.4) =====
 // A moving group may carry other Fleets of yours that sit on the Stars along its path, whether they moved this turn or not (Shmorden, 2026-10-28). They ride to the end, add nothing to the group's range, and count as moved. On the group's own Star only Fleets that already moved can ride (rule 5.4's second case: the group moves on and carries the Fleet that just arrived); the ones that can still move join the group itself instead. Fleets used in a Take this turn can't move again (4.10), so they never ride.
-// After a person picks the destination (tap, drag, or a preview), each Star on the path with Fleets that may ride is asked about, in path order. While the question is open the board shows the group at its destination, the dashed path, and a dashed circle round the Fleets being asked about. Computers never hitchhike yet (human-only first; CPU play is unchanged).
+// After a person picks the destination (tap, drag, or a preview), each Star on the path with Fleets that may ride is asked about, in path order. While the question is open the board shows the group at its destination, the dashed path, and a dashed circle round the Fleets being asked about. (2026-10-30, Shmorden) A computer is not asked: it takes every Fleet that may ride (hhCpu, in moveF; a placeholder rule to be refined later). cpuHH = false switches that off (tests compare play with and without it).
 // MAP: fSpent, fMoved, hhFree, hhOK = counts and who may | fBfs, fPathOf = the path | hhCands, hhAsk, hhDraw, hhPick, hhCancel, hhDone = the question | hhApply, hhRec, hhTxt = carry them, log and message.
 // fSpent(s) = Fleets on s used in a Take this turn (fa). fMoved(s) = Fleets on s that moved this turn and may still ride.
 const fSpent=s=>Math.min(s.fa||0,s.f||0),fMoved=s=>Math.max(0,Math.min(s.fm||0,s.f||0)-fSpent(s));
 // hhFree(s,o) = how many Fleets on Star s may ride with a group passing through: every Fleet there except those used in a Take and those already promised to a pending Fleet move (as a group or as hitchhikers). o = s is the group's own Star: only its moved Fleets.
 function hhFree(s,o){return Math.max(0,o?fMoved(s)-hhOut(s.id):(s.f||0)-fSpent(s)-pvOut0(s.id)-hhOut(s.id))}
+// cpuHhTake(s,k,go) = how many of the k Fleets that may ride from Star s a computer takes: all of them, unless taking them would let an enemy take s when it can't now (cpuThreatened); then only as many as keep it safe (possibly none). go = Fleets of the moving group itself that leave s too (the group's own Star). A Star that can be taken anyway lets them all go.
+function cpuHhTake(s,k,go){if(!s)return 0;const me=cur(),st=str(s)-go;if(cpuThreatened(s,st,me))return k;let n=k;while(n>0&&cpuThreatened(s,st-n,me))n--;return n}
+// hhOK() = a person is moving, so the riders are asked about. hhCpu() = a computer is moving and computers hitchhike (cpuHH): it takes them all without a question. hhAny() = either: the path prefers riders and hhCands lists them.
 const hhOK=()=>!!G&&!cpuRun&&!cpuOf(cur());
+var cpuHH=true;
+const hhCpu=()=>cpuHH&&!!G&&cpuRun&&cpuOf(cur()),hhAny=()=>hhOK()||hhCpu();
 // fBfs(a,n,hh) = the Stars a group of n on Star a can reach along your own Connections: d = distance, par = the Star before it on the path. hh = among equally short paths prefer the one through the most Stars with Fleets that may ride (a placeholder rule; without it, the first path found, as before). The distances are the same either way. fPathOf(B,a,t) = the path from a to t as star ids.
 function fBfs(a,n,hh){const me=cur(),d=new Map([[a.id,0]]),par=new Map(),w=new Map([[a.id,0]]),q=[a];while(q.length){const x=q.shift(),dx=d.get(x.id);if(dx>=n)continue;G.conns.forEach(c=>{if(c[0]!=x.id&&c[1]!=x.id)return;const u=by(c[0]==x.id?c[1]:c[0]);if(!u||u.o!=me)return;
 // A Star is reached first from the earliest Star of the layer before; a later one of that layer replaces it only when its path passes more Stars with Fleets that may ride (the queue holds a whole layer before the next, so this always happens before u is used).
 const v=w.get(x.id)+(hh&&hhFree(u,false)>0?1:0);if(!d.has(u.id)){d.set(u.id,dx+1);w.set(u.id,v);par.set(u.id,x.id);q.push(u)}else if(d.get(u.id)==dx+1&&v>w.get(u.id)){w.set(u.id,v);par.set(u.id,x.id)}})}return {d,par}}
 function fPathOf(B,a,t){const p=[t.id];while(p[0]!=a.id)p.unshift(B.par.get(p[0]));return p}
-// hhCands(a,path) = the Stars on the path (the group's own Star first, never the destination) with Fleets that may ride, as {id, k: how many}. Empty for computers.
-function hhCands(a,path){if(!hhOK())return [];const out=[];path.slice(0,-1).forEach((id,i)=>{const s=by(id),k=s?hhFree(s,i==0):0;if(k>0)out.push({id,k})});return out}
+// hhCands(a,path) = the Stars on the path (the group's own Star first, never the destination) with Fleets that may ride, as {id, k: how many}. Empty for computers when cpuHH is off.
+function hhCands(a,path){if(!hhAny())return [];const out=[];path.slice(0,-1).forEach((id,i)=>{const s=by(id),k=s?hhFree(s,i==0):0;if(k>0)out.push({id,k})});return out}
 // hhAsk(h) starts the question: h = {a: the group's Star, b: destination, n: group size, path, c: the candidates (hhCands), i: the one being asked about, pk: the answers so far as [star id, Fleets]}.
 function hhAsk(h){hhS=h;hhDraw()}
 // hhDraw() asks about candidate h.c[h.i]: None or how many ride (Bring / Leave when there is one), or Cancel move. Like every question on the board it is a low dialog over an undimmed board (ovQ), with the whole path kept in view above it.
@@ -622,7 +630,7 @@ if(hOK&&!rOK){pend.dec.push('H');pend.hold++;continue}
 // (new) Online: def = the defender's color; rem = that player is on another device, so the question is sent there and this device waits.
 pend.hOK=hOK;pend.hX=hX;pend.def=by(pend.b).o;
 // (new) A computer defender on this device chooses Hold or Retreat at once.
-if(cpuHere(pend.def)){const v=cpuPick({nb:pend.nb,hOK,lvl:cpuEff(G.cpu[pend.def])});if(v==='H'){pend.dec.push('H');pend.hold++}else pend.dec.push(v);continue}
+if(cpuHere(pend.def)){const v=cpuPick({nb:pend.nb,hOK,lvl:cpuEff(G.cpu[pend.def]),b:pend.b});if(v==='H'){pend.dec.push('H');pend.hold++}else pend.dec.push(v);continue}
 // (2026-10-28-c, Shmorden) A person with no Hold and exactly one Retreat spot has no choice: the Fleet goes there by itself (computers keep their own pick above, so their play is unchanged).
 if(!hOK&&!hX&&pend.nb.length==1){pend.dec.push(pend.nb[0]);continue}
 // (2026-10-28-c) The choice is a question at the bottom of the screen (defDlg: Hold / Retreat); the bar's Hold button is no longer used. Tapping a ringed Star (Retreat) or the attacked Star (Hold) still works.
@@ -700,11 +708,10 @@ const chipIn=(c,vp,al,rk)=>chipDot(c)+'<span class="ct"><span>'+esc(cpuOf(c)&&PC
 // chipFit(box) = every score chip in box whose first line does not fit gets a smaller font for it, down to 65% (then it is cut with ... as before).
 function chipFit(box){if(!box)return;box.querySelectorAll('.chip .ct>span:first-child').forEach(e=>{let f=1;e.style.fontSize='';while(e.scrollWidth>e.clientWidth&&f>.65){f=Math.round((f-.05)*100)/100;e.style.fontSize=f+'em'}})}
 const teamLine=vp=>teamsOn()?[...new Set(G.pl.map(teamOf))].sort().map(t=>'Team '+t+': '+teamVp(t,vp)+' VP').join(' · '):'';
-// teamErr(pl,team,cpu) = why a team setup is not allowed (empty text = fine): 4 players only, every player on team 1 to 3, at least 2 different teams, and a computer player must be alone on its team (until computer teamwork exists). pl = player colors, team = {color: number}, cpu = {color: level} or nothing.
+// teamErr(pl,team,cpu) = why a team setup is not allowed (empty text = fine): 4 players only, every player on team 1 to 3, at least 2 different teams. (2026-10-30, Shmorden) Computers may share a team with people or other computers; they never attack a teammate (cpuTgt) but don't give gifts or connect to teammates yet. pl = player colors, team = {color: number}, cpu = {color: level} or nothing (no longer checked; kept so every caller stays the same).
 function teamErr(pl,team,cpu){if(pl.length!=4)return 'Teams need 4 players.';
 if(!team||typeof team!='object'||pl.some(c=>!Number.isInteger(team[c])||team[c]<1||team[c]>3))return 'Every player needs a team from 1 to 3.';
-if(new Set(pl.map(c=>team[c])).size<2)return 'Put the players on at least 2 different teams.';
-if(cpu&&pl.some(c=>cpu[c]&&pl.some(d=>d!=c&&team[d]==team[c])))return 'A computer player has to be alone on its team.';return ''}
+if(new Set(pl.map(c=>team[c])).size<2)return 'Put the players on at least 2 different teams.';return ''}
 // kill(c,also) eliminates player c: remove their connections and Fleets (their stars stay on the board as leftovers anyone may capture). In a team game, first every star of c that is linked to a star of a LIVING teammate passes to that teammate with its Fleets and its link (a Capital too); a star linked to two teammates goes to the earlier connection in G.conns. Owners are read before anything changes, so a chain of c's stars does not pass along: only a star with a direct link counts. also = players eliminated in the same moment (deficit can drop two at once): they cannot receive gifts. Returns the gifts as [{id, to}] (nothing without teams). Fix: a connection is removed when EITHER end belongs to c (it used to look at the first end only). (new) It also records why and when in G.out[c] = {w, r}: w = 'z' (no Stars left) here; deficit() changes it to 'd' and a concession (doConc) to 'c'; r = the round. The round and end screens show it.
 function kill(c,also){const gifts=[];
 if(teamsOn()){const own=new Map(G.stars.map(s=>[s.id,s.o]));
@@ -1713,11 +1720,12 @@ function menuPin(top){const o=$('ov'),b=o.firstChild;if(top==null||!b)return;ovU
 // (2026-10-29-i, Shmorden: online games get Main menu too) Online it first asks (netMainAsk), since the start menu is outside the room: Leave leaves the online game exactly like the Leave game / End online game button (netLeave: the host's leaving ends it for everyone), the board stays here as a local game, and the start menu opens; Back returns to the Menu (or the end screen).
 function mainMenu(){if(!G)return;if(net.on)return netMainAsk();persist();histSave();resetFlow();$('ov').onclick=null;menu()}
 function netMainAsk(){const host=net.role=='host';$('ov').onclick=null;ov('<h1>Leave the online game?</h1><p>'+(host?'You are the host, so leaving ends the online game for everyone. ':'')+'The board stays on this device as a local game: Continue saved game on the main menu opens it.</p><div class="r"><button onclick="saveUI()">Back</button><button onclick="netLeave();mainMenu()">Leave</button></div>')}
-// (2026-10-29-k, Shmorden) quickGame() = the start menu's Quick game button: a Solo game with everything picked at random and started at once: the board size (7x7, 5x5 or 3x3), 2 or 4 players (placeholder: Shmorden named no number), your seat (in its usual color), and each computer's level (Easy, Medium or Hard) and color; computers are named by color initial and level (R.Easy, qkNm; any color, b.Easy and B.Easy tell blue and Brown apart, 2026-10-29-l). The New game page's choices are left as they were. Refused like New game while a game is in progress. Teams stay off until computers can play on teams (then: Teams on or off at random).
+// (2026-10-29-k, Shmorden) quickGame() = the start menu's Quick game button: a Solo game with everything picked at random and started at once: the board size (7x7, 5x5 or 3x3), 2 or 4 players (placeholder: Shmorden named no number), your seat (in its usual color), and each computer's level (Easy, Medium or Hard) and color; computers are named by color initial and level (R.Easy, qkNm; any color, b.Easy and B.Easy tell blue and Brown apart, 2026-10-29-l). The New game page's choices are left as they were. Refused like New game while a game is in progress. (2026-10-30-b) A 4-player Quick game has Teams on half the time (placeholder), always 2 against 2 with your partner picked at random.
 function quickGame(){if(G&&!G.over&&!net.on){const b=$('mquick');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}
 const R=a=>a[Math.floor(Math.random()*a.length)],sz=R([7,5,3]),n=R([2,4]),pl=n==2?[0,2]:[0,2,3,1],me=R(pl),cpu={},pc={},used=new Set([DEFCOL[me]]);
 pl.forEach(c=>{if(c==me)return;cpu[c]=R([1,2,3]);const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
-start(n,sz,null,cpu,null,{pc,qk:1})}
+let team=null;if(n==4&&Math.random()<.5){const o=pl.slice().sort(()=>Math.random()-.5);team={};o.forEach((c,i)=>team[c]=i<2?1:2)}
+start(n,sz,null,cpu,team,{pc,qk:1})}
 // menuNew() = the start menu's New game button. While a game is in progress (loaded, not over) it does not open the New game page: the button blinks like Play does and a line says why.
 function menuNew(){if(G&&!G.over&&!net.on){const b=$('mnew');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}newGameOpen()}
 // endGameDlg() = the Menu's End game button: asks first (same look as Concede), then doEndGame ends the game for everyone.
@@ -2171,7 +2179,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-30-a';
+const BUILD='2026-10-30-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2197,7 +2205,7 @@ const ng={mode:null,n:null,sz:null,col:null,pm:'choice',cpu:{},view:'new',teams:
 // ngCpuMap() = the computer players chosen on the New game page, for the colors in play. ngCpu(c) flips one color between Human and Computer.
 const ngPl=()=>ng.n==4?[0,2,3,1]:[0,2];
 const ngCpuMap=()=>{const o={};ngPl().forEach(c=>{if(ng.cpu[c])o[c]=ng.cpu[c]});return o};
-function ngCpu(c){if(ng.mode=='solo'&&c==ng.col)return;const L=cpuSeatLv().filter(x=>ng.mode!='solo'||x>0);ng.cpu[c]=ng.cpu[c]===undefined?L[0]:L[(L.indexOf(ng.cpu[c])+1)%L.length];if(ng.cpu[c]>0&&ngShares(c)){ng.cpu[c]=0;ng.note='A computer player has to be alone on its team.'}ngRedraw()}
+function ngCpu(c){if(ng.mode=='solo'&&c==ng.col)return;const L=cpuSeatLv().filter(x=>ng.mode!='solo'||x>0);ng.cpu[c]=ng.cpu[c]===undefined?L[0]:L[(L.indexOf(ng.cpu[c])+1)%L.length];ngRedraw()}
 // ngSize() is the board size chosen (7, 5 or 3 sectors per side); ngPm() the position selection.
 const ngSize=()=>ng.sz,ngPm=()=>ng.pm;
 // pmRow() draws the Position selection buttons (New game page): Player choice (each player picks on the Game menu page), Free placement only, Fixed positions only.
@@ -2221,23 +2229,19 @@ let ngFresh=true;
 function newGameOpen(){if(ngFresh){ngReset();ngFresh=false}newGameDlg()}
 // ===== Team mode: setup (team project step 3) =====
 // ng.teams = the Teams switch (New game page), ng.team = {color: 1-3} chosen per seat (nothing is chosen until tapped, like the rest of the page), ng.note = a one-time message for the line under the page.
-// ngPlNow() = the colors in play on the screen showing (New game page, or the online room's seats). ngTeamOK() = may Teams be on here: 4 players, not Solo (in Solo every other seat is a computer and a computer has to be alone on its team, which 4 players cannot do). ngTeamFix() = switch Teams off when it is no longer allowed (a choice was kept so switching back on restores it).
+// ngPlNow() = the colors in play on the screen showing (New game page, or the online room's seats). ngTeamOK() = may Teams be on here: 4 players (Solo too since 2026-10-30-b: you and the computers pick teams like any seat). ngTeamFix() = switch Teams off when it is no longer allowed (a choice was kept so switching back on restores it).
 const ngPlNow=()=>ng.view=='net'?net.seats.map(s=>s.c):ngPl();
-const ngTeamOK=()=>ng.view=='net'?net.n==4:ng.n==4&&ng.mode!='solo';
+const ngTeamOK=()=>ng.view=='net'?net.n==4:ng.n==4;
 function ngTeamFix(){if(!ngTeamOK())ng.teams=false}
-// ngCpuNow() = computer seats now as {color: level}. ngShares(c) = Teams are on and another seat has the same team as seat c.
-const ngCpuNow=()=>{if(ng.view=='net'){const o={};net.seats.forEach(s=>{if(s.kind=='cpu')o[s.c]=s.lvl||1});return o}return ngCpuMap()};
-const ngShares=c=>!!(ng.teams&&ngTeamOK()&&ng.team[c]&&ngPlNow().some(d=>d!=c&&ng.team[d]==ng.team[c]));
-// ngTeamNext(c) = the next team number (1, 2, 3, then 1) for seat c that keeps the computer rule: a computer must be alone on its team. 0 = none fits.
-function ngTeamNext(c){const cp=ngCpuNow(),pl=ngPlNow(),cur=ng.team[c]||0;
-for(let i=1;i<=3;i++){const t=(cur+i-1)%3+1;if(!pl.some(d=>d!=c&&ng.team[d]==t&&(cp[c]||cp[d])))return t}return 0}
+// ngTeamNext(c) = the next team number (1, 2, 3, then 1) for seat c. (2026-10-30) Computers may share a team, so every number fits.
+const ngTeamNext=c=>(ng.team[c]||0)%3+1;
 // ngTeam(c) = the team button of seat c. ngTeams(on) = the Teams switch.
-function ngTeam(c){const t=ngTeamNext(c);if(t)ng.team[c]=t;else ng.note='A computer player has to be alone on its team.';ngRedraw()}
+function ngTeam(c){ng.team[c]=ngTeamNext(c);ngRedraw()}
 function ngTeams(on){ng.teams=!!on&&ngTeamOK();ngRedraw()}
 // ngTeamMap() = the teams to start the game with ({color: team}), or null for an ordinary game.
 function ngTeamMap(){if(!(ng.teams&&ngTeamOK()))return null;const o={};ngPlNow().forEach(c=>{o[c]=ng.team[c]});return o}
 // teamsRow() = the Teams switch with a one-line reminder of the rules, or the reason Teams are not available. teamBtn(c) = the team button of a seat.
-function teamsRow(){if(!ngTeamOK())return '<p style="margin:10px 0 0;color:var(--mut);font-size:13px">Teams: '+(ng.view=='new'&&ng.mode=='solo'?'not available in Solo (a computer has to be alone on its team).':'need 4 players.')+'</p>';
+function teamsRow(){if(!ngTeamOK())return '<p style="margin:10px 0 0;color:var(--mut);font-size:13px">Teams: need 4 players.</p>';
 return '<p style="margin:10px 0 4px">Teams</p><div class="r">'+[[false,'Off'],[true,'On']].map(([v,t])=>'<button'+(!!ng.teams==v?' class="act"':'')+' onclick="ngTeams('+v+')">'+t+'</button>').join('')+'</div>'+(ng.teams?'<p style="margin:6px 0 0;color:var(--mut);font-size:13px">Scores stay individual. A team wins when it is the last team with a living player, or has the most combined points after round 30. Teammates cannot attack each other.</p>':'<p style="margin:6px 0 0;color:var(--mut);font-size:13px">Every player plays for themselves. The last player standing wins, or the player with the most points after round 30.</p>')}
 const teamBtn=c=>'<button'+(ng.team[c]?' class="act"':'')+' onclick="ngTeam('+c+')">'+(ng.team[c]?'Team '+ng.team[c]:'Team ?')+'</button>';
 // netPlayerRows() = the Players list of the online New game menu: every seat with its color dot and name (tap to change one that is yours, or any seat when you are the host), a Computer tag, and the team button while Teams are on (host only). They are the looks the NEXT game will use.
@@ -2494,7 +2498,7 @@ t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});se
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
-const NET_VER=21,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const NET_VER=22,PEER_SRC='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SKEY='constellate-online',RALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 // net = everything about the online session. on = in an online game or lobby. role = host or guest. room = the room code. n = number of players. peer/conn = the connection library objects (conn is a guest's line to the host). seats = the seat list (host: full details with each guest's line; guest: just a display copy). my = the colors THIS device controls. started = the game has begun. rq = a Hold/Retreat question waiting for this device's answer. lastG/lastAsk/lastDef = what was last sent, to avoid sending the same thing twice. acting = this device just finished a turn and still owes everyone the final state. hsent = how many history snapshots everyone already has. hold = pause sending (used while a game is being created). tok = this guest's private seat key. status = short connection note shown in the info row. lobby = the lobby dialog is on screen. last = when anything last arrived from the host. retry/busy/gone/fails = reconnect bookkeeping.
 const net={on:false,role:null,room:null,n:2,sz:7,pm:'choice',team:null,peer:null,conn:null,seats:[],my:[],started:false,rq:null,lastG:'',lastAsk:'',lastDef:null,acting:false,hsent:0,hold:false,tok:null,status:'',lobby:false,last:0,retry:null,busy:false,gone:false,fails:0,look:null};
 // rnd(n) makes n random room-code characters; mkTok() makes a longer random key (uses the browser's secure random when it has one).
@@ -2617,7 +2621,7 @@ if(sz)net.sz=sz;if(pm)net.pm=pm;net.hold=true;net.started=true;net.lobby=false;n
 net.lastG=JSON.stringify(G);net.acting=false;relay(fullMsg(true),null);netPush()}
 // netToggleSeat(c) (host): in the lobby, turn an open seat into "the host plays this one too" and back.
 // netCpuSeat(c) (host): in the lobby, turn an open seat into a computer player and back.
-function netCpuSeat(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host')return;if(s.kind=='open'){if(net.team&&net.seats.some(q=>q.c!=c&&net.team[q.c]==net.team[c]))return nmsg('A computer player has to be alone on its team.');s.kind='cpu';s.lvl=1;s.online=true}else if(s.kind=='cpu'){s.kind='open';s.lvl=0;s.online=false}netPush()}
+function netCpuSeat(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host')return;if(s.kind=='open'){s.kind='cpu';s.lvl=1;s.online=true}else if(s.kind=='cpu'){s.kind='open';s.lvl=0;s.online=false}netPush()}
 // netCpuLvl(c) (host): cycle a lobby computer seat through Easy, Medium and Hard.
 function netCpuLvl(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host'||s.kind!='cpu')return;s.lvl=(s.lvl||1)%3+1;netPush()}
 function netToggleSeat(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host')return;if(s.kind=='open')s.kind='local';else if(s.kind=='local'&&!s.took)s.kind='open';netPush()}
@@ -2711,6 +2715,13 @@ const cpuOf=c=>!!(G&&G.cpu&&G.cpu[c]);
 // allCpu() = every player still in the game is a computer.
 const allCpu=()=>!!G&&!!G.cpu&&G.pl.filter(c=>G.alive[c]).every(c=>G.cpu[c]);
 const cpuHere=c=>cpuOf(c)&&(!net.on||net.role=='host');
+// (CPUs and teams, 2026-10-30) cpuTgt(o,me) = a star owned by o is one computer me may attack: not its own and not a LIVING teammate's (a dead teammate's leftover Stars may be captured, RULES.md 9.4). Who can take the computer's Stars is isFoe (living players on another team). Every 'enemy star' test in the CPU code uses one of the two, so a computer never targets a teammate and never guards against one. With teams off they are exactly the old tests (o!=me; o!=me and alive), so games without teams play the same.
+const cpuTgt=(o,me)=>o!=me&&!isAlly(o,me);
+// (CPUs and teams, step 2, 2026-10-30) cpuTeamCfg = the team values (placeholders, not tuned): mate = how much a teammate's Victory Point is worth to me, as a share of my own (round 30 is won on combined team VP, so a claim that breaks a teammate's sector costs the team; less than 1 because turn order, Fleets and Deficit Elimination use individual VP); endWin / endTeam = bonus for taking the last Star of an enemy who is the last living player of their team, when that ends the game / when other teams are still left; sup = strength a living teammate's Star within 2.3 adds to my new Star or capture (the teammate can Connect to it). Nothing here is read in a game without teams.
+const cpuTeamCfg={mate:.8,endWin:40,endTeam:12,sup:1};
+// cpuEndCore(o,left) = (team games) the bonus for leaving enemy o with `left` Stars: 0 unless left is 0 (o is eliminated) and o is the last living player of its team (the team is out, RULES.md 9.2); endWin when that leaves one side (the game is won), else endTeam. A player whose teammate is still alive gets no bonus: their linked Stars pass to that teammate (9.7). cpuEndB(o) = the same for one capture on the real board.
+function cpuEndCore(o,left){if(!teamsOn()||left>0||!G.alive[o]||G.pl.some(c=>c!=o&&G.alive[c]&&sameTeam(c,o)))return 0;return sidesLeft()-1<2?cpuTeamCfg.endWin:cpuTeamCfg.endTeam}
+const cpuEndB=o=>teamsOn()?cpuEndCore(o,G.stars.filter(q=>q.o==o).length-1):0;
 // cpuMs = pause between the computer's moves (so you can follow them); 700 normal, 250 fast, 0 instant. cpuRun = true while the computer is making a move (it lets its moves through the "computer is playing" lock). cpuTimer = the pending next-move timer. cpuTimers = false turns the timer off (tests drive the computer by hand). cpuSeed = a number makes its randomness repeatable (tests); null = real randomness. cpuErr = the last error the computer hit (it never stops the game; after a few failures it just ends its turn; tests check it stays empty). cpuBad = moves that failed this turn, so they are not retried; cpuTurn = which turn cpuBad belongs to; cpuStall = consecutive failures.
 let cpuErr=null,cpuMs=700,cpuRun=false,cpuTimer=null,cpuTimers=true,cpuSeed=null,cpuBad=new Set(),cpuTurn='',cpuStall=0;try{const v=localStorage.getItem('constellate-cpums');if(v!==null&&!isNaN(+v))cpuMs=+v}catch(e){}
 const cpuR=()=>cpuSeed==null?Math.random():((cpuSeed=(cpuSeed*1664525+1013904223)>>>0)/4294967296);
@@ -2718,23 +2729,26 @@ const cpuR=()=>cpuSeed==null?Math.random():((cpuSeed=(cpuSeed*1664525+1013904223
 const cpuSpeedLabel=()=>'CPU speed: '+(cpuMs>=500?'Normal':cpuMs>0?'Fast':'Instant');
 function cpuSpeedCycle(b){cpuMs=cpuMs>=500?250:cpuMs>0?0:700;try{localStorage.setItem('constellate-cpums',String(cpuMs))}catch(e){}b.textContent=cpuSpeedLabel()}
 // (reference only: the game now uses the fast incPot1/incPot2; the harness checks them against this) cpuPot(S,me) = how good board S is for color me: 10 per Victory Point plus a small reward for leading in a sector (my stars minus the best opponent's, capped), so a move toward a majority counts even before it scores. S is a copy of the game with its stars changed (calc needs the whole game).
-function cpuPot(S,me){const vp=calc(S).vp[me],cnt={};S.stars.forEach(s=>{const k=Math.floor(s.x/3)+','+Math.floor(s.y/3);(cnt[k]=cnt[k]||[0,0,0,0])[s.o]++});let g=0;Object.values(cnt).forEach(n=>{let o=0;n.forEach((v,c)=>{if(c!=me&&v>o)o=v});g+=.4*Math.max(-2,Math.min(2,n[me]-o))});return vp*10+g}
+// cpuPotMate(S,me,vp) = (team games) teammates' points at cpuTeamCfg.mate of my own, 10 per point: the term incEval adds, repeated here so the reference values stay comparable.
+const cpuPotMate=(S,me,vp)=>S.team?S.pl.reduce((a,c)=>a+(c!=me&&S.alive[c]&&S.team[c]&&S.team[c]==S.team[me]?cpuTeamCfg.mate*10*vp[c]:0),0):0;
+function cpuPot(S,me){const V=calc(S).vp,vp=V[me],cnt={};S.stars.forEach(s=>{const k=Math.floor(s.x/3)+','+Math.floor(s.y/3);(cnt[k]=cnt[k]||[0,0,0,0])[s.o]++});let g=0;Object.values(cnt).forEach(n=>{let o=0;n.forEach((v,c)=>{if(c!=me&&v>o)o=v});g+=.4*Math.max(-2,Math.min(2,n[me]-o))});return vp*10+g+cpuPotMate(S,me,V)}
 // ----- Levels. G.cpu[color] is 1 Easy, 2 Medium, 3 Hard (plans whole turns), 4 Hard (legacy, the old move-by-move Hard), 5 Hard+F (test, also plans Fleets), 6 Custom (the player's own saved level, step 8). cpuRaw() = the level number of the computer whose turn it is; cpuLvl() = its STYLE level: the same, except that Custom plays like the built-in level it was based on (1-3), so every 'is it Medium / Hard' check keeps working. Only the values (cpuPar) are Custom's own.
 const CPU_LEVELS=['','Easy','Medium','Hard','Hard (legacy)','Hard+F (test)','Custom'],cpuRaw=()=>(G&&G.cpu&&G.cpu[cur()])||1,cpuEff=l=>l==6?cpuBaseNow():l,cpuLvl=()=>cpuEff(cpuRaw());
 // cpuDanger = this computer is close to deficit elimination (it is last and 2 or more points behind the next player), so the center sector is worth its full 3 points again; cpuNew = ids of stars it claimed or captured this turn (they support each other).
 // cpuFeat = switches for Medium's separate ideas (so each can be measured on its own): center = discount the center sector; rows = reward row/column progress; threat = discount claims and captures the opponent could take back; conn = value connections that lift a threatened star to safety; place = put Fleets on threatened stars; move = move Fleets onto threatened stars; attack = place and move Fleets to enable captures; reach = how many Fuel away an opponent star must be to count as a threat (opponents rarely spend more than a few Fuel on one capture); def = pick the strongest Retreat star. (The random wobble when choosing is the 'noise' row of CPU_PARAMS.)
 const cpuFeat={center:1,rows:1,threat:1,conn:1,place:1,move:1,def:1,attack:1,reach:3};
 let cpuDanger=false,cpuNew=[];
-function cpuDangerCheck(me){const vp=calc(G).vp,alive=G.pl.filter(c=>G.alive[c]);if(alive.some(c=>c!=me&&vp[c]<vp[me]))return false;const higher=alive.filter(c=>vp[c]>vp[me]).map(c=>vp[c]);return !!higher.length&&Math.min(...higher)-vp[me]>=2}
+// (CPUs and teams) In a team game a player is immune to the gap above it when every player in the score level directly ahead is a teammate (RULES.md 9.3), so that is no danger.
+function cpuDangerCheck(me){const vp=calc(G).vp,alive=G.pl.filter(c=>G.alive[c]);if(alive.some(c=>c!=me&&vp[c]<vp[me]))return false;const higher=alive.filter(c=>vp[c]>vp[me]).map(c=>vp[c]);if(!higher.length)return false;const up=Math.min(...higher);if(teamsOn()&&alive.every(c=>vp[c]!=up||sameTeam(c,me)))return false;return up-vp[me]>=2}
 // cpuOppAp() = the Fuel an opponent will have on their next turn (this round's or next round's, whichever is more).
 const cpuOppAp=()=>Math.max(1,Math.min(15,Math.max(acts(G.round),acts(G.round+1))));
 // cpuThreatened(pos,tStr,me,ign) = could some live opponent star take a star at pos that has strength tStr, spending no more Fuel than the opponent will have? (ign = a star to leave out, such as the one being captured right now.)
-function cpuThreatened(pos,tStr,me,ign){const ap=Math.min(cpuOppAp(),cpuFeat.reach);return G.stars.some(A=>A!==ign&&A.o!=me&&G.alive[A.o]&&cost(A,pos)<=ap&&cStr(A)>tStr)}
+function cpuThreatened(pos,tStr,me,ign){const ap=Math.min(cpuOppAp(),cpuFeat.reach);return G.stars.some(A=>A!==ign&&isFoe(A.o,me)&&cost(A,pos)<=ap&&cStr(A)>tStr)}
 // (reference only, see incPot2) cpuPot2(S,me,danger) = Medium's board value for color me: 10 per Victory Point, but the center sector counts as 1 point not 3 (it costs too much to defend) unless danger; a small reward for leading each non-center sector; and progress toward full rows and columns of sectors that no one else has broken into (a rival's open line is subtracted, so blocking it counts).
 function cpuPot2(S,me,danger){const {ctl,vp}=calc(S),Z=S.sz||7,mid=(Z-1)/2,cnt={};S.stars.forEach(s=>{const k=Math.floor(s.x/3)+','+Math.floor(s.y/3);(cnt[k]=cnt[k]||[0,0,0,0])[s.o]++});
-let v=vp[me]*10;if(cpuFeat.center&&!danger&&ctl[mid][mid]==me)v-=20;
+let v=vp[me]*10+cpuPotMate(S,me,vp);if(cpuFeat.center&&!danger&&ctl[mid][mid]==me)v-=20;
 Object.keys(cnt).forEach(k=>{const [x,y]=k.split(',').map(Number);if(cpuFeat.center&&!danger&&x==mid&&y==mid)return;const n=cnt[k];let o=0;n.forEach((c,col)=>{if(col!=me&&c>o)o=c});v+=.4*Math.max(-2,Math.min(2,n[me]-o))});
-if(cpuFeat.rows)for(let i=0;i<Z;i++)[ctl[i],ctl.map(r=>r[i])].forEach(L=>{const mn=L.filter(c=>c==me).length,others=new Set(L.filter(c=>c>=0&&c!=me));if(!others.size)v+=9*Math.pow(mn/Z,2);else if(others.size==1&&mn==0){const f=[...others][0];if(S.alive[f])v-=5*Math.pow(L.filter(c=>c==f).length/Z,2)}});return v}
+if(cpuFeat.rows)for(let i=0;i<Z;i++)[ctl[i],ctl.map(r=>r[i])].forEach(L=>{const mn=L.filter(c=>c==me).length,others=new Set(L.filter(c=>c>=0&&c!=me));if(!others.size)v+=9*Math.pow(mn/Z,2);else if(others.size==1&&mn==0){const f=[...others][0];if(S.alive[f]&&!(S.team&&S.team[f]&&S.team[f]==S.team[me]))v-=5*Math.pow(L.filter(c=>c==f).length/Z,2)}});return v}
 // cpuPotL(S,me) = the board value for the level playing now.
 const cpuPotL=(S,me)=>cpuLvl()>1?cpuPot2(S,me,cpuDanger):cpuPot(S,me);
 // ===== Turn cache (CPU project step 5, part 1) =====
@@ -2747,7 +2761,7 @@ const cCs=s=>cpuTab?cpuTab[s.id]:cs(s),cStr=s=>cpuTab?cpuTab[s.id]+(s.f||0):str(
 // ===== Fast scoring (CPU project step 3) =====
 // The slow cpuPot/cpuPot2 above rescan every star for all 49 sectors for EVERY candidate move (and copy the star list). A candidate only ever changes ONE sector (a star appears, or a star changes owner), so the fast version keeps a tally of the board and changes just that sector, reads the value, and puts it back.
 // cpuInc(S) builds the tally T for board S: n = stars per sector per color (index (y*Z+x)*4+color), ctl = who controls each sector (-1 nobody), vp = raw Victory Points per color (dead players are zeroed when read), lc = for each of the 2Z lines (rows 0..Z-1, then columns Z..2Z-1) how many of its sectors each color controls, mg = per color the sum over ALL sectors of the margin clamp(my stars - best other, -2, 2) as a whole number, alive = S.alive, pl = the players still in the game.
-function cpuInc(S){const Z=S.sz||7,T={Z,mid:(Z-1)/2,alive:S.alive,pl:S.pl.filter(c=>S.alive[c]!==false),n:new Int8Array(Z*Z*4),ctl:new Int8Array(Z*Z).fill(-1),vp:[0,0,0,0],lc:new Int8Array(2*Z*4),mg:[0,0,0,0]};
+function cpuInc(S){const Z=S.sz||7,T={Z,mid:(Z-1)/2,alive:S.alive,tm:S.team||null,pl:S.pl.filter(c=>S.alive[c]!==false),n:new Int8Array(Z*Z*4),ctl:new Int8Array(Z*Z).fill(-1),vp:[0,0,0,0],lc:new Int8Array(2*Z*4),mg:[0,0,0,0]};
 S.stars.forEach(q=>{T.n[((Math.floor(q.y/3))*Z+Math.floor(q.x/3))*4+q.o]++});
 for(let y=0;y<Z;y++)for(let x=0;x<Z;x++){const s=y*Z+x,w=incOwner(T,s);T.ctl[s]=w;if(w>=0){T.vp[w]+=incPts(T,x,y);T.lc[y*4+w]++;T.lc[(Z+x)*4+w]++}for(let k=0;k<4;k++)T.mg[k]+=incMarg(T.n,s*4,k)}
 for(let i=0;i<2*T.Z;i++)incLine(T,i,1);return T}
@@ -2867,19 +2881,25 @@ function cpuCustomDel(){cpuCustom.saved=false;cpuOver[6]={};Object.keys(ng.cpu).
 function cpuBack(){if(cpuUi.back=='menu'&&G)menuPage('dev');else settingsDlg()}
 // incEval(T,me,P,danger) = how good the board in tally T is for color me, using the values P (one level's cpuP). It adds up: my points (center discounted unless danger) + my lead per sector + progress on full rows/columns, then (only if those values are on) incRival: opponent points lost, rival leads, elimination risk. With the Easy / Medium / Hard defaults it gives exactly the old cpuPot / cpuPot2 values (the harness checks that).
 function incEval(T,me,P,danger){const Z=T.Z,mid=T.mid,ci=mid*Z+mid,nc=cpuFeat.center&&P.centerCut>0&&!danger,W=P.ownVp;let v=incVp(T,me)*W;
+// (CPUs and teams) A teammate's points count for me too, at cpuTeamCfg.mate of my own (team games only).
+if(T.tm)for(const c of T.pl)if(c!=me&&incMate(T,c,me))v+=cpuTeamCfg.mate*W*incVp(T,c);
 if(nc&&T.ctl[ci]==me)v-=P.centerCut*W;
 v+=P.marginOwn*(T.mg[me]-(nc?incMarg(T.n,ci*4,me):0));
 if(cpuFeat.rows&&(P.lineOwn||P.lineBlock))for(let i=0;i<Z;i++)for(let L=i;L<2*Z;L+=Z){const mn=T.lc[L*4+me];let no=0,f=-1;for(let c=0;c<4;c++)if(c!=me&&T.lc[L*4+c]>0){no++;f=c}
-if(!no)v+=P.lineOwn*Math.pow(mn/Z,2);else if(no==1&&mn==0){if(T.alive[f])v-=P.lineBlock*Math.pow(T.lc[L*4+f]/Z,2)}}
+if(!no)v+=P.lineOwn*Math.pow(mn/Z,2);else if(no==1&&mn==0){if(T.alive[f]&&!incMate(T,f,me))v-=P.lineBlock*Math.pow(T.lc[L*4+f]/Z,2)}}
 if(P.oppVp||P.marginOpp||P.elimPen)v+=incRival(T,me,P,nc);
 return v}
 // incRival(T,me,P,nc) = the part of the value that comes from the opponents (negative when they are doing well). Each opponent's points and sector leads are subtracted, weighted up by Leader focus when that opponent is ahead of me (the center discount applies to them too). Then the elimination risk: if I am in or tied for last place, the gap to the nearest higher score (plus the expected slip) costs elimPen per point beyond elimFrom, spread so that a gap of 4 costs the full elimPen (and more beyond).
+// (CPUs and teams) In a team game Leader focus compares team totals (the opponent's team against mine, as round 30 does), and there is no elimination risk when every player at the next score up is a teammate (immunity, RULES.md 9.3).
 function incRival(T,me,P,nc){const ci=T.mid*T.Z+T.mid,vme=incVp(T,me);let v=0,lo=vme,up=1e9;
+const tv=T.tm?t=>{let x=0;for(const d of T.pl)if(T.tm[d]==t)x+=incVp(T,d);return x}:null,tme=tv?tv(T.tm[me]):0;
 for(const c of T.pl)if(c!=me){const x=incVp(T,c);if(x<lo)lo=x}
-for(const c of T.pl){if(c==me)continue;const x=incVp(T,c),m=1+P.leaderBoost*Math.max(0,Math.min(1,(x-vme)/P.leaderSpan));
-v-=P.oppVp*m*(x-(nc&&T.ctl[ci]==c?P.centerCut:0));v-=P.marginOpp*m*(T.mg[c]-(nc?incMarg(T.n,ci*4,c):0));if(x>lo&&x<up)up=x}
-if(P.elimPen>0&&vme==lo&&up<1e9){const g=up-lo+P.elimBuffer;if(g>P.elimFrom)v-=P.elimPen*(g-P.elimFrom)/(4-P.elimFrom)}
+for(const c of T.pl){if(c==me)continue;const x=incVp(T,c);if(x>lo&&x<up)up=x;if(incMate(T,c,me))continue;const m=1+P.leaderBoost*Math.max(0,Math.min(1,((tv?tv(T.tm[c])-tme:x-vme))/P.leaderSpan));
+v-=P.oppVp*m*(x-(nc&&T.ctl[ci]==c?P.centerCut:0));v-=P.marginOpp*m*(T.mg[c]-(nc?incMarg(T.n,ci*4,c):0))}
+if(P.elimPen>0&&vme==lo&&up<1e9&&!(T.tm&&T.pl.every(c=>c==me||incVp(T,c)!=up||incMate(T,c,me)))){const g=up-lo+P.elimBuffer;if(g>P.elimFrom)v-=P.elimPen*(g-P.elimFrom)/(4-P.elimFrom)}
 return v}
+// incMate(T,c,me) = in a team game, c is on me's team (T.tm = the game's teams, null without teams). (CPUs and teams) A teammate is not a rival: its points, sector leads and open lines are not counted against me (its points count for me instead, see incEval).
+const incMate=(T,c,me)=>!!(T.tm&&T.tm[c]&&T.tm[c]==T.tm[me]);
 // incPot1 / incPot2 = the OLD Easy and Medium values (default parameters), kept so the harness can compare them with the slow cpuPot / cpuPot2. incPotL(T,me) = the value for the level playing now, with its current parameters (this is what the CPU uses).
 const incPot1=(T,me)=>incEval(T,me,cpuDefP(1),false);
 const incPot2=(T,me,danger)=>incEval(T,me,cpuDefP(2),danger);
@@ -2888,25 +2908,27 @@ const incPotL=(T,me)=>incEval(T,me,cpuPar(),cpuDanger);
 function incTake(T,b,me){incStar(T,b,b.o,-1);incStar(T,b,me,1);const v=incPotL(T,me);incStar(T,b,me,-1);incStar(T,b,b.o,1);return v}
 function incClaim(T,x,y,me){incAdd(T,Math.floor(x/3),Math.floor(y/3),me,1);const v=incPotL(T,me);incAdd(T,Math.floor(x/3),Math.floor(y/3),me,-1);return v}
 // cpuLoss(s,me,T) = how much worse the board gets for me if star s flips to the nearest opponent. T = an optional tally of the current board (callers that ask many times pass one).
-function cpuLoss(s,me,T){const foe=G.stars.filter(q=>q.o!=me&&G.alive[q.o]).sort((a,b)=>Math.hypot(a.x-s.x,a.y-s.y)-Math.hypot(b.x-s.x,b.y-s.y))[0];if(!foe)return 0;T=T||cpuInc(G);const b=incPotL(T,me);incStar(T,s,s.o,-1);incStar(T,s,foe.o,1);const a=incPotL(T,me);incStar(T,s,foe.o,-1);incStar(T,s,s.o,1);return Math.max(0,b-a)}
+function cpuLoss(s,me,T){const foe=G.stars.filter(q=>isFoe(q.o,me)).sort((a,b)=>Math.hypot(a.x-s.x,a.y-s.y)-Math.hypot(b.x-s.x,b.y-s.y))[0];if(!foe)return 0;T=T||cpuInc(G);const b=incPotL(T,me);incStar(T,s,s.o,-1);incStar(T,s,foe.o,1);const a=incPotL(T,me);incStar(T,s,foe.o,-1);incStar(T,s,s.o,1);return Math.max(0,b-a)}
 // cpuSupport(a,N,c,ap) = the strength a new star at N (claimed from star a, costing c Fuel) can be expected to reach. It starts at 1 (its connection to a) and adds the three kinds of support: free Fleets on a or a's neighbors that can step onto it; a nearby friendly star it can be connected to with Fuel left over; and another star claimed or captured this turn close by (advancing with several stars).
 function cpuSupport(a,N,c,ap){const me=cur();let st=1,fl=(a.f||0)-(a.fm||0);G.conns.forEach(q=>{if(q[0]==a.id||q[1]==a.id){const u=by(q[0]==a.id?q[1]:q[0]);if(u&&u.o==me)fl+=(u.f||0)-(u.fm||0)}});st+=Math.max(0,Math.min(fl,3));
 if(ap-c>=1&&G.stars.some(s=>s.o==me&&s!==a&&Math.hypot(s.x-N.x,s.y-N.y)<=2.3))st+=1;
-if(cpuNew.some(id=>{const q=by(id);return q&&Math.hypot(q.x-N.x,q.y-N.y)<=3}))st+=1;return st}
+if(cpuNew.some(id=>{const q=by(id);return q&&Math.hypot(q.x-N.x,q.y-N.y)<=3}))st+=1;
+// (CPUs and teams) a living teammate's Star close by is backup too (it can Connect to the new Star).
+if(teamsOn()&&G.stars.some(q=>isAlly(q.o,me)&&Math.hypot(q.x-N.x,q.y-N.y)<=2.3))st+=cpuTeamCfg.sup;return st}
 // ===== Hard level (level 3): everything Medium does, plus the ideas below. cpuFeat3 = switches so each can be measured: buffer = claim ring systems in front of sectors it leads (strategy 1: keep fights out of sectors you want to keep); hopeless = do not spend Fuel in a sector the opponent is clearly winning; cut = capture the neighbors that give Fleets a way to retreat before attacking those Fleets, and attack Fleets that have no retreat (strategy 6); multi = use two-star attacks as a normal option; cap = guard its own Capital first.
 const cpuFeat3={buffer:1,hopeless:1,cut:1,multi:1,cap:1};
 const cpuHard=()=>cpuLvl()>2;
 // cpuSec(S) = stars per sector, as {'x,y': [count per color]}.
 function cpuSec(S){const c={};S.stars.forEach(s=>{const k=Math.floor(s.x/3)+','+Math.floor(s.y/3);(c[k]=c[k]||[0,0,0,0])[s.o]++});return c}
 // cpuBuffer(N,me,sc) = bonus for a new star at N that sits just outside (within 1.6 systems of) a sector I lead, on the side where enemies are near: it keeps the fighting out of that sector. At most 1.6.
-function cpuBuffer(N,me,sc){let v=0;const foes=G.stars.filter(s=>s.o!=me&&G.alive[s.o]);for(const k in sc){const n=sc[k];let o=0;n.forEach((c,col)=>{if(col!=me&&c>o)o=c});if(n[me]<1||n[me]<=o)continue;const [sx,sy]=k.split(',').map(Number),x0=sx*3,y0=sy*3,dx=Math.max(x0-N.x,0,N.x-(x0+3)),dy=Math.max(y0-N.y,0,N.y-(y0+3)),d=Math.hypot(dx,dy);if(d<=0||d>1.6)continue;if(foes.some(f=>Math.hypot(f.x-(x0+1.5),f.y-(y0+1.5))<6))v+=.8}return Math.min(1.6,v)}
+function cpuBuffer(N,me,sc){let v=0;const foes=G.stars.filter(s=>isFoe(s.o,me));for(const k in sc){const n=sc[k];let o=0;n.forEach((c,col)=>{if(col!=me&&c>o)o=c});if(n[me]<1||n[me]<=o)continue;const [sx,sy]=k.split(',').map(Number),x0=sx*3,y0=sy*3,dx=Math.max(x0-N.x,0,N.x-(x0+3)),dy=Math.max(y0-N.y,0,N.y-(y0+3)),d=Math.hypot(dx,dy);if(d<=0||d>1.6)continue;if(foes.some(f=>Math.hypot(f.x-(x0+1.5),f.y-(y0+1.5))<6))v+=.8}return Math.min(1.6,v)}
 // cpuBufTab(me,sc) / cpuBufFast(N,tab) = cpuBuffer split in two so the sector scan runs once per search: the table lists the sectors I lead that have an enemy star within 6 of their middle ([left, top] pairs), and cpuBufFast adds .8 for each of them that N touches (within 1.6, not inside), at most 1.6. Same numbers as cpuBuffer (the harness --check compares them).
-function cpuBufTab(me,sc){const foes=G.stars.filter(s=>s.o!=me&&G.alive[s.o]),t=[];for(const k in sc){const n=sc[k];let o=0;n.forEach((c,col)=>{if(col!=me&&c>o)o=c});if(n[me]<1||n[me]<=o)continue;const [sx,sy]=k.split(',').map(Number),x0=sx*3,y0=sy*3;if(foes.some(f=>Math.hypot(f.x-(x0+1.5),f.y-(y0+1.5))<6))t.push(x0,y0)}return t}
+function cpuBufTab(me,sc){const foes=G.stars.filter(s=>isFoe(s.o,me)),t=[];for(const k in sc){const n=sc[k];let o=0;n.forEach((c,col)=>{if(col!=me&&c>o)o=c});if(n[me]<1||n[me]<=o)continue;const [sx,sy]=k.split(',').map(Number),x0=sx*3,y0=sy*3;if(foes.some(f=>Math.hypot(f.x-(x0+1.5),f.y-(y0+1.5))<6))t.push(x0,y0)}return t}
 function cpuBufFast(N,t){let v=0;for(let i=0;i<t.length;i+=2){const x0=t[i],y0=t[i+1],dx=Math.max(x0-N.x,0,N.x-(x0+3)),dy=Math.max(y0-N.y,0,N.y-(y0+3)),d=Math.hypot(dx,dy);if(d<=0||d>1.6)continue;v+=.8}return Math.min(1.6,v)}
 // cpuHopeless(N,me,sc) = penalty for putting a star in a sector where an opponent already leads by 2 or more stars.
 function cpuHopeless(N,me,sc){const n=sc[Math.floor(N.x/3)+','+Math.floor(N.y/3)];if(!n)return 0;let o=0;n.forEach((c,col)=>{if(col!=me&&c>o)o=c});const d=o-n[me];return d>=2?Math.min(4,1.2*(d-1)):0}
-// cpuRoutes(s) = the stars a Fleet on s could retreat to (stars of the same owner connected to it).
-const cpuRoutes=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).map(c=>by(c[0]==s.id?c[1]:c[0])).filter(u=>u&&u.o==s.o);
+// cpuRoutes(s) = the stars a Fleet on s could retreat to (stars of the same owner connected to it; in a team game also a living teammate's star linked to it, RULES.md 9.6, the same spots the Defence call offers).
+const cpuRoutes=s=>G.conns.filter(c=>c[0]==s.id||c[1]==s.id).map(c=>by(c[0]==s.id?c[1]:c[0])).filter(u=>u&&(u.o==s.o||isAlly(u.o,s.o)));
 // cpuCutBonus(b,mineStars) = extra value of capturing star b for Fleet reasons: (1) b holds Fleets and has no retreat, so they will be forced to Hold; (2) b is the connection some Fleet-holding neighbor retreats through, and capturing b erases it (worth most when it is that neighbor's last route and the neighbor is itself within reach).
 function cpuCutBonus(b,mine){let v=0;if((b.f||0)>0&&!cpuRoutes(b).length)v+=.8*b.f;cpuRoutes(b).forEach(n=>{if((n.f||0)>0&&mine.some(a=>cost(a,n)<=3)){const r=cpuRoutes(n).length;v+=.8*n.f*(r<=1?.9:.3)}});return v}
 // cpuSpot(a,cx,cy) = a legal position for a new star in system (cx,cy) connected from star a: a random legal fixed spot; if the game allows free placement and no fixed spot fits, any legal spot on a fine grid (the same grid moveAvail uses). null = no room.
@@ -2915,13 +2937,13 @@ if(G.pm!='fixed'){for(let i=0;i<=10;i++)for(let j=0;j<=10;j++){const p={x:cx+MAR
 // cpuCands(R) = the moves the computer is considering, each {t,a,b/cx,cy,v,key}. t: 'take' an enemy star, 'claim' an empty system, 'conn' connect two of its own stars. v = how good (before a little randomness). Claims only look R systems out (R = 3 first, the whole Fuel range if nothing is found). Medium adds the threat check: a claim or capture that the opponent could simply take back (and that has no support) is worth much less, and a connection that lifts a threatened star out of reach is worth what that star is worth.
 function cpuCands0(R){const P=cpuPar(),me=cur(),ap=G.ap,L2=cpuLvl()>1,mine=G.stars.filter(s=>s.o==me&&!G.used.includes(s.id)),out=[],T=cpuInc(G),base=incPotL(T,me),N=NSYS(G),mid=(N-1)/2,occ=new Set(G.stars.map(q=>Math.floor(q.x)+','+Math.floor(q.y)));
 const linked=(a,b)=>G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id)),sc3=cpuHard()?cpuSec(G):null,bt3=cpuHard()&&cpuFeat3.buffer?cpuBufTab(me,sc3):null,takeable=new Set();
-for(const a of mine)for(const b of G.stars){if(b===a)continue;const c=cost(a,b);if(c>ap||!cclear(a,b))continue;
-if(b.o!=me){if(cStr(a)<=cStr(b))continue;takeable.add(b.id);const key='t'+a.id+'_'+b.id;if(cpuBad.has(key))continue;let g=incTake(T,b,me)-base;let bonus=b.cap?8:1;if(cpuHard()&&cpuFeat3.cut)bonus+=cpuCutBonus(b,mine);
+for(const a of mine)for(const b of G.stars){if(b===a||isAlly(b.o,me))continue;const c=cost(a,b);if(c>ap||!cclear(a,b))continue;
+if(b.o!=me){if(cStr(a)<=cStr(b))continue;takeable.add(b.id);const key='t'+a.id+'_'+b.id;if(cpuBad.has(key))continue;let g=incTake(T,b,me)-base;let bonus=(b.cap?8:1)+cpuEndB(b.o);if(cpuHard()&&cpuFeat3.cut)bonus+=cpuCutBonus(b,mine);
 if(L2&&cpuFeat.threat&&!b.cap){const mn=Math.max(0,cStr(b)+1-cCs(a));if(cpuThreatened(b,1+mn,me,b))g=g*.3-.3}
 out.push({t:'take',a,b,v:g+bonus-P.apCost*c,key})}
 else if(!linked(a,b)){const key='c'+a.id+'_'+b.id;if(cpuBad.has(key))continue;let v;
-if(L2&&cpuFeat.conn){v=.1-.1*c;[a,b].forEach(P=>{if(cpuThreatened(P,cStr(P),me)&&!cpuThreatened(P,cStr(P)+1,me))v+=.5*Math.min(4,cpuLoss(P,me,T))});const near=G.stars.some(s=>s.o!=me&&G.alive[s.o]&&Math.hypot(s.x-b.x,s.y-b.y)<4);if(near)v+=.3}
-else{const near=G.stars.some(s=>s.o!=me&&Math.abs(s.x-b.x)+Math.abs(s.y-b.y)<4);v=.1+(near?.4:0)-.1*c}
+if(L2&&cpuFeat.conn){v=.1-.1*c;[a,b].forEach(P=>{if(cpuThreatened(P,cStr(P),me)&&!cpuThreatened(P,cStr(P)+1,me))v+=.5*Math.min(4,cpuLoss(P,me,T))});const near=G.stars.some(s=>isFoe(s.o,me)&&Math.hypot(s.x-b.x,s.y-b.y)<4);if(near)v+=.3}
+else{const near=G.stars.some(s=>cpuTgt(s.o,me)&&Math.abs(s.x-b.x)+Math.abs(s.y-b.y)<4);v=.1+(near?.4:0)-.1*c}
 out.push({t:'conn',a,b,v,key})}}
 const pick=mine.slice().sort(()=>cpuR()-.5).slice(0,12);
 for(const a of pick){const ax=Math.floor(a.x),ay=Math.floor(a.y);for(let cy=Math.max(0,ay-R);cy<=Math.min(N-1,ay+R);cy++)for(let cx=Math.max(0,ax-R);cx<=Math.min(N-1,ax+R);cx++){const c=Math.abs(cx-ax)+Math.abs(cy-ay);if(c<1||c>Math.min(R,ap)||occ.has(cx+','+cy))continue;const key='s'+a.id+'_'+cx+'_'+cy;if(cpuBad.has(key))continue;
@@ -2930,44 +2952,45 @@ if(cpuHard()){if(cpuFeat3.buffer)g+=cpuBufFast(Np,bt3);if(cpuFeat3.hopeless)g-=c
 if(L2&&cpuFeat.threat&&cpuThreatened(Np,cpuSupport(a,Np,c,ap),me))g=g*.3-.3;
 out.push({t:'claim',a,cx,cy,v:g,key})}}
 // Hard: two-star attacks on stars that no single star can take.
-if(cpuHard()&&cpuFeat3.multi)for(const b of G.stars){if(b.o==me||takeable.has(b.id))continue;const cand=mine.filter(a=>cclear(a,b)&&cost(a,b)<=Math.min(ap,3));if(cand.length<2)continue;let pair=null,pv=-1;for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++){const x=cand[i],y=cand[j],t=cCs(x)+(x.f||0)+cCs(y)+(y.f||0);if(cost(x,b)+cost(y,b)<=ap&&t>cStr(b)&&t>pv){pv=t;pair=[x,y]}}if(!pair)continue;const key='x'+b.id+'_'+pair[0].id+'_'+pair[1].id;if(cpuBad.has(key))continue;out.push({t:'multi',a:pair[0],y:pair[1],b,v:incTake(T,b,me)-base+(b.cap?8:1)+(cpuFeat3.cut?cpuCutBonus(b,mine):0)-P.apCost*(cost(pair[0],b)+cost(pair[1],b))-.3,key})}
+if(cpuHard()&&cpuFeat3.multi)for(const b of G.stars){if(!cpuTgt(b.o,me)||takeable.has(b.id))continue;const cand=mine.filter(a=>cclear(a,b)&&cost(a,b)<=Math.min(ap,3));if(cand.length<2)continue;let pair=null,pv=-1;for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++){const x=cand[i],y=cand[j],t=cCs(x)+(x.f||0)+cCs(y)+(y.f||0);if(cost(x,b)+cost(y,b)<=ap&&t>cStr(b)&&t>pv){pv=t;pair=[x,y]}}if(!pair)continue;const key='x'+b.id+'_'+pair[0].id+'_'+pair[1].id;if(cpuBad.has(key))continue;out.push({t:'multi',a:pair[0],y:pair[1],b,v:incTake(T,b,me)-base+(b.cap?8:1)+cpuEndB(b.o)+(cpuFeat3.cut?cpuCutBonus(b,mine):0)-P.apCost*(cost(pair[0],b)+cost(pair[1],b))-.3,key})}
 return out}
 function cpuCands(R){cpuTab=cpuStrTab();try{return cpuCands0(R)}finally{cpuTab=null}}
 // cpuChoose(list) = the move to make: the best v plus a random wobble (that wobble is what makes Easy a beginner; Medium uses much less).
 function cpuChoose(list){const nz=cpuPar().noise;let best=null,bv=-1e9;for(const m of list){const w=m.v+cpuR()*nz;if(w>bv){bv=w;best=m}}return best}
 // cpuCaps(me,maxCost) = the enemy stars worth attacking from nearby, as a list of {b, g} where g = how much better the board gets for me if I capture b (Capitals count extra). Only stars within maxCost Fuel of one of my stars are looked at.
-function cpuCaps(me,maxCost){const mine=G.stars.filter(s=>s.o==me),out=[],T=cpuInc(G),base=incPotL(T,me);for(const b of G.stars){if(b.o==me)continue;if(!mine.some(s=>cost(s,b)<=maxCost))continue;const g=incTake(T,b,me)-base+(b.cap?8:1)+(cpuHard()&&cpuFeat3.cut?cpuCutBonus(b,mine):0);if(g>0)out.push({b,g})}return out}
+function cpuCaps(me,maxCost){const mine=G.stars.filter(s=>s.o==me),out=[],T=cpuInc(G),base=incPotL(T,me);for(const b of G.stars){if(!cpuTgt(b.o,me))continue;if(!mine.some(s=>cost(s,b)<=maxCost))continue;const g=incTake(T,b,me)-base+(b.cap?8:1)+cpuEndB(b.o)+(cpuHard()&&cpuFeat3.cut?cpuCutBonus(b,mine):0);if(g>0)out.push({b,g})}return out}
 // cpuAttackValue(s,extra,caps) = how much it is worth to have star s end up with `extra` more strength: the best capture it could then make (needs the Fleets to be enough, and Fuel to reach it), divided by how many more Fleets that still needs.
 function cpuAttackValue(s,extra,caps){let best=0;const ap=Math.min(G.ap,cpuFeat.reach);for(const {b,g} of caps){const c=cost(s,b);if(c>ap||!cclear(s,b))continue;const need=Math.max(0,cStr(b)+1-cStr(s)-extra);if(need>0)continue;const v=g/(1+Math.max(0,cStr(b)+1-cStr(s)));if(v>best)best=v}return best}
 // cpuPlace() puts one Fleet on a star: Easy near the enemy (or on a threatened Capital), spreading Fleets out a little; Medium see cpuPlace2.
 function cpuPlace(){return cpuLvl()>1&&cpuFeat.place?cpuPlace2():cpuPlace1()}
 // cpuPlace2() (Medium) puts the Fleet where it matters most: on a star the opponent could take, preferring one the Fleet actually makes safe, weighted by what that star is worth; otherwise near the enemy.
-function cpuPlace2(){cpuTab=cpuStrTab();const me=cur(),T=cpuInc(G),ok=placeable(),foes=G.stars.filter(s=>s.o!=me&&G.alive[s.o]);const dist=s=>foes.length?Math.min(...foes.map(f=>Math.abs(f.x-s.x)+Math.abs(f.y-s.y))):9;let best=null,bv=-1e9;const caps=cpuFeat.attack?cpuCaps(me,cpuFeat.reach):[];
+function cpuPlace2(){cpuTab=cpuStrTab();const me=cur(),T=cpuInc(G),ok=placeable(),foes=G.stars.filter(s=>isFoe(s.o,me));const dist=s=>foes.length?Math.min(...foes.map(f=>Math.abs(f.x-s.x)+Math.abs(f.y-s.y))):9;let best=null,bv=-1e9;const caps=cpuFeat.attack?cpuCaps(me,cpuFeat.reach):[];
 for(const s of ok){let v=-.25*dist(s)+(s.cap&&dist(s)<=4?1.5:0)-.3*(s.f||0)+cpuR()*.4;if(cpuFeat.threat&&cpuThreatened(s,cStr(s),me)){v+=cpuLoss(s,me,T)*(cpuThreatened(s,cStr(s)+1,me)?.35:1)}
 if(cpuHard()&&cpuFeat3.cap&&s.cap&&cpuThreatened(s,cStr(s),me))v+=cpuThreatened(s,cStr(s)+1,me)?6:15;
 if(cpuFeat.attack){const left=Math.max(1,G.pool);let bestA=0;const ap=Math.min(G.ap,cpuFeat.reach);for(const {b,g} of caps){if(cost(s,b)>ap||!cclear(s,b))continue;const need=Math.max(0,cStr(b)+1-cStr(s));if(need<1||need>left)continue;const val=g/(1+need);if(val>bestA)bestA=val}v+=bestA}
 if(v>bv){bv=v;best=s}}cpuTab=null;mode='p';placeF(best);mode='s'}
-function cpuPlace1(){const me=cur(),ok=placeable(),foes=G.stars.filter(s=>s.o!=me&&G.alive[s.o]);const dist=s=>foes.length?Math.min(...foes.map(f=>Math.abs(f.x-s.x)+Math.abs(f.y-s.y))):9;let best=null,bv=-1e9;for(const s of ok){const d=dist(s),v=-d+(s.cap&&d<=4?2:0)-.3*(s.f||0)+cpuR()*1.5;if(v>bv){bv=v;best=s}}mode='p';placeF(best);mode='s'}
+function cpuPlace1(){const me=cur(),ok=placeable(),foes=G.stars.filter(s=>isFoe(s.o,me));const dist=s=>foes.length?Math.min(...foes.map(f=>Math.abs(f.x-s.x)+Math.abs(f.y-s.y))):9;let best=null,bv=-1e9;for(const s of ok){const d=dist(s),v=-d+(s.cap&&d<=4?2:0)-.3*(s.f||0)+cpuR()*1.5;if(v>bv){bv=v;best=s}}mode='p';placeF(best);mode='s'}
 // cpuFleetMove() makes ONE Fleet move toward the enemy, or returns false if none is worth making. Fleets near enemy Stars are ready to join an attack and make their Star harder to take, so Fleets sitting well back (more than 3 away from every enemy Star) move up. A group of n Fleets can go up to n Connections along the computer's own network (the same rule as the Move mode, and moves cost no Fuel). A Capital keeps its Fleets while an enemy Star is within 5. It only moves when the new Star is at least half a system closer, so it only ever advances and never shuffles back and forth.
 // cpuReach(a,n) = the own stars a group of n Fleets on star a can reach (up to n Connections along its own network), as a map id -> steps.
 function cpuReach(a,n){const me=cur(),reach=new Map([[a.id,0]]),q=[a];while(q.length){const x=q.shift();if(reach.get(x.id)>=n)continue;G.conns.forEach(c=>{if(c[0]==x.id||c[1]==x.id){const u=by(c[0]==x.id?c[1]:c[0]);if(u&&u.o==me&&!reach.has(u.id)){reach.set(u.id,reach.get(x.id)+1);q.push(u)}}})}return reach}
-// cpuMoveExec(a,t,n,key) makes the Move and reports whether it worked.
-function cpuMoveExec(a,t,n,key){const before=t.f||0;mode='m';resetFlow();moveF(a);if(!flow)pickN(a.id,n);moveF(t);mode='s';resetFlow();if((t.f||0)==before+n)return true;cpuBad.add(key);return false}
+// cpuMoveExec(a,t,n,key) makes the Move and reports whether it worked (the group arrived; hitchhikers may have come too, so t can gain more than n).
+function cpuMoveExec(a,t,n,key){const before=t.f||0;mode='m';resetFlow();moveF(a);if(!flow)pickN(a.id,n);moveF(t);mode='s';resetFlow();if((t.f||0)>=before+n)return true;cpuBad.add(key);return false}
 // cpuFleetMove2() (Medium) = move a group of Fleets onto a threatened star they would make safe, as long as leaving does not expose the star they leave.
 function cpuFleetMove2(){cpuTab=cpuStrTab();const me=cur(),T=cpuInc(G);let best=null;const caps=cpuFeat.attack?cpuCaps(me,cpuFeat.reach):[];for(const a of G.stars){if(a.o!=me)continue;const n=(a.f||0)-(a.fm||0);if(n<1)continue;if(cpuThreatened(a,cStr(a)-n,me)&&!cpuThreatened(a,cStr(a),me))continue;
 cpuReach(a,n).forEach((_,id)=>{if(id==a.id)return;const t=by(id),key='m'+a.id+'_'+id+'_'+n;if(cpuBad.has(key))return;let v=0;if(cpuFeat.threat&&cpuThreatened(t,cStr(t),me)&&!cpuThreatened(t,cStr(t)+n,me))v=cpuLoss(t,me,T)+(cpuHard()&&cpuFeat3.cap&&t.cap?12:0);if(cpuFeat.attack&&!G.used.includes(t.id)){const now=cpuAttackValue(t,0,caps),then=cpuAttackValue(t,n,caps);if(then>now)v=Math.max(v,then)}if(v>0){v+=cpuR()*.3;if(!best||v>best.v)best={a,t,n,v,key}}})}
 cpuTab=null;return best?cpuMoveExec(best.a,best.t,best.n,best.key):false}
-function cpuFleetMove(){if(cpuLvl()>1&&(cpuFeat.move||cpuFeat.attack)&&cpuFleetMove2())return true;cpuTab=cpuStrTab();const me=cur(),foes=G.stars.filter(s=>s.o!=me&&G.alive[s.o]);if(!foes.length){cpuTab=null;return false}const dist=s=>Math.min(...foes.map(f=>Math.hypot(f.x-s.x,f.y-s.y)));let best=null;
+function cpuFleetMove(){if(cpuLvl()>1&&(cpuFeat.move||cpuFeat.attack)&&cpuFleetMove2())return true;cpuTab=cpuStrTab();const me=cur(),foes=G.stars.filter(s=>isFoe(s.o,me));if(!foes.length){cpuTab=null;return false}const dist=s=>Math.min(...foes.map(f=>Math.hypot(f.x-s.x,f.y-s.y)));let best=null;
 for(const a of G.stars){if(a.o!=me)continue;const n=(a.f||0)-(a.fm||0);if(n<1)continue;const d0=dist(a);if(d0<=3||(a.cap&&d0<=5))continue;
 if(cpuLvl()>1&&cpuFeat.move&&cpuThreatened(a,cStr(a)-n,me)&&!cpuThreatened(a,cStr(a),me))continue;
 cpuReach(a,n).forEach((_,id)=>{if(id==a.id)return;const t=by(id),key='m'+a.id+'_'+id+'_'+n;if(cpuBad.has(key))return;const d1=dist(t);if(d1<=d0-.5){const v=(d0-d1)+cpuR()*.8;if(!best||v>best.v)best={a,t,n,v,key}}})}
 cpuTab=null;return best?cpuMoveExec(best.a,best.t,best.n,best.key):false}
 // cpuPick(ask) = a defending computer's choice for one Fleet: 'H' (Hold) or the id of a star to Retreat to. ask = {nb: retreat star ids, hOK: Hold allowed, lvl: its level}. Easy usually Retreats to a random star; Medium Retreats more often, to the strongest star.
-function cpuPick(ask){const l=cpuFeat.def?(ask.lvl||1):1;if(ask.nb.length&&(!ask.hOK||cpuR()<(l>1?.8:.6))){if(l>1){let b=ask.nb[0],bs=-1;ask.nb.forEach(id=>{const q=by(id),v=q?str(q)+cpuR()*.1:0;if(v>bs){bs=v;b=id}});return b}return ask.nb[Math.floor(cpuR()*ask.nb.length)]}return ask.hOK?'H':ask.nb[0]}
+// (CPUs and teams, placeholder) In a team game a computer Retreats to its OWN linked Stars when it has any; a teammate's linked Star (a Fleet gift, RULES.md 9.6) is used only when it is the only way out, which keeps the Fleet on the team instead of losing it. ask.b = the attacked Star (the defender's), sent by both the local and the online question.
+function cpuPick(ask){if(teamsOn()&&ask.b!=null){const d=by(ask.b),own=d?ask.nb.filter(id=>{const q=by(id);return q&&q.o==d.o}):ask.nb;if(own.length&&own.length<ask.nb.length)ask=Object.assign({},ask,{nb:own})}const l=cpuFeat.def?(ask.lvl||1):1;if(ask.nb.length&&(!ask.hOK||cpuR()<(l>1?.8:.6))){if(l>1){let b=ask.nb[0],bs=-1;ask.nb.forEach(id=>{const q=by(id),v=q?str(q)+cpuR()*.1:0;if(v>bs){bs=v;b=id}});return b}return ask.nb[Math.floor(cpuR()*ask.nb.length)]}return ask.hOK?'H':ask.nb[0]}
 // cpuTapAt(x,y) taps the board like a finger would.
 const cpuTapAt=(x,y)=>tap(x,y);
 // cpuDo(m) makes the chosen move by tapping, exactly as a person would. Returns false if nothing changed (the move did not work), so it is not tried again this turn.
-function cpuDo(m){if(m.t=='multi')return cpuMultiDo(m.b,m.a,m.y,m.key);const n0=G.stars.length,before=JSON.stringify([G.ap,G.stars.length,G.conns.length,G.used.length]);mode='s';resetFlow();const a=m.a;
+function cpuDo(m){if(m.t=='multi')return cpuMultiDo(m.b,m.a,m.y,m.key);if(m.t=='tconn'||m.t=='gift'||m.t=='fgift')return cpuTeamDo(m);const n0=G.stars.length,before=JSON.stringify([G.ap,G.stars.length,G.conns.length,G.used.length]);mode='s';resetFlow();const a=m.a;
 cpuTapAt(a.x,a.y);
 if(m.t=='claim'){const p=cpuSpot(a,m.cx,m.cy);if(!p){cpuBad.add(m.key);resetFlow();return false}cpuTapAt(p.x,p.y)}
 else{cpuTapAt(m.b.x,m.b.y);
@@ -2975,11 +2998,21 @@ if(m.t=='take'&&pend&&!pend.ph){const fr=a.f||0,mn=Math.max(0,str(m.b)+1-cs(a)),
 if(pend)return true;resetFlow();const after=JSON.stringify([G.ap,G.stars.length,G.conns.length,G.used.length]);if(after==before){cpuBad.add(m.key);return false}if(m.t=='claim'&&G.stars.length>n0)cpuNew.push(G.stars[G.stars.length-1].id);if(m.t=='take')cpuNew.push(m.b.id);return true}
 // cpuMulti() = the last resort when the only move left is a two-Star attack: pick two stars that together beat a target, use all their Fleets, and confirm.
 function cpuMultiDo(b,x,y,key){const before=JSON.stringify([G.ap,G.stars.length,G.conns.length,G.used.length]);mode='x';resetFlow();cpuTapAt(b.x,b.y);[x,y].forEach(a=>{cpuTapAt(a.x,a.y);if($('ov').style.display=='flex'&&(a.f||0)>0&&multi)mcUse(a.id,a.f)});multiGo();mode='s';if(pend)return true;resetFlow();if(JSON.stringify([G.ap,G.stars.length,G.conns.length,G.used.length])==before){cpuBad.add(key);return false}cpuNew.push(b.id);return true}
-function cpuMulti(){const me=cur(),mine=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id));for(const b of G.stars){if(b.o==me)continue;const cand=mine.filter(a=>cclear(a,b)&&cost(a,b)<=G.ap);for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++){const x=cand[i],y=cand[j],key='x'+b.id+'_'+x.id+'_'+y.id;if(cpuBad.has(key))continue;if(cost(x,b)+cost(y,b)<=G.ap&&cs(x)+(x.f||0)+cs(y)+(y.f||0)>str(b)){if(cpuMultiDo(b,x,y,key))return true}}}return false}
+// ----- Teamwork tools (CPUs and teams, step 2, 2026-10-30). The moves a computer can make toward a teammate, each through the same code as a person's popup button (tmDo, fgDo), so the rules, the move log, History, transcripts and online play all see an ordinary move. No level CHOOSES these yet (Shmorden: build the tools, train them later); only the Full Fuel Connect below is used.
+// cpuTeamMoves() = every teamwork move legal for the computer whose turn it is: {t:'tconn', a, b, c} Connect own Star a to teammate Star b for c Fuel; {t:'gift', a, b, c} Gift own Star a to the teammate whose Star b it links to; {t:'fgift', a, b, n} give the n Fleets on a that can still move (n = the whole group; any smaller group is legal too) to teammate Star b. key = the cpuBad key. Empty without teams.
+function cpuTeamMoves(){if(!teamsOn())return [];const me=cur(),out=[];for(const a of G.stars){if(a.o!=me)continue;const n=fFree(a);for(const b of G.stars){if(!isAlly(b.o,me))continue;const c=cost(a,b);
+if(!tmErr(a,b,'conn'))out.push({t:'tconn',a,b,c,key:'k'+a.id+'_'+b.id});if(!tmErr(a,b,'gift'))out.push({t:'gift',a,b,c,key:'g'+a.id+'_'+b.id});if(n>0&&!fgErr(a,b,n))out.push({t:'fgift',a,b,n,key:'h'+a.id+'_'+b.id+'_'+n})}}return out}
+// cpuTeamDo(m) = make teamwork move m (from cpuTeamMoves; an fgift may carry a smaller n). Returns false if nothing changed, and remembers the move in cpuBad so it is not tried again this turn. cpuDo hands these kinds here, so a plan or a candidate list can include them later.
+function cpuTeamDo(m){const a=m.a,b=m.b,key=m.key||m.t+a.id+'_'+b.id,before=JSON.stringify([G.ap,G.conns.length,a.o,a.f||0,b.f||0]);mode='s';resetFlow();
+if(m.t=='fgift'){flow={src:a.id,n:m.n};fg={a:a.id,t:b.id,n:m.n};fgDo()}else{tm={a:a.id,b:b.id};tmDo(m.t=='gift'?'gift':'conn')}
+resetFlow();if(JSON.stringify([G.ap,G.conns.length,a.o,a.f||0,b.f||0])!=before)return true;cpuBad.add(key);return false}
+// cpuMateConn() = (CPUs and teams, 2026-10-30) the very last resort of a computer on a team: when every other move is gone but a Connect to a living teammate's Star is still possible, Full Fuel (RULES.md 9.4) says the turn can't end, so it makes the cheapest such Connect (a Gift never: nobody is forced to give a Star away). Computers don't connect to teammates for any other reason yet. Returns false at once without teams.
+function cpuMateConn(){let best=null;for(const m of cpuTeamMoves())if(m.t=='tconn'&&!cpuBad.has(m.key)&&(!best||m.c<best.c))best=m;return best?cpuTeamDo(best):false}
+function cpuMulti(){const me=cur(),mine=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id));for(const b of G.stars){if(!cpuTgt(b.o,me))continue;const cand=mine.filter(a=>cclear(a,b)&&cost(a,b)<=G.ap);for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++){const x=cand[i],y=cand[j],key='x'+b.id+'_'+x.id+'_'+y.id;if(cpuBad.has(key))continue;if(cost(x,b)+cost(y,b)<=G.ap&&cs(x)+(x.f||0)+cs(y)+(y.f||0)>str(b)){if(cpuMultiDo(b,x,y,key))return true}}}return false}
 // ===== Turn planner (CPU project step 5, part 2) =====
 // Instead of choosing one move at a time, a planning level builds WHOLE turns on a lightweight copy of the board, scores the board each turn would leave behind, and plays the best one. Every star can act only once per turn (a new or captured star cannot act), so a turn is a set of moves under the Fuel budget; Fuel are a budget here, not a price (cpuP's apCost is not used).
 // How a turn is built ("rollout"): repeat { list every move that is legal now; give each a value = how much better the board gets (incEval, same table as step 4) + the old Hard bonuses (Capital, cut-off, buffer, hopeless) with the old "the opponent can simply take it back" discount; pick one by value divided by cost^alpha; apply it to the copy } until the Fuel are gone. alpha = 0 chases the biggest gain, larger alpha prefers cheap moves, so different rollouts spend the same budget in different ways (one big steal versus several cheap gains). Later rollouts add random noise. The turn that leaves the best board wins: its leaf value = incEval of the final board + the move bonuses - a penalty for every own star an opponent could take back (0.7 x what losing it would cost, plus 8 for a Capital).
-// What the copy models: claims (a new star in a system, connected to its origin), connections, captures (the target's connections are erased, the cheapest fleet count is committed, defending Fleets retreat to the strongest neighbor or, with no retreat, are forced to Hold and cost attackers), and two-star attacks. It does not model the defender's random Hold choices, or where inside a system a new star lands; the plan is therefore checked move by move (cpuPlanOK) and rebuilt from the real board when something no longer fits. Fleets are NOT planned (step 6): they are placed and moved first, as before, and not moved again while a plan is running.
+// What the copy models: claims (a new star in a system, connected to its origin), connections, captures (the target's connections are erased, the cheapest fleet count is committed, defending Fleets retreat to the strongest neighbor they may use (own, or a living teammate's, RULES.md 9.6) or, with no retreat, are forced to Hold and cost attackers), and two-star attacks. It does not model the defender's random Hold choices, or where inside a system a new star lands; the plan is therefore checked move by move (cpuPlanOK) and rebuilt from the real board when something no longer fits. Fleets are NOT planned (step 6): they are placed and moved first, as before, and not moved again while a plan is running.
 // cpuPlanLv = levels that plan whole turns (2 = Medium with a handicapped planner: few turns tried, wobble, now and then a long move; 3 = Hard, 5 = the Hard+F test level; 4 = Hard (legacy) does not; the harness --plan adds more). cpuPlanCfg: K = rollouts per plan, ms = time cap per plan in real play (ignored when cpuSeed is set so seeded tests repeat), thr = share of a lost star's value charged for a star an opponent could retake, capPen = extra charge for a Capital, enable = share of a blocked capture's value credited to a connection that unblocks it, look = share of next turn's expected gain (cpuPlanNext) added to a turn's value, maxPlans = plans per turn (then the old move-by-move code finishes the turn), pred = keep the predicted end board for the harness check. cpuPS = counters the harness reads.
 const cpuPlanLv=new Set([2,3,5]);
 // cpuFleetLv = levels whose plans also place and move Fleets (step 6; 5 = the Hard+F test level). cpuFleetPlanOn() = does the level playing now plan its Fleets?
@@ -2989,7 +3022,7 @@ const cpuFleetPlanOn=()=>cpuPlanOn()&&cpuFleetLv.has(cpuLvl());
 const cpuPlanCfg={K:14,ms:300,thr:.7,thrLast:.2,capPen:8,enable:.5,look:.5,maxPlans:6,pred:false,fPlace:1,fMove:1,post:1,fmA:0,fmD:1,ftake:1};
 let cpuPlan=null,cpuPS={plans:0,rolls:0,ms:0,exec:0,stale:0,failed:0,empty:0,pl:0,fm:0,xp:0,xf:0};
 const cpuPlanOn=()=>cpuPlanLv.has(cpuLvl())||cpuPar().planK>0;
-const cpuTClone=T=>({Z:T.Z,mid:T.mid,alive:T.alive,pl:T.pl,n:T.n.slice(),ctl:T.ctl.slice(),vp:T.vp.slice(),lc:T.lc.slice(),mg:T.mg.slice()});
+const cpuTClone=T=>({Z:T.Z,mid:T.mid,alive:T.alive,tm:T.tm,pl:T.pl,n:T.n.slice(),ctl:T.ctl.slice(),vp:T.vp.slice(),lc:T.lc.slice(),mg:T.mg.slice()});
 // cpuPlanInit(me) = the copy of the board a plan starts from: per star (index i, real stars first, new ones appended) x,y, system cx,cy, owner o, Fleets f, Fleets already moved fm, acted-this-turn u, Capital cap, the real star object, and adj = the stars it is connected to; plus Fuel left (ap), the score tally T, the set of occupied systems, the stars touched this turn, and the sum of move bonuses.
 function cpuPlanInit(me){const S=G.stars,idx=new Map(),s={me,n:S.length,n0:S.length,id:[],x:[],y:[],cx:[],cy:[],o:[],f:[],fm:[],u:[],cap:[],real:[],adj:[],ap:G.ap,T:cpuInc(G),occ:new Set(),touched:[],bonus:0,pool:0,plc:[]};
 S.forEach((q,i)=>{idx.set(q.id,i);s.id.push(q.id);s.x.push(q.x);s.y.push(q.y);s.cx.push(Math.floor(q.x));s.cy.push(Math.floor(q.y));s.o.push(q.o);s.f.push(q.f||0);s.fm.push(q.fm||0);s.u.push(G.used.includes(q.id)?1:0);s.cap.push(q.cap?1:0);s.real.push(q);s.adj.push([]);s.occ.add(Math.floor(q.x)+','+Math.floor(q.y))});
@@ -2997,20 +3030,22 @@ G.conns.forEach(c=>{const a=idx.get(c[0]),b=idx.get(c[1]);if(a!=null&&b!=null){s
 if(cpuFleetPlanOn()&&G.pool>0){s.pool=G.pool;s.plc=placeable().map(q=>idx.get(q.id))}return s}
 function cpuPlanClone(s){return {me:s.me,n:s.n,n0:s.n0,id:s.id.slice(),x:s.x.slice(),y:s.y.slice(),cx:s.cx.slice(),cy:s.cy.slice(),o:s.o.slice(),f:s.f.slice(),fm:s.fm.slice(),u:s.u.slice(),cap:s.cap.slice(),real:s.real.slice(),adj:s.adj.map(a=>a.slice()),ap:s.ap,T:cpuTClone(s.T),occ:new Set(s.occ),touched:s.touched.slice(),bonus:s.bonus,pool:s.pool,plc:s.plc}}
 // cpuPlanEn(s,me) = the live opponents' stars as parallel lists (index, system column, system row, strength), the table every "could an opponent take this" question reads. cpuPlanThr(en,reach,cx,cy,t,ign) = could an opponent star within reach Fuel of system (cx,cy) beat strength t (star ign left out)?
-function cpuPlanEn(s,me){const e={i:[],x:[],y:[],s:[]};for(let i=0;i<s.n;i++)if(s.o[i]!=me&&G.alive[s.o[i]]){e.i.push(i);e.x.push(s.cx[i]);e.y.push(s.cy[i]);e.s.push(s.adj[i].length+s.f[i])}return e}
+function cpuPlanEn(s,me){const e={i:[],x:[],y:[],s:[]};for(let i=0;i<s.n;i++)if(isFoe(s.o[i],me)){e.i.push(i);e.x.push(s.cx[i]);e.y.push(s.cy[i]);e.s.push(s.adj[i].length+s.f[i])}return e}
 function cpuPlanThr(e,reach,cx,cy,t,ign){for(let k=0;k<e.i.length;k++)if(e.i[k]!==ign&&Math.abs(e.x[k]-cx)+Math.abs(e.y[k]-cy)<=reach&&e.s[k]>t)return true;return false}
 // cpuPlanLoss(s,e,X,i) = how much worse the board gets for me if my star i flips to the nearest opponent star (the planner's cpuLoss).
 function cpuPlanLoss(s,e,X,i){if(!e.i.length)return 0;let fo=-1,bd=1e9;for(let k=0;k<e.i.length;k++){const j=e.i[k],d=Math.hypot(s.x[j]-s.x[i],s.y[j]-s.y[i]);if(d<bd){bd=d;fo=s.o[j]}}
 const T=s.T,sx=Math.floor(s.cx[i]/3),sy=Math.floor(s.cy[i]/3),b=incEval(T,X.me,X.P,X.danger);incAdd(T,sx,sy,s.o[i],-1);incAdd(T,sx,sy,fo,1);const a=incEval(T,X.me,X.P,X.danger);incAdd(T,sx,sy,fo,-1);incAdd(T,sx,sy,s.o[i],1);return Math.max(0,b-a)}
-// cpuPlanSup(s,a,N,c) = the strength a new star at N (claimed from star a for c Fuel) can be expected to reach (cpuSupport on the copy): 1 for its connection, free Fleets on a and its neighbors (up to 3), a friendly star within 2.3 with Fuel left over, a star touched this turn within 3.
+// cpuPlanSup(s,a,N,c) = the strength a new star at N (claimed from star a for c Fuel) can be expected to reach (cpuSupport on the copy): 1 for its connection, free Fleets on a and its neighbors (up to 3), a friendly star within 2.3 with Fuel left over, a star touched this turn within 3, and (team games) a living teammate's star within 2.3.
 function cpuPlanSup(s,a,N,c){const me=s.me;let st=1,fl=s.f[a]-s.fm[a];s.adj[a].forEach(k=>{if(s.o[k]==me)fl+=s.f[k]-s.fm[k]});st+=Math.max(0,Math.min(fl,3));
 if(s.ap-c>=1)for(let i=0;i<s.n;i++)if(s.o[i]==me&&i!==a&&Math.hypot(s.x[i]-N.x,s.y[i]-N.y)<=2.3){st++;break}
-if(s.touched.some(i=>Math.hypot(s.x[i]-N.x,s.y[i]-N.y)<=3))st++;return st}
+if(s.touched.some(i=>Math.hypot(s.x[i]-N.x,s.y[i]-N.y)<=3))st++;
+if(teamsOn())for(let i=0;i<s.n;i++)if(isAlly(s.o[i],me)&&Math.hypot(s.x[i]-N.x,s.y[i]-N.y)<=2.3){st+=cpuTeamCfg.sup;break}
+return st}
 // cpuPlanTv(s,X,j) = what taking enemy star j is worth on the plan's STARTING board (incEval gain + the Capital / cut-off bonus), remembered in X.tv. Only valid before a rollout's first move, which is when Fleets are placed.
-function cpuPlanTv(s,X,j){let v=X.tv.get(j);if(v===undefined){const T=s.T,me=s.me,o=s.o[j],sx=Math.floor(s.cx[j]/3),sy=Math.floor(s.cy[j]/3),v0=incEval(T,me,X.P,X.danger);incAdd(T,sx,sy,o,-1);incAdd(T,sx,sy,me,1);v=incEval(T,me,X.P,X.danger)-v0+(s.cap[j]?8:1)+X.cutB(j);incAdd(T,sx,sy,me,-1);incAdd(T,sx,sy,o,1);X.tv.set(j,v)}return v}
+function cpuPlanTv(s,X,j){let v=X.tv.get(j);if(v===undefined){const T=s.T,me=s.me,o=s.o[j],sx=Math.floor(s.cx[j]/3),sy=Math.floor(s.cy[j]/3),v0=incEval(T,me,X.P,X.danger);incAdd(T,sx,sy,o,-1);incAdd(T,sx,sy,me,1);v=incEval(T,me,X.P,X.danger)-v0+(s.cap[j]?8:1)+X.cutB(j)+(X.team?cpuEndCore(o,s.o.filter((q,i)=>q==o&&i<s.n).length-1):0);incAdd(T,sx,sy,me,-1);incAdd(T,sx,sy,o,1);X.tv.set(j,v)}return v}
 // cpuPlanPlace(s,X,pol,moves) = (step 6) place the whole Fleet pool on the copy, one Fleet at a time, each on the star that scores best: near the enemy, protecting a star an opponent could take (weight pol.wd), or making a capture possible that the Fleets in the pool can finish (weight pol.wa, the capture's value divided by the Fleets still missing), plus noise pol.tau. pol.conc = 1 prefers stacking Fleets on one star, 0 spreading. Different rollouts use different pol, so the plan search decides between attack-heavy, defence-heavy and stacked placements by the value of the whole turn. Adds {t:'place',a} moves (cost 0).
 function cpuPlanPlace(s,X,pol,moves){const me=s.me,e=cpuPlanEn(s,me),rc=Math.min(s.ap,cpuFeat.reach),str=i=>s.adj[i].length+s.f[i],cl=(i,j)=>{const a=s.real[i],b=s.real[j];return !a||!b||cclear(a,b)};
-const tg=[];if(cpuFeat.attack)for(let j=0;j<s.n0;j++)if(s.o[j]!=me&&cpuPlanTv(s,X,j)>0)tg.push(j);
+const tg=[];if(cpuFeat.attack)for(let j=0;j<s.n0;j++)if(cpuTgt(s.o[j],me)&&cpuPlanTv(s,X,j)>0)tg.push(j);
 const lc=new Map(),loss=i=>{let v=lc.get(i);if(v===undefined){v=cpuPlanLoss(s,e,X,i);lc.set(i,v)}return v};
 const dist=i=>{let d=9;for(let k=0;k<e.i.length;k++){const j=e.i[k],v=Math.abs(s.x[j]-s.x[i])+Math.abs(s.y[j]-s.y[i]);if(v<d)d=v}return d};
 const cands=s.plc.filter(i=>i!=null&&s.o[i]==me);
@@ -3023,14 +3058,14 @@ if(pol.tau)v-=pol.tau*X.spread*Math.log(-Math.log(Math.max(1e-9,cpuR())));
 if(v>bv){bv=v;best=p}}
 s.f[best]++;moves.push({t:'place',a:best,c:0,d:0,bn:0})}}
 // cpuPlanGen(s,X,R) = every legal move on the copy with its value d and cost c: {t:'take'|'claim'|'conn'|'multi', a, b | cx,cy, y, c, d}. a/b/y are star indices. Claims look R systems out and only the cheapest origin (then the weakest star) is listed per system, so strong stars are kept for attacks. A connection is listed only if it helps: it lifts an own star out of reach of an opponent, or it unblocks a capture that is short by exactly one strength (the unblocked capture's value x enable). Two-star attacks are listed for targets no single star can take. With X.ftk (step 6) {t:'ftake',x,a,b,n} = move n Fleets from star x to star a, then take b from a (listed when the Fleets are what lets a win). With X.fmv (step 6) free Fleet moves {t:'fmove',a,b,n,c:0} are listed too: a group of n Fleets from star a to star b (up to n Connections along own stars) when that makes a capture possible from b (value x enable, minus what leaving costs a) or makes b safe from a take (and does not expose a).
-function cpuPlanGen(s,X,R){const me=X.me,P=X.P,T=s.T,ap=s.ap,out=[],Z=T.Z,N=NSYS(G),mid=(N-1)/2,v0=incEval(T,me,P,X.danger),str=i=>s.adj[i].length+s.f[i],e=cpuPlanEn(s,me),thr=(cx,cy,t,ign)=>cpuPlanThr(e,X.reach,cx,cy,t,ign);
+function cpuPlanGen(s,X,R){const eb=j=>X.team?cpuEndCore(s.o[j],s.o.reduce((n,o,i)=>n+(o==s.o[j]&&i<s.n?1:0),0)-1):0;const me=X.me,P=X.P,T=s.T,ap=s.ap,out=[],Z=T.Z,N=NSYS(G),mid=(N-1)/2,v0=incEval(T,me,P,X.danger),str=i=>s.adj[i].length+s.f[i],e=cpuPlanEn(s,me),thr=(cx,cy,t,ign)=>cpuPlanThr(e,X.reach,cx,cy,t,ign);
 const att=[],cl=(i,j)=>{const a=s.real[i],b=s.real[j];return !a||!b||cclear(a,b)};for(let i=0;i<s.n;i++)if(s.o[i]==me&&!s.u[i])att.push(i);
 const cst=(i,j)=>Math.abs(s.cx[i]-s.cx[j])+Math.abs(s.cy[i]-s.cy[j]);
 const dvT=new Map(),val=j=>{let v=dvT.get(j);if(v===undefined){const o=s.o[j],sx=Math.floor(s.cx[j]/3),sy=Math.floor(s.cy[j]/3);incAdd(T,sx,sy,o,-1);incAdd(T,sx,sy,me,1);v=incEval(T,me,P,X.danger)-v0;incAdd(T,sx,sy,me,-1);incAdd(T,sx,sy,o,1);dvT.set(j,v)}return v};
 const blk=new Map(),single=new Set();
-for(let j=0;j<s.n0;j++){if(s.o[j]==me)continue;const sj=str(j);for(const i of att){const c=cst(i,j);if(c>ap||!cl(i,j))continue;const si=str(i);if(si<sj)continue;
-const key='t'+s.id[i]+'_'+s.id[j];if(si==sj){const w=val(j)+(s.cap[j]?8:1)+X.cutB(j);const o=blk.get(i);if((!o||w>o.v)&&w>0)blk.set(i,{v:w,c});continue}
-if(cpuBad.has(key))continue;single.add(j);let g=val(j);const bonus=(s.cap[j]?8:1)+X.cutB(j);
+for(let j=0;j<s.n0;j++){if(!cpuTgt(s.o[j],me))continue;const sj=str(j);for(const i of att){const c=cst(i,j);if(c>ap||!cl(i,j))continue;const si=str(i);if(si<sj)continue;
+const key='t'+s.id[i]+'_'+s.id[j];if(si==sj){const w=val(j)+(s.cap[j]?8:1)+X.cutB(j)+eb(j);const o=blk.get(i);if((!o||w>o.v)&&w>0)blk.set(i,{v:w,c});continue}
+if(cpuBad.has(key))continue;single.add(j);let g=val(j);const bonus=(s.cap[j]?8:1)+X.cutB(j)+eb(j);
 if(cpuFeat.threat&&!s.cap[j]){const mn=Math.max(0,sj+1-s.adj[i].length);if(thr(s.cx[j],s.cy[j],1+mn,j))g=g*.3-.3}
 out.push({t:'take',a:i,b:j,c,d:g+bonus,bn:bonus})}}
 const lift=new Map(),lf=p=>{let v=lift.get(p);if(v===undefined){const sp=str(p);v=0;if(thr(s.cx[p],s.cy[p],sp,-1)&&!thr(s.cx[p],s.cy[p],sp+1,-1))v=.5*Math.min(4,cpuPlanLoss(s,e,X,p));lift.set(p,v)}return v};
@@ -3041,10 +3076,10 @@ for(const a of att){const ax=s.cx[a],ay=s.cy[a];for(let cy=Math.max(0,ay-R);cy<=
 org.forEach(o=>{const {a,c,cx,cy}=o,key='s'+s.id[a]+'_'+cx+'_'+cy;if(cpuBad.has(key))return;const Np={x:cx+.5,y:cy+.5};let g=cval(Math.floor(cx/3),Math.floor(cy/3))-.04*(Math.abs(cx-mid)+Math.abs(cy-mid));
 if(X.hard){if(cpuFeat3.buffer)g+=cpuBufFast(Np,X.bt3);if(cpuFeat3.hopeless)g-=cpuHopeless(Np,me,X.sc3)}
 if(cpuFeat.threat&&thr(cx,cy,cpuPlanSup(s,a,Np,c),-1))g=g*.3-.3;out.push({t:'claim',a,cx,cy,c,d:g,bn:0})});
-if(X.hard&&cpuFeat3.multi)for(let j=0;j<s.n0;j++){if(s.o[j]==me||single.has(j))continue;const cand=att.filter(i=>cst(i,j)<=Math.min(ap,3)&&cl(i,j));if(cand.length<2)continue;let pair=null,pt=1e9,sj=str(j);
+if(X.hard&&cpuFeat3.multi)for(let j=0;j<s.n0;j++){if(!cpuTgt(s.o[j],me)||single.has(j))continue;const cand=att.filter(i=>cst(i,j)<=Math.min(ap,3)&&cl(i,j));if(cand.length<2)continue;let pair=null,pt=1e9,sj=str(j);
 for(let p=0;p<cand.length;p++)for(let q=p+1;q<cand.length;q++){const x=cand[p],y=cand[q],t=str(x)+str(y);if(cst(x,j)+cst(y,j)<=ap&&t>sj&&t<pt){pt=t;pair=[x,y]}}
-if(!pair)continue;const key='x'+s.id[j]+'_'+s.id[pair[0]]+'_'+s.id[pair[1]];if(cpuBad.has(key))continue;const bonus=(s.cap[j]?8:1)+X.cutB(j);out.push({t:'multi',a:pair[0],y:pair[1],b:j,c:cst(pair[0],j)+cst(pair[1],j),d:val(j)+bonus-.3,bn:bonus})}
-if(X.fmv){const pc=new Map(),pot=(i,ex)=>{if(s.u[i])return 0;const k=i*100+ex+50;let v=pc.get(k);if(v!==undefined)return v;v=0;const si=str(i)+ex;for(let j=0;j<s.n0;j++){if(s.o[j]==me||si<=str(j)||cst(i,j)>ap||!cl(i,j))continue;const w=val(j)+(s.cap[j]?8:1)+X.cutB(j);if(w>v)v=w}pc.set(k,v);return v};
+if(!pair)continue;const key='x'+s.id[j]+'_'+s.id[pair[0]]+'_'+s.id[pair[1]];if(cpuBad.has(key))continue;const bonus=(s.cap[j]?8:1)+X.cutB(j)+eb(j);out.push({t:'multi',a:pair[0],y:pair[1],b:j,c:cst(pair[0],j)+cst(pair[1],j),d:val(j)+bonus-.3,bn:bonus})}
+if(X.fmv){const pc=new Map(),pot=(i,ex)=>{if(s.u[i])return 0;const k=i*100+ex+50;let v=pc.get(k);if(v!==undefined)return v;v=0;const si=str(i)+ex;for(let j=0;j<s.n0;j++){if(!cpuTgt(s.o[j],me)||si<=str(j)||cst(i,j)>ap||!cl(i,j))continue;const w=val(j)+(s.cap[j]?8:1)+X.cutB(j);if(w>v)v=w}pc.set(k,v);return v};
 const lcC=new Map(),thw=i=>{let v=lcC.get(i);if(v===undefined){v=cpuPlanCfg.thr*cpuPlanLoss(s,e,X,i)+(s.cap[i]?cpuPlanCfg.capPen:0);lcC.set(i,v)}return v},dfn=(i,d)=>!!(cpuFeat.threat&&cpuPlanThr(e,X.reach,s.cx[i],s.cy[i],str(i)+d,-1));
 for(let x=0;x<s.n;x++){if(s.o[x]!=me)continue;const nf=s.f[x]-s.fm[x];if(nf<1)continue;
 const dm=new Map([[x,0]]),q=[x];while(q.length){const y=q.shift(),dy=dm.get(y);if(dy>=nf)continue;for(const k of s.adj[y])if(s.o[k]==me&&!dm.has(k)){dm.set(k,dy+1);q.push(k)}}
@@ -3054,8 +3089,8 @@ if(X.ftk){const fl=new Map(),thx=i=>cpuPlanCfg.thr*cpuPlanLoss(s,e,X,i)+(s.cap[i
 for(let x=0;x<s.n;x++){if(s.o[x]!=me)continue;const nf=s.f[x]-s.fm[x];if(nf<1)continue;
 const dm=new Map([[x,0]]),q=[x];while(q.length){const y=q.shift(),dy=dm.get(y);if(dy>=nf)continue;for(const k of s.adj[y])if(s.o[k]==me&&!dm.has(k)){dm.set(k,dy+1);q.push(k)}}
 dm.forEach((dist,t)=>{if(t===x||s.u[t])return;const st=str(t);
-for(let j=0;j<s.n0;j++){if(s.o[j]==me)continue;const sj=str(j),n=sj+1-st;if(n<1||n>nf||dist>n)continue;const c=cst(t,j);if(c>ap||!cl(t,j))continue;const key='t'+s.id[t]+'_'+s.id[j];if(cpuBad.has(key))continue;
-let g=val(j);const bonus=(s.cap[j]?8:1)+X.cutB(j);if(cpuFeat.threat&&!s.cap[j]){const mn=Math.max(0,sj+1-s.adj[t].length);if(thr(s.cx[j],s.cy[j],1+mn,j))g=g*.3-.3}
+for(let j=0;j<s.n0;j++){if(!cpuTgt(s.o[j],me))continue;const sj=str(j),n=sj+1-st;if(n<1||n>nf||dist>n)continue;const c=cst(t,j);if(c>ap||!cl(t,j))continue;const key='t'+s.id[t]+'_'+s.id[j];if(cpuBad.has(key))continue;
+let g=val(j);const bonus=(s.cap[j]?8:1)+X.cutB(j)+eb(j);if(cpuFeat.threat&&!s.cap[j]){const mn=Math.max(0,sj+1-s.adj[t].length);if(thr(s.cx[j],s.cy[j],1+mn,j))g=g*.3-.3}
 let d=g+bonus;if(!dfx(x,0)&&dfx(x,-n))d-=cpuPlanCfg.fmD*thx(x);const k2=t+'_'+j,o=best.get(k2);if(!o||d>o.d)best.set(k2,{t:'ftake',x,a:t,b:j,n,c,d,bn:bonus})}})}
 best.forEach(m=>{if(m.d>0)out.push(m)})}
 return out}
@@ -3065,16 +3100,16 @@ if(m.t=='fmove'){s.f[m.a]-=m.n;s.f[m.b]+=m.n;s.fm[m.b]+=m.n;return}
 const link=(a,b)=>{s.adj[a].push(b);s.adj[b].push(a)},sec=i=>[Math.floor(s.cx[i]/3),Math.floor(s.cy[i]/3)];
 if(m.t=='claim'){const j=s.n++;s.id.push(-j-1);s.x.push(m.cx+.5);s.y.push(m.cy+.5);s.cx.push(m.cx);s.cy.push(m.cy);s.o.push(me);s.f.push(0);s.fm.push(0);s.u.push(1);s.cap.push(0);s.real.push(null);s.adj.push([]);link(m.a,j);s.u[m.a]=1;s.occ.add(m.cx+','+m.cy);incAdd(T,Math.floor(m.cx/3),Math.floor(m.cy/3),me,1);s.touched.push(j);return}
 if(m.t=='conn'){link(m.a,m.b);s.u[m.a]=1;return}
-const j=m.b,att=m.t=='multi'?[m.a,m.y]:[m.a],D=s.f[j],rOK=s.adj[j].length>0;let use=0,A=0;
+const j=m.b,att=m.t=='multi'?[m.a,m.y]:[m.a],D=s.f[j],rt=s.adj[j].filter(k=>s.o[k]==s.o[j]||isAlly(s.o[k],s.o[j])),rOK=rt.length>0;let use=0,A=0;
 if(m.t=='take'){use=Math.max(0,s.adj[j].length+s.f[j]+1-s.adj[m.a].length);A=use}else{att.forEach(i=>{A+=s.f[i]});use=A}
 const holds=rOK?0:Math.min(D,A),surv=A-holds;
-if(rOK&&D>0){let kb=s.adj[j][0],bs=-1;s.adj[j].forEach(k=>{const v=s.adj[k].length+s.f[k];if(v>bs){bs=v;kb=k}});s.f[kb]+=D}
+if(rOK&&D>0){let kb=rt[0],bs=-1;rt.forEach(k=>{const v=s.adj[k].length+s.f[k];if(v>bs){bs=v;kb=k}});s.f[kb]+=D}
 s.adj[j].forEach(k=>{s.adj[k]=s.adj[k].filter(z=>z!==j)});s.adj[j]=[];
 if(m.t=='take'){const fr=s.f[m.a]-s.fm[m.a];s.fm[m.a]-=Math.max(0,use-fr);s.f[m.a]-=use}else att.forEach(i=>{const fr=s.f[i]-s.fm[i];s.fm[i]-=Math.max(0,s.f[i]-fr);s.f[i]=0});
 const [sx,sy]=sec(j),old=s.o[j];incAdd(T,sx,sy,old,-1);incAdd(T,sx,sy,me,1);s.o[j]=me;s.f[j]=surv;s.fm[j]=surv;att.forEach(i=>{link(i,j);s.u[i]=1});s.u[j]=1;s.touched.push(j)}
 // cpuPlanLeaf(s,X,e) = what a finished turn is worth: board value (incEval) + the move bonuses - the retake penalty (see the block comment above).
 // cpuAfterShare(me) = the share of the live opponents that still move after me this round (1 = I move first, 0 = I move last). Hard only: weights the retake penalty (thr) between thrLast (I move last: nothing can be retaken before the round is scored) and 1 (everyone still moves). Tuned in step 9: thrLast .2 (was 1 = no weighting).
-function cpuAfterShare(me){const o=G.order.filter(c=>c!=me&&G.alive[c]);if(!o.length)return 1;return G.order.slice(G.ti+1).filter(c=>c!=me&&G.alive[c]).length/o.length}
+function cpuAfterShare(me){const o=G.order.filter(c=>isFoe(c,me));if(!o.length)return 1;return G.order.slice(G.ti+1).filter(c=>isFoe(c,me)).length/o.length}
 function cpuPlanLeaf(s,X){const me=X.me,e=cpuPlanEn(s,me),tw=cpuPlanCfg.thr*(X.hard?cpuPlanCfg.thrLast+(1-cpuPlanCfg.thrLast)*X.after:1);let v=incEval(s.T,me,X.P,X.danger)+s.bonus;
 for(let i=0;i<s.n;i++)if(s.o[i]==me&&cpuPlanThr(e,X.reach,s.cx[i],s.cy[i],s.adj[i].length+s.f[i],-1))v-=tw*cpuPlanLoss(s,e,X,i)+(s.cap[i]?cpuPlanCfg.capPen:0);return v}
 // cpuPlanNext(s,X) = what my NEXT turn could add on the board turn s leaves behind: every star is rested, Fuel = next round's, and one deterministic rollout (alpha 1) is played with the opponents standing still; the result is the board value gained plus its bonuses. Credits turns that leave stars where cheap points are waiting (without it, a one-Fuel claim and a two-Fuel claim to the same sector tie, and the planner ignores which leaves the better next move).
@@ -3091,7 +3126,7 @@ return {s,moves,val:cpuPlanLeaf(s,X)+(cpuPlanCfg.look>0?cpuPlanCfg.look*cpuPlanN
 // cpuPOL = the four fixed Fleet placement styles tried by rollouts 0-3 (balanced, attack-heavy and stacked, defence-heavy, balanced and stacked); later rollouts draw random weights.
 const cpuPOL=[{wa:1,wd:1,conc:0,tau:0},{wa:2,wd:.5,conc:1,tau:0},{wa:.5,wd:2,conc:0,tau:0},{wa:1,wd:1,conc:1,tau:0}];
 function cpuPlanMake(){const t0=performance.now(),me=cur(),base=cpuPlanInit(me),sc3=cpuSec(G),hard=cpuHard(),mineU=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id)),cut={};
-const X={me,P:cpuPar(),danger:cpuDanger,after:cpuAfterShare(me),reach:Math.min(cpuOppAp(),cpuFeat.reach),hard,sc3,bt3:hard&&cpuFeat3.buffer?cpuBufTab(me,sc3):null,spread:cpuPar().planSpread,fp:cpuFleetPlanOn()&&!!cpuPlanCfg.fPlace,fmv:cpuFleetPlanOn()&&!!cpuPlanCfg.fMove,ftk:cpuFleetPlanOn()&&!!cpuPlanCfg.ftake,tv:new Map(),cutB:j=>{if(!(hard&&cpuFeat3.cut))return 0;if(cut[j]===undefined)cut[j]=cpuCutBonus(base.real[j],mineU);return cut[j]}};
+const X={me,team:teamsOn(),P:cpuPar(),danger:cpuDanger,after:cpuAfterShare(me),reach:Math.min(cpuOppAp(),cpuFeat.reach),hard,sc3,bt3:hard&&cpuFeat3.buffer?cpuBufTab(me,sc3):null,spread:cpuPar().planSpread,fp:cpuFleetPlanOn()&&!!cpuPlanCfg.fPlace,fmv:cpuFleetPlanOn()&&!!cpuPlanCfg.fMove,ftk:cpuFleetPlanOn()&&!!cpuPlanCfg.ftake,tv:new Map(),cutB:j=>{if(!(hard&&cpuFeat3.cut))return 0;if(cut[j]===undefined)cut[j]=cpuCutBonus(base.real[j],mineU);return cut[j]}};
 const KK=Math.min(cpuPlanCfg.K,X.P.planK),fx=Math.min(4,X.P.planFixed);let best=null;for(let r=0;r<KK;r++){const al=r<fx?[0,1,.5,1.5][r]:cpuR()*1.5,tau=r<fx?0:.4+.6*cpuR(),res=cpuPlanRoll(base,X,al,tau,X.fp?(r<4?cpuPOL[r]:{wa:.3+2.2*cpuR(),wd:.3+2.2*cpuR(),conc:cpuR()<.5?1:0,tau:.4+.6*cpuR()}):null);cpuPS.rolls++;if(cpuPlanCfg.dbg)(cpuPS.dbg=cpuPS.dbg||[]).push([G.round,r,+al.toFixed(2),+res.val.toFixed(2),res.moves.map(m=>m.t[0]+m.c+':'+(m.t=='claim'?m.cx+','+m.cy:m.b)+'@'+m.d.toFixed(2)).join(' ')]);if(!best||res.val>best.val)best=res;if(cpuSeed==null&&r>=3&&performance.now()-t0>cpuPlanCfg.ms)break}
 cpuPS.ms+=performance.now()-t0;if(!best||!best.moves.length)return [];
 const R=i=>base.real[i];if(cpuPlanCfg.pred)cpuPlan.pred={n:Array.from(best.s.T.n),ap:best.s.ap,val:best.val,f:Array.from({length:base.n0},(_,i)=>[base.id[i],best.s.f[i]])};
@@ -3104,7 +3139,7 @@ if(m.t=='fmove'){const t=cpuFleetTgt(m);return !!t&&t!==a&&a.o==me&&!cpuBad.has(
 if(a.o!=me||G.used.includes(a.id)||cpuBad.has(m.key))return false;
 if(m.t=='claim')return !G.stars.some(q=>Math.floor(q.x)==m.cx&&Math.floor(q.y)==m.cy)&&Math.abs(Math.floor(a.x)-m.cx)+Math.abs(Math.floor(a.y)-m.cy)<=G.ap;
 const b=m.b;if(m.t=='conn')return b.o==me&&cost(a,b)<=G.ap&&cclear(a,b)&&!G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id));
-if(b.o==me)return false;if(m.t=='take')return cost(a,b)<=G.ap&&cclear(a,b)&&str(a)>str(b);
+if(!cpuTgt(b.o,me))return false;if(m.t=='take')return cost(a,b)<=G.ap&&cclear(a,b)&&str(a)>str(b);
 const y=m.y;return y.o==me&&!G.used.includes(y.id)&&cost(a,b)+cost(y,b)<=G.ap&&cclear(a,b)&&cclear(y,b)&&str(a)+str(y)>str(b)}
 // cpuPlanBusy() = a plan is running (moves left): Fleets are not moved meanwhile.
 const cpuPlanBusy=()=>cpuPlanOn()&&!!cpuPlan&&cpuPlan.tid==cpuTurn&&cpuPlan.q.length>0;
@@ -3128,7 +3163,7 @@ const wait=fp&&(!cpuPlan||cpuPlan.tid!=cpuTurn||cpuPlan.made==0)&&G.ap>0&&moveAv
 if(!cpuPlanBusy()&&!wait&&(!fp||cpuPlanCfg.post)&&cpuFleetMove())return 'acted';
 if(G.ap>0&&moveAvail()){if(cpuPlanOn()&&cpuPlanStep())return 'acted';let c=cpuCands(3);if(!c.length)c=cpuCands(G.ap);
 if(c.length){const m=cpuChoose(c);if(!cpuDo(m))cpuStall++;return 'acted'}
-if(cpuMulti())return 'acted';
+if(cpuMulti()||cpuMateConn())return 'acted';
 if(++cpuStall>3){cpuStall=0;endTurn();return 'ended'}return 'acted'}
 if(cpuStall>3||!endBlock()){cpuStall=0;endTurn();return 'ended'}
 if(++cpuStall>3){cpuStall=0;endTurn();return 'ended'}return 'acted'}
