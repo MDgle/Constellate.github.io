@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-10-31-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-10-31-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -153,6 +153,12 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* (new) #ov2: a second dialog layer drawn ON TOP of #ov. The color picker and the name box open here, so the page that opened them stays underneath (dimmed) and is not replaced. It copies the look of #ov and its box. */
 #ov2{position:fixed;inset:0;z-index:6;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
 #ov2>div{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:20px;max-width:340px;width:100%;max-height:92%;overflow:auto;box-shadow:0 6px 28px rgba(0,0,0,.6)}
+/* (2026-10-31) #dd = a seat drop-down (ddOpen): a small list under the button it belongs to; #ddb = the see-through layer behind it that closes it when tapped. .sub = an item of an opened sub list, indented. */
+#ddb{position:fixed;inset:0;z-index:7}
+#dd{position:fixed;z-index:8;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:170px;max-width:calc(100vw - 32px);max-height:70vh;overflow:auto;box-shadow:0 6px 28px rgba(0,0,0,.6)}
+#dd button{flex:none;width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;min-height:40px;white-space:nowrap}
+#dd button.sub{padding-left:28px}
+#dd button.act{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line);font-weight:600}
 #ov2>div.pop{transform-origin:50% 50%;animation:ovpop .22s cubic-bezier(.2,.8,.2,1)}
 #ov2 h1{margin:0 0 6px;font-size:26px}#ov2 p{color:var(--mut);margin:0 0 14px}
 #ov2 .r{display:flex;gap:8px}#ov2 .r button{flex:1;font-weight:500}
@@ -574,13 +580,15 @@ new MutationObserver(tutSync).observe($('ov'),{attributes:true,attributeFilter:[
 /*}TUT*/
 // start(n) begins a new game. pl = player colors in turn order. caps = where each capital sits as (system column, system row).
 // (changed) start(n,sz): n players on a board of sz sectors per side (default 7). Capitals sit the same distance from the edges on every size: one system in (e = far side, m = middle).
-function start(n,sz,pm,cpu,team,look){sz=[3,5,7].includes(sz)?sz:7;const N=sz*3,e=N-2,m=(N-1)/2,pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[e,1],2:[1,e]}:{0:[m,1],1:[1,m],2:[e,m],3:[m,e]};
+function start(n,sz,pm,cpu,team,look,sty){sz=[3,5,7].includes(sz)?sz:7;const N=sz*3,e=N-2,m=(N-1)/2,pl=n==2?[0,2]:[0,2,3,1],caps=n==2?{0:[e,1],2:[1,e]}:{0:[m,1],1:[1,m],2:[e,m],3:[m,e]};
 // Creates the game state G: players, capitals, who is alive, stars, connections, round 1, turn order, whose turn, Fuel points, used stars, scores, next star id.
  G={pl,caps,alive:{},stars:[],conns:[],round:1,order:[...pl],ti:0,ap:1,used:[],score:{},nid:1,over:null,first:pl[0],gid:newGid()};if(sz!=7)G.sz=sz;
 // (new) pm = position selection: 'free' (free placement only) or 'fixed' (fixed positions only). A game with no pm leaves the choice to each player.
 if(pm=='free'||pm=='fixed')G.pm=pm;
 // (new) cpu = {color: level}: those colors are played by the computer (level 1 = Easy).
 if(cpu){const m={};pl.forEach(c=>{if(cpu[c])m[c]=[1,2,3,4,5,6].includes(cpu[c])?cpu[c]:1});if(Object.keys(m).length){G.cpu=m;cpuGameSync()}}
+// (2026-10-31) sty = {color: Easy personality}: 'g' 'd' 'a' 'm' 'h' (see Easy personalities), 'r' = Surprise me (drawn now, marked in G.cpuQ), 'x' = the old Easy (tests). Only Easy computers keep one; General is the default and is not stored.
+if(G.cpu&&sty){const s={},q={};Object.keys(G.cpu).forEach(c=>{if(G.cpu[c]!=1)return;let v=sty[c];if(v=='r'){v=ES_KEYS[Math.floor(Math.random()*ES_KEYS.length)];q[c]=1}if(v&&v!='g'&&(ES_NAMES[v]||v=='x'))s[c]=v});if(Object.keys(s).length)G.cpuS=s;if(Object.keys(q).length)G.cpuQ=q}
 // (new) team = {color: 1-3}: team mode (4 players only, see teamErr). An invalid setup is ignored, so the game is then an ordinary one; the New game page checks it first.
 if(team&&!teamErr(pl,team,cpu)){G.team={};pl.forEach(c=>{G.team[c]=team[c]})}
 // (new) look = {pc,pn}: custom player colors and names (see lookClean). Always applied, so a game with no look resets the colors to the defaults.
@@ -1015,8 +1023,8 @@ let overHidden=false;
 function overHide(){overHidden=true;$('ov').style.display='none';render()}
 // rematch() = the end screen's Instant rematch: starts a new game with exactly the same setup (players, board size, position rule, which colors are computers and their level values, teams). Offline it restarts here; online only the host can, which reuses the room and its seats (netStart).
 function rematch(){if(!G||!G.over)return;if(net.on)return net.role=='host'?netStart(net.sz,net.pm,net.team):undefined;
-const o={n:G.pl.length,sz:G.sz||7,pm:G.pm,cpu:G.cpu?Object.assign({},G.cpu):null,team:G.team?Object.assign({},G.team):null,cv:G.cpuV,cb:G.cpuB,look:{pc:G.pc,pn:G.pn}};
-start(o.n,o.sz,o.pm,o.cpu,o.team,o.look);if(o.cpu&&o.cv){G.cpuV=JSON.parse(JSON.stringify(o.cv));if(o.cb)G.cpuB=o.cb;else delete G.cpuB;cpuPC={}}}
+const o={n:G.pl.length,sz:G.sz||7,pm:G.pm,cpu:G.cpu?Object.assign({},G.cpu):null,team:G.team?Object.assign({},G.team):null,cv:G.cpuV,cb:G.cpuB,look:{pc:G.pc,pn:G.pn},sty:esStyMap()};
+start(o.n,o.sz,o.pm,o.cpu,o.team,o.look,o.sty);if(o.cpu&&o.cv){G.cpuV=JSON.parse(JSON.stringify(o.cv));if(o.cb)G.cpuB=o.cb;else delete G.cpuB;cpuPC={}}}
 // ===== Transcription (fixed-position games) =====
 // transcript() = the whole game as text, move by move like a chess score: a header (date, board, players, how to read the spots), then for every round each player's moves in order, numbered from 1 in each turn, with the scores at the start of each round, and the result at the end of a finished game. It is built from the move log (H.mv).
 // (2026-10-28-b, Shmorden's design) A transcript is also the save format people can read, copy into a message and paste back: a game that is not finished ends with a "Current state" section (posText) holding everything needed to carry on, whose turn it is included. Loading (trLoad) uses only what follows that line for the game, and rebuilds the history from the moves above it. When the history does not start at the beginning of the game (it was loaded part way, or is very long), a "Start state" section before the first round gives the board the moves start from. Every game has one now, not only fixed-position games.
@@ -1032,15 +1040,15 @@ if(G.over){const vp=calc().vp,top=G.over;L.push('','RESULT','Final scores: '+G.p
 else L.push('',posText(G,'Current state').trim());
 return L.join('\n')+'\n'}
 // trPlayers(g) = the Players line: each player's name, then in brackets what the name alone doesn't say (their seat when the name is not the seat's color name, their color when it was changed and the name doesn't say it, computer and level), then [Team n]. trPlayersRead reads it back.
-function trPlayers(g){const lv=c=>({1:'Easy',2:'Medium',3:'Hard',6:'Custom'})[g.cpu[c]]||'level '+g.cpu[c];
+function trPlayers(g){const lv=c=>g.cpu[c]==1?esWord(g,c):({2:'Medium',3:'Hard',6:'Custom'})[g.cpu[c]]||'level '+g.cpu[c];
 return g.pl.map(c=>{const nm=lkNm(g,c),col=lkP(g,c).n,t=[];if(nm!=POS_NM[c])t.push('seat '+POS_NM[c]);if(lkKey(g,c)!=DEFCOL[c]&&nm!=col)t.push(col);if(g.cpu&&g.cpu[c])t.push('computer',lv(c));return nm+(t.length?' ('+t.join(', ')+')':'')+(g.team?' [Team '+g.team[c]+']':'')}).join(', ')}
-// trPlayersRead(line,i) = {pl, cpu, team, pc, pn, nm: {lower-case name: seat}} from a Players line (i = its line number for errors). (2026-10-29-k) A computer named like R.Easy (QK_RE) sets qk (Quick game names) instead of a name.
+// trPlayersRead(line,i) = {pl, cpu, team, pc, pn, nm: {lower-case name: seat}, sty: {seat: Easy personality}} from a Players line (i = its line number for errors). An Easy computer may be written with its personality: (computer, Easy Hunter). (2026-10-29-k) A computer named like R.Easy (QK_RE) sets qk (Quick game names) instead of a name.
 function trPlayersRead(line,i){const bad=m=>{throw new Error('Line '+(i+1)+': '+m)},E=[];let d=0,cur='';for(const ch of line){if(ch=='('||ch=='[')d++;if(ch==')'||ch==']')d--;if(ch==','&&!d){E.push(cur);cur=''}else cur+=ch}E.push(cur);
-const o={cpu:{},team:{},pc:{},pn:{},nm:{}},seats=[],lvl={easy:1,medium:2,hard:3,custom:6};
+const o={cpu:{},team:{},pc:{},pn:{},nm:{},sty:{}},seats=[],lvl={easy:1,medium:2,hard:3,custom:6};
 E.map(x=>x.trim()).filter(Boolean).forEach(x=>{const m=/^(.+?)\s*(?:\(([^)]*)\))?\s*(?:\[Team (\d)\])?$/.exec(x);if(!m)bad('"'+x+'" is not a player.');const nm=m[1].trim(),tk=(m[2]||'').split(',').map(t=>t.trim()).filter(Boolean);
-let seat=null,col=null,cp=null;tk.forEach((t,j)=>{const lt=t.toLowerCase(),sm=/^seat (\w+)$/.exec(lt),pc=PCOL.find(p=>p.n.toLowerCase()==lt);if(sm){seat=POS_SEAT[sm[1]];if(seat==null||sm[1].length<3)bad('"'+t+'" is not a seat.')}else if(lt=='computer')cp=cp||1;else if(lvl[lt]||/^level [1-6]$/.test(lt))cp=lvl[lt]||+lt.slice(6);else if(pc)col=pc.k;else bad('"'+t+'" is not understood.')});
+let seat=null,col=null,cp=null,sk=null;tk.forEach((t,j)=>{const lt=t.toLowerCase(),sm=/^seat (\w+)$/.exec(lt),pc=PCOL.find(p=>p.n.toLowerCase()==lt);if(sm){seat=POS_SEAT[sm[1]];if(seat==null||sm[1].length<3)bad('"'+t+'" is not a seat.')}else if(lt=='computer')cp=cp||1;else if(lvl[lt]||/^level [1-6]$/.test(lt))cp=lvl[lt]||+lt.slice(6);else if(/^easy\s/.test(lt)&&esKey(lt.slice(5))){cp=1;sk=esKey(lt.slice(5))}else if(pc)col=pc.k;else bad('"'+t+'" is not understood.')});
 const pn=PCOL.find(p=>p.n.toLowerCase()==nm.toLowerCase());if(seat==null)seat=pn&&POS_NM.includes(pn.n)&&!(pn.k!=DEFCOL[POS_NM.indexOf(pn.n)])?POS_NM.indexOf(pn.n):null;if(seat==null)bad('Say which seat '+nm+' plays, like "'+nm+' (seat Red)".');
-if(seats.includes(seat))bad('Two players have the seat '+POS_NM[seat]+'.');seats.push(seat);if(!col&&pn&&pn.k!=DEFCOL[seat])col=pn.k;if(col&&col!=DEFCOL[seat])o.pc[seat]=col;if(!pn){if(cp&&QK_RE.test(nm))o.qk=1;else o.pn[seat]=nm}if(cp)o.cpu[seat]=cp;if(m[3])o.team[seat]=+m[3];o.nm[QK_RE.test(nm)&&cp?nm:nm.toLowerCase()]=seat});
+if(seats.includes(seat))bad('Two players have the seat '+POS_NM[seat]+'.');seats.push(seat);if(!col&&pn&&pn.k!=DEFCOL[seat])col=pn.k;if(col&&col!=DEFCOL[seat])o.pc[seat]=col;if(!pn){if(cp&&QK_RE.test(nm))o.qk=1;else o.pn[seat]=nm}if(cp)o.cpu[seat]=cp;if(cp==1&&sk&&sk!='g')o.sty[seat]=sk;if(m[3])o.team[seat]=+m[3];o.nm[QK_RE.test(nm)&&cp?nm:nm.toLowerCase()]=seat});
 const s=new Set(seats);if(s.size==2&&s.has(0)&&s.has(2))o.pl=[0,2];else if(s.size==4)o.pl=[0,2,3,1];else bad('A game has Red and Blue, or Red, Blue, Orange and Purple.');return o}
 // trSnapG(q,w) = a game-like object for posText from history snapshot q, with w (or the first in the snapshot's order) to move: Capitals get their first owner back from where they sit (G.caps), Fleets count as not moved, the scores are the board's VP then.
 function trSnapG(q,w){const S=snapState(q),al={};G.pl.forEach(c=>{al[c]=q.al.includes(c)});const co=s=>G.pl.find(c=>G.caps[c]&&G.caps[c][0]==Math.floor(s.x)&&G.caps[c][1]==Math.floor(s.y));
@@ -1060,7 +1068,7 @@ let bd=false;L.forEach(([i,t])=>{let m;if(!bd&&(m=/^Board:\s*(\d)\s*x/i.exec(t))
 if(!P)bad(0,'The transcript has no Players line.');if(![3,5,7].includes(sz))bad(0,'The board must be 7x7, 5x5 or 3x3.');
 const ri=L.findIndex(([,t])=>TR_RND.test(t.trim()));let S;
 if(si>=0){const sec=L.filter(([i])=>i>=si&&(ri<0||i<L[ri][0])).map(x=>x[1]).join('\n');S=posParse(sec,si)}else S=posParse('Start state\nBoard: '+sz+'x'+sz+'\nPlayers: '+P.pl.length);
-['cpu','team','pc','pn'].forEach(k=>{if(Object.keys(P[k]).length)S[k]=P[k];else delete S[k]});if(P.qk)S.qk=1;if(pm)S.pm=pm;if(S.team){const e=teamErr(S.pl,S.team,S.cpu);if(e)bad(0,e)}
+['cpu','team','pc','pn'].forEach(k=>{if(Object.keys(P[k]).length)S[k]=P[k];else delete S[k]});if(Object.keys(P.sty).length)S.cpuS=P.sty;else delete S.cpuS;if(P.qk)S.qk=1;if(pm)S.pm=pm;if(S.team){const e=teamErr(S.pl,S.team,S.cpu);if(e)bad(0,e)}
 S.gid=newGid();S.over=null;S.out=S.out||{};const Hx={v:1,gid:S.gid,pl:S.pl.slice(),snaps:[],mv:[]},g0=G,h0=H;let over=false;G=S;H=Hx;
 try{G.rank=rankSnap(G.score);histSnap(si>=0?'l':'s');let w=null,nm=0;
 const N=NSYS(G),SP='([A-Ga-g]\\d·?[abc]\\d(?:·?(?:[SLV]\\d{1,2}|@[\\d.]+,[\\d.]+))?)',R=x=>new RegExp('^'+x.replace(/SP/g,SP)+'$');
@@ -1130,6 +1138,8 @@ head=top.length==1?NM[top[0]]+' wins'+(via?' via Stars':''):'Perfect Tie!';if(to
 // (new) Each line starts with the final rank: 1 + the living players placed strictly above (tied players share a rank).
 const rk=c=>(G.alive[c]?0:1e6)-(top.includes(c)?1e5:0)-vp[c]*100-nStars(c);body=G.pl.slice().sort((a,b)=>rk(a)-rk(b)).map(c=>erow(c,NM[c]+' '+vp[c]+' VP, '+sys(c),0,G.alive[c]?1+G.pl.filter(d=>G.alive[d]&&rk(d)<rk(c)).length:0)).join('')}
 if(G.round>30&&clearWin(top))sub+='<p style="margin:0 0 8px">Decided in '+rdName(G.round)+'.</p>';
+// (2026-10-31) The Easy computers' personalities, so a Surprise me pick is revealed: "Red was Easy Hunter (Surprise me)".
+const es=G.cpu?G.pl.filter(c=>esSty(c)).map(c=>NM[c]+' was '+esLabel(c)+(G.cpuQ&&G.cpuQ[c]?' (Surprise me)':'')):[];if(es.length)sub+='<p style="margin:0 0 8px;color:var(--mut);font-size:13px">'+es.join('. ')+'.</p>';
 ov('<h1>'+head+'</h1>'+sub+'<div class="erl">'+body+'</div>'+btn);if(anim)endSeq()}
 // tap(bx,by,np) runs when the board is tapped, in board units (np = a drag was dropped on a Star here: don't pick a move preview, carry on with the selected Star). cx,cy = the system column and row. Do nothing without a game or after it ends.
 function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
@@ -1552,6 +1562,8 @@ if(n.cpu==null)delete n.cpu;else{if(typeof n.cpu!='object'||Array.isArray(n.cpu)
 // (new) The values the computers play with (G.cpuV = {level: {key: value}}, G.cpuB = the level Custom plays like): optional; unknown keys are dropped and values clamped to the allowed range.
 if(n.cpuV!=null){if(!n.cpu||typeof n.cpuV!='object'||Array.isArray(n.cpuV))delete n.cpuV;else{const v={};Object.keys(n.cpuV).forEach(l=>{const o=n.cpuV[l];if(![1,2,3,4,6].includes(+l)||!o||typeof o!='object')return;const w={};CPU_PARAMS.forEach(q=>{if(F(o[q.k]))w[q.k]=Math.max(q.min,Math.min(q.max,o[q.k]))});if(Object.keys(w).length)v[l]=w});n.cpuV=v}}
 if(!n.cpuV||![1,2,3].includes(n.cpuB))delete n.cpuB;
+// (2026-10-31) Easy personalities: G.cpuS = {color: 'd' 'a' 'm' 'h' 'x'} and G.cpuQ = {color: 1} (Surprise me), both optional and only for Easy computers; anything else is dropped (the computer then plays General).
+for(const f of ['cpuS','cpuQ']){const o=n[f];if(o==null){delete n[f];continue}const w={};if(n.cpu&&typeof o=='object'&&!Array.isArray(o))Object.keys(o).forEach(k=>{if(n.cpu[k]==1&&(f=='cpuQ'?o[k]===1:['d','a','m','h','x'].includes(o[k])))w[k]=o[k]});if(Object.keys(w).length)n[f]=w;else delete n[f]}
 // (new) Teams: absent = ordinary game; otherwise {color: 1-3} for every player, passing the same teamErr check as the New game page.
 if(n.team==null)delete n.team;else{if(typeof n.team!='object'||Array.isArray(n.team)||Object.keys(n.team).some(k=>!n.pl.includes(+k)))bad('The team setting is invalid.');const t={};n.pl.forEach(c=>{t[c]=n.team[c]});const e=teamErr(n.pl,t,n.cpu);if(e)bad('The team setting is invalid. '+e);n.team=t}
 // (new) Player look: pc = {seat: color key}, pn = {seat: 1-3 letters/digits}; only for seats in play; no two players may share a color or a name.
@@ -1633,7 +1645,7 @@ return copyOut('link')}
 //   Title: ... / Note: ...          optional, shown when the position opens (G.note); Note may repeat (one paragraph each)
 //   Board: 7x7 | 5x5 | 3x3          default 7x7
 //   Players: Red, Blue              2 players = Red and Blue, 4 = Red, Blue, Orange, Purple (any order), or just 2 / 4; default 2
-//   Computers: Blue Hard            optional: Easy, Medium, Hard, or a level number 1-6
+//   Computers: Blue Hard            optional: Easy, Medium, Hard, or a level number 1-6; an Easy may name its personality: Blue Easy Hunter (General, Defensive, All in, Middle grabber, Hunter)
 //   Teams: Red 1, Blue 2, ...       optional, 4 players
 //   Placement: free | fixed         optional; default each player's choice
 //   Round: 5                        default 1
@@ -1674,8 +1686,8 @@ let sz=7;if(V('board')){const b=/^(\d)\s*(?:x\s*(\d))?$/i.exec(V('board'));if(!b
 const N=sz*3;let pl;
 if(!V('players')||V('players')=='2')pl=[0,2];else if(V('players')=='4')pl=[0,2,3,1];else{const s=new Set(words('players').map(w=>seat(w,Li('players'))));if(s.size==2&&s.has(0)&&s.has(2))pl=[0,2];else if(s.size==4)pl=[0,2,3,1];else bad(Li('players'),'Players must be Red and Blue (2 players) or Red, Blue, Orange and Purple (4 players).')}
 const inG=(c,i)=>{if(!pl.includes(c))bad(i,POS_NM[c]+' is not in this game.');return c},
-pairs=k=>{const i=Li(k),o={};V(k).split(',').map(x=>x.trim()).filter(Boolean).forEach(x=>{const m=/^(\S+)\s+(\S+)$/.exec(x);if(!m)bad(i,'Write each one as a player and a value, like "Red 3", separated by commas.');const c=inG(seat(m[1],i),i);if(c in o)bad(i,POS_NM[c]+' is listed twice.');o[c]=m[2]});return o};
-let cpu=null;{const o=pairs('computers'),lv={easy:1,medium:2,hard:3};Object.keys(o).forEach(c=>{const v=o[c].toLowerCase(),l=lv[v]||(/^[1-6]$/.test(v)?+v:0);if(!l)bad(Li('computers'),'A computer level is Easy, Medium, Hard or a number from 1 to 6.');(cpu=cpu||{})[c]=l})}
+pairs=k=>{const i=Li(k),o={};V(k).split(',').map(x=>x.trim()).filter(Boolean).forEach(x=>{const m=/^(\S+)\s+(\S.*)$/.exec(x);if(!m)bad(i,'Write each one as a player and a value, like "Red 3", separated by commas.');const c=inG(seat(m[1],i),i);if(c in o)bad(i,POS_NM[c]+' is listed twice.');o[c]=m[2]});return o};
+let cpu=null,sty=null;{const o=pairs('computers'),lv={easy:1,medium:2,hard:3};Object.keys(o).forEach(c=>{const w=o[c].toLowerCase().split(/\s+/),v=w[0],l=lv[v]||(/^[1-6]$/.test(v)?+v:0);if(!l||w.length>1&&!(l==1&&esKey(w.slice(1).join(' '))))bad(Li('computers'),'A computer level is Easy, Medium, Hard or a number from 1 to 6. An Easy computer may add its personality: General, Defensive, All in, Middle grabber or Hunter.');(cpu=cpu||{})[c]=l;const k=w.length>1?esKey(w.slice(1).join(' ')):null;if(k&&k!='g')(sty=sty||{})[c]=k})}
 let team=null;if(V('teams')){if(pl.length!=4)bad(Li('teams'),'Teams need 4 players.');const o=pairs('teams');team={};pl.forEach(c=>{if(!(c in o))bad(Li('teams'),POS_NM[c]+' has no team.');team[c]=num(o[c],Li('teams'),1,3,'A team')})}
 let pm=null;if(V('placement')){pm=V('placement').toLowerCase();if(pm!='free'&&pm!='fixed')bad(Li('placement'),'Placement is free or fixed.')}
 const round=V('round')?num(V('round'),Li('round'),1,RMAX,'Round'):1,score={};pl.forEach(c=>{score[c]=0});{const o=pairs('scores');Object.keys(o).forEach(c=>{score[c]=num(o[c],Li('scores'),0,9999,'A score')})}
@@ -1710,12 +1722,12 @@ for(let j=0;j+1<ps.length;j++){const a=ref(ps[j],i),b=ref(ps[j+1],i),nm=a.lb+'-'
 if(!alive[a.o]||!alive[b.o])bad(i,'The Connection '+nm+' belongs to a player who is out.');if(a.o!==b.o&&!(team&&team[a.o]===team[b.o]))bad(i,'The Connection '+nm+' joins Stars of two players who are not teammates.');
 const z=S.find(s=>s!==a&&s!==b&&dseg(s,a,b)<outerR(s)+LINE_W/2+PAD-.002);if(z)bad(i,'The Connection '+nm+' passes over Star '+z.lb+'. A line can\'t cross a Star: move one of them or use another spot.');C.push([a.id,b.id])}}));
 const g={pl,caps,alive,stars:S.map(s=>{const q=Object.assign({},s);delete q.lb;return q}),conns:C,round,order,ti:order.indexOf(turn),ap,used,score,nid,over:null,first:order[0],po:order.slice(),pool,gid:newGid()};
-const cp=g.stars.find(s=>s.cap&&s.co===turn);g.capOnly=!!cp&&cp.o!==turn;if(sz!=7)g.sz=sz;if(pm)g.pm=pm;if(cpu)g.cpu=cpu;if(team)g.team=team;
+const cp=g.stars.find(s=>s.cap&&s.co===turn);g.capOnly=!!cp&&cp.o!==turn;if(sz!=7)g.sz=sz;if(pm)g.pm=pm;if(cpu)g.cpu=cpu;if(sty)g.cpuS=sty;if(team)g.team=team;
 if(V('title')||note.length)g.note={t:V('title'),x:note.join('\n')};return g}
 // posText(g,head) = game g (default the live game) as a state section headed head ('Current state', or 'Start state' in a transcript); posParse reads it back to the same position. Player look (it is in the transcript's Players line), history, move previews and a multi-attack being set up are not included.
 function posText(g,head){g=g||G;const nm=c=>POS_NM[c],L=[head||'Current state'];if(g.note&&g.note.t)L.push('Title: '+g.note.t);if(g.note&&g.note.x)g.note.x.split('\n').forEach(x=>L.push('Note: '+x));
 L.push('Board: '+(g.sz||7)+'x'+(g.sz||7),'Players: '+g.pl.map(nm).join(', '));
-if(g.cpu)L.push('Computers: '+Object.keys(g.cpu).map(c=>nm(+c)+' '+(['','Easy','Medium','Hard'][g.cpu[c]]||g.cpu[c])).join(', '));
+if(g.cpu)L.push('Computers: '+Object.keys(g.cpu).map(c=>nm(+c)+' '+(g.cpu[c]==1?esWord(g,c):['','Easy','Medium','Hard'][g.cpu[c]]||g.cpu[c])).join(', '));
 if(g.team)L.push('Teams: '+g.pl.map(c=>nm(c)+' '+g.team[c]).join(', '));if(g.pm)L.push('Placement: '+g.pm);
 L.push('Round: '+g.round,'Scores: '+g.pl.map(c=>nm(c)+' '+(g.score[c]||0)).join(', '),'Order: '+g.order.filter(c=>g.alive[c]).map(nm).join(', '),'Turn: '+nm(g.order[g.ti]),'Fuel: '+g.ap,'Fleets to place: '+(g.pool||0));
 const out=g.pl.filter(c=>!g.alive[c]);if(out.length)L.push('Out: '+out.map(nm).join(', '));if(g.pv&&g.pv.length)L.push('# Move previews are not included.');
@@ -1917,12 +1929,12 @@ function menuPin(top){const o=$('ov'),b=o.firstChild;if(top==null||!b)return;ovU
 // (2026-10-29-i, Shmorden: online games get Main menu too) Online it first asks (netMainAsk), since the start menu is outside the room: Leave leaves the online game exactly like the Leave game / End online game button (netLeave: the host's leaving ends it for everyone), the board stays here as a local game, and the start menu opens; Back returns to the Menu (or the end screen).
 function mainMenu(){if(!G)return;if(net.on)return netMainAsk();persist();histSave();resetFlow();$('ov').onclick=null;menu()}
 function netMainAsk(){const host=net.role=='host';$('ov').onclick=null;ov('<h1>Leave the online game?</h1><p>'+(host?'You are the host, so leaving ends the online game for everyone. ':'')+'The board stays on this device as a local game: Continue saved game on the main menu opens it.</p><div class="r"><button onclick="saveUI()">Back</button><button onclick="netLeave();mainMenu()">Leave</button></div>')}
-// (2026-10-29-k, Shmorden) quickGame() = the start menu's Quick game button: a Solo game with everything picked at random and started at once: the board size (7x7, 5x5 or 3x3), 2 or 4 players (placeholder: Shmorden named no number), your seat (in its usual color), and each computer's level (Easy, Medium or Hard) and color; computers are named by color initial and level (R.Easy, qkNm; any color, b.Easy and B.Easy tell blue and Brown apart, 2026-10-29-l). The New game page's choices are left as they were. Refused like New game while a game is in progress. (2026-10-30-b) A 4-player Quick game has Teams on half the time (placeholder), always 2 against 2 with your partner picked at random.
+// (2026-10-29-k, Shmorden) quickGame() = the start menu's Quick game button: a Solo game with everything picked at random and started at once: the board size (7x7, 5x5 or 3x3), 2 or 4 players (placeholder: Shmorden named no number), your seat (in its usual color), and each computer's level (Easy, Medium or Hard) and color; computers are named by color initial and level (R.Easy, qkNm; any color, b.Easy and B.Easy tell blue and Brown apart, 2026-10-29-l). The New game page's choices are left as they were. Refused like New game while a game is in progress. (2026-10-30-b) A 4-player Quick game has Teams on half the time (placeholder), always 2 against 2 with your partner picked at random. (2026-10-31) An Easy computer gets a Surprise me personality (Easy personalities).
 function quickGame(){if(G&&!G.over&&!net.on){const b=$('mquick');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}
 const R=a=>a[Math.floor(Math.random()*a.length)],sz=R([7,5,3]),n=R([2,4]),pl=n==2?[0,2]:[0,2,3,1],me=R(pl),cpu={},pc={},used=new Set([DEFCOL[me]]);
 pl.forEach(c=>{if(c==me)return;cpu[c]=R([1,2,3]);const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
 let team=null;if(n==4&&Math.random()<.5){const o=pl.slice().sort(()=>Math.random()-.5);team={};o.forEach((c,i)=>team[c]=i<2?1:2)}
-start(n,sz,null,cpu,team,{pc,qk:1})}
+const sty={};pl.forEach(c=>{if(cpu[c]==1)sty[c]='r'});start(n,sz,null,cpu,team,{pc,qk:1},sty)}
 // menuNew() = the start menu's New game button. While a game is in progress (loaded, not over) it does not open the New game page: the button blinks like Play does and a line says why.
 function menuNew(){if(G&&!G.over&&!net.on){const b=$('mnew');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}newGameOpen()}
 // endGameDlg() = the Menu's End game button: asks first (same look as Concede), then doEndGame ends the game for everyone.
@@ -2376,7 +2388,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-10-31-a';
+const BUILD='2026-10-31-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2398,11 +2410,10 @@ ov('<h1>'+(spage=='h'?'Settings':sec?sec[1]:'Theme')+'</h1>'+bar+'<div style="ma
 function settingsTab(k){settingsDlg(k,true)}
 // ng = the choices on the New game page. (changed, team project step 3b: the Classic / New game pages are gone; the New game page is what Custom used to be.) n = players. sz = board size (sectors per side: 7, 5 or 3). col = the color you play when hosting online. view = which screen to redraw after a choice ('new' = the New game page, 'net' = a new game in the current online room).
 // (changed) Nothing is chosen when the New game page opens: tab, mode (pass / host / solo), n, sz and col start empty (null) and a seat with no entry in cpu is 'not chosen yet' (0 = Human, 1+ = computer level). ngReset() puts everything back to that; newGameOpen() does it every time the page is opened from a menu.
-const ng={mode:null,n:null,sz:null,col:null,pm:'choice',cpu:{},view:'new',teams:false,team:{},note:'',look:{pc:{},pn:{}}};
-// ngCpuMap() = the computer players chosen on the New game page, for the colors in play. ngCpu(c) flips one color between Human and Computer.
+const ng={mode:null,n:null,sz:null,col:null,pm:'choice',cpu:{},sty:{},view:'new',teams:false,team:{},note:'',look:{pc:{},pn:{}}};
+// ngCpuMap() = the computer players chosen on the New game page, for the colors in play. (2026-10-31) A seat is chosen from its drop-down (ngLvlOpen, Seat drop-downs).
 const ngPl=()=>ng.n==4?[0,2,3,1]:[0,2];
 const ngCpuMap=()=>{const o={};ngPl().forEach(c=>{if(ng.cpu[c])o[c]=ng.cpu[c]});return o};
-function ngCpu(c){if(ng.mode=='solo'&&c==ng.col)return;const L=cpuSeatLv().filter(x=>ng.mode!='solo'||x>0);ng.cpu[c]=ng.cpu[c]===undefined?L[0]:L[(L.indexOf(ng.cpu[c])+1)%L.length];ngRedraw()}
 // ngSize() is the board size chosen (7, 5 or 3 sectors per side); ngPm() the position selection.
 const ngSize=()=>ng.sz,ngPm=()=>ng.pm;
 // pmRow() draws the Position selection buttons (New game page): Player choice (each player picks on the Game menu page), Free placement only, Fixed positions only.
@@ -2420,7 +2431,7 @@ function ngSet(k,v){ng[k]=v;if(k=='n'&&ng.col!=null&&!ngPl().includes(ng.col))ng
 function ngMissing(){const m=[];if(!ng.sz)m.push('a board size');if(!ng.mode)m.push('how to play');
 if(!ng.n)m.push('number of players');else{const own=ng.mode&&ng.mode!='pass';if(own&&ng.col==null)m.push('your color');
 if(ng.mode!='solo'&&ngPl().some(c=>ng.cpu[c]===undefined))m.push('who plays each color');else if(own&&ng.col!=null&&ng.cpu[ng.col])m.push('a person for your own color');if(ng.teams&&ngTeamOK()){if(ngPl().some(c=>!ng.team[c]))m.push('a team for every color');else{const e=teamErr(ngPl(),ng.team,ngCpuMap());if(e)m.push(e)}}}return m}
-function ngReset(){Object.assign(ng,{mode:null,n:null,sz:null,col:null,pm:'choice',cpu:{},view:'new',teams:false,team:{},note:'',look:{pc:{},pn:{}}})}
+function ngReset(){Object.assign(ng,{mode:null,n:null,sz:null,col:null,pm:'choice',cpu:{},sty:{},view:'new',teams:false,team:{},note:'',look:{pc:{},pn:{}}})}
 // (changed) The page starts empty only the FIRST time it is opened after the app or website loads (ngFresh); after that the choices are kept, so starting another game after finishing or leaving one remembers them. A page reload starts empty again.
 let ngFresh=true;
 function newGameOpen(){if(ngFresh){ngReset();ngFresh=false}newGameDlg()}
@@ -2432,15 +2443,33 @@ const ngTeamOK=()=>ng.view=='net'?net.n==4:ng.n==4;
 function ngTeamFix(){if(!ngTeamOK())ng.teams=false}
 // ngTeamNext(c) = the next team number (1, 2, 3, then 1) for seat c. (2026-10-30) Computers may share a team, so every number fits.
 const ngTeamNext=c=>(ng.team[c]||0)%3+1;
-// ngTeam(c) = the team button of seat c. ngTeams(on) = the Teams switch.
-function ngTeam(c){ng.team[c]=ngTeamNext(c);ngRedraw()}
+// ngTeams(on) = the Teams switch. (2026-10-31) A seat's team is chosen from its drop-down (ngTeamOpen, Seat drop-downs); ngTeamNext stays for the tests.
 function ngTeams(on){ng.teams=!!on&&ngTeamOK();ngRedraw()}
 // ngTeamMap() = the teams to start the game with ({color: team}), or null for an ordinary game.
 function ngTeamMap(){if(!(ng.teams&&ngTeamOK()))return null;const o={};ngPlNow().forEach(c=>{o[c]=ng.team[c]});return o}
 // teamsRow() = the Teams switch with a one-line reminder of the rules, or the reason Teams are not available. teamBtn(c) = the team button of a seat.
 function teamsRow(){if(!ngTeamOK())return '<p style="margin:10px 0 0;color:var(--mut);font-size:13px">Teams: need 4 players.</p>';
 return '<p style="margin:10px 0 4px">Teams</p><div class="r">'+[[false,'Off'],[true,'On']].map(([v,t])=>'<button'+(!!ng.teams==v?' class="act"':'')+' onclick="ngTeams('+v+')">'+t+'</button>').join('')+'</div>'+(ng.teams?'<p style="margin:6px 0 0;color:var(--mut);font-size:13px">Scores stay individual. A team wins when it is the last team with a living player, or has the most combined points after round 30. Teammates cannot attack each other.</p>':'<p style="margin:6px 0 0;color:var(--mut);font-size:13px">Every player plays for themselves. The last player standing wins, or the player with the most points after round 30.</p>')}
-const teamBtn=c=>'<button'+(ng.team[c]?' class="act"':'')+' onclick="ngTeam('+c+')">'+(ng.team[c]?'Team '+ng.team[c]:'Team ?')+'</button>';
+const teamBtn=c=>'<button'+(ng.team[c]?' class="act"':'')+' onclick="ngTeamOpen('+c+',this)">'+(ng.team[c]?'Team '+ng.team[c]:'Team ?')+' ▾</button>';
+// ===== Seat drop-downs (Shmorden, 2026-10-31) =====
+// ddOpen(btn,items,pick) = a drop-down list under button btn (above it when there is no room below). items = [{l: label (html), v: value, act: true for the current choice, sub: [items]}]. Tapping an item that has a sub list opens it in place (one at a time; tapping again closes it); tapping any other item closes the list and calls pick(v). Tapping outside closes it. dd = the open list, or null.
+let dd=null;
+function ddOpen(btn,items,pick){ddClose();dd={btn,items,pick,open:items.findIndex(i=>i.sub&&i.sub.some(s=>s.act))};ddDraw()}
+function ddDraw(){if(!dd)return;let b=$('ddb'),p=$('dd');if(!b){b=document.createElement('div');b.id='ddb';b.onclick=ddClose;document.body.appendChild(b)}if(!p){p=document.createElement('div');p.id='dd';p.setAttribute('role','menu');document.body.appendChild(p)}
+const btn=(it,i,j)=>'<button role="menuitem"'+(j!=null?' class="sub'+(it.act?' act':'')+'"':it.act?' class="act"':'')+' onclick="ddTap('+i+','+(j==null?-1:j)+')">'+it.l+(it.sub?'<span>'+(dd.open==i?'▴':'▸')+'</span>':'')+'</button>';
+p.innerHTML=dd.items.map((it,i)=>btn(it,i)+(it.sub&&dd.open==i?it.sub.map((s,j)=>btn(s,i,j)).join(''):'')).join('');
+const r=dd.btn.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;p.style.left=Math.max(16,Math.min(r.left,innerWidth-w-16))+'px';p.style.top=(r.bottom+4+h<=innerHeight-8?r.bottom+4:Math.max(8,r.top-4-h))+'px'}
+function ddTap(i,j){if(!dd)return;const it=j<0?dd.items[i]:dd.items[i].sub[j];if(j<0&&it.sub){dd.open=dd.open==i?-1:i;ddDraw();return}const f=dd.pick;ddClose();f(it.v)}
+function ddClose(){dd=null;['dd','ddb'].forEach(id=>{const e=$(id);if(e)e.remove()})}
+// ng.sty = {color: Easy personality} chosen on the New game page: 'g' 'd' 'a' 'm' 'h' or 'r' (Surprise me); missing = General. ngLvlName(c,html) = the seat button's text: the level, and for Easy its personality ('Easy ?' for Surprise me).
+function ngLvlName(c,html){const v=ng.cpu[c];if(v!=1)return cpuName(v,html);const s=ng.sty[c]||'g';return cpuName(1,html)+' '+(s=='r'?'?':ES_NAMES[s])}
+// ngLvlOpen(c,btn) = the seat's drop-down: Human, Easy (opens Surprise me and the five personalities), Medium, Hard, then Hard (legacy) / Custom when they are offered. Solo leaves out Human, and your own seat can't be a computer.
+function ngLvlOpen(c,btn){if(ng.mode=='solo'&&c==ng.col)return;const v=ng.cpu[c],s=ng.sty[c]||'g',L=cpuSeatLv().filter(x=>ng.mode!='solo'||x>0);
+ddOpen(btn,L.map(x=>x==1?{l:cpuName(1,true),v:1,sub:[{l:'Surprise me',v:'1r',act:v==1&&s=='r'}].concat(ES_KEYS.map(k=>({l:ES_NAMES[k],v:'1'+k,act:v==1&&s==k})))}:{l:x?cpuName(x,true):'Human',v:x,act:v===x}),x=>{if(typeof x=='string'){ng.cpu[c]=1;ng.sty[c]=x[1]}else ng.cpu[c]=x;ngRedraw()})}
+// ngTeamOpen(c,btn) = the team drop-down of seat c: Team 1, 2 or 3.
+function ngTeamOpen(c,btn){ddOpen(btn,[1,2,3].map(t=>({l:'Team '+t,v:t,act:ng.team[c]==t})),t=>{ng.team[c]=t;ngRedraw()})}
+// ngStyMap() = the Easy personalities to start the game with ({color: style}), for the Easy seats in play.
+const ngStyMap=()=>{const o={};ngPl().forEach(c=>{if(ng.cpu[c]==1)o[c]=ng.sty[c]||'g'});return o};
 // netPlayerRows() = the Players list of the online New game menu: every seat with its color dot and name (tap to change one that is yours, or any seat when you are the host), a Computer tag, and the team button while Teams are on (host only). They are the looks the NEXT game will use.
 const netPlayerRows=()=>{const tm=ng.teams&&ngTeamOK()&&net.role=='host';return '<p style="margin:12px 0 4px">Players <span style="color:var(--mut);font-size:13px">(look for the next game)</span></p>'+net.seats.map(s=>'<div style="display:flex;align-items:center;gap:8px;margin:6px 0">'+lkBtns(s.c,net.look,lkCan(s.c))+(s.kind=='cpu'?'<span style="color:var(--mut)">Computer</span>':'')+(tm?'<span style="margin-left:auto">'+teamBtn(s.c)+'</span>':'')+'</div>').join('')}
 // sizeRow() draws the three board-size buttons (New game page), the chosen one highlighted.
@@ -2450,9 +2479,9 @@ function newGame(){if(net.on)netMenuGame();else newGameOpen()}
 // (2026-10-29-k, Shmorden) Play sits just above Back and, like Back, stays at the bottom of the screen when the page scrolls (class pin, see ovSc); the line of what is still to choose (#nm) moved above it.
 // newGameDlg() is the New game page. Board size, position selection and Teams, then players, your color (used when hosting online, laid out like the hosted lobby), and how to play: on this device (pass the device around) or host an online room (any board size works online).
 function newGameDlg(back){ng.view='new';ovDir=back==2?0:back?-1:$('ov').dataset.page=='new'?0:1;const note=ng.note;ng.note='';const pl=ngPl(),own=ng.mode=='solo'||ng.mode=='host',solo=ng.mode=='solo';
-const seats=!ng.n?'<p style="margin:6px 0 0;color:var(--mut)">Choose the number of players first.</p>':pl.map(c=>{const v=ng.cpu[c],tm=ng.teams&&ngTeamOK();return '<div style="display:flex;align-items:center;gap:8px;margin:6px 0'+(tm?';flex-wrap:wrap':'')+'"><button class="sdot" onclick="ngColorOpen('+c+')" aria-label="Color"><i style="background:'+lkCol(ng.look,c)+'"></i></button><button class="sname" onclick="ngNameOpen('+c+')">'+esc(lkNm(ng.look,c))+'</button>'+(own?'<button style="margin-left:auto"'+(ng.col==c?' class="act"':'')+' onclick="ngSet(\'col\','+c+')">'+(ng.col==c?'You':'Play')+'</button>':'')+'<button'+(own?'':' style="margin-left:auto"')+(v?' class="act"':'')+(solo&&c==ng.col?' disabled style="opacity:.8"':'')+' onclick="ngCpu('+c+')">'+(v===undefined?'Choose':v?cpuName(v,true):'Human')+'</button>'+(tm?teamBtn(c):'')+'</div>'}).join('');
+const seats=!ng.n?'<p style="margin:6px 0 0;color:var(--mut)">Choose the number of players first.</p>':pl.map(c=>{const v=ng.cpu[c],tm=ng.teams&&ngTeamOK();return '<div style="display:flex;align-items:center;gap:8px;margin:6px 0'+(tm?';flex-wrap:wrap':'')+'"><button class="sdot" onclick="ngColorOpen('+c+')" aria-label="Color"><i style="background:'+lkCol(ng.look,c)+'"></i></button><button class="sname" onclick="ngNameOpen('+c+')">'+esc(lkNm(ng.look,c))+'</button>'+(own?'<button style="margin-left:auto"'+(ng.col==c?' class="act"':'')+' onclick="ngSet(\'col\','+c+')">'+(ng.col==c?'You':'Play')+'</button>':'')+'<button'+(own?'':' style="margin-left:auto"')+(v?' class="act"':'')+(solo&&c==ng.col?' disabled style="opacity:.8"':'')+' onclick="ngLvlOpen('+c+',this)">'+(v===undefined?'Choose':v?ngLvlName(c,true):'Human')+' ▾</button>'+(tm?teamBtn(c):'')+'</div>'}).join('');
 const miss=ngMissing(),ready=!miss.length;
-ov('<h1>New game</h1>'+'<p style="margin:10px 0 4px">Board size</p>'+sizeRow()+pmRow()+'<p style="margin:12px 0 4px">How do you want to play?</p><div class="r">'+[['pass','Pass and play'],['host','Host online game'],['solo','Solo']].map(([v,t])=>'<button'+(ng.mode==v?' class="act"':'')+' onclick="ngSet(\'mode\',\''+v+'\')">'+t+'</button>').join('')+'</div><p style="margin:12px 0 4px">Number of players</p><div class="r">'+[2,4].map(n=>'<button'+(ng.n==n?' class="act"':'')+' onclick="ngSet(\'n\','+n+')">'+n+' players</button>').join('')+'</div>'+teamsRow()+'<p style="margin:12px 0 0">Players</p>'+seats+'<p style="margin:4px 0 0;color:var(--mut);font-size:13px">'+(solo?'Solo: you play the color you pick; every other color is a computer, Easy to begin with. Tap one to change its level.':'Tap the dot to pick a color and the name to set 3-letter initials. Tap the last button to cycle a player: Human, Easy, Medium or Hard computer (and Custom once you have saved one in Settings > CPU Designer).'+(ng.mode=='host'?' Human seats you do not play stay open for friends to join.':''))+'</p>'+'<p id="nm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)">'+(note||(ready?'':'Still to choose: '+miss.join(', ')+'.'))+'</p><div class="r pin" style="margin-top:12px"><button id="ngplay" onclick="ngPlay()"'+(ready?'':' class="ngoff"')+'>Play</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>');$('ov').dataset.page='new'}
+ov('<h1>New game</h1>'+'<p style="margin:10px 0 4px">Board size</p>'+sizeRow()+pmRow()+'<p style="margin:12px 0 4px">How do you want to play?</p><div class="r">'+[['pass','Pass and play'],['host','Host online game'],['solo','Solo']].map(([v,t])=>'<button'+(ng.mode==v?' class="act"':'')+' onclick="ngSet(\'mode\',\''+v+'\')">'+t+'</button>').join('')+'</div><p style="margin:12px 0 4px">Number of players</p><div class="r">'+[2,4].map(n=>'<button'+(ng.n==n?' class="act"':'')+' onclick="ngSet(\'n\','+n+')">'+n+' players</button>').join('')+'</div>'+teamsRow()+'<p style="margin:12px 0 0">Players</p>'+seats+'<p style="margin:4px 0 0;color:var(--mut);font-size:13px">'+(solo?'Solo: you play the color you pick; every other color is a computer, Easy to begin with. Tap one to change its level (an Easy computer also has a personality).':'Tap the dot to pick a color and the name to set 3-letter initials. Tap the last button to choose a player: Human, Easy (pick a personality, or Surprise me), Medium or Hard computer (and Custom once you have saved one in Settings > CPU Designer).'+(ng.mode=='host'?' Human seats you do not play stay open for friends to join.':''))+'</p>'+'<p id="nm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)">'+(note||(ready?'':'Still to choose: '+miss.join(', ')+'.'))+'</p><div class="r pin" style="margin-top:12px"><button id="ngplay" onclick="ngPlay()"'+(ready?'':' class="ngoff"')+'>Play</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>');$('ov').dataset.page='new'}
 // ngPlay() = the Play button: Host online game goes to the host-room lobby (ngHost); Pass and play and Solo start the game on this device (ngLocal). Does nothing until every choice is made.
 function ngPlay(){const m=ngMissing();if(m.length)return ngHint(m);if(ng.mode=='host')ngHost();else ngLocal()}
 // ngHint(m) = Play was tapped before every choice was made: the Play button blinks and a popup says 'Complete your selections to play' with what is still missing, listed from the top of the page to the bottom. (changed 2026-10-29-k, Shmorden) It sits just above Play, so Play and Back stay uncovered, says "Tap to close" and stays until it is tapped (or a choice redraws the page); it no longer closes by itself. (The Play button is never truly disabled, because a disabled button cannot be tapped and so could not explain itself.)
@@ -2460,7 +2489,7 @@ function ngHint(m){const b=$('ngplay');if(b){b.classList.remove('blink');void b.
 let h=$('ngh');if(h)h.remove();h=document.createElement('div');h.id='ngh';h.onclick=e=>{if(e)e.stopPropagation();h.remove()};const pb=b?b.getBoundingClientRect().top:innerHeight-24;
 h.style.cssText='position:fixed;left:16px;right:16px;bottom:'+Math.max(24,Math.round(innerHeight-pb+8))+'px;z-index:5;cursor:pointer;box-sizing:border-box;max-width:min(340px,calc(100vw - 32px));margin:0 auto;background:var(--panel);color:var(--ink);border:2px solid var(--warn);border-radius:12px;padding:12px 14px;box-shadow:0 4px 18px rgba(0,0,0,.5)';
 h.innerHTML='<b>Complete your selections to play</b><ul style="margin:6px 0 0;padding-left:20px">'+m.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p style="margin:6px 0 0;color:var(--mut);font-size:13px;text-align:right">Tap to close</p>';$('ov').appendChild(h)}
-function ngLocal(){start(ng.n,ngSize(),ngPm(),ngCpuMap(),ngTeamMap(),ngLook())}
+function ngLocal(){start(ng.n,ngSize(),ngPm(),ngCpuMap(),ngTeamMap(),ngLook(),ngStyMap())}
 // ===== Players: color picker and name box =====
 // A look = {pc:{seat:colorKey}, pn:{seat:'ABC'}}. (build q) The color picker and the name box open as a SECOND dialog (ov2) on top of the page that opened them; that page is not replaced. They edit one of two looks, chosen when they open (lkCtx): 'ng' = ng.look (the New game page), 'net' = the online room's look net.look (the lobby and the online New game menu). Online, the host can change every seat; a guest can change only their own seat, by asking the host (message 'look'), who checks it and sends everyone the new room look.
 // lkOpen = what is open now ({k:'col'|'name', c:seat}) or null. lkCur() = the look being edited. lkSeats() = the seats in play. lkCan(c) = may THIS device change seat c's look online.
@@ -2498,7 +2527,7 @@ ov2('<h1>Player name</h1><p>The name shows on the score chip and in the game.</p
 function ngNameType(el){el.value=[...el.value.toUpperCase()].filter(ch=>/[\p{L}\p{N}]/u.test(ch)).slice(0,3).join('')}
 function ngNameInit(c){const el=$('ngi'),e=lkCommit(c,'pn',el?el.value.toUpperCase():''),p=$('ngnn');if(e){if(p)p.textContent=e;return}lkDone()}
 function ngNameColor(c){lkCommit(c,'pn',null);lkDone()}
-function ngHost(){if(ng.cpu[ng.col])return nmsg('Your own color has to be a person. Pick another color for yourself, or switch it to Human.');netHost(ng.n,ngSize(),ng.col,ngPm(),ngCpuMap(),ngTeamMap(),ngLook())}
+function ngHost(){if(ng.cpu[ng.col])return nmsg('Your own color has to be a person. Pick another color for yourself, or switch it to Human.');netHost(ng.n,ngSize(),ng.col,ngPm(),ngCpuMap(),ngTeamMap(),ngLook(),ngStyMap())}
 // ===== (new) Haptics: a short phone vibration =====
 // HKEY = where the on/off choice is remembered. hapOn = the choice. hapOK() = does this browser support vibration at all? (Android Chrome and Samsung Internet do; iPhone browsers do not.) buzz(p) vibrates with pattern p (milliseconds) if allowed. hapLabel() is the toggle button text. hapToggle(b) flips the choice.
 const HKEY='constellate-haptics';let hapOn=true;try{hapOn=localStorage.getItem(HKEY)!=='0'}catch(e){}
@@ -2929,8 +2958,8 @@ function holdBtn(){if(net.on&&net.rq&&!net.rq.sent&&!net.my.includes(cur())){if(
 function netWaitMsg(){const d=pend.def;return 'Waiting for '+NM[d]+' to make the Defence call.'+(seatUp(d)?'':' '+NM[d]+' is offline: Undo cancels the attack, or wait for them to return.')}
 // ---- Host side ----
 // netHost(n,sz,col) opens a room for n players on a board of sz sectors per side, with the host playing color col: try random codes until the matchmaking server accepts one.
-async function netHost(n,sz,col,pm,cpu,team,look){try{await netLib()}catch(e){return nmsg(e.message)}
-netCleanup(true);net.look=look&&(look.pc||look.pn)?look:null;net.role='host';net.n=n;net.sz=[3,5,7].includes(sz)?sz:7;net.pm=pm=='free'||pm=='fixed'?pm:'choice';net.started=false;const pl=n==2?[0,2]:[0,2,3,1],hc=pl.includes(col)?col:pl[0];net.team=team&&!teamErr(pl,team,cpu)?Object.assign({},team):null;net.seats=pl.map(c=>({c,kind:c===hc?'host':(cpu&&cpu[c]?'cpu':'open'),lvl:cpu&&cpu[c]?([1,2,3].includes(cpu[c])?cpu[c]:1):0,tok:null,conn:null,online:c===hc||!!(cpu&&cpu[c])}));netMy();net.tok=null;nmsg('Opening a room...');
+async function netHost(n,sz,col,pm,cpu,team,look,sty){try{await netLib()}catch(e){return nmsg(e.message)}
+netCleanup(true);net.look=look&&(look.pc||look.pn)?look:null;net.role='host';net.n=n;net.sz=[3,5,7].includes(sz)?sz:7;net.pm=pm=='free'||pm=='fixed'?pm:'choice';net.started=false;const pl=n==2?[0,2]:[0,2,3,1],hc=pl.includes(col)?col:pl[0];net.team=team&&!teamErr(pl,team,cpu)?Object.assign({},team):null;net.seats=pl.map(c=>({c,kind:c===hc?'host':(cpu&&cpu[c]?'cpu':'open'),lvl:cpu&&cpu[c]?([1,2,3].includes(cpu[c])?cpu[c]:1):0,sty:(sty&&sty[c])||'g',tok:null,conn:null,online:c===hc||!!(cpu&&cpu[c])}));netMy();net.tok=null;nmsg('Opening a room...');
 for(let i=0;i<6&&!net.room;i++){const code=rnd(5),r=await netOpenPeer('cstl-'+code);if(r=='ok')net.room=code;else if(r!='taken')break}
 if(!net.room){net.role=null;net.seats=[];net.my=[];return nmsg('Could not reach the matchmaking server. Check your connection and try again.')}
 net.on=true;net.gone=false;netSave();netLobby()}
@@ -2967,8 +2996,8 @@ function hostLost(conn){const s=net.seats.find(q=>q.conn===conn);if(!s)return;s.
 // netStart() (host): everyone is seated, so create the game with the normal start code and send everyone a full copy.
 // (changed, team project step 3) netStart(sz,pm,team): team = the teams for the new game ({color: team} or null = no teams); left out, the room's teams stay. A bad team setup is refused with the reason.
 function netStart(sz,pm,team){if(net.role!='host'||net.seats.some(s=>s.kind=='open'))return nmsg('Fill every seat first.');
-const cp={};net.seats.forEach(q=>{if(q.kind=='cpu')cp[q.c]=q.lvl||1});const tm=arguments.length>2?(team?Object.assign({},team):null):net.team;if(tm){const e=teamErr(net.seats.map(q=>q.c),tm,cp);if(e)return nmsg(e)}net.team=tm;
-if(sz)net.sz=sz;if(pm)net.pm=pm;net.hold=true;net.started=true;net.lobby=false;netMy();try{start(net.n,net.sz,net.pm,cp,net.team,net.look)}finally{net.hold=false}
+const cp={},st={};net.seats.forEach(q=>{if(q.kind=='cpu'){cp[q.c]=q.lvl||1;st[q.c]=q.sty||'g'}});const tm=arguments.length>2?(team?Object.assign({},team):null):net.team;if(tm){const e=teamErr(net.seats.map(q=>q.c),tm,cp);if(e)return nmsg(e)}net.team=tm;
+if(sz)net.sz=sz;if(pm)net.pm=pm;net.hold=true;net.started=true;net.lobby=false;netMy();try{start(net.n,net.sz,net.pm,cp,net.team,net.look,st)}finally{net.hold=false}
 net.lastG=JSON.stringify(G);net.acting=false;relay(fullMsg(true),null);netPush()}
 // netToggleSeat(c) (host): in the lobby, turn an open seat into "the host plays this one too" and back.
 // netCpuSeat(c) (host): in the lobby, turn an open seat into a computer player and back.
@@ -3032,7 +3061,7 @@ function netLeave(){if(net.role=='host')relay({t:'end'},null);else nsend(net.con
 // netMenuOpen(code) is the Join online game screen: type the 5-character room code (a room link fills it in). Hosting is on the New game page.
 function netMenuOpen(code){ovDir=1;net.lobby=false;ov('<h1>Join online game</h1><p>Live play: everyone must be online at the same time. Enter the room code from the host, or open the room link they sent you.</p><div class="r"><input id="rc" maxlength="5" value="'+esc(code||'')+'" placeholder="Room code" autocapitalize="characters" autocomplete="off" spellcheck="false" style="flex:1;min-width:0;min-height:44px;font:inherit;text-transform:uppercase;box-sizing:border-box"><button onclick="netJoin($(\'rc\').value)">Join</button></div><p id="nm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r"><button onclick="menu()">Back</button></div>')}
 // seatRows() builds the seat list shown in the lobby and the in-game online menu.
-function seatRows(game){return net.seats.map(s=>{const me=net.my.includes(s.c),lab=s.kind=='host'?(net.role=='host'?'You (host)':'Host'):s.kind=='cpu'?'Computer ('+(net.role=='host'?cpuName(s.lvl||1,true):CPU_LEVELS[s.lvl||1])+')':s.kind=='local'?(s.took?'Host is playing this seat':'Host plays this seat too'):s.kind=='guest'?(me&&net.role=='guest'?'You':'Joined'):'Waiting...',off=s.kind=='guest'&&!s.online?' (offline)':'';
+function seatRows(game){return net.seats.map(s=>{const me=net.my.includes(s.c),lab=s.kind=='host'?(net.role=='host'?'You (host)':'Host'):s.kind=='cpu'?'Computer ('+(net.role=='host'?cpuName(s.lvl||1,true)+((s.lvl||1)==1?' '+(s.sty=='r'?'?':ES_NAMES[s.sty]||ES_NAMES.g):''):CPU_LEVELS[s.lvl||1])+')':s.kind=='local'?(s.took?'Host is playing this seat':'Host plays this seat too'):s.kind=='guest'?(me&&net.role=='guest'?'You':'Joined'):'Waiting...',off=s.kind=='guest'&&!s.online?' (offline)':'';
 let btn='';if(net.role=='host'){if(!game&&s.kind=='open')btn='<button onclick="netToggleSeat('+s.c+')">I\'ll play it</button><button onclick="netCpuSeat('+s.c+')">Add computer</button>';else if(!game&&s.kind=='cpu')btn='<button onclick="netCpuLvl('+s.c+')">Level</button><button onclick="netCpuSeat('+s.c+')">Remove</button>';else if(!game&&s.kind=='local'&&!s.took)btn='<button onclick="netToggleSeat('+s.c+')">Open it</button>';else if(game&&s.kind=='guest'&&!s.online)btn='<button onclick="netTakeover('+s.c+')">Take over</button>'}
 return '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0">'+lkBtns(s.c,game?G:net.look,!game&&lkCan(s.c))+(((net.team&&net.team[s.c])||s.team)?'<span style="color:var(--mut)">Team '+((net.team&&net.team[s.c])||s.team)+'</span>':'')+'<span style="margin-left:auto;color:var(--mut)">'+lab+off+'</span>'+btn+'</div>'}).join('')}
 // netLobby() is the waiting room before the game starts.
@@ -3360,6 +3389,80 @@ resetFlow();if(JSON.stringify([G.ap,G.conns.length,a.o,a.f||0,b.f||0])!=before)r
 // cpuMateConn() = (CPUs and teams, 2026-10-30) the very last resort of a computer on a team: when every other move is gone but a Connect to a living teammate's Star is still possible, Full Fuel (RULES.md 9.4) says the turn can't end, so it makes the cheapest such Connect (a Gift never: nobody is forced to give a Star away). Computers don't connect to teammates for any other reason yet. Returns false at once without teams.
 function cpuMateConn(){let best=null;for(const m of cpuTeamMoves())if(m.t=='tconn'&&!cpuBad.has(m.key)&&(!best||m.c<best.c))best=m;return best?cpuTeamDo(best):false}
 function cpuMulti(){const me=cur(),mine=G.stars.filter(q=>q.o==me&&!G.used.includes(q.id));for(const b of G.stars){if(!cpuTgt(b.o,me))continue;const cand=mine.filter(a=>cclear(a,b)&&cost(a,b)<=G.ap);for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++){const x=cand[i],y=cand[j],key='x'+b.id+'_'+x.id+'_'+y.id;if(cpuBad.has(key))continue;if(cost(x,b)+cost(y,b)<=G.ap&&cs(x)+(x.f||0)+cs(y)+(y.f||0)>str(b)){if(cpuMultiDo(b,x,y,key))return true}}}return false}
+// ===== Easy personalities (Shmorden, 2026-10-31) =====
+// An Easy computer has a personality: an Easy player that has chosen a bad strategy and follows it faithfully. G.cpuS = {color: style}: 'g' General (EGE), 'd' Defensive (EDE), 'a' All in (EAI), 'm' Middle grabber (EMI), 'h' Hunter (EHU); 'x' = the Easy from before personalities (tests only). A computer with no entry plays General. G.cpuQ = {color: 1} marks a 'Surprise me' pick: the style was drawn at random when the game started, and the end screen names it. Only the built-in Easy (level 1) has personalities: Custom and the other levels ignore G.cpuS. Fleets (placing, moving, Hold/Retreat) stay the old Easy code for every style.
+// The shared base (each style changes only what it says): every Sector is worth 1 VP, the center too, and full rows/columns mean nothing; an opponent's Star is noticed only when it sits in or next to (diagonals too) a Sector where this computer has a Star; a Capital is an ordinary Star (no extra value); no Connections unless nothing else is left (a Set's own line is already a Connection, so every Star is in the network). Moves are chosen one at a time: the best value plus the Easy random wobble (the 'noise' row of CPU_PARAMS), so the CPU Designer's Easy values still apply.
+const ES_KEYS=['g','d','a','m','h'],ES_NAMES={g:'General',d:'Defensive',a:'All in',m:'Middle grabber',h:'Hunter'},ES_INIT={g:'EGE',d:'EDE',a:'EAI',m:'EMI',h:'EHU'};
+// esSty(c) = the personality of computer c, or '' when it has none (not the built-in Easy, or the old Easy 'x').
+function esSty(c){if(!G||!G.cpu||G.cpu[c]!=1)return '';const s=(G.cpuS&&G.cpuS[c])||'g';return ES_NAMES[s]?s:''}
+// esStyMap() = this game's personalities in the form start() takes ({color: style}, 'r' for a Surprise me pick, so a rematch draws again), or null.
+function esStyMap(){if(!G||!G.cpu)return null;const o={};Object.keys(G.cpu).forEach(c=>{if(G.cpu[c]==1)o[c]=G.cpuQ&&G.cpuQ[c]?'r':(G.cpuS&&G.cpuS[c])||'g'});return Object.keys(o).length?o:null}
+// esLabel(c) = the name of computer c's personality for the screen ('Easy Hunter'), or '' when it has none.
+function esLabel(c){const s=esSty(c);return s?'Easy '+ES_NAMES[s]:''}
+// esKey(name) = the personality key for a written name ('Hunter' -> 'h', any case), or null. esWord(g,c) = how a written game names computer c's level: 'Easy Hunter' for an Easy with a personality other than General, else the plain level (used by the Current state Computers line and the transcript Players line).
+function esKey(name){const n=String(name||'').trim().toLowerCase();return ES_KEYS.find(k=>ES_NAMES[k].toLowerCase()==n)||null}
+function esWord(g,c){const l=g.cpu[c],b=({1:'Easy',2:'Medium',3:'Hard',6:'Custom'})[l]||String(l),s=l==1&&g.cpuS&&g.cpuS[c];return s&&ES_NAMES[s]?b+' '+ES_NAMES[s]:b}
+// esS = this turn's memory: tid = the turn it belongs to (cpuTurn), def = Fuel still to spend on defence (Defensive), scared = playing General to stay out of Deficit Elimination (Hunter).
+let esS={tid:''};
+// esVal(T,me,P) = the Easy board value: ownVp for each Sector I control (all worth 1) plus marginOwn per Star of lead in each Sector (between -2 and 2, as the other levels count it).
+function esVal(T,me,P){let n=0;for(let i=0;i<T.ctl.length;i++)if(T.ctl[i]==me)n++;return P.ownVp*n+P.marginOwn*T.mg[me]}
+const esSec=q=>Math.floor(q.x/3)+','+Math.floor(q.y/3);
+// esCands(R) = every move an Easy personality could make now: {t:'claim',a,cx,cy} Set a Star in the empty System (cx,cy) up to R Fuel away, {t:'take',a,b} take enemy Star b, {t:'conn',a,b} Connect two own Stars. Each has c = its Fuel, sx/sy = the target's Sector, g = how much the Easy board value changes, key = the cpuBad key. The value of a claim or take depends only on the Sector (and on whose Star is taken), so it is worked out once per Sector.
+function esCands(R){const P=cpuPar(),me=cur(),ap=G.ap,mine=G.stars.filter(s=>s.o==me&&!G.used.includes(s.id)),T=cpuInc(G),base=esVal(T,me,P),N=NSYS(G),occ=new Set(G.stars.map(q=>Math.floor(q.x)+','+Math.floor(q.y))),out=[],memo=new Map();R=Math.min(R,ap);
+const linked=(a,b)=>G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id));
+const gain=(sx,sy,from)=>{const k=sx+','+sy+','+from;let v=memo.get(k);if(v===undefined){if(from>=0)incAdd(T,sx,sy,from,-1);incAdd(T,sx,sy,me,1);v=esVal(T,me,P)-base;incAdd(T,sx,sy,me,-1);if(from>=0)incAdd(T,sx,sy,from,1);memo.set(k,v)}return v};
+for(const a of mine){const ax=Math.floor(a.x),ay=Math.floor(a.y);
+for(let cy=Math.max(0,ay-R);cy<=Math.min(N-1,ay+R);cy++)for(let cx=Math.max(0,ax-R);cx<=Math.min(N-1,ax+R);cx++){const c=Math.abs(cx-ax)+Math.abs(cy-ay);if(c<1||c>R||occ.has(cx+','+cy))continue;const key='s'+a.id+'_'+cx+'_'+cy;if(cpuBad.has(key))continue;const sx=Math.floor(cx/3),sy=Math.floor(cy/3);out.push({t:'claim',a,cx,cy,c,sx,sy,g:gain(sx,sy,-1),key})}
+for(const b of G.stars){if(b===a)continue;const c=cost(a,b);if(c>ap||!cclear(a,b))continue;
+if(b.o==me){if(linked(a,b))continue;const key='c'+a.id+'_'+b.id;if(!cpuBad.has(key))out.push({t:'conn',a,b,c,g:0,key})}
+else if(cpuTgt(b.o,me)&&cStr(a)>cStr(b)){const key='t'+a.id+'_'+b.id;if(cpuBad.has(key))continue;const sx=Math.floor(b.x/3),sy=Math.floor(b.y/3);out.push({t:'take',a,b,c,sx,sy,g:gain(sx,sy,b.o),key})}}}
+return out}
+// esPickBy(list,f) = the move with the best f(m) plus the Easy wobble; f returning null leaves a move out. null when nothing is left.
+function esPickBy(list,f){const nz=cpuPar().noise;let best=null,bv=-1e9;for(const m of list){const v=f(m);if(v==null)continue;const w=v+cpuR()*nz;if(w>bv){bv=w;best=m}}return best}
+// esBase(L,me) = the General choice from list L: Sets and noticed takes by board value minus the Fuel price (apCost); if none, takes of Stars it would otherwise ignore; Connections (cheapest first) only when nothing else is left. Every style falls back to this, so Full Fuel is always met.
+function esBase(L,me){const P=cpuPar(),seen=esSeen(me);
+return esPickBy(L,m=>m.t=='claim'?m.g-P.apCost*m.c:m.t=='take'&&seen(m.b)?m.g+1-P.apCost*m.c:null)||esPickBy(L,m=>m.t=='take'?m.g+1-P.apCost*m.c:null)||esPickBy(L,m=>m.t=='conn'?-m.c:null)}
+// esSeen(me) = a test: is enemy Star b noticed (in or next to a Sector where I have a Star, diagonals too)?
+function esSeen(me){const S=new Set();G.stars.forEach(q=>{if(q.o==me)S.add(esSec(q))});return b=>{const x=Math.floor(b.x/3),y=Math.floor(b.y/3);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(S.has((x+dx)+','+(y+dy)))return true;return false}}
+// esCount(me) = for each Sector, how many Stars I have there ({'x,y': n}). esMine(me,T) = the Sectors I control, as 'x,y' keys.
+function esCount(me){const n={};G.stars.forEach(q=>{if(q.o==me){const k=esSec(q);n[k]=(n[k]||0)+1}});return n}
+function esMine(me,T){const out=[];for(let y=0;y<T.Z;y++)for(let x=0;x<T.Z;x++)if(T.ctl[y*T.Z+x]==me)out.push(x+','+y);return out}
+// esFull(me) = Defensive's test: every Sector I control holds at least 3 of my Stars.
+function esFull(me){const n=esCount(me);return esMine(me,cpuInc(G)).every(k=>(n[k]||0)>=3)}
+// esInit(me,s) = start-of-turn work. Defensive: once every Sector it controls has 3 of its Stars, a third of this turn's Fuel (rounded, a placeholder) goes to defence first. Hunter: gets scared when the next score up is 2 or more VP ahead (1 or more when nobody else moves after it this round), and then plays General for the turn; a score level made only of teammates does not count (team immunity, RULES.md 9.3).
+function esInit(me,s){esS={tid:cpuTurn,def:0,scared:false};
+if(s=='d'&&esFull(me))esS.def=Math.round(G.ap/3);
+if(s=='h'){const vp=calc(G).vp,mine=vp[me],al=G.pl.filter(c=>G.alive[c]&&c!=me),up=al.filter(c=>vp[c]>mine).map(c=>vp[c]);if(up.length){const u=Math.min(...up);const mates=al.filter(c=>vp[c]==u).every(c=>sameTeam(c,me));if(!mates&&u-mine>=(cpuAfterShare(me)==0?1:2))esS.scared=true}}}
+// esPick() = the move the Easy computer whose turn it is makes next, or null (then the old Easy code looks for a Move). Builds the candidates once and hands them to the personality.
+function esPick(){const me=cur(),s=esSty(me);if(!s)return null;if(esS.tid!=cpuTurn)esInit(me,s);cpuTab=cpuStrTab();try{const L=esCands(G.ap);if(!L.length)return null;return (ES_RULE[s]||esBase)(L,me)}finally{cpuTab=null}}
+// ES_RULE = each personality's choice from the candidate list L.
+const ES_RULE={
+g:esBase,
+// Defensive: Sets a Star in a Sector where it has no Star yet only while every Sector it controls has 3 of its Stars. When the turn's defence Fuel (esS.def) is not spent yet, it first Sets Stars inside Sectors it controls, then makes Connections (cheapest first); a move started on defence is paid in full from it.
+d(L,me){const P=cpuPar(),T=cpuInc(G),own=new Set(esMine(me,T)),has=esCount(me);
+if(esS.def>0){const m=esPickBy(L,m=>m.t=='claim'&&own.has(m.sx+','+m.sy)?m.g+2-P.apCost*m.c:null)||esPickBy(L,m=>m.t=='conn'?-m.c:null);if(m){esS.def-=m.c;return m}esS.def=0}
+if(esFull(me))return esBase(L,me);
+// Not full yet: it fills its Sectors that have fewer than 3 of its Stars, then may Set only in Sectors where it already has a Star.
+const k=m=>m.sx+','+m.sy,f=esPickBy(L,m=>m.t=='claim'&&has[k(m)]&&has[k(m)]<3?m.g+3-P.apCost*m.c:null);if(f)return f;
+const ok=L.filter(m=>m.t!='claim'||has[k(m)]);return esBase(ok.length?ok:L,me)},
+// All in: its most expensive Move each time; among Moves of that price, the best by General's choice. What is left of the Fuel then goes the same way, until Full Fuel is met.
+a(L,me){const seen=esSeen(me),ok=L.filter(m=>m.t=='claim'||(m.t=='take'&&seen(m.b)));if(!ok.length)return esBase(L,me);const top=Math.max(...ok.map(m=>m.c));return esBase(ok.filter(m=>m.c==top),me)},
+// Middle grabber: (1) until it controls the center Sector, heads there: Sets and takes in the center first, otherwise the Set that gets closest to it; (2) once it controls the center, Connects every pair of its Stars there; (3) then grows outward one System at a time: its group is its Stars in the center plus its Stars next to them (System by System, diagonals too); Connections between neighbours in the group come before a Set in an empty System next to the group. Takes outside the center are left out. If it loses the center it goes back to (1).
+m(L,me){const P=cpuPar(),T=cpuInc(G),Z=T.Z,md=T.mid,lo=md*3,hi=md*3+2,inC=(x,y)=>x>=lo&&x<=hi&&y>=lo&&y<=hi,dC=(x,y)=>Math.max(lo-x,0,x-hi)+Math.max(lo-y,0,y-hi),sx=q=>Math.floor(q.x),sy=q=>Math.floor(q.y);
+if(T.ctl[md*Z+md]!=me){const m=esPickBy(L,m=>m.t=='take'&&inC(sx(m.b),sy(m.b))?25+m.g-.1*m.c:m.t=='claim'?(inC(m.cx,m.cy)?20+m.g-.1*m.c:2*(dC(sx(m.a),sy(m.a))-dC(m.cx,m.cy))-.3*dC(m.cx,m.cy)-P.apCost*m.c):null);return m||esBase(L,me)}
+const mine=G.stars.filter(q=>q.o==me),grp=new Set(mine.filter(q=>inC(sx(q),sy(q))).map(q=>q.id));let grew=true;
+while(grew){grew=false;for(const q of mine)if(!grp.has(q.id)&&mine.some(p=>grp.has(p.id)&&Math.abs(sx(p)-sx(q))<=1&&Math.abs(sy(p)-sy(q))<=1)){grp.add(q.id);grew=true}}
+const near=(p,q)=>Math.abs(sx(p)-sx(q))<=1&&Math.abs(sy(p)-sy(q))<=1,both=(p,q)=>inC(sx(p),sy(p))&&inC(sx(q),sy(q));
+const c=esPickBy(L,m=>m.t=='conn'&&grp.has(m.a.id)&&grp.has(m.b.id)&&(both(m.a,m.b)||near(m.a,m.b))?15-.1*m.c:null);if(c)return c;
+const gs=mine.filter(q=>grp.has(q.id)),e=esPickBy(L,m=>m.t=='claim'&&gs.some(q=>Math.abs(sx(q)-m.cx)<=1&&Math.abs(sy(q)-m.cy)<=1)?10+m.g-P.apCost*m.c:null);
+return e||esBase(L.filter(m=>m.t!='take'||inC(sx(m.b),sy(m.b))),me)||esBase(L,me)},
+// Hunter: points mean nothing to it; it wants an opponent out by taking their last Star. Its target is the living enemy with the fewest Stars (the nearest one on a tie). Takes of the target's Stars come first (more eager as they run out), then other takes, then a Connection that lets one of its Stars beat a target Star within reach, then the Set that gets closest to the target. When scared (esInit) it plays General instead.
+h(L,me){if(esS.scared)return esBase(L,me);const P=cpuPar(),foes=G.pl.filter(c=>isFoe(c,me)&&G.stars.some(q=>q.o==c));if(!foes.length)return esBase(L,me);
+const mine=G.stars.filter(q=>q.o==me),dist=(c)=>Math.min(...G.stars.filter(q=>q.o==c).map(q=>Math.min(...mine.map(p=>cost(p,q))))),cnt=c=>G.stars.filter(q=>q.o==c).length;
+const tgt=foes.slice().sort((x,y)=>cnt(x)-cnt(y)||dist(x)-dist(y))[0],ts=G.stars.filter(q=>q.o==tgt),left=ts.length,reach=cpuOppAp();
+const dT=(x,y)=>Math.min(...ts.map(q=>Math.abs(Math.floor(q.x)-x)+Math.abs(Math.floor(q.y)-y)));
+const opens=(p)=>ts.some(q=>cost(p,q)<=reach&&cStr(p)+1>cStr(q)&&cStr(p)<=cStr(q));
+return esPickBy(L,m=>m.t=='take'?(m.b.o==tgt?30-2*Math.min(left,10)-.1*m.c:8-.1*m.c):m.t=='conn'?(opens(m.a)||opens(m.b)?6-.1*m.c:null):2*(dT(Math.floor(m.a.x),Math.floor(m.a.y))-dT(m.cx,m.cy))-.3*dT(m.cx,m.cy)-P.apCost*m.c)||esBase(L,me)}};
 // ===== Turn planner (CPU project step 5, part 2) =====
 // Instead of choosing one move at a time, a planning level builds WHOLE turns on a lightweight copy of the board, scores the board each turn would leave behind, and plays the best one. Every star can act only once per turn (a new or captured star cannot act), so a turn is a set of moves under the Fuel budget; Fuel are a budget here, not a price (cpuP's apCost is not used).
 // How a turn is built ("rollout"): repeat { list every move that is legal now; give each a value = how much better the board gets (incEval, same table as step 4) + the old Hard bonuses (Capital, cut-off, buffer, hopeless) with the old "the opponent can simply take it back" discount; pick one by value divided by cost^alpha; apply it to the copy } until the Fuel are gone. alpha = 0 chases the biggest gain, larger alpha prefers cheap moves, so different rollouts spend the same budget in different ways (one big steal versus several cheap gains). Later rollouts add random noise. The turn that leaves the best board wins: its leaf value = incEval of the final board + the move bonuses - a penalty for every own star an opponent could take back (0.7 x what losing it would cost, plus 8 for a Capital).
@@ -3512,7 +3615,10 @@ if(G.pool>0&&placeable().length){cpuPlace();return 'acted'}
 // (new) Then bring Fleets up toward the enemy before spending Fuel, so they can join this turn's attacks.
 const wait=fp&&(!cpuPlan||cpuPlan.tid!=cpuTurn||cpuPlan.made==0)&&G.ap>0&&moveAvail();
 if(!cpuPlanBusy()&&!wait&&(!fp||cpuPlanCfg.post)&&cpuFleetMove())return 'acted';
-if(G.ap>0&&moveAvail()){if(cpuPlanOn()&&cpuPlanStep())return 'acted';let c=cpuCands(3);if(!c.length)c=cpuCands(G.ap);
+if(G.ap>0&&moveAvail()){
+// (2026-10-31) An Easy personality picks its own Move (Easy personalities); with nothing found, the code below still looks.
+if(esSty(cur())){const m=esPick();if(m){if(!cpuDo(m))cpuStall++;return 'acted'}}
+if(cpuPlanOn()&&cpuPlanStep())return 'acted';let c=cpuCands(3);if(!c.length)c=cpuCands(G.ap);
 if(c.length){const m=cpuChoose(c);if(!cpuDo(m))cpuStall++;return 'acted'}
 if(cpuMulti()||cpuMateConn())return 'acted';
 if(++cpuStall>3){cpuStall=0;endTurn();return 'ended'}return 'acted'}
