@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-02-u",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-02-v",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -2430,7 +2430,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+/*SKY{*/b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+/*}SKY*/b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')/*MUS{*/+b('musToggle(this)',musLabel())/*}MUS*/}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-02-u';
+const BUILD='2026-11-02-v';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2625,17 +2625,20 @@ const SND_D={key:0,wave:'sine',dur:100,del:0,f1:440,f2:null,vol:30,att:5,rel:nul
 // the lightsaber, not the lightsaber itself: two idling projector motors humming and harmonizing (detuned saws that beat, a fifth above) and
 // a picture-tube buzz (a square wave with crackle), swinging (a slow wobble) and sinking. Single Pulse (was Rumble) = Pulse with one pulse;
 // Hush = two short pulses.
+// (2026-11-02-v, Shmorden) Twinkle bright again (its first pitches, only the very top rolled off). Loss = a low hum that comes and goes
+// like a Doppler pass: one half wave of the wobble over its length (0.4 Hz over 1.25 s), so it starts low, rises a fourth in the middle
+// and ends low, with the volume swelling and receding together.
 const SND_BUILT=[['Hush',[{wave:'triangle',dur:110,f1:494,vol:13,att:10,rel:90,cut:2000,rep:2,gap:70,rev:30,key:1},{wave:'sine',dur:520,f1:123,vol:14,att:40,rel:420,key:1}]],
  ['Piano',[{wave:'triangle',dur:1800,f1:587.33,vol:15,att:4,rel:1780,cut:4000,cut2:700,rev:25,key:1},{wave:'sine',dur:2200,f1:587.33,vol:9,att:4,rel:2180,rev:25,key:1},{wave:'sine',dur:900,f1:1174.66,vol:2,att:4,rel:880,cut:2000,key:1}]],
  ['Ting',[{wave:'sine',dur:1600,f1:987.77,vol:6,att:3,rel:1580,cut:2000,rev:65,revl:2.5,key:1},{wave:'sine',dur:900,f1:1975.53,vol:0.8,att:3,rel:880,cut:2000,rev:65,revl:2.5,key:1}]],
- ['Twinkle',[{wave:'sine',dur:900,f1:1174.66,vol:8,att:3,rel:880,cut:2200,vib:7,vibd:0.15,rev:25,key:1},{wave:'sine',del:90,dur:800,f1:1760,vol:3,att:3,rel:780,cut:2200,vib:9,vibd:0.2,rev:25,key:1}]],
+ ['Twinkle',[{wave:'sine',dur:900,f1:2349.32,vol:8,att:3,rel:880,cut:6000,vib:7,vibd:0.15,rev:25,key:1},{wave:'sine',del:90,dur:800,f1:3520,vol:3.5,att:3,rel:780,cut:6000,vib:9,vibd:0.2,rev:25,key:1}]],
  ['Glasses',[{wave:'sine',dur:700,f1:660,vol:8,att:330,rel:330,vib:0.6,vibd:0.1,cut:1800,rev:60,revl:2.5,key:1},{wave:'sine',dur:700,f1:660,vol:7,att:330,rel:330,vib:0.93,vibd:0.1,cut:1800,rev:60,revl:2.5,key:1},{wave:'sine',dur:700,f1:330,vol:6,att:360,rel:300,vib:0.5,vibd:0.08,cut:1400,rev:60,revl:2.5,key:1},{wave:'sine',dur:700,f1:990,vol:1,att:330,rel:330,vib:0.7,vibd:0.1,cut:1800,rev:60,revl:2.5,key:1}]],
  ['Bass',[{wave:'sine',dur:750,f1:73.42,vol:26,att:20,rel:700,key:1},{wave:'triangle',dur:750,f1:146.83,vol:12,att:30,rel:680,cut:900,cut2:250,key:1},{wave:'sine',dur:750,f1:293.66,vol:22,att:6,rel:744,rev:15,key:1},{wave:'triangle',dur:750,f1:587.33,vol:10,att:4,rel:746,cut:2000,cut2:600,rev:15,key:1}]],
  ['Chord',[{wave:'triangle',dur:15000,f1:293.66,vol:7,att:350,rel:700,cut:1400,rev:40,key:1},{wave:'sine',dur:15000,f1:293.66,vol:6,att:350,rel:700,rev:40,key:1}]],
  ['Glass',[{wave:'sine',dur:160,f1:880,vol:13,att:3,rel:150,cut:2000,rev:25,revl:1.5,key:1},{wave:'sine',dur:120,f1:1760,vol:2.5,att:2,rel:110,cut:2000,key:1}]],
  ['Ebb',[{wave:'sine',dur:700,f1:440,f2:220.0,vol:8,att:120,rel:560,cut:1800,vib:0.6,vibd:0.1,rev:60,revl:2.5,key:1},{wave:'sine',dur:700,f1:440,f2:220.0,vol:7,att:120,rel:560,cut:1800,vib:0.93,vibd:0.1,rev:60,revl:2.5,key:1},{wave:'sine',dur:700,f1:220,f2:110.0,vol:6,att:120,rel:560,cut:1400,vib:0.5,vibd:0.08,rev:60,revl:2.5,key:1},{wave:'sine',dur:700,f1:660,f2:330.0,vol:1,att:120,rel:560,cut:1800,vib:0.7,vibd:0.1,rev:60,revl:2.5,key:1}]],
  ['Pulse',[{wave:'triangle',dur:220,f1:494,vol:16,att:10,rel:200,cut:2000,rep:3,gap:140,rev:30,key:1},{wave:'sine',dur:1100,f1:123,vol:20,att:40,rel:1000,key:1}]],
- ['Loss',[{wave:'sawtooth',dur:900,f1:110,f2:82.41,vol:14,att:60,rel:840,cut:1600,cut2:300,q:2,vib:1.6,vibd:0.35,rev:30,key:1},{wave:'sawtooth',dur:900,f1:110.9,f2:83.1,vol:12,att:60,rel:840,cut:1600,cut2:300,q:2,vib:1.6,vibd:0.35,rev:30},{wave:'sine',dur:900,f1:55,f2:41.2,vol:22,att:40,rel:850,vib:1.6,vibd:0.35,key:1},{wave:'sawtooth',dur:900,f1:165,f2:123.47,vol:5,att:80,rel:820,cut:1200,cut2:250,vib:1.6,vibd:0.35,rev:30,key:1},{wave:'square',dur:900,f1:220,f2:164.81,vol:3,att:60,rel:840,noise:35,cut:3500,cut2:900,q:3,vib:1.6,vibd:0.35,rev:30,key:1}]],
+ ['Loss',[{wave:'sawtooth',dur:1250,f1:110,vol:14,att:580,rel:620,cut:900,q:2,vib:0.4,vibd:5,rev:30,key:1},{wave:'sawtooth',dur:1250,f1:110.9,vol:12,att:580,rel:620,cut:900,q:2,vib:0.4,vibd:5,rev:30},{wave:'sine',dur:1250,f1:55,vol:22,att:540,rel:670,vib:0.4,vibd:5,key:1},{wave:'sawtooth',dur:1250,f1:165,vol:5,att:580,rel:620,cut:700,vib:0.4,vibd:5,rev:30,key:1},{wave:'square',dur:1250,f1:220,vol:3,att:580,rel:620,noise:35,cut:2500,q:3,vib:0.4,vibd:5,rev:30,key:1}]],
  ['Single Pulse',[{wave:'triangle',dur:220,f1:494,vol:16,att:10,rel:200,cut:2000,rep:1,gap:0,rev:30,key:1},{wave:'sine',dur:1100,f1:123,vol:20,att:40,rel:1000,key:1}]],
  ['Chime',[{wave:'sine',dur:1400,f1:587,vol:9,att:5,rel:1350,rev:55,revl:3,key:1},{wave:'sine',del:120,dur:1200,f1:880,vol:6,att:5,rel:1150,rev:55,revl:3,key:1}]],
  ['Dawn',[{wave:'sine',dur:2400,f1:294,vol:10,att:600,rel:1700,rev:60,revl:4,key:1},{wave:'sine',dur:2400,f1:440,vol:7,att:800,rel:1500,rev:60,revl:4,key:1},{wave:'sine',del:300,dur:2000,f1:1175,vol:2,att:400,rel:1500,cut:2000,rev:60,revl:4,key:1}]],
@@ -2766,43 +2769,39 @@ function sfx(ev,dl,o){/*SKY{*/ambEv(ev,dl);/*}SKY*/sndLast=Date.now();if(!soundO
 // plays sound s: Star set = the next note of a tune (sndMel); Take, Multi-attack made and Deficit Elimination (SND_ROOTED) = moved to the
 // loop's note now (their pitches are written for D, the loop's first note, so a Take on B plays a B); Fleet move = its slide up or down at
 // as long as the Fleets' move on the board (bxFlLast, set by the board animation just before).
-const SND_ROOTED={deficit:1,deficit2:1,deficit3:1},SND_NODANCE={multiNote:1};let bxFlLast=null,sndMelLast={},sndMelDir={},sndMelH={},sndMelB={};
+const SND_ROOTED={deficit:1,deficit2:1,deficit3:1},SND_NODANCE={multiNote:1},SND_FIXED={'Pulse':1,'Single Pulse':1,'Hush':1};let bxFlLast=null,sndMelLast={};
 function sndHow(ev,s,o){o=Object.assign({},o);if(o.r||!s.L.length)return o;
- if(ev=='starSet')o.r=sndMel(s.L[0].f1)/s.L[0].f1;else if(SND_ROOTED[ev])o.r=MUS_NOTES[musNote()]/MUS_NOTES[0];
- else if(!SND_NODANCE[ev]){const q=s.L.find(x=>x.wave!='noise'),y=SND_STY[ev];if(q)o.r=sndMel(q.f1,ev,y=='bass'?-4:-5,y=='bass'?5:y=='arp'?12:7)/q.f1}
+ const q=s.L.find(x=>x.wave!='noise'),bs=ev=='take'||ev=='multi',lo=ev=='starSet'?-8:bs?-4:-5,hi=ev=='starSet'?12:bs?5:7;
+ if(SND_ROOTED[ev])o.r=MUS_NOTES[musNote()]/MUS_NOTES[0];
+ else if(q&&!SND_NODANCE[ev]&&!SND_FIXED[s.n])o.r=(sndPathOn&&G&&G.gid?sndPathNext(q.f1,lo,hi):sndMel(q.f1,ev,lo,hi))/q.f1;
  if(ev=='fleetMove'&&!o.len&&bxFlLast&&performance.now()-bxFlLast.at<100&&bxFlLast.ms>0)o.len=Math.max(150,bxFlLast.ms);return o}
 // Every sound dances around the keyboard the way the Star set tune does (Shmorden 2026-11-02-r): sndHow gives each event's sound the next
-// note of its own tune (sndMel with the event's key, within a fourth below to a fifth above its own pitch), so no event plays the same
-// note twice in a row. Exceptions: Deficit (SND_ROOTED) stays on the loop's note, and the Multi-attack chord has its own voicing. Take and Multi-attack dance too
-// (2026-11-02-u), in the bass's own range, on the notes of the loop note's chord.
-// Each track moves its own way (SND_STY, Shmorden 2026-11-02-u: "they all need to be different from each other... we don't get star placing
-// going a, d, g then the fleet placements go a, d, g"): step = mostly to a neighbouring note, keeping its direction (a melody); arp = leaps of
-// two or three notes, mostly the way it is going (an arpeggio, upward first); zig = up, down, up (a twinkle); slow = one note at a time (a
-// drift); bass = the root and fifth of the loop note's chord most of all, then its third, then anything; free = any move of one to four
-// notes. On top, a track avoids copying another: a move that would make its last three moves (counted in notes of the key) the same as
-// another track's last three is made 20 times less likely, and going straight back to the note before last about 3 times less likely (so a track does not
-// rock between two notes); the arpeggio gets an octave and a fifth of room. Two tracks landing on the same note now and then is fine (an incidental chord).
+// note, from the game's shared note path (sndPathNext, 2026-11-02-v) or, with the Note path switch Off or outside a game, from its own
+// tune (sndMel with the event's key). Range: a fourth below to a fifth above its own pitch (the Star set a sixth below to an octave above;
+// Take and Multi-attack a major third below to a fourth above, so the bass stays low). Exceptions: Deficit (SND_ROOTED) stays on the loop's
+// note, the Multi-attack chord has its own voicing, and Pulse, Single Pulse and Hush (SND_FIXED) never dance, so they always share one pitch.
 // sndMel(f) = the next note of the Star set tune, in Hz (Shmorden: piano notes, each different from the last by at least a second; "for
 // now" in the loop's key, not black keys, which clash with it): a random pitch that fits the loop's note now (MUS_KEY), from a sixth
 // below the sound's own Pitch f to an octave above it, not the last note (sndMelLast, MIDI) and at most a fifth from it, so it moves like a
 // tune. Neighbours in a five-note set are always a second or more apart.
-const SND_STY={starSet:'step',fleetPlace:'arp',connect:'zig',gift:'zig',fleetMove:'slow',retreat:'slow',take:'bass',multi:'bass'};
-function sndMel(f,k,lo,hi){k=k||'starSet';lo=lo==null?-8:lo;hi=hi==null?12:hi;const n=musNote(),pc=MUS_KEY[n],c=Math.round(69+12*Math.log2(f/440)),N=[];
- for(let m=c+lo;m<=c+hi;m++)if(pc.includes((m%12+12)%12))N.push(m);if(!N.length)return f;
- const last=sndMelLast[k]==null?null:sndMelLast[k],sty=SND_STY[k]||'free',dir=sndMelDir[k]||(sty=='arp'?1:Math.random()<.5?1:-1),h=sndMelH[k]||[];
- let i0=-1;if(last!=null){let bd=99;N.forEach((m,i)=>{if(Math.abs(m-last)<bd){bd=Math.abs(m-last);i0=i}})}
- const rp=((Math.round(69+12*Math.log2(MUS_NOTES[n]/440))%12)+12)%12,ct=m=>{const d=((m-rp)%12+12)%12;return d==0?4:d==7?3:d==3||d==4?2:1};
- const C=[];N.forEach((m,i)=>{if(m===last)return;const st=i0<0?0:i-i0,a=Math.abs(st),sd=Math.sign(st);let w=1;
-  if(i0>=0){if(sty=='step')w=(a==1?4:a==2?1.5:0)*(sd==dir?2:1);else if(sty=='arp')w=(a==2||a==3?3:a==1?.3:0)*(sd==dir?3:1);
-   else if(sty=='zig')w=(a<=3?2:0)*(sd==-dir?4:.3);else if(sty=='slow')w=a==1?3:a==2?.5:0;else if(sty=='free')w=a<=4?1:0;
-   if(sty!='bass'&&Math.abs(m-last)>7)w=0}
-  if(sty=='bass')w=ct(m);
-  if(m===sndMelB[k])w*=.35;
-  if(w>0&&i0>=0&&h.length>=2){const q=h.slice(-2).concat(st).join();for(const o in sndMelH)if(o!=k&&sndMelH[o].length>=3&&sndMelH[o].slice(-3).join()==q){w*=.05;break}}
-  if(w>0)C.push([m,w,st])});
- const P=C.length?C:[];if(!P.length)N.forEach((m,i)=>{if(m!==last&&(last==null||Math.abs(m-last)<=7))P.push([m,1,i0<0?0:i-i0])});if(!P.length)return f;
- let r=Math.random()*P.reduce((t,x)=>t+x[1],0),pick=P[P.length-1];for(const x of P){r-=x[1];if(r<=0){pick=x;break}}
- const m=pick[0];sndMelB[k]=last;sndMelLast[k]=m;if(pick[2])sndMelDir[k]=Math.sign(pick[2]);h.push(pick[2]);sndMelH[k]=h.slice(-4);return 440*Math.pow(2,(m-69)/12)}
+function sndMel(f,k,lo,hi){k=k||'starSet';lo=lo==null?-8:lo;hi=hi==null?12:hi;const last=sndMelLast[k]==null?null:sndMelLast[k],c=Math.round(69+12*Math.log2(f/440)),pc=MUS_KEY[musNote()],L=[],A=[];for(let m=c+lo;m<=c+hi;m++)if(pc.includes((m%12+12)%12)&&m!==last){A.push(m);if(last==null||Math.abs(m-last)<=7)L.push(m)}
+ const P=L.length?L:A,m=P.length?P[Math.floor(Math.random()*P.length)]:c;sndMelLast[k]=m;return 440*Math.pow(2,(m-69)/12)}
+// ---- The note path (Shmorden 2026-11-02-v: "the notes the sound effects will dance across will be preset from the beginning of the game.
+// Random every time with parameters to make sure the notes don't repeat 3 times in a row. The sounds happen as things occur and get their
+// notes from the list made at game start."). sndPathMake(seed) = 1024 steps of the path, each a note of the key counted from the loop's
+// note (0 = its root, 1 to 4 = the next notes of MUS_KEY), never the same three times in a row; its own random numbers (mulberry32), so a
+// seed always makes the same path. sndPathSeed() = the game's seed, from its id (G.gid: the same game always has the same path). sndPathNext(f, lo, hi)
+// = the path's next note as a pitch: that note of the loop note's key, in the octave nearest to the sound's own pitch f within lo to hi
+// semitones. Every dancing sound takes the next step, whatever sound it is, so they all walk one tune together. sndPathOn = the Sound
+// page's Note path switch (On: the shared path; Off: each sound dances on its own, sndMel).
+let sndPathOn=true,sndPath=null;try{sndPathOn=localStorage.getItem('constellate-sndpath')!=='0'}catch(e){}
+function sndPathMake(seed){let x=seed>>>0;const R=()=>{x=(x+0x6D2B79F5)>>>0;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296},D=[];
+ for(let i=0;i<1024;i++){let d;do d=Math.floor(R()*5);while(i>=2&&d===D[i-1]&&d===D[i-2]);D.push(d)}return D}
+function sndPathSeed(){const g=String((G&&G.gid)||'');let h=2166136261;for(let i=0;i<g.length;i++){h^=g.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function sndPathNext(f,lo,hi){const seed=sndPathSeed();if(!sndPath||sndPath.seed!==seed)sndPath={seed,D:sndPathMake(seed),i:0};
+ const n=musNote(),pc=MUS_KEY[n][sndPath.D[sndPath.i++%sndPath.D.length]],c=Math.round(69+12*Math.log2(f/440));let best=null;
+ for(let m=c+lo-12;m<=c+hi+12;m++)if(((m%12)+12)%12==pc){const d=m<c+lo?c+lo-m+50:m>c+hi?m-c-hi+50:Math.abs(m-c);if(best==null||d<best[1])best=[m,d]}
+ return 440*Math.pow(2,(best[0]-69)/12)}
 // ---- The Multi-attack chord (Shmorden: "build the chord of the background note with 1 held note per attacker added"). While a
 // Multi-attack is put together, each attacker holds one note (the Multi-attack attacker added event, Chord) of a chord on the loop's
 // note at the first attacker: its root, fifth, third, then the other notes that fit (SND_CHORD, kept when they are in MUS_KEY), each placed above the one before
@@ -2832,6 +2831,7 @@ const sndBox='min-width:0;min-height:36px;box-sizing:border-box;font:14px monosp
 function sndMsg(t){const e=$('sndm');if(e)e.textContent=t}
 function sndDlg(tab,back){const T=['set','snd','ev','io'],nt=tab||sndTab;ovDir=$('ov').dataset.page=='sound'?Math.sign(T.indexOf(nt)-T.indexOf(sndTab)):1;if(back)sndBack=back;sndTab=nt;sndRst=false;let body;
  if(sndTab=='set')body=qBtn('snd','display:block;width:100%')+'<p style="margin:12px 0 0;font-weight:600">Master volume</p><div style="display:flex;align-items:center;gap:8px;margin:6px 0"><input type="range" class="csl" id="sndvr" min="0" max="100" step="1" value="'+sndVol+'" oninput="sndVolSet(this.value,1)" onchange="sndVolSet(this.value)" style="flex:1;min-width:0"><input type="number" id="sndvn" min="0" max="100" step="1" value="'+sndVol+'" onchange="sndVolSet(this.value)" style="width:70px;'+sndBox+'"></div>'
+  +'<button onclick="sndPathToggle(this)" style="display:block;width:100%;margin-top:8px">Note path: '+(sndPathOn?'Shared':'Each its own')+'</button><p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Shared (the default): every game makes one list of notes at its start, and each sound that dances takes the next note of it, so all the sounds walk one tune together. Each its own: every sound picks its own notes as it goes.</p>'
   +'<button onclick="sndCpuToggle(this)" style="display:block;width:100%;margin-top:8px">Computer sounds: '+(sndCpu?'On':'Off')+'</button><p style="margin:6px 0 0;font-size:12px;color:var(--mut)">On (the default): computers\' moves make sounds too, but not their selections, and not when the computer speed is Instant (only Deficit Elimination still sounds). Moves that happen to you (Defence call, Lose a Star) always do.</p>'
   +'<button onclick="sndBufNext(this)" style="display:block;width:100%;margin-top:8px">'+sndBufLabel()+'</button><p style="margin:6px 0 0;font-size:12px;color:var(--mut)">If sounds pop, tick or cut out, try Large: the phone gets more time to make the sound, and sounds start a little later after a tap. Small starts soonest.</p>'
   +'<button data-ns onclick="sndPlayS(sndByName(\'Glass\')||sndLib[0])" style="display:block;width:100%;margin-top:12px">Play a test sound</button><button onclick="sndReset(this)" style="display:block;width:100%;margin-top:8px">Reset every sound and event</button><p style="margin:6px 0 0;font-size:12px;color:var(--mut)">Sounds are remembered on this device only. Use Share to copy or save them.</p>';
@@ -2885,6 +2885,7 @@ function sndVolSet(v,live){v=Math.round(Math.min(100,Math.max(0,+v||0)));sndVol=
 const sndBufLabel=()=>'Sound buffer: '+SND_BUF.find(b=>b[0]==sndBufK)[1];
 function sndBufNext(b){const i=SND_BUF.findIndex(x=>x[0]==sndBufK);sndBufK=SND_BUF[(i+1)%SND_BUF.length][0];try{localStorage.setItem(SKEY_BUF,sndBufK)}catch(e){}
  if(actx){const c=actx;actx=null;try{c.close()}catch(e){}musSlot=-1;sfxCtx();musTick();}if(b)b.textContent=sndBufLabel();sndPlayS(sndByName('Glass')||sndLib[0])}
+function sndPathToggle(b){sndPathOn=!sndPathOn;try{localStorage.setItem('constellate-sndpath',sndPathOn?'1':'0')}catch(e){}b.textContent='Note path: '+(sndPathOn?'Shared':'Each its own')}
 function sndCpuToggle(b){sndCpu=!sndCpu;sndStore();b.textContent='Computer sounds: '+(sndCpu?'On':'Off')}
 // sndEvSet(k,v) = the sound event k plays ('' = None), heard at once; sndEvPlay(k) = its play button.
 // sndEvReset(b) (2026-11-02-p, Shmorden: "a button to reset events to default... only want the ones we are making here") puts every event back on
