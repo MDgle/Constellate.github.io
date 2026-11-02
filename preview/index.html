@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-02-m",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-02-n",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -822,7 +822,7 @@ $('ov').style.display='none';multi.step='defend';pend={b:b.id,att};resolve()}
 // multiCancel() is the Cancel button (and the Esc key, and a second tap on the chosen target): clear everything, leave Multi mode (back to nothing selected), nothing was spent or changed.
 function multiCancel(){if(!multi||pend)return;resetFlow();mode='';say('Multi-attack cancelled. Nothing was changed.');render()}
 // uiMulti() shows Cancel and Confirm (and hides End turn) while attackers are being chosen. (changed) Confirm stays tappable but gets the striped "not yet" look (nogo) until the attack could win (2+ attackers, stronger than the target); a tap then explains why (multiGo). (new) While a multi-attack exists the mode row is replaced by the two Strength boxes (#mbar): the target's Strength in its owner's color, and the attackers' combined Strength (connections + Fleets chosen) in the attacker's color, bright (.win) once it beats the target. Cancel is then the way out of Multi.
-function uiMulti(){const on=!!multi&&!pend;$('mcx').style.display=on?'block':'';$('mcf').style.display=on?'block':'';$('en').style.display=on?'none':'';
+function uiMulti(){sndChordSync();const on=!!multi&&!pend;$('mcx').style.display=on?'block':'';$('mcf').style.display=on?'block':'';$('en').style.display=on?'none':'';
 const t=multi&&multi.t!=null?by(multi.t):null,st=t?multiStats():null;
 if(on){$('mcf').disabled=false;$('mcf').classList.toggle('nogo',!(st&&multi.att.length>=2&&st.sCom>st.cb))}
 $('modes').style.display=multi?'none':'';$('mbar').style.display=multi?'flex':'';if(!multi)return;
@@ -911,7 +911,8 @@ const bp=bxPre(b);G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=s
 // (2026-10-28-b) rt = where each retreating Fleet went (a Star's point, in the order chosen), so a transcript can rebuild the board.
 mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost],rt:rets.map(id=>mvPos(by(id)))});
 // (Sound effects) Take a Star (Multi-attack for several attackers) for the attacker, or Lose a Star when it happens to a person here and the attacker is not; then Fleet destroyed and Fleet retreat, a moment later so they don't pile up.
-if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me);/*SKY{*/ambTake(me,dfc);/*}SKY*/if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);bxTake(b,bp,att,dec,fpv,fp);
+// (2026-11-02-n) the Take's bass starts as the Star taken ring does and lasts as long (tk, from bxTake; nothing with animations off).
+const tk=bxTake(b,bp,att,dec,fpv,fp)||{};if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me,tk.d,{len:tk.ms});/*SKY{*/ambTake(me,dfc);/*}SKY*/if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+c+' Fuel.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
 // ===== Team mode: data model and helpers (team project step 2) =====
@@ -2429,7 +2430,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+/*SKY{*/b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+/*}SKY*/b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')/*MUS{*/+b('musToggle(this)',musLabel())/*}MUS*/}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-02-m';
+const BUILD='2026-11-02-n';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2613,16 +2614,22 @@ const SND_D={key:0,wave:'sine',dur:100,del:0,f1:440,f2:null,vol:30,att:5,rel:nul
 // (Take, Multi-attack, elimination, game over, Deficit Elimination, a new round) are chords and swells. Drone is the music's voice (the
 // music plays it at each note of the loop; no event uses it). A sound is [name, settings] (one layer) or [name, [settings, ...]] (layers).
 // Every value is a placeholder. The sounds before this set (Bleep, Beep, Boop...) are gone from the built-ins; see SND_SET.
+// (2026-11-02-n, Shmorden: "rework all of the sounds to be instruments. As moves are made, what happens on the board will become part of the
+// music.") Piano (Star set: one note of a tune each time, see sndMel), Bass (Take and Multi-attack: a low pulse as long as the Star taken
+// ring, on the loop's note), Slide (Fleet move: a high glide up or down, as long as the move), Ting (Fleet place: a far triangle), Twinkle
+// (Connect: a close twinkle), Chord (each Multi-attack attacker holds one note of the loop note's chord, see sndChordSync) and Crescendo
+// (Deficit Elimination: the loop's note growing brighter, fuller and louder; a swell of volume alone would be held flat by the limiter, and
+// it plays its own copy of the note so it works without the music too) replace Bloom, Pluck, Link, Drift, Surge, Tide and Rise.
 const SND_BUILT=[['Glint',{wave:'sine',dur:40,f1:1760,vol:7,att:2,rel:35,key:1}],
  ['Hush',{wave:'triangle',dur:180,f1:147,f2:123,vol:22,att:5,rel:160,cut:700,key:1}],
- ['Pluck',{wave:'triangle',dur:220,f1:587,vol:18,att:3,rel:200,cut:3200,cut2:900,rev:20,key:1}],
+ ['Piano',[{wave:'triangle',dur:1800,f1:587.33,vol:15,att:4,rel:1780,cut:4000,cut2:700,rev:25,key:1},{wave:'sine',dur:2200,f1:587.33,vol:9,att:4,rel:2180,rev:25,key:1},{wave:'sine',dur:900,f1:1174.66,vol:3,att:4,rel:880,key:1}]],
+ ['Ting',[{wave:'sine',dur:1600,f1:1975.53,vol:5,att:3,rel:1580,cut:3000,rev:65,revl:2.5,key:1},{wave:'sine',dur:500,f1:4741,vol:1.5,att:2,rel:490,cut:6000,rev:65,revl:2.5,key:1}]],
+ ['Twinkle',[{wave:'sine',dur:900,f1:2349.32,vol:8,att:3,rel:880,vib:7,vibd:.15,rev:25,key:1},{wave:'sine',del:90,dur:800,f1:3520,vol:3.5,att:3,rel:780,vib:9,vibd:.2,rev:25,key:1}]],
+ ['Slide',[{wave:'sine',dur:500,f1:1760,f2:2637,vol:5,att:150,rel:300,rev:40,key:1},{wave:'triangle',dur:500,f1:3520,f2:5000,vol:1.5,att:150,rel:300,cut:6000,rev:40,key:1}]],
+ ['Bass',[{wave:'sine',dur:750,f1:73.42,vol:30,att:40,rel:680,key:1},{wave:'triangle',dur:750,f1:146.83,vol:14,att:30,rel:680,cut:900,cut2:250,key:1},{wave:'sawtooth',dur:750,f1:73.42,vol:6,att:30,rel:650,cut:700,cut2:150,q:2,rev:20,key:1}]],
+ ['Chord',[{wave:'triangle',dur:15000,f1:293.66,vol:7,att:350,rel:700,cut:1400,rev:40,key:1},{wave:'sine',dur:15000,f1:293.66,vol:6,att:350,rel:700,rev:40,key:1}]],
  ['Glass',[{wave:'sine',dur:160,f1:1175,vol:13,att:3,rel:150,rev:25,revl:1.5,key:1},{wave:'sine',dur:120,f1:2350,vol:4,att:2,rel:110,key:1}]],
- ['Bloom',[{wave:'sine',dur:700,f1:880,vol:15,att:12,rel:650,rev:45,revl:2.5,key:1},{wave:'sine',del:80,dur:600,f1:1320,vol:8,att:10,rel:560,rev:45,revl:2.5,key:1}]],
- ['Link',[{wave:'sine',dur:320,f1:440,f2:880,vol:15,att:10,rel:250,rev:35,key:1},{wave:'triangle',dur:320,f1:220,f2:440,vol:7,att:10,rel:250,key:1}]],
- ['Drift',[{wave:'noise',dur:420,vol:22,att:120,rel:280,cut:500,cut2:2200,q:2},{wave:'sine',dur:420,f1:330,vol:5,att:120,rel:280,rev:30,key:1}]],
  ['Ebb',[{wave:'noise',dur:480,vol:22,att:60,rel:400,cut:2500,cut2:400,q:2},{wave:'sine',dur:480,f1:440,f2:330,vol:6,att:40,rel:400,rev:30,key:1}]],
- ['Surge',[{wave:'sawtooth',dur:1100,f1:220,vol:10,att:30,rel:1000,cut:700,cut2:2600,q:3,rev:50,revl:3,key:1},{wave:'sine',dur:1000,f1:330,vol:9,att:20,rel:950,rev:50,revl:3,key:1},{wave:'sine',del:60,dur:900,f1:440,vol:7,att:20,rel:850,rev:50,revl:3,key:1},{wave:'noise',dur:300,vol:14,att:5,rel:280,cut:3000,cut2:300}]],
- ['Tide',[{wave:'sawtooth',dur:1600,f1:110,vol:12,att:60,rel:1500,cut:500,cut2:2400,q:3,rev:55,revl:3.5,key:1},{wave:'sine',dur:1500,f1:220,vol:10,att:40,rel:1400,rev:55,revl:3.5,key:1},{wave:'sine',del:90,dur:1400,f1:330,vol:8,att:40,rel:1300,rev:55,revl:3.5,key:1},{wave:'sine',del:180,dur:1300,f1:440,vol:6,att:40,rel:1200,rev:55,revl:3.5,key:1},{wave:'noise',dur:500,vol:16,att:5,rel:480,cut:2500,cut2:200}]],
  ['Pulse',[{wave:'triangle',dur:220,f1:494,vol:16,att:10,rel:200,rep:2,gap:140,rev:30,key:1},{wave:'sine',dur:900,f1:123,vol:20,att:40,rel:800,key:1}]],
  ['Sink',[{wave:'sine',dur:700,f1:440,f2:220,vol:15,att:10,rel:650,rev:40,revl:2,key:1},{wave:'triangle',dur:700,f1:110,vol:12,att:20,rel:650,cut:600,key:1}]],
  ['Rumble',[{wave:'sine',dur:1000,f1:73,f2:41,vol:36,att:5,rel:950,rev:35,revl:2,key:1},{wave:'noise',dur:600,vol:24,att:5,rel:580,cut:900,cut2:80}]],
@@ -2630,17 +2637,19 @@ const SND_BUILT=[['Glint',{wave:'sine',dur:40,f1:1760,vol:7,att:2,rel:35,key:1}]
  ['Dawn',[{wave:'sine',dur:2400,f1:294,vol:10,att:600,rel:1700,rev:60,revl:4,key:1},{wave:'sine',dur:2400,f1:440,vol:7,att:800,rel:1500,rev:60,revl:4,key:1},{wave:'sine',del:300,dur:2000,f1:1175,vol:3,att:400,rel:1500,rev:60,revl:4,key:1}]],
  ['Swell',[{wave:'sawtooth',dur:3000,f1:110,vol:14,att:700,rel:2200,cut:350,cut2:2000,q:2,rev:60,revl:4,key:1},{wave:'sine',dur:3000,f1:55,vol:28,att:500,rel:2400,key:1},{wave:'sine',dur:2600,f1:165,vol:8,att:900,rel:1600,rev:60,revl:4,key:1}]],
  ['Resolve',[{wave:'sine',dur:4000,f1:294,vol:12,att:200,rel:3500,rev:65,revl:5,key:1},{wave:'sine',del:200,dur:3800,f1:370,vol:9,att:200,rel:3300,rev:65,revl:5,key:1},{wave:'sine',del:400,dur:3600,f1:440,vol:8,att:200,rel:3100,rev:65,revl:5,key:1},{wave:'sine',del:600,dur:3400,f1:587,vol:6,att:200,rel:2900,rev:65,revl:5,key:1},{wave:'triangle',dur:4000,f1:73,vol:20,att:300,rel:3500,key:1}]],
- ['Rise',[{wave:'sawtooth',dur:3000,f1:55,f2:440,vol:16,att:2700,rel:300,cut:150,cut2:5000,q:4,rev:50,revl:3,key:1},{wave:'sine',dur:3000,f1:110,f2:880,vol:12,att:2700,rel:300,key:1},{wave:'noise',dur:3000,vol:16,att:2800,rel:200,cut:200,cut2:8000,q:2}]],
+ ['Crescendo',[{wave:'sawtooth',dur:3000,f1:146.83,vol:8,att:2700,rel:300,cut:200,cut2:5000,q:2,rev:40,key:1},{wave:'sawtooth',dur:3000,f1:147.6,vol:8,att:2700,rel:300,cut:200,cut2:5000,q:2,rev:40,key:1},{wave:'sine',dur:3000,f1:73.42,vol:22,att:2400,rel:300,key:1},{wave:'sawtooth',dur:3000,f1:293.66,vol:4,att:2900,rel:250,cut:300,cut2:6000,rev:40,key:1},{wave:'triangle',dur:3000,f1:220,vol:4,att:2900,rel:250,rev:40,key:1},{wave:'noise',dur:3000,vol:10,att:2900,rel:150,cut:300,cut2:8000,q:1}]],
  ['Drone',[{wave:'sawtooth',dur:12000,f1:146.83,vol:9,att:3000,rel:3000,cut:380,cut2:520,q:1.5,vib:.12,vibd:.06,rev:45,revl:4},{wave:'sawtooth',dur:12000,f1:147.6,vol:9,att:3000,rel:3000,cut:380,cut2:520,q:1.5,rev:45,revl:4},{wave:'sine',dur:12000,f1:73.42,vol:22,att:3000,rel:3000},{wave:'triangle',dur:12000,f1:220,vol:4,att:4000,rel:3000,cut:900,rev:60,revl:5}]]];
 // SND_EV = [key, name, built-in sound, group]: every game moment that can play a sound. Groups: Menus, Your moves (a person on this device; with Computer sounds on, computers too), Against you (always, when it happens to a person on this device), Game.
 const SND_EV=[['tap','Menu button tap','Glint','Menus'],['deny','Button denied (greyed out, or End turn refused)','Hush','Menus'],
- ['starSel','Star select','Glass','Your moves'],['fleetSel','Fleet select (Fleets to move)','Glass','Your moves'],['deselect','Deselect','','Your moves'],['refuse','Move refused (too weak, too far, no room...)','Hush','Your moves'],['fleetPlace','Fleet place','Pluck','Your moves'],['starSet','Star set','Bloom','Your moves'],['connect','Connect','Link','Your moves'],['gift','Gift a Star (teams)','Link','Your moves'],['fleetMove','Fleet move','Drift','Your moves'],['take','Take a Star','Surge','Your moves'],['multi','Multi-attack','Tide','Your moves'],['undo','Undo','','Your moves'],['endTurn','End turn','','Your moves'],
+ ['starSel','Star select','Glass','Your moves'],['fleetSel','Fleet select (Fleets to move)','Glass','Your moves'],['deselect','Deselect','','Your moves'],['refuse','Move refused (too weak, too far, no room...)','Hush','Your moves'],['fleetPlace','Fleet place','Ting','Your moves'],['starSet','Star set (one note of a tune each time)','Piano','Your moves'],['connect','Connect','Twinkle','Your moves'],['gift','Gift a Star (teams)','Twinkle','Your moves'],['fleetMove','Fleet move (slides up or down, as long as the move)','Slide','Your moves'],['take','Take a Star (on the music\'s note, as long as the ring)','Bass','Your moves'],['multiNote','Multi-attack attacker added (a held note of a chord, one per attacker)','Chord','Your moves'],['multi','Multi-attack made','Bass','Your moves'],['undo','Undo','','Your moves'],['endTurn','End turn','','Your moves'],
  ['defCall','Defence call (you are attacked)','Pulse','Against you'],['lose','Lose a Star','Sink','Against you'],['destroyed','Fleet destroyed (either side)','Rumble','Against you'],['retreat','Fleet retreat','Ebb','Against you'],
- ['oppSel','Opponent Star select (computers, with Computer sounds on)','Glass','Game'],['turn','Your turn starts','Chime','Game'],['round','A new round starts','Dawn','Game'],['deficit','Deficit Elimination (a low to high crescendo while a player\'s lines are erased; stretched to the animation)','Rise','Game'],['elim','A player is eliminated','Swell','Game'],['over','Game over','Resolve','Game']];
+ ['oppSel','Opponent Star select (computers, with Computer sounds on)','Glass','Game'],['turn','Your turn starts','Chime','Game'],['round','A new round starts','Dawn','Game'],['deficit','Deficit Elimination (the music\'s note builds while a player\'s lines are erased; stretched to the animation)','Crescendo','Game'],['elim','A player is eliminated','Swell','Game'],['over','Game over','Resolve','Game']];
 // SND_SET = which built-in set this is (2 = the 2026-11-02 set). SND_OLD = set 1's event defaults: a browser that saved its choices under
 // set 1 has every event still on its old default moved to the new one once (sndLoad); events it changed keep their sound, and set 1's
 // sounds stay in its library as its own sounds.
-const SND_SET=2,SKEY_SET='constellate-sndset',SND_OLD={tap:'Tick',deny:'Wam',starSel:'Boop',fleetSel:'Boop',deselect:'',refuse:'Wam',fleetPlace:'Beep',starSet:'Bleep',connect:'Zip',gift:'Zip',fleetMove:'Swoosh',take:'Zap',multi:'Woom',undo:'',endTurn:'',defCall:'Bew',lose:'Wam',destroyed:'Boom',retreat:'Woosh',oppSel:'Boop',turn:'',elim:'Boom',over:'Woom'};
+// (2026-11-02-n) SND_SET = 3, the instrument set; SND_OLDS = the event defaults of every older set (1, then 2): an event still on the
+// default of a set newer than or equal to the one a browser saved under moves to today's default.
+const SND_SET=3,SKEY_SET='constellate-sndset',SND_OLD={tap:'Tick',deny:'Wam',starSel:'Boop',fleetSel:'Boop',deselect:'',refuse:'Wam',fleetPlace:'Beep',starSet:'Bleep',connect:'Zip',gift:'Zip',fleetMove:'Swoosh',take:'Zap',multi:'Woom',undo:'',endTurn:'',defCall:'Bew',lose:'Wam',destroyed:'Boom',retreat:'Woosh',oppSel:'Boop',turn:'',elim:'Boom',over:'Woom'},SND_OLDS=[SND_OLD,{starSet:'Bloom',fleetPlace:'Pluck',connect:'Link',gift:'Link',fleetMove:'Drift',take:'Surge',multi:'Tide',deficit:'Rise'}];
 // SND_LMAX = the most layers one sound may have (each layer is its own set of sound makers, so this keeps a phone from choking).
 const SND_LMAX=12;
 // The player's choices, remembered in this browser: sndLib = every sound [{n: name, L: [settings of each layer]}] (built-ins first, in SND_BUILT order), sndEv = {event key: sound name, '' = no sound}, sndVol = Master volume 0-100, sndCpu = computers make sounds too (Off by default).
@@ -2657,7 +2666,7 @@ function sndLoad(){let raw=[];try{raw=JSON.parse(localStorage.getItem(SKEY_LIB)|
  const own=raw.filter(s=>s&&typeof s.n=='string'&&s.n.trim()).map(s=>({n:s.n.trim().slice(0,40),L:sndLayers(s)}));
  sndLib=SND_BUILT.map(([n])=>({n,L:(own.find(s=>s.n==n)||{L:sndBuiltL(n)}).L})).concat(own.filter(s=>!SND_BUILT.some(b=>b[0].toLowerCase()==s.n.toLowerCase())).filter((s,i,a)=>a.findIndex(x=>x.n.toLowerCase()==s.n.toLowerCase())==i));
  let ev={};try{ev=JSON.parse(localStorage.getItem(SKEY_EV)||'{}')||{}}catch(e){ev={}}sndEv={};let set=SND_SET;try{set=+localStorage.getItem(SKEY_SET)||1}catch(e){}const old=set<SND_SET;
- SND_EV.forEach(([k,,d])=>{const v=ev[k];sndEv[k]=typeof v=='string'&&!(old&&v===SND_OLD[k])&&(v==''||sndByName(v))?(v&&sndByName(v).n):d});if(old)try{localStorage.setItem(SKEY_SET,String(SND_SET));if(localStorage.getItem(SKEY_EV))localStorage.setItem(SKEY_EV,JSON.stringify(sndEv))}catch(e){}
+ SND_EV.forEach(([k,,d])=>{const v=ev[k];sndEv[k]=typeof v=='string'&&!(old&&SND_OLDS.slice(set-1).some(m=>m[k]===v))&&(v==''||sndByName(v))?(v&&sndByName(v).n):d});if(old)try{localStorage.setItem(SKEY_SET,String(SND_SET));if(localStorage.getItem(SKEY_EV))localStorage.setItem(SKEY_EV,JSON.stringify(sndEv))}catch(e){}
  try{const v=parseInt(localStorage.getItem(SKEY_VOL),10);if(v>=0&&v<=100)sndVol=v;sndCpu=localStorage.getItem(SKEY_CPU)==='1'}catch(e){}}
 function sndStore(){try{localStorage.setItem(SKEY_LIB,JSON.stringify(sndLib));localStorage.setItem(SKEY_EV,JSON.stringify(sndEv));localStorage.setItem(SKEY_VOL,String(sndVol));localStorage.setItem(SKEY_CPU,sndCpu?'1':'0')}catch(e){}}
 sndLoad();
@@ -2698,20 +2707,25 @@ function musTune(f){const m=69+12*Math.log2(f/440),pc=MUS_KEY[musNote()];let bes
 // o (optional, 2026-11-02) = {r: play every layer at r times its pitch (the music plays Drone at each note of the loop), len: stretch the
 // sound to len ms, its fades and start delays with it (Deficit Elimination's crescendo fits the animation), mus: true = through the music's
 // own volume (actx.Mu, made by the Music section) instead of straight to Master}. A layer set In key then moves to the nearest pitch that fits.
-function sndPlayS(s,dl,o){if(s)s.L.forEach(p=>sndPlay(p,dl,o))}
-function sndPlay(p,dl,o){if(!soundOn)return;try{const c=sfxCtx();if(!c)return;o=o||{};const q=sndClean(p);if(o.len>0){const k=o.len/q.dur;q.dur=o.len;q.att*=k;q.rel*=k;q.del*=k}
+// (2026-11-02-n) more of o: hold = play for as long as possible (Duration 15 s) until sndRelease lets it go (the Multi-attack chord);
+// flip = glide from Slide to back to Pitch instead (a Fleet move's slide goes up or down). sndPlayS returns one handle per layer (sndPlay
+// returns {N: its notes, rel: its Fade out}, nothing when it did not play), which sndRelease takes.
+function sndPlayS(s,dl,o){return s?s.L.map(p=>sndPlay(p,dl,o)):[]}
+function sndPlay(p,dl,o){if(!soundOn)return;try{const c=sfxCtx();if(!c)return;o=o||{};const q=sndClean(p);if(o.hold)q.dur=15000;else if(o.len>0){const k=o.len/q.dur;q.dur=o.len;q.att*=k;q.rel*=k;q.del*=k}if(o.flip){const x=q.f1;q.f1=q.f2;q.f2=x}
  const d=q.dur/1000,f0=q.f1*(o.r||1),kk=(o.r||1)*(q.key&&q.wave!='noise'?musTune(f0)/f0:1);let t=c.currentTime+.01+((dl||0)+q.del)/1000;if(!o.mus&&(c.V||0)>=SND_VMAX)return;const dst=o.mus&&c.Mu?c.Mu:c.M,out=c.createGain(),bus=c.createGain(),sends=[];out.connect(dst);bus.connect(out);
  if(q.rev>0){const w=c.createGain();w.gain.value=q.rev/100;bus.connect(w);w.connect(sndRev(c,dst));sends.push(w)}
  if(q.echo>0){const dn=c.createDelay(2),fb=c.createGain(),w=c.createGain();dn.delayTime.value=q.echot/1000;fb.gain.value=Math.min(.85,q.echo/100*.8);w.gain.value=q.echo/100;bus.connect(dn);dn.connect(fb);fb.connect(dn);dn.connect(w);w.connect(out)}
- for(let i=0;i<q.rep;i++){sndNote(c,q,t,d,kk*Math.pow(2,q.step*i/12),bus);t+=d+q.gap/1000}
+ const N=[];for(let i=0;i<q.rep;i++){N.push(sndNote(c,q,t,d,kk*Math.pow(2,q.step*i/12),bus));t+=d+q.gap/1000}
  // Unhook this sound once its last note, echoes and reverb have died away.
- setTimeout(()=>{try{out.disconnect();bus.disconnect();sends.forEach(w=>w.disconnect())}catch(e){}},(t-c.currentTime+(q.echo?q.echot/1000*12:0)+.5)*1000)}catch(e){}}
+ setTimeout(()=>{try{out.disconnect();bus.disconnect();sends.forEach(w=>w.disconnect())}catch(e){}},(t-c.currentTime+(q.echo?q.echot/1000*12:0)+.5)*1000);return {N,rel:q.rel}}catch(e){}}
+// sndRelease(H) lets go of the held layers H (from sndPlayS with hold): each fades out over its own Fade out (at most 1.5 s), then stops.
+function sndRelease(H){const c=actx;if(!c||!H)return;const now=c.currentTime;H.forEach(h=>{if(!h)return;const r=Math.min(1.5,Math.max(.05,h.rel/1000));h.N.forEach(n=>{try{const g=n.e.gain;if(g.cancelAndHoldAtTime)g.cancelAndHoldAtTime(now);else{g.cancelScheduledValues(now);g.setValueAtTime(g.value,now)}g.linearRampToValueAtTime(0,now+r);n.s.forEach(x=>{try{x.stop(now+r+.05)}catch(e){}})}catch(e){}})})}
 // sndNote(c,q,t,d,k,dest) = one note of q starting at t, d seconds long, its pitch times k: the wave and/or the hiss, through the brightness filter, then the loudness shape (fade in, hold, fade out).
-function sndNote(c,q,t,d,k,dest){const end=t+d,f=c.createBiquadFilter(),env=c.createGain(),ny=c.sampleRate/2-100;f.type='lowpass';f.Q.value=q.q;const c1=Math.min(q.cut,ny),c2=Math.min(q.cut2,ny);f.frequency.setValueAtTime(c1,t);if(c2!=c1)f.frequency.exponentialRampToValueAtTime(c2,end);f.connect(env);env.connect(dest);
+function sndNote(c,q,t,d,k,dest){const S=[],end=t+d,f=c.createBiquadFilter(),env=c.createGain(),ny=c.sampleRate/2-100;f.type='lowpass';f.Q.value=q.q;const c1=Math.min(q.cut,ny),c2=Math.min(q.cut2,ny);f.frequency.setValueAtTime(c1,t);if(c2!=c1)f.frequency.exponentialRampToValueAtTime(c2,end);f.connect(env);env.connect(dest);
  const v=q.vol/100,a=Math.max(.002,Math.min(q.att/1000,d)),s=Math.min(Math.max(t+a,end-q.rel/1000),end);env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(v,t+a);env.gain.setValueAtTime(v,s);env.gain.linearRampToValueAtTime(0,Math.max(end,s+.003));
  if(q.wave!='noise'){const o=c.createOscillator(),g=c.createGain(),f1=q.f1*k,f2=q.f2*k;o.type=q.wave;o.frequency.setValueAtTime(f1,t);if(f2!=f1)o.frequency.exponentialRampToValueAtTime(f2,end);g.gain.value=1-q.noise/100;o.connect(g);g.connect(f);
-  if(q.vib>0&&q.vibd>0){const l=c.createOscillator(),lg=c.createGain();l.frequency.value=q.vib;lg.gain.value=f1*(Math.pow(2,q.vibd/12)-1);l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(end+.05)}c.V=(c.V||0)+1;o.onended=()=>{c.V--};o.start(t);o.stop(end+.05)}
- if(q.wave=='noise'||q.noise>0){const n=c.createBufferSource(),g=c.createGain();n.buffer=sndNoise(c);n.loop=true;g.gain.value=q.wave=='noise'?1:q.noise/100;n.connect(g);g.connect(f);c.V=(c.V||0)+1;n.onended=()=>{c.V--};n.start(t);n.stop(end+.05)}}
+  if(q.vib>0&&q.vibd>0){const l=c.createOscillator(),lg=c.createGain();l.frequency.value=q.vib;lg.gain.value=f1*(Math.pow(2,q.vibd/12)-1);l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(end+.05);S.push(l)}c.V=(c.V||0)+1;o.onended=()=>{c.V--};o.start(t);o.stop(end+.05);S.push(o)}
+ if(q.wave=='noise'||q.noise>0){const n=c.createBufferSource(),g=c.createGain();n.buffer=sndNoise(c);n.loop=true;g.gain.value=q.wave=='noise'?1:q.noise/100;n.connect(g);g.connect(f);c.V=(c.V||0)+1;n.onended=()=>{c.V--};n.start(t);n.stop(end+.05);S.push(n)}return {e:env,s:S}}
 /*MUS{*/
 // ---- Music (Shmorden, 2026-11-02; preview only, cut out of live: tools/strip_craft.py, MUS_FORBIDDEN). A placeholder until the
 // professionally made music: a long, low, held synth (the Drone sound, editable on the Sound page) fading from note to note of the main
@@ -2734,9 +2748,35 @@ setInterval(musTick,500);document.addEventListener('pointerdown',()=>{if(soundOn
 // sfx(ev,dl) plays the sound chosen for event ev, if Sound is on. sndHere(c) = color c is a person on this device. sfxMe(ev,c,dl) = a move by color c (the player whose turn it is when left out): it plays for a person on this device, and for a computer only with Computer sounds on (a computer's Star select is the Opponent Star select event). Online, the other side's moves are silent.
 // sfxAny(ev,cs,dl) = something that involves the colors cs (an attack): it plays if any of them is a person here, or a computer with Computer sounds on.
 let sndLast=0;
-function sfx(ev,dl,o){/*SKY{*/ambEv(ev,dl);/*}SKY*/sndLast=Date.now();if(!soundOn)return;const s=sndByName(sndEv[ev]);if(s)sndPlayS(s,dl,o)}
+function sfx(ev,dl,o){/*SKY{*/ambEv(ev,dl);/*}SKY*/sndLast=Date.now();if(!soundOn)return;const s=sndByName(sndEv[ev]);if(s)sndPlayS(s,dl,sndHow(ev,s,o))}
+// ---- The instrument set (Shmorden 2026-11-02-n): what happens on the board becomes part of the music. sndHow(ev,s,o) = how event ev
+// plays sound s: Star set = the next note of a tune (sndMel); Take, Multi-attack made and Deficit Elimination (SND_ROOTED) = moved to the
+// loop's note now (their pitches are written for D, the loop's first note, so a Take on B plays a B); Fleet move = its slide up or down at
+// random (placeholder) and as long as the Fleets' move on the board (bxFlLast, set by the board animation just before).
+const SND_ROOTED={take:1,multi:1,deficit:1};let bxFlLast=null,sndMelLast=null;
+function sndHow(ev,s,o){o=Object.assign({},o);if(o.r||!s.L.length)return o;
+ if(ev=='starSet')o.r=sndMel(s.L[0].f1)/s.L[0].f1;else if(SND_ROOTED[ev])o.r=MUS_NOTES[musNote()]/MUS_NOTES[0];
+ else if(ev=='fleetMove'){o.flip=Math.random()<.5;if(!o.len&&bxFlLast&&performance.now()-bxFlLast.at<100&&bxFlLast.ms>0)o.len=Math.max(150,bxFlLast.ms)}return o}
+// sndMel(f) = the next note of the Star set tune, in Hz (Shmorden: piano notes, each different from the last by at least a second; "for
+// now" in the loop's key, not black keys, which clash with it): a random pitch that fits the loop's note now (MUS_KEY), from a sixth
+// below the sound's own Pitch f to an octave above it, not the last note (sndMelLast, MIDI) and at most a fifth from it, so it moves like a
+// tune. Neighbours in a five-note set are always a second or more apart.
+function sndMel(f){const c=Math.round(69+12*Math.log2(f/440)),pc=MUS_KEY[musNote()],L=[],A=[];for(let m=c-8;m<=c+12;m++)if(pc.includes((m%12+12)%12)&&m!==sndMelLast){A.push(m);if(sndMelLast==null||Math.abs(m-sndMelLast)<=7)L.push(m)}
+ const P=L.length?L:A,m=P.length?P[Math.floor(Math.random()*P.length)]:c;sndMelLast=m;return 440*Math.pow(2,(m-69)/12)}
+// ---- The Multi-attack chord (Shmorden: "build the chord of the background note with 1 held note per attacker added"). While a
+// Multi-attack is put together, each attacker holds one note (the Multi-attack attacker added event, Chord) of a chord on the loop's
+// note at the first attacker: its root, fifth, third, then the other notes that fit (SND_CHORD, kept when they are in MUS_KEY), an octave
+// higher each time round. Removing an attacker lets its note go; making or cancelling the attack lets the chord go (the attack itself
+// plays Multi-attack made). sndCh = the chord sounding (null = none): n = its loop note, H = the held notes. sndChordSync() runs at every
+// board redraw (uiMulti) and plays for a person here, or a computer with Computer sounds on.
+const SND_CHORD=[0,7,3,4,10,9,2,5,11,8,1,6];let sndCh=null;
+function sndChordTone(n,i){const r=MUS_NOTES[n]*2,rp=Math.round(69+12*Math.log2(r/440)),pc=MUS_KEY[n],iv=SND_CHORD.filter(x=>pc.includes((rp+x)%12));return r*Math.pow(2,(iv[i%iv.length]+12*Math.floor(i/iv.length))/12)}
+function sndChordSync(){const s=sndByName(sndEv.multiNote),who=G?cur():null,w=soundOn&&s&&s.L.length&&G&&multi&&multi.t!=null&&(sndHere(who)||(cpuOf(who)&&sndCpu))?multi.att.length:0;
+ if(!sndCh){if(!w)return;sndCh={n:musNote(),H:[]}}
+ while(sndCh.H.length<w)sndCh.H.push(sndPlayS(s,0,{hold:1,r:sndChordTone(sndCh.n,sndCh.H.length)/s.L[0].f1}));
+ while(sndCh.H.length>w)sndRelease(sndCh.H.pop());if(!w)sndCh=null}
 const sndHere=c=>c!=null&&!cpuOf(c)&&!(net.on&&!net.my.includes(c));
-function sfxMe(ev,c,dl){/*SKY{*/ambEv(ev,dl,c);/*}SKY*/if(!G)return sfx(ev,dl);if(c==null)c=cur();if(sndHere(c))return sfx(ev,dl);if(cpuOf(c)&&sndCpu)sfx(ev=='starSel'?'oppSel':ev,dl)}
+function sfxMe(ev,c,dl,o){/*SKY{*/ambEv(ev,dl,c);/*}SKY*/if(!G)return sfx(ev,dl,o);if(c==null)c=cur();if(sndHere(c))return sfx(ev,dl,o);if(cpuOf(c)&&sndCpu)sfx(ev=='starSel'?'oppSel':ev,dl,o)}
 // sndNo() = Move refused, for a person on this device only (a computer's tried and refused moves are never heard).
 function sndNo(){if(!G||sndHere(cur()))sfx('refuse')}
 function sfxAny(ev,cs,dl){/*SKY{*/ambEv(ev,dl);/*}SKY*/if(!G||cs.some(sndHere)||(sndCpu&&cs.some(cpuOf)))sfx(ev,dl)}
@@ -3053,7 +3093,7 @@ else{const r={t0:now,u1:1,ms1:BX_LINE*K,t2:null,ms2:0};tc=bxTrEnd(r);let h=dec.f
   const k=Math.min(h,x.use||0);h-=k;const n=(x.use||0)-k;if(n>0){const f=bxFleet([a.id,b.id],n,{mv:1,c:a.o});if(f)f.tr=r}})}
 if(pre.o!=b.o)bx.push({k:'oc',g:G,id:b.id,c:pre.o,t0:now,ms:tc-now});
 if(!gift)bx.push(bxRing(b.x,b.y,.07,'#fff',tc,BX_TAKEN*K,{ex:1}));
-pre.old.forEach(([p,q,col])=>{const o=p==b.id?q:p;if(by(o))bx.push({k:'rt',g:G,a:o,b:b.id,col,t0:tc,ms})});bxGo()}
+pre.old.forEach(([p,q,col])=>{const o=p==b.id?q:p;if(by(o))bx.push({k:'rt',g:G,a:o,b:b.id,col,t0:tc,ms})});bxGo();return gift?null:{d:Math.max(0,tc-now),ms:BX_TAKEN*K}}
 // bxRing(x,y,w,rc,t0,ms,o) = a ring animation (k:'ds'): it grows from (x,y) to one System across over the first 60% of ms and fades over the rest; w = its thickness, rc = its color. o = more fields (a chip to flash inverted: n, col, mv, fl; a later or longer fade: fs, fd; ex = a shockwave: it reaches one System across at the same time but keeps expanding, slowing, as it fades: the Star taken rings, Shmorden 2026-11-02-f).
 function bxRing(x,y,w,rc,t0,ms,o){return Object.assign({k:'ds',g:G,x,y,n:0,w,rc,t0,gr:ms*.6,fs:t0+ms*.6,fd:ms*.4,fl:0},o||{})}
 // bxIntro() starts a Defence call's animation (resolve; only when the attacked Star has defending Fleets): each attacker's line grows all the way to the Star with its committed Fleets riding at the tip; the Fleets stop halfway (one shared travel, bxTr; Shmorden, 2026-11-02-e, -f) until the answers are in (bxTake sets when they go on). bxTk = the call's timeline: {b, p = its pend, ie = when the lines reach the Star (the question opens), dx = the answers' animations (moved to halfway when the call needed no person), go = when the second leg may start (after the last answer's flicker), ad = when each answer plays, fx = the attackers' chips, gh = capture preview ghosts kept until the lines arrive, tr = the travel, K}.
@@ -3079,7 +3119,7 @@ function bxStarEnd(id){const now=performance.now();let e=0;bxLive().forEach(f=>{
 // bxFleet(path,n,o) starts a Fleet chip of n Fleets along path (star ids; one id = no slide). o = {c: its color (default the last Star's owner), rv: fade in (placing), mv: moved Fleets, wait: ms before it starts, show: drawn on the first Star while it waits, to: where it stops (default the end), hold: park there}. Returns the animation, or null.
 function bxFleet(path,n,o){const K=bxK();o=o||{};if(!K||!path||!path.length||n<1)return null;const a=by(path[0]),b=by(path[path.length-1]);if(!a||!b)return null;const to=o.to!=null?o.to:path.length-1;let rv=0;
 if(o.rv){const q=path.length>1?by(path[1]):null;rv=q?{x:q.x-a.x,y:q.y-a.y}:{x:1,y:0}}
-const f={k:'fl',g:G,path:path.slice(),n,b:b.id,c:o.c!=null?o.c:b.o,mv:!!o.mv,show:!!o.show,rv,from:0,to,t0:performance.now()+(o.wait||0),ms:Math.max(o.rv?BX_SLIDE*K:0,(o.rv?Math.min(to,BX_PLACEMAX):to)*BX_SLIDE*K),fd:BX_SLIDE*K,hold:!!o.hold};bx.push(f);bxGo();return f}
+const f={k:'fl',g:G,path:path.slice(),n,b:b.id,c:o.c!=null?o.c:b.o,mv:!!o.mv,show:!!o.show,rv,from:0,to,t0:performance.now()+(o.wait||0),ms:Math.max(o.rv?BX_SLIDE*K:0,(o.rv?Math.min(to,BX_PLACEMAX):to)*BX_SLIDE*K),fd:BX_SLIDE*K,hold:!!o.hold};bx.push(f);bxFlLast={at:performance.now(),ms:f.ms};bxGo();return f}
 // bxOn(f,to,hold) sends parked chip f on from where it is now to path position `to` (Hitchhike? answered), parking again if hold. Returns the ms it takes.
 function bxOn(f,to,hold){if(!f||!bx.includes(f))return 0;const now=performance.now(),at=bxAt(f,now);f.from=at;f.to=to;f.hold=!!hold;f.rv=0;f.t0=now;f.ms=Math.max(0,(to-at)*BX_SLIDE*bxK());bxGo();return f.ms}
 // bxAt(f,now) = chip f's path position now (eased in and out over the whole trip). f.tr = an attacking chip of a Take, which rides at the tip of its line (bxTr).
