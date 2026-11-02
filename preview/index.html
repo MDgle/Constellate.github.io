@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-02-h",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-02-i",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -228,6 +228,15 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvq{display:flex;flex-wrap:wrap;gap:6px;padding:4px 10px 8px;background:var(--panel)}
 #hvq button{min-height:46px;padding:0 14px;font-weight:600;color:#000;border-color:transparent}#hvq button.cur{outline:3px solid var(--ink);outline-offset:1px}
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
+/*STEAM{*/
+/* Steam preview (Shmorden, 2026-11-02): the widescreen layout. html.steam is set by steamLay (Steam preview section of the script) when ?steam asked for it and the window is wide enough. Like Tetris Effect: everything you play with sits in one centred column (--colw wide, sized so the square board fills the height), and the ambient layer (#amb, a canvas behind the page) fills the sides. #ambcol = the column's own backing, a little see-through, its edges glowing in the current player's color (--ambc). */
+html.steam{background:var(--bg)}html.steam body{background:transparent}
+html.steam #top,html.steam #st,html.steam #bar,html.steam #tut{width:var(--colw);margin-left:auto;margin-right:auto;box-sizing:border-box}
+html.steam #hv{left:calc(50% - var(--colw)/2);right:auto;width:var(--colw)}
+#amb,#ambcol{position:fixed;z-index:-1;pointer-events:none;display:none}#amb{inset:0;width:100%;height:100%}
+#ambcol{top:0;bottom:0;left:calc(50% - var(--colw)/2);width:var(--colw);background:color-mix(in srgb,var(--bg) 92%,transparent);border-left:1px solid color-mix(in srgb,var(--ambc,var(--line)) 55%,transparent);border-right:1px solid color-mix(in srgb,var(--ambc,var(--line)) 55%,transparent);box-shadow:0 0 70px -12px var(--ambc,transparent);transition:box-shadow .9s,border-color .9s}
+html.steam #amb,html.steam #ambcol{display:block}
+/*}STEAM*/
 </style></head><body>
 <script type="text/plain" id="ptext">
 PLAYER TEXT: the words on the How to play page and in the tutorial lessons. Edit them here; the game reads them as they are.
@@ -887,7 +896,7 @@ const bp=bxPre(b);G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=s
 // (2026-10-28-b) rt = where each retreating Fleet went (a Star's point, in the order chosen), so a transcript can rebuild the board.
 mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost],rt:rets.map(id=>mvPos(by(id)))});
 // (Sound effects) Take a Star (Multi-attack for several attackers) for the attacker, or Lose a Star when it happens to a person here and the attacker is not; then Fleet destroyed and Fleet retreat, a moment later so they don't pile up.
-if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me);if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);bxTake(b,bp,att,dec,fpv,fp);
+if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me);/*STEAM{*/ambTake(me,dfc);/*}STEAM*/if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);bxTake(b,bp,att,dec,fpv,fp);
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+c+' Fuel.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
 // ===== Team mode: data model and helpers (team project step 2) =====
@@ -1419,7 +1428,7 @@ if(pct==fuelPct)return;const ms=fuelPct<0||(window.matchMedia&&matchMedia('(pref
 function persist(){if(hvRO)return;try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 // render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
 // (new) rs = the selected Star in Stars mode (its Fuel range is outlined); none while an attack is being resolved (pend: Fleet choice and the Defence call) or with the range border switched off (rngOn). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. (new) While a Star is dragged (dg), the outline is drawn round its origin with the Fuel the drag may spend (dg.n), and the Fuel shown is what would be left after the drop. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
-function render(){if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
+function render(){/*STEAM{*/ambKick();/*}STEAM*/if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;autoMode();
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
 const da=dg&&ddStar(dg.k)&&by(dg.a);
@@ -2405,7 +2414,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-02-h';
+const BUILD='2026-11-02-i';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2636,12 +2645,12 @@ function sndNote(c,q,t,d,k,dest){const end=t+d,f=c.createBiquadFilter(),env=c.cr
 // sfx(ev,dl) plays the sound chosen for event ev, if Sound is on. sndHere(c) = color c is a person on this device. sfxMe(ev,c,dl) = a move by color c (the player whose turn it is when left out): it plays for a person on this device, and for a computer only with Computer sounds on (a computer's Star select is the Opponent Star select event). Online, the other side's moves are silent.
 // sfxAny(ev,cs,dl) = something that involves the colors cs (an attack): it plays if any of them is a person here, or a computer with Computer sounds on.
 let sndLast=0;
-function sfx(ev,dl){sndLast=Date.now();if(!soundOn)return;const s=sndByName(sndEv[ev]);if(s)sndPlayS(s,dl)}
+function sfx(ev,dl){/*STEAM{*/ambEv(ev,dl);/*}STEAM*/sndLast=Date.now();if(!soundOn)return;const s=sndByName(sndEv[ev]);if(s)sndPlayS(s,dl)}
 const sndHere=c=>c!=null&&!cpuOf(c)&&!(net.on&&!net.my.includes(c));
-function sfxMe(ev,c,dl){if(!G)return sfx(ev,dl);if(c==null)c=cur();if(sndHere(c))return sfx(ev,dl);if(cpuOf(c)&&sndCpu)sfx(ev=='starSel'?'oppSel':ev,dl)}
+function sfxMe(ev,c,dl){/*STEAM{*/ambEv(ev,dl,c);/*}STEAM*/if(!G)return sfx(ev,dl);if(c==null)c=cur();if(sndHere(c))return sfx(ev,dl);if(cpuOf(c)&&sndCpu)sfx(ev=='starSel'?'oppSel':ev,dl)}
 // sndNo() = Move refused, for a person on this device only (a computer's tried and refused moves are never heard).
 function sndNo(){if(!G||sndHere(cur()))sfx('refuse')}
-function sfxAny(ev,cs,dl){if(!G||cs.some(sndHere)||(sndCpu&&cs.some(cpuOf)))sfx(ev,dl)}
+function sfxAny(ev,cs,dl){/*STEAM{*/ambEv(ev,dl);/*}STEAM*/if(!G||cs.some(sndHere)||(sndCpu&&cs.some(cpuOf)))sfx(ev,dl)}
 // Menu button tap: any button tap plays Tick, unless the button set off a sound of its own (checked just after its tap is handled) or carries data-ns (the Sound page's play buttons). Button denied: a tap on a greyed-out button, or on one with the striped "not yet" look (nogo).
 document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(!b||b.disabled||b.dataset.ns!=null)return;setTimeout(()=>{if(Date.now()-sndLast>150)sfx('tap')},0)},true);
 document.addEventListener('pointerup',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(b&&(b.disabled||b.classList.contains('nogo')))sfx('deny')},true);
@@ -3013,6 +3022,123 @@ function bxGo(){if(bxRaf)return;const step=()=>{bxRaf=0;const now=performance.no
 // bxNet(t) = the network path from the current player's Capital to Star t along their own Connections (shortest; the first one found when several tie, a placeholder), as star ids; [t] for the Capital itself.
 function bxNet(t){const me=cur(),cp=capStar(me);if(!cp||!t)return [t.id];if(cp===t)return [t.id];const par=new Map([[cp.id,null]]),q=[cp];while(q.length){const s=q.shift();if(s===t)break;G.conns.forEach(c=>{if(c[0]!=s.id&&c[1]!=s.id)return;const u=by(c[0]==s.id?c[1]:c[0]);if(u&&u.o==me&&!par.has(u.id)){par.set(u.id,s.id);q.push(u)}})}
 if(!par.has(t.id))return [t.id];const p=[t.id];while(par.get(p[0])!=null)p.unshift(par.get(p[0]));return p}
+// ===== Steam preview: the widescreen layout and the ambient sides (Shmorden, 2026-11-02) =====
+/*STEAM{*/
+// Preview only while the Steam edition is explored: the live publish cuts this section out (tools/strip_craft.py, STEAM_FORBIDDEN).
+// The idea (Shmorden's, from Tetris Effect): on a wide screen everything you play with sits in one centred column, and the sides are filled
+// with ambient visuals that react to the game, so it never feels like a phone game stretched across a monitor. The sides echo the match:
+// each Star set adds a star to the sky in its owner's color, each Connection draws a constellation line, Takes send shockwaves out from the
+// column, destroyed Fleets throw sparks, a slow nebula takes on the color of whoever is playing, and each new round brightens the sky once.
+// Every number here (sizes, speeds, counts, colors) is a placeholder to experiment with. Animations Off or reduced motion: the sky holds
+// still and events only add stars and lines. It never touches the game: it reads G and listens to the sound events (sfx, sfxMe, sfxAny),
+// which fire for every game moment whether or not sound is on, and draws with its own random numbers (never Math.random, which seeded
+// test runs replace).
+// steamWant = this browser asked for the layout: ?steam in the address turns it on and is remembered, ?steam=0 turns it off.
+let steamWant=false;try{const q=new URLSearchParams(location.search);if(q.has('steam')){steamWant=q.get('steam')!=='0';localStorage.setItem('constellate-steam',steamWant?'1':'0')}else steamWant=localStorage.getItem('constellate-steam')==='1'}catch(e){}
+// AMB = the ambient layer. cv/cx = the canvas and its context; W, H = window size; cl, cr = the column's left and right edges; dust = faint
+// drifting background stars; neb = nebula clouds; cs = sky stars set by the game ({fx, fy, side, c: [r,g,b], b: born}, fx/fy = place
+// within its side, 0-1, so a resize keeps them); links = constellation lines ({a, b, c, b0: born}); fx = rings and sparks; tint = the
+// nebula's color now, tgt = the color it eases toward; k = whose turn it was last frame; rd = the round last frame; flash = the round's
+// brightening (1 fading to 0); th = theme colors read from the page; R = the random number state. var, not const: render() calls ambKick
+// and must find AMB undefined (not a startup error) if it ever runs before this line.
+var AMB={on:false,cv:null,cx:null,col:null,W:0,H:0,cl:0,cr:0,dpr:1,dust:[],neb:[],cs:[],links:[],fx:[],tint:[70,90,140],tgt:[70,90,140],k:-2,rd:0,flash:0,th:null,thT:0,raf:0,last:0,R:20261102,ev:{}};
+// ambRnd() = the layer's own random number, 0 to 1 (mulberry32).
+function ambRnd(){let t=AMB.R=(AMB.R+0x6D2B79F5)|0;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}
+// ambHex(h) turns '#rrggbb' (or 'rgb(...)') into [r, g, b]; anything else gives null.
+function ambHex(h){h=String(h||'').trim();let m=/^#([0-9a-f]{6})$/i.exec(h);if(m){const n=parseInt(m[1],16);return[n>>16,n>>8&255,n&255]}m=/rgba?\((\d+)\D+(\d+)\D+(\d+)/.exec(h);return m?[+m[1],+m[2],+m[3]]:null}
+// ambCol(c) = player c's color as [r, g, b]; the nebula's color when there is no player.
+function ambCol(c){return(c!=null&&c>=0&&ambHex(COL[c]))||AMB.tint.slice()}
+// ambTheme() reads the theme's colors (ink for the dust, warn for the Defence call, bg to tell a light theme) at most twice a second.
+function ambTheme(){const n=Date.now();if(AMB.th&&n-AMB.thT<500)return AMB.th;AMB.thT=n;const g=getComputedStyle(document.documentElement),bg=ambHex(g.getPropertyValue('--bg'))||[0,0,0];
+AMB.th={ink:ambHex(g.getPropertyValue('--ink'))||[230,230,240],warn:ambHex(g.getPropertyValue('--warn'))||[255,180,70],light:bg[0]+bg[1]+bg[2]>384};return AMB.th}
+// steamLay() turns the widescreen layout on or off to fit the window, and sizes the column: as tall as the window allows the square board
+// (190 px for the panels above and below it, never under 560 px), and only when each side keeps at least 160 px and the board gets at
+// least 420 px of height (a phone turned sideways keeps its own layout: the column would leave it a sliver of board). Runs at load and on
+// every resize, before the board's own fit (whose listener is added later), so the board fits the new column straight away.
+function steamLay(){const colw=Math.round(Math.min(innerWidth,Math.max(560,innerHeight-190))),on=steamWant&&innerWidth-colw>=320&&innerHeight-190>=420,r=document.documentElement;
+r.classList.toggle('steam',on);r.style.setProperty('--colw',colw+'px');AMB.on=on;if(!on){if(AMB.raf)cancelAnimationFrame(AMB.raf);AMB.raf=0;return}
+if(!AMB.cv){const cv=document.createElement('canvas');cv.id='amb';const col=document.createElement('div');col.id='ambcol';document.body.append(cv,col);AMB.cv=cv;AMB.cx=cv.getContext('2d');AMB.col=col}
+AMB.W=innerWidth;AMB.H=innerHeight;AMB.cl=(innerWidth-colw)/2;AMB.cr=AMB.cl+colw;AMB.dpr=Math.min(devicePixelRatio||1,1.5,Math.sqrt(5e6/(AMB.W*AMB.H)));
+AMB.cv.width=Math.round(AMB.W*AMB.dpr);AMB.cv.height=Math.round(AMB.H*AMB.dpr);
+if(!AMB.dust.length){ambSeed();for(let i=0;i<240;i++)AMB.dust.push({x:ambRnd(),y:ambRnd(),z:.2+ambRnd()*.8,ph:ambRnd()*6.3});for(let i=0;i<5;i++)AMB.neb.push({x:ambRnd(),y:ambRnd(),r:.35+ambRnd()*.35,sp:.02+ambRnd()*.04,ph:ambRnd()*6.3,side:i%2})}
+ambKick(1)}
+// ambSeed() puts a few faint constellations in the theme's ink color on both sides at the start (pc -1 = no player, drawn dimmer), so the
+// sky is never empty, on the menu included. They are the oldest stars, so the game's own stars crowd them out first (the 90-star cap).
+function ambSeed(){for(let g=0;g<6;g++){const side=g%2,cx=.15+ambRnd()*.7,cy=(g>>1)/3+.06+ambRnd()*.2;let prev=null;const n=3+Math.floor(ambRnd()*3);
+for(let i=0;i<n;i++){const s={fx:Math.min(1,Math.max(0,cx+(ambRnd()-.5)*.5)),fy:Math.min(1,Math.max(0,cy+(ambRnd()-.5)*.14)),side,c:null,pc:-1,b:-1e9};AMB.cs.push(s);
+if(prev)AMB.links.push({a:prev,b:s,c:null,b0:-1e9});prev=s}}}
+// ambSide(side, fx, fy) = the screen point at place fx, fy (0-1) of the left (0) or right (1) side, 30 px in from its edges.
+function ambSide(side,fx,fy){const p=30,a=side?AMB.cr+p:p,b=side?AMB.W-p:AMB.cl-p;return[a+fx*Math.max(0,b-a),p+fy*(AMB.H-2*p)]}
+// ambKick(force) is called by render() and on resize: notices a new turn (the nebula and the column glow turn to the player's color) and a
+// new round (the sky brightens once), clears the last game's stars when a new game starts (the round goes down), plants one sky star per
+// Star on the board when the sky has none for this game (the Capitals at the start; every Star when a saved game is opened), and draws a frame now when the sky is still (Animations Off) or starts the frame loop when it moves.
+function ambKick(force){if(!AMB||!AMB.on)return;const k=G&&!G.over?cur():-1,rd=G?G.round:0;let ch=!!force;
+if(k!=AMB.k){AMB.k=k;AMB.tgt=k>=0?ambCol(k):[70,90,140];if(AMB.col)AMB.col.style.setProperty('--ambc',k>=0?COL[k]:'transparent');ch=1}
+if(rd!=AMB.rd){if(rd>AMB.rd&&AMB.rd>0)AMB.flash=1;if(rd<AMB.rd){AMB.cs=AMB.cs.filter(s=>s.pc<0);AMB.links=AMB.links.filter(l=>!l.c)}AMB.rd=rd;ch=1}
+if(G&&!AMB.cs.some(s=>s.pc>=0)){const own=G.stars.filter(s=>s.o!=null&&G.pl.includes(s.o));if(own.length){own.forEach(b=>ambStar(b.o).b=-1e9);ch=1}}
+if(calm()){AMB.tint=AMB.tgt.slice();AMB.flash=0;if(ch||AMB.dirty){AMB.dirty=0;ambDraw(performance.now())}}else if(!AMB.raf)AMB.raf=requestAnimationFrame(ambFrame)}
+// ambFrame(t) = one frame of the moving sky; stops itself when the layout is off, the page is hidden or Animations is Off.
+function ambFrame(t){AMB.raf=0;if(!AMB.on||document.hidden||calm())return;ambDraw(t);AMB.raf=requestAnimationFrame(ambFrame)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)ambKick(1)});
+// ambEv(ev, dl, c) is called by sfx, sfxMe and sfxAny for every game moment (ev = the sound event's key, dl = its delay in ms, c = the
+// player it belongs to, or the current player). sfxMe and sfxAny go on to call sfx, so the same moment can arrive twice: AMB.ev drops a
+// repeat within 30 ms.
+function ambEv(ev,dl,c){if(!AMB||!AMB.on)return;const n=Date.now();if(n-(AMB.ev[ev]||0)<30)return;AMB.ev[ev]=n;if(c==null&&G)c=cur();setTimeout(()=>ambDo(ev,c),dl||0)}
+// ambStar(c) adds a sky star for player c and drops the oldest (with its lines) beyond 90. Each player grows one constellation: the first
+// star sits in the player's home area (by seat, the order of the Players line: 1st left, 2nd right, 3rd left, 4th right; upper half for the first two,
+// lower for the others), every later one branches off one of their recent stars (or off par, when given) and is joined to it by a thin
+// line. A branch tries 6 spots and keeps the one farthest from every other star on that side (a spot pushed back inside the edge counts
+// as crowded), so a busy area and the screen's edges do not pile up.
+function ambStar(c,par){const mine=AMB.cs.filter(s=>s.pc==c&&c>=0),cl=v=>Math.min(1,Math.max(0,v));let s;
+if(!mine.length&&!par){const i=G&&c>=0?Math.max(0,G.pl.indexOf(c)):Math.floor(ambRnd()*4);s={fx:.2+ambRnd()*.6,fy:(i>=2?.62:.12)+ambRnd()*.26,side:i%2}}
+else{par=par||mine[Math.max(0,mine.length-1-Math.floor(ambRnd()*Math.min(4,mine.length)))];const near=AMB.cs.filter(o=>o.side==par.side),P0=ambSide(par.side,0,0),P1=ambSide(par.side,1,1),sw=P1[0]-P0[0],sh=P1[1]-P0[1];let best=-1;
+for(let k=0;k<6;k++){const a=ambRnd()*6.283,x0=par.fx+Math.cos(a)*(.12+ambRnd()*.12),y0=par.fy+Math.sin(a)*(.05+ambRnd()*.05),q={fx:cl(x0),fy:cl(y0),side:par.side};
+let m=1e9;near.forEach(o=>{m=Math.min(m,Math.hypot((o.fx-q.fx)*sw,(o.fy-q.fy)*sh))});if(q.fx!=x0||q.fy!=y0)m*=.3;if(m>best){best=m;s=q}}s.par=par}
+Object.assign(s,{c:ambCol(c),pc:c,b:performance.now()});AMB.cs.push(s);if(s.par)AMB.links.push({a:s.par,b:s,c:s.c,w:1.1,b0:s.b});delete s.par;
+while(AMB.cs.length>90){const o=AMB.cs.shift();AMB.links=AMB.links.filter(l=>l.a!=o&&l.b!=o)}return s}
+// ambTake(a, d) is called when player a takes a Star from player d: d's newest sky star flares and turns a's color.
+function ambTake(a,d){if(!AMB||!AMB.on)return;const v=AMB.cs.filter(s=>s.pc==d&&d!=null);const s=v[v.length-1];if(!s)return;s.pc=a;s.c=ambCol(a);s.b=performance.now();AMB.dirty=1;ambKick()}
+// ambRing / ambSparks add an expanding ring, or a burst of sparks, at x, y in color c (dur = how long it lasts, ms).
+function ambRing(x,y,c,R,dur,w){AMB.fx.push({t:'r',x,y,c,R,dur,w:w||2,b:performance.now()})}
+function ambSparks(x,y,c,n,sp,dir){const t=performance.now();for(let i=0;i<n;i++){const a=dir==null?ambRnd()*6.283:dir+(ambRnd()-.5)*1.2,v=sp*(.4+ambRnd()*.8);AMB.fx.push({t:'s',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c,dur:700+ambRnd()*700,b:t})}}
+// ambEdge() = a random point on one of the column's two edges, and the direction pointing away from the column: [x, y, angle].
+function ambEdge(){const l=ambRnd()<.5;return[l?AMB.cl:AMB.cr,AMB.H*(.15+ambRnd()*.7),l?Math.PI:0]}
+// ambDo(ev, c) = what each game moment does to the sky. A Connection = a thicker, brighter line from the player's newest star to their nearest
+// other star on that side within 30% of the screen's height, or to a new star branching off it (never a line across the screen).
+function ambDo(ev,c){if(!AMB.on)return;const C=ambCol(c),still=calm();
+if(ev=='starSet'||ev=='gift')ambStar(c);
+else if(ev=='connect'){const mine=AMB.cs.filter(s=>s.pc==c);let a=mine[mine.length-1]||ambStar(c);const pa=ambSide(a.side,a.fx,a.fy);
+let b=null,bd=AMB.H*.3;mine.forEach(s=>{if(s==a||s.side!=a.side||AMB.links.some(l=>(l.a==a&&l.b==s)||(l.a==s&&l.b==a)))return;const p=ambSide(s.side,s.fx,s.fy),d=Math.hypot(p[0]-pa[0],p[1]-pa[1]);if(d<bd){bd=d;b=s}});
+if(!b){b=ambStar(c,a);AMB.links.pop()}AMB.links.push({a,b,c:C,w:2.4,b0:performance.now()})}
+else if(!still){const e=ambEdge();
+if(ev=='take'||ev=='multi'||ev=='lose'){ambRing(e[0],e[1],C,AMB.H*.45,1400,3);ambRing(e[0],e[1],C,AMB.H*.3,1100,1.5)}
+else if(ev=='destroyed'){ambSparks(e[0],e[1],[255,240,220],26,.35,e[2]);ambSparks(e[0],e[1],C,18,.25,e[2])}
+else if(ev=='fleetPlace'||ev=='fleetMove'||ev=='retreat')ambSparks(e[0],e[1],C,ev=='fleetPlace'?8:12,ev=='retreat'?.4:.22,e[2]);
+else if(ev=='defCall'){const W=ambTheme().warn;ambRing(AMB.cl,AMB.H/2,W,AMB.H*.6,1600,2);ambRing(AMB.cr,AMB.H/2,W,AMB.H*.6,1600,2)}
+else if(ev=='elim'){ambRing(AMB.cl,AMB.H/2,C,AMB.W*.5,2200,4);ambRing(AMB.cr,AMB.H/2,C,AMB.W*.5,2200,4)}
+else if(ev=='over'){AMB.cs.forEach((s,i)=>s.b=performance.now()+i*40);AMB.flash=1}}
+AMB.dirty=1;ambKick()}
+// ambDraw(t) draws the whole sky: nebula, dust, constellation lines, sky stars (a star blooms for its first second), then rings and sparks.
+function ambDraw(t){const x=AMB.cx,W=AMB.W,H=AMB.H,th=ambTheme(),dt=Math.min(50,AMB.last?t-AMB.last:16),still=calm();AMB.last=t;
+x.setTransform(AMB.dpr,0,0,AMB.dpr,0,0);x.clearRect(0,0,W,H);
+for(let i=0;i<3;i++)AMB.tint[i]+=(AMB.tgt[i]-AMB.tint[i])*Math.min(1,dt/900);AMB.flash=Math.max(0,AMB.flash-dt/1800);
+const tc=AMB.tint.map(Math.round).join(','),ts=still?0:t/1000,nebA=th.light?.10:.16;
+AMB.neb.forEach(n=>{const sw=n.side?W-AMB.cr:AMB.cl,cx=(n.side?AMB.cr:0)+sw*(.5+.45*Math.sin(ts*n.sp+n.ph)),cy=H*(n.y+.12*Math.cos(ts*n.sp*.8+n.ph)),r=H*n.r,g=x.createRadialGradient(cx,cy,0,cx,cy,r);
+g.addColorStop(0,'rgba('+tc+','+(nebA+AMB.flash*.08)+')');g.addColorStop(1,'rgba('+tc+',0)');x.fillStyle=g;x.fillRect(cx-r,cy-r,2*r,2*r)});
+const ink=th.ink.join(',');AMB.dust.forEach(d=>{if(!still){d.y-=d.z*dt*.000012;d.x+=d.z*dt*.000003;if(d.y<0)d.y+=1;if(d.x>1)d.x-=1}
+const a=(.18+.22*d.z)*(still?.8:.6+.4*Math.sin(ts*(.6+d.z)+d.ph))+AMB.flash*.35,s=.6+d.z*1.4;x.fillStyle='rgba('+ink+','+a.toFixed(3)+')';x.fillRect(d.x*W,d.y*H,s,s)});
+x.lineCap='round';AMB.links.forEach(l=>{const p=still?1:Math.min(1,(t-l.b0)/700),A=ambSide(l.a.side,l.a.fx,l.a.fy),B=ambSide(l.b.side,l.b.fx,l.b.fy);
+x.strokeStyle=l.c?'rgba('+l.c.join(',')+','+(l.w>2?.8:.4)+')':'rgba('+ink+',.13)';x.lineWidth=l.w||1.2;x.beginPath();x.moveTo(A[0],A[1]);x.lineTo(A[0]+(B[0]-A[0])*p,A[1]+(B[1]-A[1])*p);x.stroke()});
+AMB.cs.forEach(s=>{const P=ambSide(s.side,s.fx,s.fy),c=(s.c||th.ink).join(','),age=still?9e9:t-s.b,tw=(s.c?1:.35)*(still?1:.8+.2*Math.sin(ts*1.3+s.fx*40));if(age<0)return;
+const g=x.createRadialGradient(P[0],P[1],0,P[0],P[1],14);g.addColorStop(0,'rgba('+c+','+(.55*tw)+')');g.addColorStop(1,'rgba('+c+',0)');x.fillStyle=g;x.fillRect(P[0]-14,P[1]-14,28,28);
+x.fillStyle='rgba('+c+','+(s.c?1:.45)+')';x.beginPath();x.arc(P[0],P[1],s.c?2.2:1.6,0,6.283);x.fill();
+if(age<1100){const k=age/1100,r=6+60*k;x.strokeStyle='rgba('+c+','+(.8*(1-k))+')';x.lineWidth=2*(1-k)+.5;x.beginPath();x.arc(P[0],P[1],r,0,6.283);x.stroke();
+const L=40*(1-k)+6;x.beginPath();x.moveTo(P[0]-L,P[1]);x.lineTo(P[0]+L,P[1]);x.moveTo(P[0],P[1]-L);x.lineTo(P[0],P[1]+L);x.stroke()}});
+AMB.fx=AMB.fx.filter(f=>{const age=t-f.b,k=age/f.dur;if(k>=1||still)return false;if(age<0)return true;const c=f.c.join(',');
+if(f.t=='r'){x.strokeStyle='rgba('+c+','+(.7*(1-k))+')';x.lineWidth=f.w*(1-k)+.5;x.beginPath();x.arc(f.x,f.y,f.R*(1-Math.pow(1-k,3)),0,6.283);x.stroke()}
+else{f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.985;f.vy*=.985;x.fillStyle='rgba('+c+','+(1-k).toFixed(3)+')';x.fillRect(f.x-1,f.y-1,2.5,2.5)}return true})}
+addEventListener('resize',steamLay);steamLay();
+/*}STEAM*/
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
