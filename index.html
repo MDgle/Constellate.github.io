@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-01-g",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-02-h",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -333,8 +333,8 @@ o.innerHTML='<div>'+h+'</div>';o.style.display='flex';o.style.alignItems='';if(o
 // (new) Redrawing the SAME dialog (a tap that changes a choice) keeps its scroll position instead of jumping to the top; a different dialog starts at the top.
 try{const n=o.firstChild;if(top&&was&&n&&n.querySelector&&((n.querySelector('h1')||{}).textContent||'')==was)(n.querySelector(':scope>.ovb')||n).scrollTop=top}catch(e){}
 // (new) Animation: a dialog that opens from nothing grows vertically from its middle. Redrawing a dialog that is already open (a tab or choice changed) does not replay it.
-try{if(!wasOpen&&animMode!='off'&&o.firstChild&&o.firstChild.classList&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}
-else if(wasOpen&&dir&&oldInner&&animMode!='off'&&o.firstChild&&o.firstChild.animate&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){if(ovDefer)ovDefer={oldInner,oldH,dir};else ovSwipe(o.firstChild,oldInner,oldH,dir)}}catch(e){}}
+try{if(!wasOpen&&animEff()!='off'&&o.firstChild&&o.firstChild.classList&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}
+else if(wasOpen&&dir&&oldInner&&animEff()!='off'&&o.firstChild&&o.firstChild.animate&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){if(ovDefer)ovDefer={oldInner,oldH,dir};else ovSwipe(o.firstChild,oldInner,oldH,dir)}}catch(e){}}
 // (2026-10-29-i) ovDefer = true while menuPage draws: ov() then keeps the page swipe ({oldInner, oldH, dir}) instead of playing it, and menuPage plays it once menuPin has placed and sized the window. Played at once, the swipe animated the content that menuPin then rewraps for scrolling (ovSc), so a page taller than the screen (Settings) appeared with no swipe and its window jumped.
 let ovDefer=null;
 // (new) ovSc(b) sets up dialog box b for its size: it first undoes an earlier setup, then, when the content is taller than the box and ends with a button row (.r), moves everything before that row into a scrolling part (.ovb) and marks the box (class ovsc, see the CSS), so the row stays at the bottom edge. Elements keep their ids. It runs after drawing, in menuPin (which measures the content with the setup undone) and after a page swipe.
@@ -345,7 +345,7 @@ function ovSc(b){if(!b||!b.classList)return;ovUnwrap(b);const f=b.lastElementChi
 // (new) Closing animation. Dialogs are closed all over the code with $('ov').style.display='none'. A watcher on that style notices the change and, instead of letting the dialog vanish, shows it again for a moment while it plays the opening in reverse (the window shrinks vertically to a line and fades, and so does the dim backdrop), then really hides it. A new ov() call in the middle cancels the close. ovPrev = the display value seen last. obsFlush() drops the watcher's own changes so they do not re-trigger it.
 function obsFlush(){try{ovObs.takeRecords()}catch(e){}ovPrev=$('ov').style.display}
 const ovObs=new MutationObserver(()=>{const o=$('ov'),d=o.style.display,box=o.firstChild;
-if(d=='none'&&ovPrev=='flex'&&!ovClosing&&box&&box.animate&&animMode!='off'&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
+if(d=='none'&&ovPrev=='flex'&&!ovClosing&&box&&box.animate&&animEff()!='off'&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
 o.style.display='flex';o.style.pointerEvents='none';const t=animMs(),ease='cubic-bezier(.4,0,.8,.6)',a1=box.animate([{transform:'none',opacity:1},{transform:'scaleY(.05)',opacity:0}],{duration:t,easing:ease,fill:'forwards'}),a2=o.animate([{opacity:1},{opacity:0}],{duration:t,easing:'ease-in',fill:'forwards'});ovClosing=[a1,a2];ovWasClosing=true;obsFlush();
 Promise.all([a1.finished,a2.finished]).then(()=>{if(ovClosing&&ovClosing[0]===a1){ovClosing=null;ovWasClosing=false;[a1,a2].forEach(a=>{try{a.cancel()}catch(e){}});o.style.display='none';o.style.pointerEvents='';obsFlush()}}).catch(()=>{});return}
 ovPrev=d});
@@ -355,9 +355,9 @@ let ov2T=null;
 const ov2Calm=()=>!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
 function ov2(h){const o=$('ov2'),was=o.style.display=='flex'&&!ov2T;if(ov2T){clearTimeout(ov2T);ov2T=null;try{o.getAnimations().forEach(a=>a.cancel())}catch(e){}o.style.pointerEvents=''}
 o.innerHTML='<div>'+h+'</div>';o.style.display='flex';
-try{if(!was&&animMode!='off'&&!ov2Calm()){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}}catch(e){}}
+try{if(!was&&animEff()!='off'&&!ov2Calm()){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}}catch(e){}}
 function ov2Close(now){const o=$('ov2'),box=o.firstChild;lkOpen=null;if(o.style.display!='flex')return;
-if(!now&&box&&box.animate&&animMode!='off'&&!ov2Calm()){const t=animMs(),a1=box.animate([{transform:'none',opacity:1},{transform:'scaleY(.05)',opacity:0}],{duration:t,easing:'cubic-bezier(.4,0,.8,.6)',fill:'forwards'}),a2=o.animate([{opacity:1},{opacity:0}],{duration:t,easing:'ease-in',fill:'forwards'});o.style.pointerEvents='none';
+if(!now&&box&&box.animate&&animEff()!='off'&&!ov2Calm()){const t=animMs(),a1=box.animate([{transform:'none',opacity:1},{transform:'scaleY(.05)',opacity:0}],{duration:t,easing:'cubic-bezier(.4,0,.8,.6)',fill:'forwards'}),a2=o.animate([{opacity:1},{opacity:0}],{duration:t,easing:'ease-in',fill:'forwards'});o.style.pointerEvents='none';
 clearTimeout(ov2T);ov2T=setTimeout(()=>{ov2T=null;[a1,a2].forEach(a=>{try{a.cancel()}catch(e){}});o.style.display='none';o.style.pointerEvents='';o.innerHTML=''},t+30);return}
 if(ov2T){clearTimeout(ov2T);ov2T=null}o.style.display='none';o.style.pointerEvents='';o.innerHTML=''}
 function ovCH(b){const c=getComputedStyle(b);return b.clientHeight-(parseFloat(c.paddingTop)||0)-(parseFloat(c.paddingBottom)||0)}
@@ -434,7 +434,7 @@ function beginTurn(){delete G.pv;delete G.nw;if(!cpuOf(cur())&&(!net.on||net.my.
 // placeable() lists stars that can receive Fleets: none if your capital is lost, only the capital if capOnly, otherwise every own star reachable from the capital by walking your own connections (a flood-fill search).
 function placeable(){const me=cur(),cp=capStar(me);if(!cp||cp.o!=me)return[];if(G.capOnly)return[cp];const seen=new Set([cp.id]),q=[cp];while(q.length){const s=q.pop();G.conns.forEach(c=>{if(c[0]==s.id||c[1]==s.id){const t=by(c[0]==s.id?c[1]:c[0]);if(t.o==me&&!seen.has(t.id)){seen.add(t.id);q.push(t)}}})}return G.stars.filter(s=>seen.has(s.id))}
 // placeF(t) places one Fleet on star t if allowed, otherwise explains why. It saves an undo snapshot first.
-function placeF(t){if(G.pool<1)return say('No Fleets left to place.');const ok=placeable();if(!t||!ok.includes(t))return say(!ok.length?'Retake your Capital to place Fleets.':G.capOnly?'After a Capital loss you can only place on your Capital.':'Place Fleets on a Star connected to your Capital.');undo.push(JSON.stringify(G));t.f=(t.f||0)+1;G.pool--;mvRec({k:'p',a:mvPos(t)});sfxMe('fleetPlace');say(G.pool+' Fleets left to place.');render()}
+function placeF(t){if(G.pool<1)return say('No Fleets left to place.');const ok=placeable();if(!t||!ok.includes(t))return say(!ok.length?'Retake your Capital to place Fleets.':G.capOnly?'After a Capital loss you can only place on your Capital.':'Place Fleets on a Star connected to your Capital.');undo.push(JSON.stringify(G));t.f=(t.f||0)+1;G.pool--;mvRec({k:'p',a:mvPos(t)});bxFleet(bxNet(t),1,{rv:1});sfxMe('fleetPlace');say(G.pool+' Fleets left to place.');render()}
 // (new) resetFlow() is the ONE place that clears every half-finished interaction: the selected star, a move group in progress, a pending attack, retreat rings and the Hold button. Undo, mode switches, End turn, new game, load and every Cancel call it, so no stale selection or count can survive.
 // (new, drag and drop) ddFl = the path (star ids) drawn while "Move how many Fleets?" waits after a Fleet drag (ddFleetDrop). A var, so resetFlow can clear it before the drag section has run.
 var ddFl=null;
@@ -468,12 +468,12 @@ if(!d.has(t.id)){resetFlow();say('Out of reach. '+n+' Fleet'+(n>1?'s travel':' t
 // (new, hitchhiking) Fleets on the Stars along the path that may ride along: ask about them first (hhAsk); the move is made when the last one is answered (hhDone).
 const path=fPathOf(B,a,t),hc=hhCands(a,path);
 // (2026-10-30) A computer is not asked: the Fleets that may ride come along (Shmorden: "if moving a fleet gives a hitchhike opportunity the cpu takes it"), except those a Star needs to stay safe (cpuHhTake, 2026-10-30-b). Logged like a person's hitchhike, one Undo for all of it.
-if(hc.length&&hhCpu()){const pk=hc.map(c=>[c.id,cpuHhTake(by(c.id),c.k,c.id==a.id?n:0)]).filter(x=>x[1]>0);undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;const hs=hhApply(a,t,pk);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n},hs));sfxMe('fleetMove');resetFlow();say('Moved '+n+'.'+hhTxt(hs));return render()}
+if(hc.length&&hhCpu()){const pk=hc.map(c=>[c.id,cpuHhTake(by(c.id),c.k,c.id==a.id?n:0)]).filter(x=>x[1]>0);undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;const hs=hhApply(a,t,pk);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n},hs));bxFleet(path,n+hs.hn.reduce((m,x)=>m+x,0),{mv:1});sfxMe('fleetMove');resetFlow();say('Moved '+n+'.'+hhTxt(hs));return render()}
 if(hc.length){resetFlow();return hhAsk({a:a.id,b:t.id,n,path,c:hc,i:0,pk:[]})}
 // Valid: save undo, move exactly n Fleets (marked moved on arrival), clear the flow, say so.
 // (new) With Move preview on, the Fleet move becomes a preview along the path the Fleets would travel.
-if(pvOn())return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.');
-undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n});sfxMe('fleetMove');resetFlow();say('Moved '+n+'.');render()}
+if(pvOn()){bxFleet(path,n,{mv:1});return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.')}
+undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n});bxFleet(path,n,{mv:1});sfxMe('fleetMove');resetFlow();say('Moved '+n+'.');render()}
 // pickN(id,n) runs when a size button is tapped: it creates the move group (star id, n Fleets) and waits for a destination tap.
 function pickN(id,n){$('ov').style.display='none';sel=id;flow={src:id,n};sfxMe('fleetSel');say('Tap a Star within '+n+' Connection'+(n>1?'s':'')+(teamsOn()?', or a teammate\'s Star to give them.':''));render()}
 // ===== Hitchhiking (RULES.md 5.4) =====
@@ -498,17 +498,21 @@ function fPathOf(B,a,t){const p=[t.id];while(p[0]!=a.id)p.unshift(B.par.get(p[0]
 // hhCands(a,path) = the Stars on the path (the group's own Star first, never the destination) with Fleets that may ride, as {id, k: how many}. Empty for computers when cpuHH is off.
 function hhCands(a,path){if(!hhAny())return [];const out=[];path.slice(0,-1).forEach((id,i)=>{const s=by(id),k=s?hhFree(s,i==0):0;if(k>0)out.push({id,k})});return out}
 // hhAsk(h) starts the question: h = {a: the group's Star, b: destination, n: group size, path, c: the candidates (hhCands), i: the one being asked about, pk: the answers so far as [star id, Fleets]}.
-function hhAsk(h){hhS=h;hhDraw()}
+// (board animations) h.fx = the group's chip (bxFleet): it slides to the first Star asked about and parks there; the question opens when it arrives (hhAt).
+function hhAsk(h){hhS=h;h.fx=bxFleet(h.path,h.n,{mv:1,to:h.path.indexOf(h.c[0].id),hold:1});hhAt(h,h.fx?h.fx.ms:0)}
+// hhAt(h,ms) asks about h's next Star after ms (at once with no animation), unless the question has ended or moved on meanwhile.
+function hhAt(h,ms){const go=()=>{if(hhS===h)hhDraw()};if(ms>0){$('ov').style.display='none';setTimeout(go,ms)}else go()}
 // hhDraw() asks about candidate h.c[h.i]: None or how many ride (Bring / Leave when there is one), or Cancel move. Like every question on the board it is a low dialog over an undimmed board (ovQ), with the whole path kept in view above it.
 function hhDraw(){const h=hhS;if(!h)return;const c=h.c[h.i],k=c.k,o=c.id==h.a,F=k>1?'Fleets':'Fleet';render();
 ovQ('<h1>Hitchhike?</h1><p>'+k+' '+F+' on the ringed Star'+(o?', already moved,':'')+' can ride with your group to its destination. '+(k>1?'They add':'It adds')+' nothing to the group\'s range and '+(k>1?'count':'counts')+' as moved.'+(h.c.length>1?' (Star '+(h.i+1)+' of '+h.c.length+' on the path)':'')+'</p><div class="r" style="flex-wrap:wrap">'+(k==1?'<button onclick="hhPick(1)">Bring it</button><button onclick="hhPick(0)">Leave it</button>':'<button onclick="hhPick(0)">None</button>'+[...Array(k)].map((_,j)=>'<button onclick="hhPick('+(j+1)+')">'+(j+1)+'</button>').join(''))+'</div><div class="r" style="margin-top:8px"><button onclick="hhCancel()">Cancel move</button></div>',h.path)}
-function hhPick(m){const h=hhS;if(!h)return;if(m>0)h.pk.push([h.c[h.i].id,m]);h.i++;if(h.i<h.c.length)return hhDraw();hhDone()}
+function hhPick(m){const h=hhS;if(!h)return;if(m>0){h.pk.push([h.c[h.i].id,m]);if(h.fx)h.fx.n+=m}h.i++;if(h.i<h.c.length)return hhAt(h,bxOn(h.fx,h.path.indexOf(h.c[h.i].id),true));hhDone()}
 function hhCancel(){$('ov').style.display='none';resetFlow();say('Fleet move cancelled.');render()}
 // hhDone() makes the move with the Fleets chosen to ride: a Fleet move preview carrying them (hh) with Move preview on, otherwise at once (one Undo takes back all of it).
 function hhDone(){const h=hhS;hhS=null;$('ov').style.display='none';const a=by(h.a),t=by(h.b),me=cur();if(!a||!t||a.o!=me||t.o!=me||fFree(a)<h.n){resetFlow();say('That group is no longer available.');return render()}
 const N=h.n+' Fleet'+(h.n>1?'s':''),k=h.pk.reduce((m,x)=>m+x[1],0);
+bxOn(h.fx,h.path.length-1,false);
 if(pvOn()){const p={k:'f',a:a.id,b:t.id,n:h.n,c:0,path:h.path};if(h.pk.length)p.hh=h.pk;return pvAdd(p,'Fleet move preview: '+N+(k?', '+k+' hitchhiking':'')+'. Confirm or Cancel.')}
-undo.push(JSON.stringify(G));a.f-=h.n;t.f=(t.f||0)+h.n;t.fm=(t.fm||0)+h.n;const hs=hhApply(a,t,h.pk);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:h.n},hs));sfxMe('fleetMove');resetFlow();say('Moved '+h.n+'.'+hhTxt(hs));render()}
+undo.push(JSON.stringify(G));a.f-=h.n;t.f=(t.f||0)+h.n;t.fm=(t.fm||0)+h.n;const hs=hhApply(a,t,h.pk);if(h.fx)h.fx.n=h.n+hs.hn.reduce((m,x)=>m+x,0);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:h.n},hs));sfxMe('fleetMove');resetFlow();say('Moved '+h.n+'.'+hhTxt(hs));render()}
 // hhApply(a,t,pk) moves the riders pk ([star id, n], ...) of a group that has just gone from Star a to Star t, each count cut to what may still ride. Moved Fleets leave first, so Fleets that could still move stay behind when they can. Returns {hp: their Stars' points, hn: how many from each} for the log.
 function hhApply(a,t,pk){const o={hp:[],hn:[]};(pk||[]).forEach(([id,n])=>{const s=by(id);if(!s||s===t||s.o!=t.o)return;const k=Math.min(n,hhFree(s,s===a));if(k<1)return;const m=Math.min(k,fMoved(s));s.f-=k;s.fm=(s.fm||0)-m;t.f=(t.f||0)+k;t.fm=(t.fm||0)+k;o.hp.push(mvPos(s));o.hn.push(k)});return o}
 // hhRec(r,hs) adds the riders to a Fleet move log record (hp, hn), when there are any. hhTxt(hs) = the end of the bottom message.
@@ -529,7 +533,7 @@ const pvTarget=id=>(G.pv||[]).some(p=>p.k=='t'&&p.b==id),pvOrigin=id=>(G.pv||[])
 // (new, hitchhiking) pvOut0(id) = the group sizes only; hhOut(id) = Fleets on star id promised to pending Fleet moves as hitchhikers (p.hh = [[star id, n], ...]). Hitchhikers leave moved Fleets first (hhApply), so only the part of hhOut beyond the moved Fleets there (fMoved) is taken from the Fleets that could still move.
 const pvOut0=id=>(G.pv||[]).reduce((m,p)=>m+((p.k=='f'||p.k=='h')&&p.a==id?p.n:0),0),hhOut=id=>(G.pv||[]).reduce((m,p)=>m+(p.k=='f'&&p.hh?p.hh.reduce((k,h)=>k+(h[0]==id?h[1]:0),0):0),0),pvOut=id=>{const h=hhOut(id),s=h&&by(id);return pvOut0(id)+(s?Math.max(0,h-fMoved(s)):0)},fFree=s=>(s.f||0)-(s.fm||0)-pvOut(s.id),pvFleetStar=id=>(G.pv||[]).some(p=>(p.k=='f'||p.k=='h')&&(p.a==id||p.b==id))||hhOut(id)>0;
 // pvAdd(p,msg) makes a preview: pays the Fuel, marks the origin as acted, selects the new preview.
-function pvAdd(p,msg){undo.push(pvTag(JSON.stringify(G)));const L=G.pv||(G.pv=[]);p.i=L.reduce((m,q)=>Math.max(m,q.i),0)+1;L.push(p);if(p.k!='f'&&p.k!='h'){G.ap-=p.c;G.used.push(p.a)}sel=null;flow=null;pvSel=p.i;say(msg||'');render()}
+function pvAdd(p,msg){undo.push(pvTag(JSON.stringify(G)));const L=G.pv||(G.pv=[]);p.i=L.reduce((m,q)=>Math.max(m,q.i),0)+1;L.push(p);bxPv(p);if(p.k!='f'&&p.k!='h'){G.ap-=p.c;G.used.push(p.a)}sel=null;flow=null;pvSel=p.i;say(msg||'');render()}
 // atkGo(n) = the attack's Fleet choice is made: with Move preview on it becomes a preview, otherwise it resolves at once. pvAttack(n) builds the capture preview from the pending attack.
 function atkGo(n){if(pvOn()&&pend&&!pend.ph)return pvAttack(n);resolve(n)}
 function pvAttack(n){const x=pend.att[0],b=pend.b;pend=null;$('ov').style.display='none';pvAdd({k:'t',a:x.a,b,use:n,c:x.c},'Preview: capture for '+x.c+' Fuel'+(n?' with '+n+' Fleet'+(n>1?'s':''):'')+'. Confirm or Cancel, or pick another Star.')}
@@ -558,12 +562,12 @@ if(!clear(a,b))return 'The line passes too close to another Star.';if(cs(a)+p.us
 function pvConfirm(){if(!G||G.over||lock()||pend)return;const p=pvFind();if(!p)return;const a=by(p.a),e=pvErr(p);
 if(e){undo.push(pvTag(JSON.stringify(G)));pvDrop(p);pvSel=null;say('No longer possible: '+e+' Preview cancelled'+(p.c?', '+p.c+' Fuel refunded.':'.'));return render()}
 pvSel=null;
-if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;const hs=hhApply(a,t,p.hh);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n},hs));sfxMe('fleetMove');say('Moved '+p.n+'.'+hhTxt(hs));return render()}
-if(p.k=='c'||p.k=='g'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const b=by(p.b),A0=mvPos(a);tmApply(p.k=='c'?'conn':'gift',a,b);mvRec({k:p.k=='c'?'c':'g',a:A0,b:mvPos(b),c:p.c});sfxMe(p.k=='c'?'connect':'gift');say(p.k=='c'&&b.o==cur()?'Connected for '+p.c+' Fuel.'+elim():p.k=='c'?'Connected to '+NM[b.o]+'\'s Star for '+p.c+'.':'Gave the Star to '+NM[b.o]+' for '+p.c+'.');return render()}
-if(p.k=='h'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;mvRec({k:'h',a:mvPos(a),b:mvPos(t),n:p.n});sfxMe('fleetMove');say('Gave '+p.n+' Fleet'+(p.n>1?'s':'')+' to '+NM[t.o]+'.');return render()}
-if(p.k=='s'){const u=new String(JSON.stringify(G));undo.push(u);G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(n.id);nwAdd(n,a);mvRec({k:'s',a:mvPos(a),b:mvPos(p),c:p.c});sfxMe('starSet');
+if(p.k=='f'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;const hs=hhApply(a,t,p.hh);mvRec(hhRec({k:'f',a:mvPos(a),b:mvPos(t),n:p.n},hs));bxGhost(p,(bxFleet(p.path&&p.path.length>1?p.path:[a.id,t.id],p.n+hs.hn.reduce((m,x)=>m+x,0),{mv:1})||{}).ms);sfxMe('fleetMove');say('Moved '+p.n+'.'+hhTxt(hs));return render()}
+if(p.k=='c'||p.k=='g'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const b=by(p.b),A0=mvPos(a),gp=bxPre(a);tmApply(p.k=='c'?'conn':'gift',a,b);if(p.k=='c')bxGhost(p,bxLine(a,b));else{bxTake(a,gp,[{a:b.id,use:0}],[],null,null,1);bxGhost(p,bxEndOf(f=>f.k=='st'&&f.n==a.id))}mvRec({k:p.k=='c'?'c':'g',a:A0,b:mvPos(b),c:p.c});sfxMe(p.k=='c'?'connect':'gift');say(p.k=='c'&&b.o==cur()?'Connected for '+p.c+' Fuel.'+elim():p.k=='c'?'Connected to '+NM[b.o]+'\'s Star for '+p.c+'.':'Gave the Star to '+NM[b.o]+' for '+p.c+'.');return render()}
+if(p.k=='h'){undo.push(JSON.stringify(G));G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const t=by(p.b);a.f-=p.n;t.f=(t.f||0)+p.n;t.fm=(t.fm||0)+p.n;mvRec({k:'h',a:mvPos(a),b:mvPos(t),n:p.n});bxGhost(p,(bxFleet([a.id,t.id],p.n,{mv:1})||{}).ms);sfxMe('fleetMove');say('Gave '+p.n+' Fleet'+(p.n>1?'s':'')+' to '+NM[t.o]+'.');return render()}
+if(p.k=='s'){const u=new String(JSON.stringify(G));undo.push(u);G.pv=G.pv.filter(q=>q!==p);if(!G.pv.length)delete G.pv;const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(n.id);nwAdd(n,a);mvRec({k:'s',a:mvPos(a),b:mvPos(p),c:p.c});bxStar(a,n);bxGhost(p,bxStarEnd(n.id));sfxMe('starSet');
 // (new, Fleet ask) The Fleets chosen for the preview (fl) go with it, as many as can still move.
-const k=Math.min(p.fl||0,fFree(a));if(k>0)fwMove(a,n,k,u);const m=elim();say('Star set for '+p.c+' Fuel.'+(k>0?' '+k+' Fleet'+(k>1?'s':'')+' moved with it.':'')+m);return render()}
+const k=Math.min(p.fl||0,fFree(a));if(k>0){fwMove(a,n,k,u);bxFleet([a.id,n.id],k,{mv:1,wait:bxStarEnd(n.id)})}const m=elim();say('Star set for '+p.c+' Fuel.'+(k>0?' '+k+' Fleet'+(k>1?'s':'')+' moved with it.':'')+m);return render()}
 pvDrop(p);pend={b:p.b,att:[{a:a.id,use:p.use,c:p.c}],pv:p};resolve(p.use)}
 function pvRestore(p){const L=G.pv||(G.pv=[]);L.push(p);G.ap-=p.c;G.used.push(p.a)}
 // pvLineOK(a,b) = a new line a-b keeps clear of the grey preview Stars (not the line's own ends). pvSpotErr(me) = a new Star at me keeps clear of preview Stars and of the dashed lines.
@@ -624,7 +628,7 @@ function resolve(A){$('ov').style.display='none';
 // b = the target star, D = its defending Fleets, def = the defender's color, nb = retreat spots: the defender's other stars joined to the target by a connection, plus (team game, T3) a living teammate's star joined to it by a Connect link.
 const b=by(pend.b),D=b.f||0,def=b.o,nb=G.conns.filter(q=>q.includes(b.id)).map(q=>by(q[0]==b.id?q[1]:q[0])).filter(x=>(x.o==def||isAlly(x.o,def))&&x!==b);
 // Store on pend: A attackers, nb retreat spot ids, D defenders, dec = the decision for each defending Fleet so far, hold = Holds so far, ph = 1 marks that the defender is mid-decision (other input is blocked).
-defCamK=null;if(A!=null)pend.att[0].use=A;pend.A=pend.att.reduce((t,x)=>t+x.use,0);pend.nb=nb.map(x=>x.id);pend.D=D;pend.dec=[];pend.hold=0;pend.ph=1;
+defCamK=null;if(A!=null)pend.att[0].use=A;pend.A=pend.att.reduce((t,x)=>t+x.use,0);pend.nb=nb.map(x=>x.id);pend.D=D;pend.dec=[];pend.hold=0;pend.ph=1;bxIntro();
 // Start stepping through the defending Fleets (finishes straight away if there are none).
 defNext()}
 // defNext() walks through the defending Fleets one at a time. It decides by itself only when there is no real choice; otherwise it stops and waits for the defender.
@@ -636,21 +640,21 @@ const hOK=pend.hold<pend.A,rOK=pend.nb.length>0;
 // (T3) hX: no attacker is left to pair off, so Hold is normally gone, but every retreat spot is a teammate's star: Hold is still offered and just loses the Fleet ('X'), so the player can choose not to give it away. Never true without teams.
 const hX=!hOK&&rOK&&pend.nb.every(id=>by(id).o!=by(pend.b).o);
 // Neither option exists: this Fleet is destroyed ('X').
-if(!hOK&&!rOK){pend.dec.push('X');continue}
+if(!hOK&&!rOK){defPush('X');continue}
 // Only Hold exists: it is forced ('H') and destroys one attacker.
-if(hOK&&!rOK){pend.dec.push('H');pend.hold++;continue}
+if(hOK&&!rOK){defPush('H');pend.hold++;continue}
 // A real choice: remember whether Hold is allowed, ring the retreat spots, show the Hold button only if allowed, and put the instruction in the bottom message area.
 // (new) Online: def = the defender's color; rem = that player is on another device, so the question is sent there and this device waits.
 pend.hOK=hOK;pend.hX=hX;pend.def=by(pend.b).o;
 // (new) A computer defender on this device chooses Hold or Retreat at once.
-if(cpuHere(pend.def)){const v=cpuPick({nb:pend.nb,hOK,lvl:cpuEff(G.cpu[pend.def]),b:pend.b});if(v==='H'){pend.dec.push('H');pend.hold++}else pend.dec.push(v);continue}
+if(cpuHere(pend.def)){const v=cpuPick({nb:pend.nb,hOK,lvl:cpuEff(G.cpu[pend.def]),b:pend.b});if(v==='H'){defPush('H');pend.hold++}else defPush(v);continue}
 // (2026-10-28-c, Shmorden) A person with no Hold and exactly one Retreat spot has no choice: the Fleet goes there by itself (computers keep their own pick above, so their play is unchanged).
-if(!hOK&&!hX&&pend.nb.length==1){pend.dec.push(pend.nb[0]);continue}
+if(!hOK&&!hX&&pend.nb.length==1){defPush(pend.nb[0]);continue}
 // (2026-10-28-c) The choice is a question at the bottom of the screen (defDlg: Hold / Retreat); the bar's Hold button is no longer used. Tapping a ringed Star (Retreat) or the attacked Star (Hold) still works.
 pend.rem=net.on&&!net.my.includes(pend.def);if(!pend.rem&&!pend.bz){pend.bz=1;buzz([120,70,120]);sfx('defCall')}hl=pend.nb;$('hold').style.display='';
 say(pend.rem?netWaitMsg():NM[by(pend.b).o]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(hOK,hX));
 // Redraw (to show the rings), ask (defDlg) and wait for an answer or a tap.
-render();return defDlg()}
+render();return bxWait(defDlg)}
 // Every Fleet has a decision, so apply the whole attack at once.
 fin()}
 // holdTxt(hOK,hX) = the end of the Defence call message. (T3) holdGive = the Retreat onto a teammate's star asks 'Give 1 Fleet to Blue?' first (Yes sends the Fleet, No goes back to the choice).
@@ -665,9 +669,11 @@ function defTap(t,ok){if(t&&t.id==pend.b&&(pend.hOK||pend.hX))return defHold();
 if(!t||!pend.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(pend.hOK,pend.hX));
 if(!ok&&t.o!=pend.def)return holdAsk(t);
 // Record this Fleet's destination (the star id) and move on to the next Fleet.
-pend.dec.push(t.id);defNext()}
+defPush(t.id);defNext()}
 // defHold() is the Hold button: only valid mid-decision and only when Hold is allowed. It records a Hold and moves on.
-function defHold(){if(pend&&pend.ph&&(pend.hOK||pend.hX)){if(pend.hOK){pend.dec.push('H');pend.hold++}else pend.dec.push('X');defNext()}}
+function defHold(){if(pend&&pend.ph&&(pend.hOK||pend.hX)){if(pend.hOK){defPush('H');pend.hold++}else defPush('X');defNext()}}
+// defPush(v) records one defending Fleet's answer (a Star id = Retreat there, 'H' = Hold, 'X' = lost) and starts its animation (bxDec: the Retreat slide, or Fleet destroyed).
+function defPush(v){pend.dec.push(v);bxDec(v)}
 // ----- (2026-10-28-c, Shmorden) The Defence call question -----
 // defQ() = the Defence call waiting for an answer on THIS device, or null: {def, b: attacked Star, att: attacking Stars, nb: Retreat spots, hold: Hold is offered, hx: Hold only loses the Fleet, i, D: which Fleet of how many}. Local (pend, not answered from another device) or online (net.rq, not yet sent).
 function defQ(){if(pend&&pend.ph&&!pend.rem&&pend.dec.length<pend.D)return {def:pend.def,b:pend.b,att:pend.att.map(x=>x.a),nb:pend.nb,hold:!!(pend.hOK||pend.hX),hx:!pend.hOK&&!!pend.hX,i:pend.dec.length+1,D:pend.D,loc:1};
@@ -686,7 +692,7 @@ function defLive(){const q=pend&&pend.ph?{b:pend.b,a:pend.att.map(x=>x.a),u:pend
 const d={},add=(id,n)=>{d[id]=(d[id]||0)+n};add(q.b,-q.dec.length);let h=0;q.dec.forEach(v=>{if(v==='H')h++;else if(typeof v=='number')add(v,1)});
 q.a.forEach((id,i)=>{const k=Math.min(h,q.u[i]||0);if(k){add(id,-k);h-=k}});return d}
 // fin() applies the finished attack in one go (one attacker or several): settle every defending Fleet from pend.dec, capture the star, draw a connection from each attacker, spend the total Fuel.
-function fin(){const {b:bi,att,A,dec}=pend,b=by(bi),D=b.f||0,c=att.reduce((t,x)=>t+x.c,0);
+function fin(){const fp=pend,{b:bi,att,A,dec,pv:fpv}=pend,b=by(bi),D=b.f||0,c=att.reduce((t,x)=>t+x.c,0);
 // Clear the rings and hide the Hold button, remember the current player me, end the pending state, and save ONE undo snapshot so a single Undo reverses the whole attack.
 defClose();hl=[];$('hold').style.display='';const me=cur(),dfc=b.o;pend=null;undo.push(JSON.stringify(G));
 // Count outcomes: holds (each destroys one attacker from the combined pool), lost (no option left), rets (destination star ids of retreating Fleets); surv = committed Fleets that survive.
@@ -696,11 +702,11 @@ rets.forEach(id=>{const d=by(id);d.f=(d.f||0)+1});
 // Every attacker: take its committed Fleets off (unmoved first, so fm shrinks only if more are used than were unmoved) and mark it used, since it made a move.
 att.forEach(x=>{const a=by(x.a),free=(a.f||0)-(a.fm||0);a.fm=(a.fm||0)-Math.max(0,x.use-free);a.f=(a.f||0)-x.use;G.used.push(a.id)});
 // The capture: erase the target's connections, change its owner, set the survivors on it (marked moved), draw a connection from EACH attacker, mark the target used, spend the total Fuel, clear selection and multi-attack. (changed) A finished multi-attack also deselects Multi (back to nothing selected).
-G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;b.fa=surv;att.forEach(x=>G.conns.push([x.a,b.id]));G.used.push(b.id);G.ap-=c;sel=null;multi=null;if(mode=='x')mode='';
+const bp=bxPre(b);G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=surv;b.fm=surv;b.fa=surv;att.forEach(x=>G.conns.push([x.a,b.id]));G.used.push(b.id);G.ap-=c;sel=null;multi=null;if(mode=='x')mode='';
 // (2026-10-28-b) rt = where each retreating Fleet went (a Star's point, in the order chosen), so a transcript can rebuild the board.
 mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost],rt:rets.map(id=>mvPos(by(id)))});
 // (Sound effects) Take a Star (Multi-attack for several attackers) for the attacker, or Lose a Star when it happens to a person here and the attacker is not; then Fleet destroyed and Fleet retreat, a moment later so they don't pile up.
-if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me);if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);
+if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me);if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);bxTake(b,bp,att,dec,fpv,fp);
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+c+' Fuel.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
 // ===== Team mode: data model and helpers (team project step 2) =====
@@ -758,7 +764,7 @@ const e=tmErr(a,b,kind);if(e){say(e);return render()}
 const c=cost(a,b),to=b.o;
 // (T3) With Move preview on, the transfer is first a dashed preview (Fuel paid, Star marked used); Confirm applies it (pvConfirm).
 if(pvOn())return pvAdd({k:kind=='conn'?'c':'g',a:a.id,b:b.id,c},(kind=='conn'?'Connect':'Gift')+' preview for '+c+' Fuel. Confirm or Cancel.');
-undo.push(JSON.stringify(G));const A0=mvPos(a);tmApply(kind,a,b);G.ap-=c;if(kind=='conn')G.used.push(a.id);mvRec({k:kind=='conn'?'c':'g',a:A0,b:mvPos(b),c});sfxMe(kind=='conn'?'connect':'gift');sel=null;say(kind=='conn'?'Connected to '+NM[to]+'\'s Star for '+c+'.':'Gave the Star to '+NM[to]+' for '+c+'.');render()}
+undo.push(JSON.stringify(G));const A0=mvPos(a),gp=bxPre(a);tmApply(kind,a,b);if(kind=='conn')bxLine(a,b);else bxTake(a,gp,[{a:b.id,use:0}],[],null,null,1);G.ap-=c;if(kind=='conn')G.used.push(a.id);mvRec({k:kind=='conn'?'c':'g',a:A0,b:mvPos(b),c});sfxMe(kind=='conn'?'connect':'gift');sel=null;say(kind=='conn'?'Connected to '+NM[to]+'\'s Star for '+c+'.':'Gave the Star to '+NM[to]+' for '+c+'.');render()}
 // tmApply(kind,a,b) = the board change of a Connect or a Gift of own star a to teammate star b (Fuel and the used list are handled by the caller, since a preview pays them earlier). Connect: link a-b. Gift: erase a's connections, change its owner, mark its Fleets moved, draw one link b-a.
 function tmApply(kind,a,b){if(kind=='conn'){G.conns.push([a.id,b.id]);return}
 G.conns=G.conns.filter(q=>q[0]!=a.id&&q[1]!=a.id);a.o=b.o;a.fm=a.f||0;G.conns.push([b.id,a.id])}
@@ -772,7 +778,7 @@ function fgNo(){fg=null;$('ov').style.display='none';resetFlow();say('');render(
 function fgDo(){if(lock())return;const f=fg;fg=null;$('ov').style.display='none';if(!f||!G||G.over)return;const a=by(f.a),t=by(f.t),e=fgErr(a,t,f.n);
 if(e){resetFlow();say(e);return render()}
 if(pvOn())return pvAdd({k:'h',a:a.id,b:t.id,n:f.n,c:0},'Fleet gift preview: '+f.n+' Fleet'+(f.n>1?'s':'')+'. Confirm or Cancel.');
-undo.push(JSON.stringify(G));a.f-=f.n;t.f=(t.f||0)+f.n;t.fm=(t.fm||0)+f.n;mvRec({k:'h',a:mvPos(a),b:mvPos(t),n:f.n});sfxMe('fleetMove');resetFlow();say('Gave '+f.n+' Fleet'+(f.n>1?'s':'')+' to '+NM[t.o]+'.');render()}
+undo.push(JSON.stringify(G));a.f-=f.n;t.f=(t.f||0)+f.n;t.fm=(t.fm||0)+f.n;mvRec({k:'h',a:mvPos(a),b:mvPos(t),n:f.n});bxFleet([a.id,t.id],f.n,{mv:1});sfxMe('fleetMove');resetFlow();say('Gave '+f.n+' Fleet'+(f.n>1?'s':'')+' to '+NM[t.o]+'.');render()}
 // deficit(vp): al = alive players; t = the distinct scores sorted low to high.
 // (step 6) giftMsg(g) = the words for the stars an elimination passed to teammates (g = kill's result for one or more players), e.g. ' 2 Stars passed to Blue.'; empty without gifts.
 function giftMsg(g){const n={};(g||[]).forEach(x=>{n[x.to]=(n[x.to]||0)+1});return Object.keys(n).map(t=>' '+n[t]+' Star'+(n[t]>1?'s':'')+' passed to '+NM[t]+'.').join('')}
@@ -840,7 +846,7 @@ function finish(){const {vp}=calc();G.score=vp;G.over=winners(vp);sfx('over',600
 const END_HOLD=2000;
 function overLater(){const g=G,lz=G.pl.some(c=>!G.alive[c]&&G.out&&G.out[c]&&G.out[c].w=='z'&&G.out[c].r==G.round);if(!lz)return overDlg(1);setTimeout(()=>{if(G===g&&G.over)overDlg(1)},END_HOLD)}
 // dfEnd() = the game just ended because the round-end Deficit Elimination left one side (G.dk is from this round and has connections to erase), with animations on: play the round screen and the animation (roundPop fin), which then open the end screen. Says whether it did.
-function dfEnd(){if(!G||!G.over||calm()||!G.dk||G.dk.r!=G.round||!(G.dk.L||[]).length)return false;roundPop(true);return true}
+function dfEnd(){if(!G||!G.over||calmRaw()||!G.dk||G.dk.r!=G.round||!(G.dk.L||[]).length)return false;roundPop(true);return true}
 // (new) overDlg() shows the end-of-game dialog (winner and final scores; step 6: or the team result). It is its own function so online players who only RECEIVE the final position can show it too.
 let overHidden=false;
 // (new) overDlg() also clears overHidden (the end screen is showing). Hide closes it but keeps the finished board visible; the Menu button and the End game button (the End turn button relabelled) bring it back (see overHide, saveUI, the End turn handler and render).
@@ -959,6 +965,8 @@ if(G.round>30&&clearWin(top))sub+='<p style="margin:0 0 8px">Decided in '+rdName
 ov('<h1>'+head+'</h1>'+sub+'<div class="erl">'+body+'</div>'+btn);if(anim)endSeq()}
 // tap(bx,by,np) runs when the board is tapped, in board units (np = a drag was dropped on a Star here: don't pick a move preview, carry on with the selected Star). cx,cy = the system column and row. Do nothing without a game or after it ends.
 function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
+// (board animations) While a Fleet group slides to the next Star a Hitchhike? question asks about, the board ignores taps until the question opens.
+  if(hhS&&$('ov').style.display!='flex')return;
 // (new) While a computer player has the turn, taps do nothing, except a person answering the computer's attack with a Hold/Retreat choice (on this device, or sent here from the host when playing online).
   if(cpuOf(cur())&&!cpuRun&&!(pend&&pend.ph)&&!(net.rq&&!net.rq.sent))return say('The computer is playing.');
 // (new) Online: when it is not my turn, a tap only matters if a Hold/Retreat question is waiting for me.
@@ -966,6 +974,7 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
 // (new) Online: while a remote defender is deciding, my own taps do nothing.
   if(pend&&pend.ph&&pend.rem)return say(netWaitMsg());
 // (new) While the defender is choosing Hold or Retreat, every board tap goes to defTap instead (a tap outside the board counts as no star).
+  if(pend&&pend.ph&&bxTk&&bxTk.p===pend&&performance.now()<bxTk.ie)return;
   if(pend&&pend.ph)return defTap(cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null);
 // (new) idle = the mode has nothing in progress: Place, Move with no group chosen, Set with no Star selected, Multi with no target. A tap outside the board then leaves the mode (back to nothing selected); otherwise it only clears the selection, as before.
   const idle=mode=='p'||(mode=='m'&&!flow)||(mode=='s'&&sel==null)||(mode=='x'&&(!multi||multi.t==null));
@@ -985,7 +994,7 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
   // (2026-10-27-j) With a Star selected the tap aims, and aims at the system tapped (whatever is in it), never at a Fleet badge reaching in from a neighbor.
   // (new 2026-10-29-d) Sector rule (secNear): in Place, a tap on an empty system places on the nearest Star in its Sector that can take a Fleet.
   let t=((mode=='m'||(onB&&!(mode=='s'&&sel!=null)))&&fb)||sysStar(cx,cy);if(mode=='p'){if(G.pool>0&&t&&placeable().includes(t))return placeF(t);if(!t&&G.pool>0){const q=secNear(cx,cy,bx,by,placeable());if(q)return placeF(q)}placeF(t);if(t&&t.o==me)return render();return modeOff(1)}
-  if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}const u=undo.length;moveF(t);if(!flow&&undo.length==u&&$('ov').style.display!='flex')modeOff(1);return}
+  if(mode=='m'){if(!flow){const pp=pvAt(cx,cy,t,bx,by,1);if(pp)return pvSelect(pp);if(pvSel!=null){pvSel=null;pvUi()}}const u=undo.length;moveF(t);if(!flow&&!hhS&&undo.length==u&&$('ov').style.display!='flex')modeOff(1);return}
   // (new) Multi mode has its own tap handler. (new) An empty system before a target is chosen leaves Multi.
   // (changed) An empty system leaves Multi even with a target chosen (Shmorden, 2026-10-27).
   if(mode=='x'){if(!t)return multi&&multi.t!=null?multiCancel():modeOff();return multiF(t)}
@@ -1032,7 +1041,7 @@ const cb=str(b),fr=a.f||0,m=Math.max(0,cb+1-cs(a));if(str(a)<=cb)return sndNo(),
  if(pvOn())return pvAdd({k:'c',a:a.id,b:b.id,c},'Preview: connection for '+c+' Fuel. Confirm or Cancel, or pick another Star.');
  undo.push(JSON.stringify(G));
 // Connect: add a connection between the two stars, mark the origin used, spend the Fuel, clear selection, check eliminations, show a message, redraw.
- G.conns.push([a.id,b.id]);G.used.push(a.id);
+ G.conns.push([a.id,b.id]);G.used.push(a.id);bxLine(a,b);
  G.ap-=c;sel=null;mvRec({k:'c',a:mvPos(a),b:mvPos(b),c});sfxMe('connect');const m=elim();say('Connected for '+c+' Fuel.'+m);render()}
 // (new) Turn-ending rules. endBlock() says why the current player may NOT end the turn yet (empty text = they may): (1) every Fuel must be used, unless no Star that has not yet acted can make any move with the Fuel left; (2) every Fleet must be placed, unless the Capital is lost (then placeable() is empty). Fuel is asked about first (Shmorden, 2026-10-25). Doing nothing is never better than a legal move, so it is not offered.
 function endBlock(){if(!G||G.over)return '';
@@ -1093,7 +1102,7 @@ return out}
 let specGid=null;
 // (new) roundPop(fin): fin = the game has just ended in a Deficit Elimination (dfEnd): the screen is about the round that just ended (E = G.round; otherwise E = G.round - 1, the round before the new one), its lines go from this round's order (rpOld) to the final ranking, it has no Fuel line and no buttons, and when the animation is over the end screen opens instead of the round starting (dfAfter).
 let rpOld=null;
-function roundPop(fin){const E=fin?G.round:G.round-1;rpOld=fin?(G.po||G.order).slice():null;
+function roundPop(fin){const E=fin?G.round:G.round-1;rpOld=fin?(G.po||G.order).slice():null;rpDf=!!G.dk&&G.dk.r==E&&Array.isArray(G.dk.L)&&G.dk.L.length>0&&!calmRaw();
 // (new) In a game of computers only there is nobody to tap the popup, so the next round just begins. (fixed) Once every person in the game is out (Deficit, eliminated or conceded) the popup still shows, with End game and Spectate (cw); before, it was skipped as if nobody were playing. After Spectate (specGid = this game's id, this device only) it is skipped again, as in a game of computers only.
 // (new) While spectating, and in a game of computers only, a Deficit Elimination still plays its animation on the board alone (dfSpec); at the end of the game the end screen follows it.
 const cw=allCpu(),nobody=!G.pl.some(c=>!(G.cpu&&G.cpu[c]))||specGid===G.gid;if(fin&&nobody){dfSpec(E,()=>overDlg(1));return}if(!fin&&cw&&nobody){dfSpec(E);return}
@@ -1113,12 +1122,12 @@ ov(`${fin?'<h1>'+rdName(G.round)+'</h1>':ot?'<h1>Perfect Tie!</h1><p style="colo
 // A tap anywhere (the backdrop or the box) dismisses it; (new) while the reveal plays, the first tap only jumps it to the end. rpOn = the round popup is showing (the board's zoom in waits for it, see camTurn).
 // (new) dfPrep() readies the Deficit Elimination animation before the reveal starts; while it plays (dfOn) taps do nothing (holding skips, see dfRun).
 // (new) fin: the end screen comes after the animation (dfAfter), or at once if there is nothing to animate; a tap never just closes it without the end screen.
-dfPrep(E);if(fin){if(!dfG)return overDlg(1);dfAfter=()=>{closeRound();overDlg(1)}}
+dfPrep(E);if(!dfG)rpDf=false;if(fin){if(!dfG)return overDlg(1);dfAfter=()=>{closeRound();overDlg(1)}}
 $('ov').onclick=e=>{if(e&&e.target&&!e.target.isConnected)return;if(e&&dfOn)return;if(e&&seqSkip())return;closeRound(e);if(fin&&G&&G.over)overDlg(1)};rpOn=true;rpSeq()}
 // closeRound() hides the popup and removes its tap handler so other dialogs are not affected.
 // (fixed) The click that OPENS the popup (a button inside another dialog, which was just replaced) bubbles up to the popup's own tap handler and used to close it instantly. A click whose target is no longer on the page is therefore ignored.
 // (new) It also ends a reveal that is still playing, and starts the board's zoom in on the first player if it was waiting for the popup (camWait).
-function closeRound(e){if(e&&e.target&&!e.target.isConnected)return;seqSkip();dfStop();rpOn=false;$('ov').style.display='none';$('ov').onclick=null;if(camWait)camIn()}
+function closeRound(e){if(e&&e.target&&!e.target.isConnected)return;seqSkip();dfStop();rpDf=false;rpOn=false;$('ov').style.display='none';$('ov').onclick=null;if(camWait)camIn()}
 // endTurn() ends the current turn. em holds an extra message. Clear selection, undo history and used stars.
 function endTurn(){if(!G||G.over)return;
 // (new) A turn is being committed: record the board as it stands now (not when this call comes from a concession; that records its own snapshot).
@@ -1154,25 +1163,27 @@ function boardSVG(S,ctl,L){let s='';
  const by=id=>S.stars.find(q=>q.id==id);
 // Draw each connection as a colored line between its two stars. (step 7) (step 7d) Every link is one line in the color of its FIRST end, i.e. the player who made it; a link between teammates gets no stripe or gradient.
  // (new, drag and drop) L.dd = the Star or Star preview being dragged ({id} or {i}): it and its line are drawn by the drag overlay (ddSVG) instead.
- S.conns.forEach(([p,q])=>{if(L&&L.dd&&L.dd.id!=null&&(p===L.dd.id||q===L.dd.id))return;const a=by(p),b=by(q);s+=`<line x1=\"${a.x}\" y1=\"${a.y}\" x2=\"${b.x}\" y2=\"${b.y}\" stroke=\"${COL[a.o]}\" stroke-width=\"${LINE_W}\" stroke-linecap=\"round\"/>`});
+ // (new, board animations) L.bx = what the animations leave out (bxHide): Connections and Stars being set, Star previews being set, and Fleets on their way.
+ S.conns.forEach(([p,q])=>{if(L&&L.dd&&L.dd.id!=null&&(p===L.dd.id||q===L.dd.id))return;if(L&&L.bx&&(L.bx.s.has(p+'-'+q)||L.bx.s.has(q+'-'+p)))return;const a=by(p),b=by(q);s+=`<line x1=\"${a.x}\" y1=\"${a.y}\" x2=\"${b.x}\" y2=\"${b.y}\" stroke=\"${COL[a.o]}\" stroke-width=\"${LINE_W}\" stroke-linecap=\"round\"/>`});
  // (new) Deficit Elimination animation (live board only): the eliminated players' connections still on show (dgSVG), under the Stars. The group is always there so dfPrep and dfRun can fill it without a full redraw.
- if(L)s+='<g id="dgh">'+dgSVG()+'</g>';
+ if(L)s+='<g id="dgh">'+dgSVG()+'</g><g id="bxl">'+bxSVG(false)+'</g>';
  // (new, drag and drop) L.ddf = the path of a dragged Fleet group while "Move how many Fleets?" waits, drawn like a Fleet move preview.
  // (new, hitchhiking) L.hk = the Hitchhike? question (hhS): its group's path is drawn the same way.
  if(L&&(L.ddf||L.hk)){const ps=(L.ddf||L.hk.path).map(by).filter(Boolean);if(ps.length>1)s+=`<polyline points="${ps.map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`}
  // (new) Multi-attack preview: a dashed line from each chosen attacker to the target (they turn solid when the attack lands).
  if(L&&L.multi&&L.multi.t!=null)L.multi.att.forEach(x=>{const a=by(x.id),b=by(L.multi.t);s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round"/>`});
 // For each star: op = opacity (dimmed if it already acted this turn), f = the shared style text.
- S.stars.forEach(q=>{if(L&&L.dd&&q.id===L.dd.id)return;const op=L&&q.o==L.me&&L.used.includes(q.id)?.5:1,f=`fill="${COL[q.o]}" stroke="var(--ink)" stroke-width="${R_STROKE}" opacity="${op}"`;
+ S.stars.forEach(q=>{if(L&&L.dd&&q.id===L.dd.id)return;if(L&&L.bx&&L.bx.s.has(q.id))return;const op=L&&q.o==L.me&&L.used.includes(q.id)?.5:1,f=`fill="${COL[L&&L.bx&&L.bx.c[q.id]!=null?L.bx.c[q.id]:q.o]}" stroke="var(--ink)" stroke-width="${R_STROKE}" opacity="${op}"`;
 // Capitals are drawn as a star shape, normal stars as circles.
   s+=q.cap?`<polygon points="${sp(q.x,q.y,R_CAP,R_CAP_IN)}" ${f}/>`:`<circle cx="${q.x}" cy="${q.y}" r="${R_STAR}" ${f}/>`;
 // If the star holds Fleets, draw a small badge showing the number. (new) L.fd = changes shown during a Defence call (defLive).
   // (new) Fleet badge styles (live board only): spent (half strength, like a spent Star) when Fleets arrived by an attack this turn or a Fleet move is previewed onto the Star; dashed border when Fleets here already moved this turn. A previewed move also shows the new Fleet counts.
   // (new, hitchhiking) A previewed move's riders (p.hh) leave their Stars and show at the destination too. While the Hitchhike? question is open (L.hk) the group and the riders chosen so far show at the destination, and the Fleets being asked about get a dashed circle.
-  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;const K=L&&L.hk,hs=a=>a.reduce((m,h)=>m+h[1],0);if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}if(p.hh){p.hh.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(p.b==q.id)fl+=hs(p.hh)}})}
+  {let fl=(q.f||0)+(L&&L.fd&&L.fd[q.id]||0),spent=false,dash=false;const K=L&&L.hk,hs=a=>a.reduce((m,h)=>m+h[1],0);if(L){spent=Math.min(q.fa||0,fl)>0;dash=Math.min(q.fm||0,fl)>0;if(L.bx&&L.bx.c[q.id]!=null){spent=false;dash=false}(S.pv||[]).forEach(p=>{if(p.k!='f'&&p.k!='h')return;if(p.a==q.id)fl-=p.n;if(p.b==q.id){fl+=p.n;spent=true}if(p.hh){p.hh.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(p.b==q.id)fl+=hs(p.hh)}})}
+  if(L&&L.bx&&L.bx.f[q.id])fl-=L.bx.f[q.id];
   if(K){if(K.a==q.id)fl-=K.n;K.pk.forEach(h=>{if(h[0]==q.id)fl-=h[1]});if(K.b==q.id){fl+=K.n+hs(K.pk);spent=true}}
   if(K&&K.c[K.i]&&K.c[K.i].id==q.id)s+=`<circle cx="${q.x+BADGE.dx+BADGE.w/2}" cy="${q.y+BADGE.dy+BADGE.h/2}" r=".42" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".14 .09"/>`;
-  if(fl>0)s+=`<g opacity="${spent?.5:1}"><rect x="${q.x+BADGE.dx}" y="${q.y+BADGE.dy}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${COL[q.o]}" stroke="${dash?COL[q.o]:'var(--ink)'}" stroke-width=".04"${dash?' stroke-dasharray=".07 .05"':''}/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${fl}</text></g>`}
+  const bc=COL[L&&L.bx&&L.bx.c[q.id]!=null?L.bx.c[q.id]:q.o];if(fl>0)s+=`<g opacity="${spent?.5:1}"><rect x="${q.x+BADGE.dx}" y="${q.y+BADGE.dy}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${bc}" stroke="${dash?bc:'var(--ink)'}" stroke-width=".04"${dash?' stroke-dasharray=".07 .05"':''}/><text x="${q.x+.38}" y=".0" transform="translate(0 ${q.y+.3})" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${fl}</text></g>`}
 // (crafter, 2026-10-28-d) The Star's ID: its sector and system (A1b2), above it, shown with the IDs button.
   
 // Draw the strength number (visible only when zoomed in).
@@ -1189,13 +1200,14 @@ function boardSVG(S,ctl,L){let s='';
 // If it is the selected star, draw a dashed ring.
   if(L&&q.id==L.sel)s+=`<circle cx="${q.x}" cy="${q.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".18 .12"/>`});
 // (new) Move previews: a dashed line in the player's color from the origin to the new spot (with a ghost Star in the player's color at half strength, full-strength dashed border) or to the target of a capture; the selected one gets a dashed ring.
- if(L&&S.pv)S.pv.forEach(p=>{const a=by(p.a);if(!a||(L.dd&&p.i===L.dd.i))return;let ex,ey;if(p.k=='s'){ex=p.x;ey=p.y}else{const b=by(p.b);if(!b)return;ex=b.x;ey=b.y}const col=COL[a.o];
+ if(L&&S.pv)S.pv.forEach(p=>{const a=by(p.a);if(!a||(L.dd&&p.i===L.dd.i)||(L.bx&&L.bx.pv.has(p)))return;let ex,ey;if(p.k=='s'){ex=p.x;ey=p.y}else{const b=by(p.b);if(!b)return;ex=b.x;ey=b.y}const col=COL[a.o];
   s+=p.k=='f'?`<polyline points="${(p.path||[]).map(i=>by(i)).filter(Boolean).map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`:`<line x1="${a.x}" y1="${a.y}" x2="${ex}" y2="${ey}" stroke="${col}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/>`;
   if(p.k=='s')s+=`<circle cx="${ex}" cy="${ey}" r="${R_STAR}" fill="${col}" fill-opacity=".5" stroke="${col}" stroke-width="${R_STROKE}" stroke-dasharray=".08 .06"/>`;
   if(p.i==L.pvSel)s+=`<circle cx="${ex}" cy="${ey}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/><circle cx="${a.x}" cy="${a.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09"/>`});
 // (new) While a defender chooses Hold or Retreat (and, since 2026-10-27-g, while the attacker chooses how many Fleets to use in a single attack): a dashed line in the attacker's color from each attacker to the target, a solid ring on each attacker, a dashed ring on the target (also shown when the attacker is a computer, and on the defender's own device online).
- if(L&&L.atk&&Array.isArray(L.atk.att)){const tg=by(L.atk.b);if(tg){L.atk.att.forEach(id=>{const a=by(id);if(!a)return;s+=`<line x1="${a.x}" y1="${a.y}" x2="${tg.x}" y2="${tg.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/><circle cx="${a.x}" cy="${a.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09"/>`});s+=`<circle cx="${tg.x}" cy="${tg.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`}}
+ if(L&&L.atk&&Array.isArray(L.atk.att)){const tg=by(L.atk.b);if(tg){L.atk.att.forEach(id=>{const a=by(id);if(!a)return;if(!(L.bx&&L.bx.tk))s+=`<line x1="${a.x}" y1="${a.y}" x2="${tg.x}" y2="${tg.y}" stroke="${COL[a.o]}" stroke-width="${LINE_W}" stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"/><circle cx="${a.x}" cy="${a.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09"/>`});s+=`<circle cx="${tg.x}" cy="${tg.y}" r=".5" fill="none" stroke="var(--ink)" stroke-width=".09" stroke-dasharray=".2 .12"/>`}}
 // (new, drag and drop) The drag overlay goes on top of everything; ddPaint refills #ddg on each finger move without redrawing the board.
+ if(L)s+='<g id="bxt">'+bxSVG(true)+'</g>';
  if(L&&L.dd)s+='<g id="ddg">'+ddSVG()+'</g>';
 // Put all the shapes into the page, then highlight the active mode button and update the Place label.
  return s}
@@ -1222,7 +1234,7 @@ function render(){if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;autoMode();
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
 const da=dg&&ddStar(dg.k)&&by(dg.a);
-W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:dg&&by(dg.a)?{id:dg.id,i:dg.i}:null,ddf:ddFl,hk:hhS,hb:Date.now()-hlBl<1600?Date.now()-hlBl:null,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&(pend.ph||!multi))?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[]});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
+W.innerHTML=boardSVG(G,ctl,{me,used:G.used,sel,multi,hl,pvSel,dd:dg&&by(dg.a)?{id:dg.id,i:dg.i}:null,ddf:ddFl,hk:hhS,hb:Date.now()-hlBl<1600?Date.now()-hlBl:null,rng:da?(rngOn?{x:Math.floor(da.x),y:Math.floor(da.y),n:dg.n}:null):rs&&fl>0?{x:Math.floor(rs.x),y:Math.floor(rs.y),n:fl}:null,hint:hint?{ids:hint.ids,age:Date.now()-hint.t}:null,atk:(pend&&(pend.ph||!multi))?{att:pend.att.map(x=>x.a),b:pend.b}:(net.on&&net.rq&&Array.isArray(net.rq.att))?{att:net.rq.att,b:net.rq.b}:null,fd:defLive(),fr:(mode=='m'&&flow&&by(flow.src))?[...cpuReach(by(flow.src),flow.n).keys()].filter(id=>id!=flow.src):[],bx:bx.length?bxHide():null});uiMulti();pvUi();$('en').textContent=G.over&&overHidden?'End game':'End turn';modesUi(me);
 // Fill the info row: player name, round (and online status); Fuel left goes to the gauge (fuelUi).
  $('inft').innerHTML=`<b style="color:${COL[me]}">${NM[me]}</b>${teamsOn()?'<span style="color:var(--mut)">Team '+teamOf(me)+'</span>':''}<span>${G.round<=30?'Round '+G.round+' of 30':rdName(G.round)}</span>${net.on?`<span class="onl" style="color:var(--mut)">You: ${net.my.map(c=>NM[c]).join(', ')||'...'}${net.status?' · '+esc(net.status):''}</span>`:''}`;fuelUi(da&&dg.e?Math.max(0,dg.n-dg.e.c):fl);
 // Fill the score chips: one per player with VP and star count.
@@ -1234,7 +1246,7 @@ $('tvp').innerHTML=teamLine(vp);
 // (new) modeOff(keep) leaves the current mode: clears any half-finished flow and goes back to nothing selected (the two-button row). keep = leave the bottom message as it is (it says why the tap did nothing).
 function modeOff(keep){resetFlow();mode='';if(!keep)say('');render()}
 // (new) modesUi(me) draws the mode row. At rest (nothing selected) it shows two buttons, Star and Fleets N (the Fleets left to place; "Fleets #", Shmorden 2026-10-27). Selecting a mode opens its pair: Star becomes Set and Multi slides down below it; Fleet becomes Place (with the Fleets left to place) and Move slides down below it. A computer's turn shows the row at rest, so the buttons don't slide open and shut with each computer move; so does a finished game.
-function modesUi(me){const m=cpuOf(me)||G.over?'':mode,oS=m=='s'||m=='x',oF=m=='p'||m=='m',R=$('modes');R.classList.toggle('calm',animMode=='off');
+function modesUi(me){const m=cpuOf(me)||G.over?'':mode,oS=m=='s'||m=='x',oF=m=='p'||m=='m',R=$('modes');R.classList.toggle('calm',animEff()=='off');
 R.querySelectorAll('[data-m]').forEach(b=>{const k=b.dataset.m;b.classList.toggle('act',k==m);if(k=='s')b.textContent=oS?'Set':'Star';if(k=='p')b.textContent=oF?'Place '+(G.pool||0):'Fleets '+(G.pool||0);if(k=='x'||k=='m'){const sh=k=='x'?!oS:!oF;b.classList.toggle('shut',sh);b.tabIndex=sh?-1:0}})}
 // apply() applies the current pan and zoom to the drawing and records the zoom level for CSS.
 // (changed) apply() now batches updates to one per screen frame in touch mode (smoother on iPhone); applyNow() does the real work.
@@ -1868,14 +1880,14 @@ const fwAuto=a=>faAuto()?fFree(a):0;
 // fwMove(a,n,k,u) moves k Fleets from Star a to Star n (just set from it, so one Connection away) as a Fleet move: they count as moved this turn, and the move log gets a Fleet move record. u = the Undo entry of the Star's setting when both happen in one step: marked m2, so one Undo takes back both log records.
 function fwMove(a,n,k,u){const b=JSON.parse(JSON.stringify(G));a.f-=k;n.f=(n.f||0)+k;n.fm=(n.fm||0)+k;mvRec({k:'f',a:mvPos(a),b:mvPos(n),n:k},b);if(u)u.m2=1}
 // starSet(a,p,c,txt) sets a new Star at p from Star a for c Fuel, as every placement did before (one Undo entry, the Connection, both Stars used, Fuel paid, remembered as set this turn, logged), with the Fleets that go along (fwAuto) moving in the same step. With 'ask' and Fleets on a that can still move, it then asks how many go (fwAsk). txt = the start of the message.
-function starSet(a,p,c,txt){const u=new String(JSON.stringify(G));undo.push(u);const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id);G.ap-=c;nwAdd(n,a);sel=null;mvRec({k:'s',a:mvPos(a),b:mvPos(p),c});sfxMe('starSet');
-const k=fwAuto(a);if(k>0)fwMove(a,n,k,u);const m=elim();say(txt+' for '+c+' Fuel.'+(k>0?' '+k+' Fleet'+(k>1?'s':'')+' moved with it.':'')+m);render();if(fask()=='ask'&&fFree(a)>0&&!G.over)fwAsk(a.id,n.id,null)}
+function starSet(a,p,c,txt){const u=new String(JSON.stringify(G));undo.push(u);const n={id:G.nid++,x:p.x,y:p.y,o:cur()};G.stars.push(n);G.conns.push([a.id,n.id]);G.used.push(a.id,n.id);G.ap-=c;nwAdd(n,a);sel=null;mvRec({k:'s',a:mvPos(a),b:mvPos(p),c});bxStar(a,n);sfxMe('starSet');
+const k=fwAuto(a);if(k>0){fwMove(a,n,k,u);bxFleet([a.id,n.id],k,{mv:1,wait:bxStarEnd(n.id)})}const m=elim();say(txt+' for '+c+' Fuel.'+(k>0?' '+k+' Fleet'+(k>1?'s':'')+' moved with it.':'')+m);render();if(fask()=='ask'&&fFree(a)>0&&!G.over)fwAsk(a.id,n.id,null)}
 // pvStar(a,p,c,msg) makes a Star preview (Move preview on) carrying fl = the Fleets that go along when it is confirmed (fwAuto now; with 'ask' and Fleets that can move, fwAsk asks first).
 function pvStar(a,p,c,msg){sfxMe('starSet');const k=fwAuto(a),q={k:'s',a:a.id,x:p.x,y:p.y,c};if(k)q.fl=k;pvAdd(q,msg+(k?' '+k+' Fleet'+(k>1?'s':'')+' will go with it.':''));if(fask()=='ask'&&fFree(a)>0)fwAsk(a.id,null,q.i)}
 // fwAsk(aid,nid,pi) asks how many of Star aid's Fleets go with the Star just set from it: nid = that Star (they move at once, fwGo), or pi = the Star preview (the number is kept on it as fl, and they move when it is confirmed).
 function fwAsk(aid,nid,pi){const a=by(aid),f=a?fFree(a):0;if(f<1)return;const q=pi!=null&&(G.pv||[]).find(z=>z.i==pi);ovQ(`<h1>Move Fleets with the new Star?</h1><p>This Star has ${f} Fleet${f>1?'s':''} that can move. Fleets that go count as moved this turn.</p><div class="r" style="flex-wrap:wrap">${[...Array(f+1)].map((_,i)=>`<button onclick="fwGo(${aid},${nid},${pi},${i})">${i?i:'None'}</button>`).join('')}</div>`,[a,nid!=null?nid:q])}
 function fwGo(aid,nid,pi,k){$('ov').style.display='none';if(pi!=null){const q=(G.pv||[]).find(z=>z.i==pi);if(q){if(k)q.fl=k;else delete q.fl;say(k?k+' Fleet'+(k>1?'s':'')+' will go with the Star when it is confirmed.':'The Fleets stay.')}return render()}
-const a=by(aid),n=by(nid);if(k>0&&a&&n&&fFree(a)>=k){undo.push(JSON.stringify(G));fwMove(a,n,k,null);say(k+' Fleet'+(k>1?'s':'')+' moved with the Star.')}render()}
+const a=by(aid),n=by(nid);if(k>0&&a&&n&&fFree(a)>=k){undo.push(JSON.stringify(G));fwMove(a,n,k,null);bxFleet([a.id,n.id],k,{mv:1,wait:bxStarEnd(n.id)});say(k+' Fleet'+(k>1?'s':'')+' moved with the Star.')}render()}
 // mcMin() ('min') spreads as few Fleets as the multi-attack needs over its attackers, in the order they were added; while even every Fleet is not enough, every Fleet is used.
 function mcMin(){if(!multi||multi.t==null)return;let need=str(by(multi.t))+1-multi.att.reduce((t,x)=>t+cs(by(x.id)),0);multi.att.forEach(x=>{const f=by(x.id).f||0,u=Math.max(0,Math.min(f,need));x.use=u;need-=u})}
 // ===== Drag and drop =====
@@ -2198,7 +2210,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-01-g';
+const BUILD='2026-11-02-h';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2356,7 +2368,10 @@ function hapToggle(b){if(!hapOK())return;hapOn=!hapOn;try{localStorage.setItem(H
 // ===== (new) Animations and Sound settings (Settings page, bottom row) =====
 // animMode = 'on' (normal speed; the default until the player picks one, Shmorden 2026-10-30), 'fast' (about half the time) or 'off' (no animation); remembered in this browser. animMs() = how long one animation lasts in milliseconds. soundOn = the Sound switch (remembered), the master switch for every sound; the sounds themselves and the Sound page are in the Sound effects section below.
 const AKEY='constellate-anim',SKEY2='constellate-sound';let animMode='on',soundOn=false;try{const a=localStorage.getItem(AKEY);if(a=='on'||a=='fast'||a=='off')animMode=a;soundOn=localStorage.getItem(SKEY2)==='1'}catch(e){}
-const animMs=()=>animMode=='fast'?220:animMode=='off'?0:440;
+// (Shmorden, 2026-11-02-g) animQ() = Computer speed is Instant in a game with a computer: then every animation is off, as with Animations Off, except the Deficit Elimination animation (while it plays, dfOn, and the round screen that leads into it: rpDf, set by roundPop when the round removed someone by Deficit Elimination, cleared when that screen closes or the animation stops). animEff() = the Animations setting in effect (read it, not animMode, wherever something animates); calmRaw() = the setting itself says no animation.
+let rpDf=false;
+const animQ=()=>{try{return !!G&&!!G.cpu&&cpuMs==0&&!dfOn&&!rpDf}catch(e){return false}},animEff=()=>animQ()?'off':animMode;
+const animMs=()=>animEff()=='fast'?220:animEff()=='off'?0:440;
 const animLabel=()=>'Animations: '+(animMode=='on'?'On':animMode=='fast'?'Fast':'Off');
 function animCycle(b){animMode=animMode=='on'?'fast':animMode=='fast'?'off':'on';try{localStorage.setItem(AKEY,animMode)}catch(e){}b.textContent=animLabel()}
 const soundLabel=()=>'Sound: '+(soundOn?'On':'Off');
@@ -2439,7 +2454,7 @@ document.addEventListener('pointerup',e=>{const b=e.target&&e.target.closest&&e.
 // ===== Turn and round transitions: camera moves, round screen and end screen reveals =====
 // (new) Shmorden's request 2026-10-26. On every change of turn the board moves to the player whose turn it is (camBox): within a round it pans and zooms there in one move; at a new round it zooms out to Fit first. At the end of a round it zooms out and the round screen plays its reveal (roundPop, rpSeq); the zoom in waits until that screen is closed. At the end of the game it zooms out and the end screen plays its reveal (overDlg, endSeq). Animations Off (or the phone's reduce-motion setting) turns all of it off. With CPU speed Instant a computer's turn only zooms out. A touch, drag or wheel on the board stops a camera move where it is. All timings come from the Animations speed (animMs) and are placeholders.
 // calm() = no animations wanted. camMs() = how long one camera move takes. camRaf = the running camera frame, camT = the pause before the zoom in, camWait = the zoom in waits for the round screen to close, camEnd = when the running camera move ends (performance.now() time; the screens wait for it), camKey = the turn last seen by camTurn (null = do not animate the next change: a new or loaded game). rpOn = the round screen is showing.
-const calm=()=>animMode=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
+const calm=()=>animEff()=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches),calmRaw=()=>animMode=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
 const camMs=()=>Math.round(animMs()*1.5);
 let camRaf=0,camT=null,camWait=false,camEnd=0,camKey=null,rpOn=false,camTo=null;
 // camStop() stops any camera move and cancels a waiting zoom in (the player took over the view, or the board was refitted).
@@ -2521,7 +2536,7 @@ if(!clip||s.skip||!box.animate)return clr();const U=animMs(),a=box.animate([{hei
 function odometer(s,el,ms){const V=+el.textContent,end=()=>{clearInterval(id);el.classList.remove('scr')};let id=0;if(s.skip)return end();const t0=performance.now();el.dataset.s='0';
 id=setInterval(()=>{const f=(performance.now()-t0)/ms;if(f>=1)return end();el.dataset.s=String(Math.floor(V*f))},45);s.x.push(end)}
 // rpSeq() = the round screen's reveal (see roundPop). U = one animation, P = a brief pause (both placeholders). rows = the player lines as drawn (new order); old = last round's order (G.lo; players already out before it go last), and each line starts moved to where its player stood in that order (dy), then slides home.
-function rpSeq(){const o=$('ov');if(calm()){o.querySelectorAll('.scr').forEach(e=>e.classList.remove('scr'));o.querySelectorAll('.rrow').forEach(rbFit);return}
+function rpSeq(){const o=$('ov');rpDf=!!dfG&&!calmRaw();if(calm()){o.querySelectorAll('.scr').forEach(e=>e.classList.remove('scr'));o.querySelectorAll('.rrow').forEach(rbFit);return}
 const R=rvPrep(),U=animMs(),P=U,rows=[...R.box.querySelectorAll('.rrow')],fin=rows.map(r=>+r.dataset.c),old=(rpOld||G.lo||G.order).filter(c=>fin.includes(c)),tops=rows.map(r=>r.offsetTop);fin.forEach(c=>{if(!old.includes(c))old.push(c)});
 const dy=rows.map((r,i)=>tops[old.indexOf(fin[i])]-tops[i]),moves=dy.some(d=>d),late=[...R.box.querySelectorAll('.rnote,.rtm')],rks=[...R.box.querySelectorAll('.rk')],hbs=[...R.box.querySelectorAll('.rbh:not(.rbd)')];
 rows.forEach((r,i)=>{r.style.opacity='0';if(dy[i])r.style.transform='translateY('+dy[i]+'px)'});late.concat(rks).forEach(e=>{e.style.opacity='0'});
@@ -2554,15 +2569,15 @@ function dfFlash(r){const b=getComputedStyle(r).backgroundColor,w=getComputedSty
 // dfAfter = what to do when the animation is over instead of the round going on (the end screen, when a Deficit Elimination ended the game; see roundPop fin, dfSpec). dfStop forgets it.
 const DF_MS=250,HOLD_MS=500;let dfAfter=null,dfG=null,dfOn=false,dfKey='',dfStopF=null,dfRaf=0;
 // dfPrep(E) (from roundPop and dfSpec; E = the round that just ended) builds dfG from G.dk when that round removed players by Deficit Elimination, and works out the erase order for each of them.
-function dfPrep(E){dfStop();dfG=null;const d=G.dk,k=(G.gid||'')+'/'+E;if(calm()||!d||d.r!=E||!Array.isArray(d.L)||dfKey==k)return;dfKey=k;
+function dfPrep(E){dfStop();dfG=null;const d=G.dk,k=(G.gid||'')+'/'+E;if(calmRaw()||!d||d.r!=E||!Array.isArray(d.L)||dfKey==k)return;dfKey=k;
 const L=d.L.filter(q=>by(q[0])&&by(q[1])).map(q=>({a:q[0],b:q[1],col:COL[q[2]],c:q[3],w:null,m:'a'})),list=(rpOld||G.lo||G.order).concat(d.p).filter((c,i,a)=>a.indexOf(c)==i&&d.p.includes(c)&&L.some(l=>l.c==c));
-if(!list.length)return;list.forEach(c=>dfOrder(c,L,d.cap&&d.cap[c]));dfG={L,list,cur:null,t0:0};dgDraw()}
-// dfOrder(c,L,cap) gives each of player c's lines in L its wave w (0, 1, 2...) and the end m it retracts from. The erasing starts at c's Capital (cap): every line touching a Star already reached goes in the next wave, retracting away from it (both ends toward the middle when both ends were reached), and its far Star is reached. When nothing touches a reached Star (no Capital, the Capital had no connections, or a separate group of connections), the Star nearest the start (the Capital, or the middle of the sector c started in, G.caps) is reached next. Returns the number of waves.
-function dfOrder(c,L,cap){const E=L.filter(l=>l.c==c),seen=new Set(),k=cap!=null&&by(cap),cp=G.caps&&G.caps[c],N=NSYS(G),home=k?{x:k.x,y:k.y}:cp?{x:Math.floor(cp[0]/3)*3+1.5,y:Math.floor(cp[1]/3)*3+1.5}:{x:N/2,y:N/2};let w=0;
-if(k)seen.add(k.id);
+if(!list.length)return;const R={};list.forEach(c=>{R[c]=[];dfOrder(c,L,d.cap&&d.cap[c],R[c])});dfG={L,list,cur:null,t0:0,R};dgDraw()}
+// dfOrder(c,L,cap,R) gives each of player c's lines in L its wave w (0, 1, 2...) and the end m it retracts from. The erasing starts at c's Capital (cap): every line touching a Star already reached goes in the next wave, retracting away from it (both ends toward the middle when both ends were reached), and its far Star is reached. When nothing touches a reached Star (no Capital, the Capital had no connections, or a separate group of connections), the Star nearest the start (the Capital, or the middle of the sector c started in, G.caps) is reached next. Returns the number of waves. R (optional) gets {id, t} for each Star as the erasing reaches it, t = ms after the erasing starts (Star taken rings, bxDfRings): a Star it starts from (the Capital, or the nearest Star of a separate group) when its first wave begins, every other Star when the line retracting toward it reaches it (the end of that wave).
+function dfOrder(c,L,cap,R){const E=L.filter(l=>l.c==c),seen=new Set(),k=cap!=null&&by(cap),cp=G.caps&&G.caps[c],N=NSYS(G),home=k?{x:k.x,y:k.y}:cp?{x:Math.floor(cp[0]/3)*3+1.5,y:Math.floor(cp[1]/3)*3+1.5}:{x:N/2,y:N/2};let w=0;
+if(k)seen.add(k.id);const hit=new Set(),rec=(id,t)=>{if(R&&!hit.has(id)){hit.add(id);R.push({id,t})}};if(k&&E.some(l=>l.a==k.id||l.b==k.id))rec(k.id,0);
 for(;;){const left=E.filter(l=>l.w==null);if(!left.length)break;const wave=left.filter(l=>seen.has(l.a)||seen.has(l.b));
- if(!wave.length){let best=null,bd=Infinity;left.forEach(l=>[l.a,l.b].forEach(id=>{const q=by(id),dd=Math.hypot(q.x-home.x,q.y-home.y);if(dd<bd){bd=dd;best=id}}));seen.add(best);continue}
- wave.forEach(l=>{l.w=w;l.m=seen.has(l.a)&&seen.has(l.b)?'both':seen.has(l.a)?'a':'b'});wave.forEach(l=>{seen.add(l.a);seen.add(l.b)});w++}
+ if(!wave.length){let best=null,bd=Infinity;left.forEach(l=>[l.a,l.b].forEach(id=>{const q=by(id),dd=Math.hypot(q.x-home.x,q.y-home.y);if(dd<bd){bd=dd;best=id}}));seen.add(best);rec(best,w*DF_MS);continue}
+ wave.forEach(l=>{l.w=w;l.m=seen.has(l.a)&&seen.has(l.b)?'both':seen.has(l.a)?'a':'b'});wave.forEach(l=>{if(l.m=='a')rec(l.b,(w+1)*DF_MS);if(l.m=='b')rec(l.a,(w+1)*DF_MS)});wave.forEach(l=>{seen.add(l.a);seen.add(l.b)});w++}
 return w}
 // dgSVG() = the SVG for the lines in dfG as they look now: the player being erased has each line shortened by how far its wave has got (p from 0 to 1), from the end it retracts from; the round line cap keeps the receding end rounded. Lines already erased are gone from dfG.
 function dgSVG(){if(!dfG)return '';const now=performance.now();let s='';dfG.L.forEach(l=>{let p=0;if(l.c==dfG.cur&&dfG.t0)p=Math.max(0,Math.min(1,(now-dfG.t0-l.w*DF_MS)/DF_MS));if(p>=1)return;const a=by(l.a),b=by(l.b);if(!a||!b)return;
@@ -2583,13 +2598,13 @@ const at=(ms,f)=>T.push(setTimeout(f,ms)),clr=()=>{T.forEach(clearTimeout);T=[];
 const next=()=>{clr();i++;if(i>=list.length)return fin();const c=list[i],r=rowOf(c);ph=1;if(r&&r.animate)A.push(r.animate(dfFlash(r),{duration:U*1.6,iterations:3,easing:'ease-in-out'}));
  // zin(): zoom to the player, a half-pause, then their lines retract wave by wave.
  const zin=()=>{ph=2;camGo(dfBox(c),camMs(),()=>at(P*.5,()=>{
-  ph=3;const n=Math.max(0,...dfG.L.filter(l=>l.c==c).map(l=>l.w+1));dfG.cur=c;dfG.t0=performance.now();const step=()=>{dgDraw();if(dfG&&performance.now()-dfG.t0<n*DF_MS)dfRaf=requestAnimationFrame(step);else dfRaf=0};dfRaf=requestAnimationFrame(step);
+  ph=3;const n=Math.max(0,...dfG.L.filter(l=>l.c==c).map(l=>l.w+1));dfG.cur=c;dfG.t0=performance.now();bxDfRings(c,dfG.t0);const step=()=>{dgDraw();if(dfG&&performance.now()-dfG.t0<n*DF_MS)dfRaf=requestAnimationFrame(step);else dfRaf=0};dfRaf=requestAnimationFrame(step);
   at(n*DF_MS+P*.5,back)}))};
  if(bd)return zin();
  at(U*4.8,()=>{ph=2;if(o.animate)A.push(o.animate([{opacity:1},{opacity:0}],{duration:U,easing:'ease-in'}));at(U,()=>{o.style.opacity='0';zin()})})};
 // back(): the player's lines are gone; the board zooms back out to Fit as the round screen fades back in with their reason and note; a pause, then the next player.
 // (fixed 2026-10-27-l) When the game ends after this (dfAfter set, last player), the round screen does not come back for a moment before the end screen: the board zooms back out and the end screen follows (fin).
-const back=()=>{clr();ph=4;const c=list[i],r=rowOf(c),nt=bd?null:R.box.querySelector('.rnote[data-c="'+c+'"]'),fade=o.style.opacity=='0';dfG.L=dfG.L.filter(l=>l.c!=c);dfG.cur=null;dgDraw();camGo(camFit(),camMs());if(dfAfter&&i==list.length-1)return at(camMs(),next);o.style.opacity='';
+const back=()=>{clr();ph=4;bxDfFade();const c=list[i],r=rowOf(c),nt=bd?null:R.box.querySelector('.rnote[data-c="'+c+'"]'),fade=o.style.opacity=='0';dfG.L=dfG.L.filter(l=>l.c!=c);dfG.cur=null;dgDraw();camGo(camFit(),camMs());if(dfAfter&&i==list.length-1)return at(camMs(),next);o.style.opacity='';
  if(fade&&o.animate)A.push(o.animate([{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'}));const s={skip:false,a:A};
  at(fade?U:0,()=>{if(r)rvOut(s,r);if(nt){nt.style.opacity='';seqA(s,nt,[{opacity:0},{opacity:1}],{duration:U,easing:'ease-out'})}at(bd?camMs()+P:U+P,next)})};
 // fin(): every player is done: the buttons, and taps work normally again.
@@ -2601,8 +2616,11 @@ let ht=null,hh=null,ha=null;const down=()=>{if(!dfOn)return;clearTimeout(hh);cle
  up=()=>{if(ht){clearTimeout(ht);ht=null;try{if(ha)ha.cancel()}catch(e){}hh=setTimeout(hide,900)}},hide=()=>{clearTimeout(hh);hs.style.display='none';try{if(ha)ha.cancel()}catch(e){}ha=null};
 o.addEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(k=>o.addEventListener(k,up));
 // stop(): end it (fin or dfStop): no timers, no hold handlers, the round screen visible.
-const stop=()=>{clr();clearTimeout(ht);ht=null;hide();o.removeEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(k=>o.removeEventListener(k,up));o.style.opacity='';if(bd)o.remove();dfOn=false;dfStopF=null;dfG=null;dgDraw()};
+const stop=()=>{clr();bxDfFade(1);rpDf=false;clearTimeout(ht);ht=null;hide();o.removeEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(k=>o.removeEventListener(k,up));o.style.opacity='';if(bd)o.remove();dfOn=false;dfStopF=null;dfG=null;dgDraw()};
 dfStopF=stop;next()}
+// bxDfRings(c,t0) (Shmorden, 2026-11-02-e) starts a Star taken ring on each Star of player c's network as the erasing (started at t0) reaches it (dfG.R, from dfOrder): white, select-ring thick, expanding like a Take's, fading after BX_DFHOLD and more slowly (BX_DFFADE). bxDfFade(gone) = the zoom back out (back): every ring not yet fading fades now, so they end together, and rings not yet started are dropped; gone = the animation was stopped: remove them all.
+function bxDfRings(c,t0){if(!dfG||!dfG.R||!dfG.R[c]||calm())return;const g=BX_TAKEN*.6;dfG.R[c].forEach(({id,t})=>{const q=by(id);if(q)bx.push(bxRing(q.x,q.y,.07,'#fff',t0+t,BX_TAKEN,{df:1,ex:1,fs:t0+t+BX_DFHOLD,fd:BX_DFFADE}))});bxGo()}
+function bxDfFade(gone){const now=performance.now();bx=bx.filter(f=>!(f.df&&(gone||f.t0>now)));bx.forEach(f=>{if(f.df&&f.fs>now)f.fs=now});bxGo()}
 // dfCover() = a see-through layer over the whole screen for the board-only animation (dfRun with no round screen): it takes the touches (hold to skip) so the board is not dragged meanwhile.
 function dfCover(){const d=document.createElement('div');d.id='dfcv';d.style.cssText='position:fixed;inset:0;z-index:5;touch-action:none';document.body.appendChild(d);return d}
 // dfSpec(E,after) (from roundPop, while this device spectates a game where only computers are left, or in a game of computers only, so there is no round screen; E = the round that just ended, after = what follows instead of play going on: the end screen): when the round removed players by Deficit Elimination, play their animation on the board alone, after the round's zoom out has finished. dfOn holds the computers (cpuTick) and the turn's zoom in (camTurn) until it is over. Shmorden, 2026-10-27.
@@ -2614,6 +2632,113 @@ function endSeq(){if(calm())return;const R=rvPrep(),U=animMs(),P=U,rows=[...R.bo
 const steps=[],t0=Math.max(0,camEnd-performance.now());steps.push({at:t0,fn:s=>rvOpen(R,s)});let t=t0+U+P;
 rows.forEach(r=>{steps.push({at:t,fn:s=>{r.style.opacity='';seqA(s,r,[{opacity:0,clipPath:'inset(0 0 100% 0)'},{opacity:1,clipPath:'inset(0 0 0 0)'}],{duration:U,easing:'ease-out'})}});t+=U*.6});
 t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});seqRun(steps);R.box.addEventListener('click',()=>seqSkip())}
+// ===== Board animations: setting Stars, Connections, Takes, placing and moving Fleets (Shmorden, 2026-11-02) =====
+// Setting a Star: its Connection grows out of the origin Star to the new spot (the Deficit Elimination retract played backwards, BX_LINE), and the new Star blossoms from nothing to full size (BX_BLOOM), starting when the growing line enters the new Star's System (Shmorden, 2026-11-02-b: System, not Sector). A Star preview (Move preview on) plays the same in its dashed look, and Confirm plays it again, solid (likewise every preview below: Shmorden, 2026-11-02-b). The trigger is the tap that sets it, or letting go of a dragged Star.
+// Placing a Fleet (Shmorden, 2026-11-02-h): the chip starts at the Capital and zooms along the whole network path to the Star (bxNet): 0.25 s per Connection, at most 3 Connections' worth of time (BX_PLACEMAX) however long the path, eased in and out; as it leaves it fades in sideways over the first 0.25 s, the side facing the way it travels first. Placed on the Capital itself, it only fades in (left side first, a placeholder).
+// Moving Fleets: the chip slides from Star to Star along the path (BX_SLIDE per Connection). With a Hitchhike? question it stops on each Star asked about (the question opens when it gets there) and goes on, carrying any riders, once the choice is made. Fleets sent along with a new Star slide down the new Connection after the Star has blossomed.
+// Making a Connection: only the line grows (bxLine), own or a teammate's. Taking a Star (one attacker or several; Shmorden's order, 2026-11-02-c): 1. a line grows from each attacker; 2. when they arrive the Star turns the attacker's color; 3. at the same time its old Connections retract toward their other ends, the Deficit Elimination way (one wave, DF_MS), the retreating Fleets slide from it to the Stars chosen for them, and the surviving attacking Fleets slide down the new lines onto it (bxTake). Every Retreat slides, whoever answered the Defence call (on this device, another device online, or a computer). Gifting a Star to a teammate plays as the teammate's Take of it (no Fleets move); giving Fleets slides them like a move.
+// Defence call (Shmorden, 2026-11-02-d; -e: the Fleets ride at the line's tip and pause halfway): 1. and 2. the attackers' lines grow to the Star, their committed Fleets riding at the tips and stopping halfway (bxIntro; -f); 3. a person's Defence call question opens only then (bxWait); 4. each answer animates as it is made (bxDec): a Retreat slides to its Star, a Hold plays Fleet destroyed on the defending Fleet and on one attacking Fleet, a lost Fleet plays it on the defending Fleet; 5. once the answers are in, the Fleets go on; when they arrive the Star turns the attacker's color with the Star taken ring (white, 0.75 s) and its old lines retract (bxTake). The game itself still settles the attack as before (a computer's answers at once, so its play is unchanged): the animation is a timeline, and answers given before the Fleets reach halfway play when they get there. A Take with no defending Fleets plays as before: lines grow, then color change (with the shockwave), retract and the attackers slide in.
+// Fleet destroyed (k:'ds'): the chip shows with its colors inverted for one flicker (BX_FLICK), then it is gone (the count drops); together a grey ring 3/4 as thick as the select ring grows from the chip's middle to one System across and fades (BX_WAVE in all). Star taken: a white ring as thick as the select ring, from the Star's middle, when it changes color (0.75 s; Shmorden, 2026-11-02-e). Deficit Elimination plays it on each Star the erasing reaches, and those wait a second before fading (bxDfRings).
+// Previews: each grows (or slides) when made; on Confirm the real animation plays over the dashed preview, which stays drawn underneath until it has finished (k:'gp').
+// Display only: G is changed at once, as before; while an animation plays the board leaves out what it draws (the Connection and Star being set, the arriving Fleets' share of the destination's count), so computers, saves, Undo and online play are unaffected. Computers' moves animate too (they tap like a person). Not with Animations off or reduced motion; Fast halves every time. Fleet drags, preview Confirms and moves from other devices online don't animate. The timings and easings are placeholders.
+// bx = the animations playing: {k:'st' a Star being set: a = origin id, n = the new Star's id or pv = its preview object, x, y, t0, tl = line ms, tb = when the blossom starts, tm = blossom ms; ln = a line only (a Connection, or a Take's line), n = its far Star, which stays drawn} or {k:'rt' a Connection retracting: a = the end it shrinks toward, b = the end it leaves, col, t0, ms} or {k:'oc' a Star still drawn in its old owner's color: id, c = that owner, t0, ms} or {k:'ds' Fleet destroyed / Star taken (bxRing): x, y = the middle, n = the count on the inverted chip (0 = no chip, Star taken), col, mv, fl = flicker ms, w = ring thickness, rc = ring color, t0, gr = ms the ring grows, fs = when it starts fading, fd = ms the fade lasts} or {k:'gp' a confirmed preview still drawn: p = a copy of the preview, col, t0, ms} or {k:'fl' a Fleet chip: path = star ids, n = Fleets shown, b = the Star whose count waits for it, c = color, mv = moved (dashed border), rv = reveal: the direction it fades in from as {x,y}, or 0; from, to = path positions (0 = path[0], 1 = path[1]...), t0, ms; hold = it stays parked at `to` (a Hitchhike? question)}. Each one remembers the game it belongs to (g), so Undo or loading another game drops it.
+const BX_LINE=250,BX_BLOOM=250,BX_SLIDE=250,BX_PLACEMAX=3,BX_FLICK=120,BX_WAVE=500,BX_GREY='#8a8a8a',BX_TAKEN=750,BX_DFHOLD=1000,BX_DFFADE=800;let bx=[],bxRaf=0;
+// bxTk = the timeline of the Defence call being animated: {b: the attacked Star, p: its pend, ie = when the attacking Fleets reach the edge, last = when the last answer's animation ends, ad = when each answer plays (until then the defending Fleet still shows on the Star), fx = the attackers' chips (by attacker), K = the time factor}.
+let bxTk=null;
+// bxK() = the time factor: 1 for Animations On, .5 for Fast, 0 for none.
+const bxK=()=>!G||calm()?0:animEff()=='fast'?.5:1;
+// bxLive() = the animations that still apply: those of this game, whose Stars still exist (a parked chip only while its Hitchhike? question is open).
+function bxLive(){const now=performance.now();bx=bx.filter(f=>f.g===G&&!(f.keep&&!f.keep())&&!(f.hold&&!f.keep&&!(hhS&&hhS.fx===f))&&!(f.k=='fl'&&f.n<=0&&!(f.pq||[]).some(t=>t>now))&&(f.k=='ds'||(f.k=='st'?by(f.a)&&(f.pv?(G.pv||[]).includes(f.pv):by(f.n)):f.k=='rt'?by(f.a)&&by(f.b):f.k=='oc'?by(f.id):f.k=='gp'?by(f.p.a):f.path.every(id=>by(id)))));return bx}
+// bxDone(f,now) = animation f has finished (a parked chip never does).
+const bxDone=(f,now)=>f.tr?now>=bxTrEnd(f.tr):f.hold?false:f.k=='ds'?now>=f.fs+f.fd:f.k=='st'?now-f.t0>=Math.max(f.tl,f.tb+f.tm):f.k=='fl'?!f.hold&&now-f.t0>=f.ms:now-f.t0>=f.ms;
+// bxStar(a,n,pv) starts the animation of a Star set from Star a: n = the new Star, or pv = the Star preview object (with x, y).
+function bxStar(a,n,pv){const K=bxK();if(!K||!a)return;const p=pv||n,tl=BX_LINE*K;
+bx.push({k:'st',g:G,a:a.id,n:n?n.id:null,pv:pv||null,x:p.x,y:p.y,t0:performance.now(),tl,tb:tl*bxEnter(a,p,Math.floor(p.x),Math.floor(p.y)),tm:BX_BLOOM*K});bxGo()}
+// bxLine(a,b,pv,wait) grows a line only, from Star a to Star b: a Connection made (pv = its preview object, drawn dashed) or a Take's line; wait = ms before it starts. Returns its ms (0 with no animation).
+function bxLine(a,b,pv,wait){const K=bxK();if(!K||!a||!b)return 0;const tl=BX_LINE*K;bx.push({k:'st',ln:1,g:G,a:a.id,n:pv?null:b.id,pv:pv||null,x:b.x,y:b.y,t0:performance.now()+(wait||0),tl,tb:0,tm:0});bxGo();return tl}
+// bxPv(p) animates a preview just made (pvAdd): a Star preview, a Connection preview or a capture preview. (Fleet move previews start their slide before pvAdd.)
+function bxPv(p){const a=by(p.a);if(!bxK()||!a)return;if(p.k=='s')return bxStar(a,null,p);if(p.k=='c'||p.k=='t'||p.k=='g')bxLine(a,by(p.b),p);if(p.k=='h')bxFleet([p.a,p.b],p.n,{mv:1})}
+// bxGhost(p,ms) keeps preview p drawn (dashed, under the board animations) for ms after its Confirm, so the real animation covers it.
+function bxGhost(p,ms){const a=by(p.a);if(!bxK()||!a||!(ms>0))return;bx.unshift({k:'gp',g:G,p:JSON.parse(JSON.stringify(p)),col:COL[a.o],t0:performance.now(),ms});bxGo()}
+// bxEndOf(test) = ms until the last animation matching test ends (0 if none).
+function bxEndOf(t){const now=performance.now();let e=0;bxLive().forEach(f=>{if(t(f))e=Math.max(e,f.k=='st'?f.t0+Math.max(f.tl,f.tb+f.tm)-now:f.t0+f.ms-now)});return e}
+// bxPre(s) = what bxTake needs from Star s before it is taken or gifted: old = its Connections as [star id, star id, color], o = its owner.
+function bxPre(s){return {old:G.conns.filter(q=>q[0]==s.id||q[1]==s.id).map(q=>[q[0],q[1],COL[by(q[0]).o]]),o:s.o}}
+// bxTake(b,pre,att,dec,pv,fp,gift) plays a Take of Star b after G has changed (fin, or a Star gift: tmApply): pre = bxPre(b) from before, att = the attackers ({a, use}), dec = the Defence call answers, pv = the capture preview it came from (kept drawn under the growing lines), fp = fin's pend (its Defence call timeline, bxTk, when there was one), gift = a Star gift (no shockwave).
+// After a Defence call (bxIntro ran) that was settled before the lines reached the Star (a computer defender, or no choice to make; Shmorden, 2026-11-02-g): one smooth motion, no pause: the Fleets ride the tip all the way (r.smooth), every answer plays as they pass halfway (bxDec's animations, T.dx, are moved there), and the color change comes when they arrive. Otherwise (a person answered): once the answers are in (bxTk.go: a Retreat's slide starts with it, a Hold's flicker plays first), the lines and their chips go on from halfway; when they arrive b turns the attacker's color with the Star taken ring (white, BX_TAKEN) and its old lines retract. Without one: the lines grow with the surviving attacking Fleets at their tips (Holds take Fleets from the first attackers first, as defLive shows them), b keeping its old color (k:'oc') until they arrive; then the color change (ring) and the retract.
+function bxTake(b,pre,att,dec,pv,fp,gift){const K=bxK();if(!K||!b)return;const now=performance.now(),ms=DF_MS*K,T=bxTk;let tc;
+if(fp&&T&&T.p===fp){const r=T.tr;if(now<T.ie-1){const sh=r.t0+r.ms1/2-T.ie;T.dx.forEach(f=>{f.t0+=sh;if(f.fs!=null)f.fs+=sh});T.ad=T.ad.map(x=>x+sh);T.fx.forEach(c=>{if(c)c.pq=c.pq.map(x=>x+sh)});r.smooth=1}else r.t2=Math.max(now,T.go);tc=bxTrEnd(r);T.gh.forEach(g=>{g.ms=tc-g.t0});bx.forEach(f=>{if(f.tk&&f.n==b.id)f.keep=null;if(f.k=='fl'&&f.tkb==b.id){f.keep=null;f.b=b.id;f.tkb=null}})}
+else{const r={t0:now,u1:1,ms1:BX_LINE*K,t2:null,ms2:0};tc=bxTrEnd(r);let h=dec.filter(x=>x=='H').length;
+ att.forEach(x=>{const a=by(x.a);if(!a)return;bx.push({k:'st',ln:1,g:G,a:a.id,n:b.id,pv:null,x:b.x,y:b.y,t0:now,tl:r.ms1,tb:0,tm:0,tr:r});if(pv)bxGhost({k:'t',a:a.id,b:b.id},r.ms1);
+  const k=Math.min(h,x.use||0);h-=k;const n=(x.use||0)-k;if(n>0){const f=bxFleet([a.id,b.id],n,{mv:1,c:a.o});if(f)f.tr=r}})}
+if(pre.o!=b.o)bx.push({k:'oc',g:G,id:b.id,c:pre.o,t0:now,ms:tc-now});
+if(!gift)bx.push(bxRing(b.x,b.y,.07,'#fff',tc,BX_TAKEN*K,{ex:1}));
+pre.old.forEach(([p,q,col])=>{const o=p==b.id?q:p;if(by(o))bx.push({k:'rt',g:G,a:o,b:b.id,col,t0:tc,ms})});bxGo()}
+// bxRing(x,y,w,rc,t0,ms,o) = a ring animation (k:'ds'): it grows from (x,y) to one System across over the first 60% of ms and fades over the rest; w = its thickness, rc = its color. o = more fields (a chip to flash inverted: n, col, mv, fl; a later or longer fade: fs, fd; ex = a shockwave: it reaches one System across at the same time but keeps expanding, slowing, as it fades: the Star taken rings, Shmorden 2026-11-02-f).
+function bxRing(x,y,w,rc,t0,ms,o){return Object.assign({k:'ds',g:G,x,y,n:0,w,rc,t0,gr:ms*.6,fs:t0+ms*.6,fd:ms*.4,fl:0},o||{})}
+// bxIntro() starts a Defence call's animation (resolve; only when the attacked Star has defending Fleets): each attacker's line grows all the way to the Star with its committed Fleets riding at the tip; the Fleets stop halfway (one shared travel, bxTr; Shmorden, 2026-11-02-e, -f) until the answers are in (bxTake sets when they go on). bxTk = the call's timeline: {b, p = its pend, ie = when the lines reach the Star (the question opens), dx = the answers' animations (moved to halfway when the call needed no person), go = when the second leg may start (after the last answer's flicker), ad = when each answer plays, fx = the attackers' chips, gh = capture preview ghosts kept until the lines arrive, tr = the travel, K}.
+function bxIntro(){const K=bxK(),p=pend;bxTk=null;if(!K||!p||!(p.D>0))return;const b=by(p.b),now=performance.now(),keep=()=>!!bxTk&&bxTk.p===p;if(!b)return;
+const r={call:1,t0:now,u1:.5,ms1:2*BX_LINE*K,t2:null,ms2:p.att.some(x=>x.use>0)?BX_LINE*K:1},ie=now+r.ms1,fx=[],gh=[];
+p.att.forEach((x,i)=>{const a=by(x.a);if(!a)return;bx.push({k:'st',ln:1,tk:1,g:G,a:a.id,n:b.id,pv:null,x:b.x,y:b.y,t0:now,tl:r.ms1,tb:0,tm:0,tr:r,keep});
+ if(p.pv){bxGhost({k:'t',a:a.id,b:b.id},1e9);gh.push(bx[0])}
+ if(x.use>0){const f=bxFleet([a.id,b.id],x.use,{mv:1,c:a.o});if(f){f.tr=r;f.tkb=b.id;f.src=a.id;f.keep=keep;f.pq=[];fx[i]=f}}});
+bxTk={b:b.id,p,ie,go:ie,ad:[],dx:[],fx,gh,tr:r,K};bxGo()}
+// bxWait(fn) runs fn (the Defence call question) once the attacking Fleets have reached the edge of the System (at once without an intro); meanwhile the question is hidden and taps on the board do nothing (tap). It is opened and hidden at once first (no closing animation: obsFlush), so the camera fits the attack (qCam measures the question) while the line grows.
+function bxWait(fn){const p=pend,w=bxTk&&bxTk.p===p?bxTk.ie-performance.now():0;if(w<=0)return fn();fn();$('ov').style.display='none';obsFlush();setTimeout(()=>{if(pend===p&&p.ph)fn()},w+10)}
+// bxDec(v) animates one Defence call answer (defPush) at max(now, when the lines reached the Star): v = a Star id: a chip slides there from the attacked Star; 'H': Fleet destroyed on the defending Fleet and on one attacking chip (the first attacker that still has one, as defLive counts); 'X': Fleet destroyed on the defending Fleet. Until it plays, the defending Fleet still shows on the Star (bxTk.ad).
+function bxDec(v){const T=bxTk,p=pend;if(!T||T.p!==p||!bxK())return;const b=by(p.b);if(!b)return;const now=performance.now(),t=Math.max(now,T.ie),K=T.K,i=p.dec.length-1;T.ad.push(t);let go=t;
+if(typeof v=='number'){const f=bxFleet([b.id,v],1,{wait:t-now});if(f)T.dx.push(f)}
+else{go=t+BX_FLICK*K;bx.push(bxRing(b.x+BADGE.dx+BADGE.w/2,b.y+BADGE.dy+BADGE.h/2,.0525,BX_GREY,t,BX_WAVE*K,{n:p.D-i,col:COL[b.o],mv:false,fl:BX_FLICK*K}));T.dx.push(bx[bx.length-1]);
+ if(v==='H'){let h=p.dec.filter(x=>x==='H').length,j=-1;for(let k=0;k<p.att.length;k++){const u=p.att[k].use||0;if(h<=u){j=k;break}h-=u}const c=j>=0&&T.fx[j];
+  if(c&&c.n>0){const pq=c.pq.filter(x=>x>t).length,P=bxPt(c,T.tr.u1);bx.push(bxRing(P.x+BADGE.dx+BADGE.w/2,P.y+BADGE.dy+BADGE.h/2,.0525,BX_GREY,t,BX_WAVE*K,{n:c.n+pq,col:COL[c.c],mv:true,fl:BX_FLICK*K}));T.dx.push(bx[bx.length-1]);c.n--;c.pq.push(t)}}}
+T.go=Math.max(T.go,go);bxGo()}
+// bxEnter(a,p,sx,sy) = how far along the line from a to p (0 to 1) it enters the System whose corner is (sx,sy): 0 when a is in it already.
+function bxEnter(a,p,sx,sy){let t0=0;const d={x:p.x-a.x,y:p.y-a.y};for(const [o,v,lo] of [['x',d.x,sx],['y',d.y,sy]]){const hi=lo+1,q=a[o];if(Math.abs(v)<1e-9)continue;const u1=(lo-q)/v,u2=(hi-q)/v;t0=Math.max(t0,Math.min(u1,u2))}return Math.max(0,Math.min(1,t0))}
+// bxStarEnd(id) = ms until the Star id's animation ends (0 if none): Fleets sent with a new Star wait for it.
+function bxStarEnd(id){const now=performance.now();let e=0;bxLive().forEach(f=>{if(f.k=='st'&&f.n==id)e=Math.max(e,f.t0+Math.max(f.tl,f.tb+f.tm)-now)});return e}
+// bxFleet(path,n,o) starts a Fleet chip of n Fleets along path (star ids; one id = no slide). o = {c: its color (default the last Star's owner), rv: fade in (placing), mv: moved Fleets, wait: ms before it starts, show: drawn on the first Star while it waits, to: where it stops (default the end), hold: park there}. Returns the animation, or null.
+function bxFleet(path,n,o){const K=bxK();o=o||{};if(!K||!path||!path.length||n<1)return null;const a=by(path[0]),b=by(path[path.length-1]);if(!a||!b)return null;const to=o.to!=null?o.to:path.length-1;let rv=0;
+if(o.rv){const q=path.length>1?by(path[1]):null;rv=q?{x:q.x-a.x,y:q.y-a.y}:{x:1,y:0}}
+const f={k:'fl',g:G,path:path.slice(),n,b:b.id,c:o.c!=null?o.c:b.o,mv:!!o.mv,show:!!o.show,rv,from:0,to,t0:performance.now()+(o.wait||0),ms:Math.max(o.rv?BX_SLIDE*K:0,(o.rv?Math.min(to,BX_PLACEMAX):to)*BX_SLIDE*K),fd:BX_SLIDE*K,hold:!!o.hold};bx.push(f);bxGo();return f}
+// bxOn(f,to,hold) sends parked chip f on from where it is now to path position `to` (Hitchhike? answered), parking again if hold. Returns the ms it takes.
+function bxOn(f,to,hold){if(!f||!bx.includes(f))return 0;const now=performance.now(),at=bxAt(f,now);f.from=at;f.to=to;f.hold=!!hold;f.rv=0;f.t0=now;f.ms=Math.max(0,(to-at)*BX_SLIDE*bxK());bxGo();return f.ms}
+// bxAt(f,now) = chip f's path position now (eased in and out over the whole trip). f.tr = an attacking chip of a Take, which rides at the tip of its line (bxTr).
+function bxAt(f,now){if(f.tr)return bxTr(f.tr,now,0);const t=f.ms>0?Math.max(0,Math.min(1,(now-f.t0)/f.ms)):1,e=t<.5?2*t*t:1-Math.pow(2-2*t,2)/2;return f.from+(f.to-f.from)*e}
+// bxTr(r,now,ln) = how far along a Take's line (0 to 1) its tip (ln = 1) or its attacking chips (ln = 0) are now. r = {t0, ms1, u1 = 1, ...}: no Defence call, line and chips go all the way together in ms1. r = {call: 1, t0, ms1, u1 = .5, t2, ms2} (Shmorden, 2026-11-02-f): the line grows all the way to the target in ms1; the chips ride at its tip and ease to a stop at halfway (they fall a little behind the tip from .4 on, never ahead); t2 = when they go on (null = not yet known: they wait), taking ms2 for the second half. Each movement eases in and out. bxTrEnd(r) = when the chips arrive (Infinity while t2 is unknown).
+function bxTr(r,now,ln){const e=t=>t<.5?2*t*t:1-Math.pow(2-2*t,2)/2;if(now<r.t0)return 0;const L=e(Math.min(1,(now-r.t0)/r.ms1));if(!r.call||ln||r.smooth)return L;
+if(r.t2!=null&&now>=r.t2)return .5+.5*e(Math.min(1,(now-r.t2)/r.ms2));return L<.4?L:L>=.6?.5:.4+(L-.4)-(L-.4)*(L-.4)/.4}
+const bxTrEnd=r=>!r.call||r.smooth?r.t0+r.ms1:r.t2==null?Infinity:Math.max(r.t0+r.ms1,r.t2+r.ms2);
+// bxPt(f,u) = the board point at path position u.
+function bxPt(f,u){const i=Math.max(0,Math.min(f.path.length-1,Math.floor(u))),a=by(f.path[i]),b=by(f.path[Math.min(f.path.length-1,i+1)]),r=u-i;return {x:a.x+(b.x-a.x)*r,y:a.y+(b.y-a.y)*r}}
+// bxHide() = what the board leaves out or changes while animations play: c = {star id: the owner whose color it keeps for now}, s = Connection keys 'a-n' being grown and Star ids being set, pv = Star previews being set, f = {star id: Fleets still on their way there}.
+function bxHide(){const h={s:new Set(),pv:new Set(),f:{},c:{}};bxLive().forEach(f=>{if(f.k=='st'){if(f.pv)h.pv.add(f.pv);else{if(!f.ln)h.s.add(f.n);h.s.add(f.a+'-'+f.n)}}else if(f.k=='fl'){if(f.tkb!=null&&pend&&pend.b===f.tkb)h.f[f.src]=(h.f[f.src]||0)+f.n;else h.f[f.b]=(h.f[f.b]||0)+f.n}else if(f.k=='oc'&&performance.now()<f.t0+f.ms)h.c[f.id]=f.c;if(f.tk)h.tk=1});
+ if(bxTk&&bxTk.p&&bxTk.ad){const now=performance.now(),k=bxTk.ad.filter(t=>t>now).length;if(k)h.f[bxTk.b]=(h.f[bxTk.b]||0)-k}return h}
+// bxSVG(top) = the animations as they look now: top = false the growing Connections (under the Stars), true the blossoming Stars and the Fleet chips (over them).
+function bxSVG(top){if(!G||!bx.length)return '';const now=performance.now();let s='';bxLive().forEach((f,j)=>{
+ if(f.k=='gp'){if(top)return;const p=f.p,a=by(p.a),D=`stroke-dasharray=".22 .14" stroke-linecap="round" opacity=".85"`;if(!a)return;if(p.k=='f'||p.k=='h'){const ps=(p.path&&p.path.length>1?p.path:[p.a,p.b]).map(by).filter(Boolean);s+=`<polyline points="${ps.map(z=>z.x+','+z.y).join(' ')}" fill="none" stroke="var(--ink)" stroke-width=".07" stroke-dasharray=".2 .12" stroke-linecap="round" stroke-linejoin="round"/>`;return}
+  const e=p.k=='s'?p:by(p.b);if(!e)return;s+=`<line x1="${a.x}" y1="${a.y}" x2="${e.x}" y2="${e.y}" stroke="${f.col}" stroke-width="${LINE_W}" ${D}/>`;if(p.k=='s')s+=`<circle cx="${p.x}" cy="${p.y}" r="${R_STAR}" fill="${f.col}" fill-opacity=".5" stroke="${f.col}" stroke-width="${R_STROKE}" stroke-dasharray=".08 .06"/>`;return}
+ if(f.k=='oc')return;
+ if(f.k=='ds'){if(!top||now<f.t0)return;const t=now-f.t0,r=f.ex?.5*Math.sqrt(t/f.gr):.5*(1-Math.pow(1-Math.min(1,t/f.gr),2)),op=now<f.fs?1:Math.max(0,1-(now-f.fs)/f.fd);
+  if(f.n>0&&t<f.fl)s+=`<g filter="url(#bxinv)"><rect x="${f.x-BADGE.w/2}" y="${f.y-BADGE.h/2}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${f.col}" stroke="${f.mv?f.col:'var(--ink)'}" stroke-width=".04"${f.mv?' stroke-dasharray=".07 .05"':''}/><text x="${f.x-BADGE.w/2+.26}" y="${f.y-BADGE.h/2+.26}" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${f.n}</text></g>`;
+  if(r>.005&&op>0)s+=`<circle cx="${f.x}" cy="${f.y}" r="${r.toFixed(4)}" fill="none" stroke="${f.rc||BX_GREY}" stroke-width="${f.w}" opacity="${op.toFixed(3)}"/>`;return}
+ if(f.k=='rt'){if(top)return;const a=by(f.a),b=by(f.b),p=f.ms>0?Math.max(0,Math.min(1,(now-f.t0)/f.ms)):1;if(p>=1)return;const X=b.x+(a.x-b.x)*p,Y=b.y+(a.y-b.y)*p;s+=`<line x1="${a.x}" y1="${a.y}" x2="${X.toFixed(3)}" y2="${Y.toFixed(3)}" stroke="${f.col}" stroke-width="${LINE_W}" stroke-linecap="round"/>`;return}
+ if(f.k=='st'){const a=by(f.a);if(!a||now<f.t0)return;const col=COL[a.o],pv=!!f.pv;
+  if(!top){const p=f.tr?bxTr(f.tr,now,1):f.tl>0?Math.min(1,(now-f.t0)/f.tl):1,x=a.x+(f.x-a.x)*p,y=a.y+(f.y-a.y)*p;s+=`<line x1="${a.x}" y1="${a.y}" x2="${x.toFixed(3)}" y2="${y.toFixed(3)}" stroke="${col}" stroke-width="${LINE_W}" stroke-linecap="round"${pv?' stroke-dasharray=".22 .14" opacity=".85"':''}/>`;return}
+  const t=now-f.t0-f.tb;if(f.ln||t<=0)return;const e=f.tm>0?Math.min(1,t/f.tm):1,r=R_STAR*(1-Math.pow(1-e,3));if(r<.005)return;
+  s+=pv?`<circle cx="${f.x}" cy="${f.y}" r="${r.toFixed(4)}" fill="${col}" fill-opacity=".5" stroke="${col}" stroke-width="${R_STROKE}" stroke-dasharray=".08 .06"/>`:`<circle cx="${f.x}" cy="${f.y}" r="${r.toFixed(4)}" fill="${col}" stroke="var(--ink)" stroke-width="${R_STROKE}" opacity="${G.used.includes(f.n)&&a.o==cur()?.5:1}"/>`;return}
+ const fn=f.n+(f.pq||[]).filter(t=>t>now).length;if(!top||(now<f.t0&&!f.show)||fn<=0)return;const P=bxPt(f,bxAt(f,now)),x=P.x+BADGE.dx,y=P.y+BADGE.dy,col=COL[f.c];let m='';
+ // The sideways fade (placing): a mask whose gradient runs across the chip in the direction it travels; the edge sweeps from the side nearest the Star it comes from to the far side.
+ if(f.rv){const t=f.fd>0?Math.min(1,(now-f.t0)/f.fd):1,L=Math.hypot(f.rv.x,f.rv.y)||1,ux=f.rv.x/L,uy=f.rv.y/L,cx=x+BADGE.w/2,cy=y+BADGE.h/2,hw=(Math.abs(ux)*BADGE.w+Math.abs(uy)*BADGE.h)/2+.01,W=.45,fr=t*(1+W),id='bxm'+j;
+  s+=`<defs><linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="${(cx-ux*hw).toFixed(3)}" y1="${(cy-uy*hw).toFixed(3)}" x2="${(cx+ux*hw).toFixed(3)}" y2="${(cy+uy*hw).toFixed(3)}"><stop offset="${Math.max(0,fr-W).toFixed(3)}" stop-color="#fff" stop-opacity="1"/><stop offset="${Math.max(0,Math.min(1,fr)).toFixed(3)}" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="${id}" maskUnits="userSpaceOnUse" x="${x-.1}" y="${y-.1}" width="${BADGE.w+.2}" height="${BADGE.h+.2}"><rect x="${x-.1}" y="${y-.1}" width="${BADGE.w+.2}" height="${BADGE.h+.2}" fill="url(#${id}g)"/></mask></defs>`;m=` mask="url(#${id})"`}
+ s+=`<g${m}><rect x="${x.toFixed(3)}" y="${y.toFixed(3)}" width="${BADGE.w}" height="${BADGE.h}" rx=".08" fill="${col}" stroke="${f.mv?col:'var(--ink)'}" stroke-width=".04"${f.mv?' stroke-dasharray=".07 .05"':''}/><text x="${(P.x+.38).toFixed(3)}" y="${(P.y+.3).toFixed(3)}" font-size=".26" font-weight="700" text-anchor="middle" fill="#fff" stroke="#000" stroke-width=".03" paint-order="stroke">${fn}</text></g>`});
+ if(top&&s.includes('bxinv'))s='<defs><filter id="bxinv" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0"/></filter></defs>'+s;return s}
+// bxGo() keeps the frame loop running while anything moves: each frame redraws only the two animation layers; when an animation ends the whole board is redrawn once, so the real Star, Connection and Fleet count take its place.
+function bxGo(){if(bxRaf)return;const step=()=>{bxRaf=0;const now=performance.now(),n0=bx.length;bxLive();const done=bx.filter(f=>bxDone(f,now));bx=bx.filter(f=>!done.includes(f));
+ if(done.length||bx.length!=n0){if(G&&!hvRO)render()}else{const l=$('bxl'),t=$('bxt');if(l)l.innerHTML=bxSVG(false);if(t)t.innerHTML=bxSVG(true)}
+ if(bx.some(f=>!f.hold||now<f.t0+f.ms))bxRaf=requestAnimationFrame(step)};bxRaf=requestAnimationFrame(step)}
+// bxNet(t) = the network path from the current player's Capital to Star t along their own Connections (shortest; the first one found when several tie, a placeholder), as star ids; [t] for the Capital itself.
+function bxNet(t){const me=cur(),cp=capStar(me);if(!cp||!t)return [t.id];if(cp===t)return [t.id];const par=new Map([[cp.id,null]]),q=[cp];while(q.length){const s=q.shift();if(s===t)break;G.conns.forEach(c=>{if(c[0]!=s.id&&c[1]!=s.id)return;const u=by(c[0]==s.id?c[1]:c[0]);if(u&&u.o==me&&!par.has(u.id)){par.set(u.id,s.id);q.push(u)}})}
+if(!par.has(t.id))return [t.id];const p=[t.id];while(par.get(p[0])!=null)p.unshift(par.get(p[0]));return p}
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
