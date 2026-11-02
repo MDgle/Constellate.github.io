@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-02-x",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-02-y",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -30,13 +30,13 @@ window.__diag=show;window.addEventListener("load",function(){setTimeout(function
 :root[data-theme="cgreen"] body,:root[data-theme="ccyan"] body,:root[data-theme="corange"] body{font-family:"VT323","Courier New",ui-monospace,monospace;font-size:19px;letter-spacing:.02em}
 :root[data-theme="cgreen"] #ov h1,:root[data-theme="ccyan"] #ov h1,:root[data-theme="corange"] #ov h1{font-family:inherit!important;font-style:normal!important;text-transform:uppercase}
 :root[data-theme="cgreen"] button,:root[data-theme="cgreen"] .chip,:root[data-theme="cgreen"] #ov>div,:root[data-theme="cgreen"] #msg,:root[data-theme="cgreen"] input,:root[data-theme="cgreen"] select,:root[data-theme="cgreen"] textarea,:root[data-theme="ccyan"] button,:root[data-theme="ccyan"] .chip,:root[data-theme="ccyan"] #ov>div,:root[data-theme="ccyan"] #msg,:root[data-theme="ccyan"] input,:root[data-theme="ccyan"] select,:root[data-theme="ccyan"] textarea,:root[data-theme="corange"] button,:root[data-theme="corange"] .chip,:root[data-theme="corange"] #ov>div,:root[data-theme="corange"] #msg,:root[data-theme="corange"] input,:root[data-theme="corange"] select,:root[data-theme="corange"] textarea{border-radius:0!important}
-/* Cassette filter: body.crt. A fixed overlay (never catches taps) draws scan lines and a dark vignette and flickers very slightly; a slow lighter band rolls down the screen; text glows a little. Everything is switched off by reduced-motion except the static lines. */
+/* Cassette filter: body.crt. A fixed overlay (never catches taps) draws scan lines and a dark vignette and flickers very slightly; a slow lighter band rolls down the screen; text glows a little. Everything moves whatever the Animations setting (the device's reduce-motion setting is not read since 2026-11-02-y). */
 body.crt{text-shadow:0 0 3px currentColor}
 body.crt::after{content:"";position:fixed;inset:0;z-index:2147483000;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.32) 0,rgba(0,0,0,.32) 1px,transparent 1px,transparent 3px),radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%);animation:crtf .12s steps(2) infinite}
 body.crt::before{content:"";position:fixed;left:0;right:0;top:0;height:18%;z-index:2147483000;pointer-events:none;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.05),transparent);animation:crtr 7s linear infinite}
 @keyframes crtf{0%{opacity:.94}100%{opacity:1}}
 @keyframes crtr{0%{transform:translateY(-120%)}100%{transform:translateY(660%)}}
-@media(prefers-reduced-motion:reduce){body.crt::after,body.crt::before{animation:none}body.crt::before{display:none}}
+
 /* html: fill the full height of the screen. */
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 /* body: no margin; stack children vertically (top panel, board, bottom bar); base font and colors; stop pull-to-refresh bounce and text selection. */
@@ -68,11 +68,11 @@ body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg
 .chip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,var(--panel))}.chip.dead{opacity:.4;text-decoration:line-through}
 /* (step 7) #tvp: the team totals line under the player chips (team games only; empty = hidden). */
 #tvp{font-size:12px;color:var(--mut);margin-top:4px}#tvp:empty{display:none}
-/* #modes: two mode buttons, Star (opens Set / Multi) and Fleet (opens Place / Move), each in its own slot (.mg); .act marks the selected one. A pair's second button (.sub) hides behind the first until its pair is open, then slides down from beneath it and hangs below the top panel, over the board (#top is raised above the board for this, z-index 3; popups #ov 4 and #ov2 6 stay above it). .calm (Animations Off) and reduced motion skip the slide. */
+/* #modes: two mode buttons, Star (opens Set / Multi) and Fleet (opens Place / Move), each in its own slot (.mg); .act marks the selected one. A pair's second button (.sub) hides behind the first until its pair is open, then slides down from beneath it and hangs below the top panel, over the board (#top is raised above the board for this, z-index 3; popups #ov 4 and #ov2 6 stay above it). .calm (Animations Off) skips the slide. */
 #top{position:relative;z-index:3}
 #modes{display:flex;gap:6px;margin-top:6px}#modes .mg{flex:1;position:relative;display:flex;min-width:0}#modes button{flex:1;min-height:38px;padding:0 6px;position:relative;z-index:1;white-space:nowrap;overflow:hidden}
 #modes .sub{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:0;box-shadow:0 4px 10px rgba(0,0,0,.45);transition:transform .22s ease-out,opacity .22s ease-out}#modes .sub.shut{transform:translateY(calc(-100% - 6px));opacity:0;pointer-events:none;box-shadow:none}
-#modes.calm .sub{transition:none}@media(prefers-reduced-motion:reduce){#modes .sub{transition:none}}#modes .act{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line);font-weight:600}
+#modes.calm .sub{transition:none}#modes .act{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line);font-weight:600}
 /* #st: the board area stretches to fill leftover space; position:relative lets overlays be placed inside it. */
 #st{flex:1;position:relative;min-height:0;overflow:hidden}
 /* svg: the drawing surface fills its area; touch-action:none lets our code handle finger drags and pinches. */
@@ -117,7 +117,7 @@ button{font:inherit;touch-action:manipulation;min-height:44px;min-width:44px;bor
 #mbar>div.on{background:var(--c);opacity:1}#mba.on{filter:brightness(.7)}#mba.win{filter:brightness(1.2);border:2px solid var(--ink)}
 :root[data-theme="cgreen"] #mbar>div,:root[data-theme="ccyan"] #mbar>div,:root[data-theme="corange"] #mbar>div{border-radius:0}
 /* (new) svg .hint: the dashed rings End turn puts on Stars that can still use Fuel; they stay for 1 second, then fade out. */
-svg .hint{animation:hintf 1.4s linear forwards}@keyframes hintf{0%,71%{opacity:1}100%{opacity:0}}@media(prefers-reduced-motion:reduce){svg .hint{animation:none}}
+svg .hint{animation:hintf 1.4s linear forwards}@keyframes hintf{0%,71%{opacity:1}100%{opacity:0}}
 button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #ov: full-screen dim backdrop that centers pop-up dialogs (hidden until JS shows it). */
 #ov{position:fixed;inset:0;z-index:4;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -148,7 +148,7 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* (new, 2026-10-28-c) #ov.pass: the Defence call question lets taps through to the board around it, so a ringed Star can still be tapped. svg .blk: the Retreat rings blink 4 times after Retreat is pressed (placeholder look). */
 /* (new, 2026-10-28-d) .sid = a Star's place ID (A1b2) drawn above it, shown only with the IDs side button (body.ids). Placeholder look. */
 /*CRAFT{*/.sid{display:none}body.ids .sid{display:inline}/*}CRAFT*/
-#ov.pass{pointer-events:none}#ov.pass>div{pointer-events:auto}svg .blk{animation:blk .4s ease-in-out 4}@keyframes blk{50%{opacity:.08}}@media(prefers-reduced-motion:reduce){svg .blk{animation:none}}
+#ov.pass{pointer-events:none}#ov.pass>div{pointer-events:auto}svg .blk{animation:blk .4s ease-in-out 4}@keyframes blk{50%{opacity:.08}}
 /* (new) .pchip: a player line on the round and end screens drawn as a player chip: a border in the player's color (--c) around a dull tint of it (22% of the color over the panel; plain panel on browsers without color-mix). Placeholder look, the place for chip cosmetics later. */
 .ord{min-width:30px;font-weight:700}.pchip{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 10px;border:2px solid var(--c);border-radius:8px;background:var(--panel);background:color-mix(in srgb,var(--c) 22%,var(--panel));color:var(--ink)}
 :root[data-theme="cgreen"] .pchip,:root[data-theme="ccyan"] .pchip,:root[data-theme="corange"] .pchip{border-radius:0}.scr{position:relative;color:transparent}.scr::after{content:attr(data-s);position:absolute;right:0;top:0;color:var(--ink)}
@@ -180,7 +180,7 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 .mq{overflow:hidden;white-space:nowrap;background:var(--sel-line);color:#000;border-radius:8px;margin-top:12px;padding:8px 0;font-weight:600;font-style:italic;font-size:14px}
 .mq span{display:inline-block;padding-left:100%;animation:mq 12s linear infinite}
 @keyframes mq{to{transform:translateX(-100%)}}
-@media(prefers-reduced-motion:reduce){.mq{white-space:normal;text-align:center;padding:8px 10px}.mq span{animation:none;padding-left:0}}
+
 /* (new) #ov button.ngoff: the Play button while choices are missing (grey, but still tappable so it can explain itself). */
 #ov button.ngoff{background:var(--dis);color:var(--dis-ink);border-color:var(--line)}
 /* (new) .blink: the Play button flashes the warning color when it is tapped before the New game choices are complete. */
@@ -228,8 +228,7 @@ input.csl::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:
 #hvq{display:flex;flex-wrap:wrap;gap:6px;padding:4px 10px 8px;background:var(--panel)}
 #hvq button{min-height:46px;padding:0 14px;font-weight:600;color:#000;border-color:transparent}#hvq button.cur{outline:3px solid var(--ink);outline-offset:1px}
 #hvm{box-sizing:border-box;height:33px;overflow-y:auto;padding:6px 10px 10px;background:var(--panel);color:var(--mut);font-size:13px;line-height:17px;border-top:1px solid var(--line)}
-/*SKY{*/
-/* Sky and side layout (Shmorden, 2026-11-02; preview only). Both are switched in Settings > Display and set up by skyLay (Sky section of the script).
+/* Sky and side layout (Shmorden, 2026-11-02; live since 2026-11-02-y). Both are switched in Settings > Display and set up by skyLay (Sky section of the script).
 html.sky = the Sky is on: #sky (a canvas behind the page) paints space, with a constellation per player and effects that react to the game, wherever
 the page is see-through: beside the board, above and below it on an upright phone, and over the whole screen behind the start menu (html.skymenu
 lifts the canvas over the game and under the dialog). The board gets its own dark backing square (drawn by boardSVG), so the sky never shows
@@ -251,7 +250,6 @@ html.side #chips,html.side #modes{flex-direction:column}html.side #modes .mg{fle
 html.side #zoom{position:fixed;left:var(--rx);top:8px;width:var(--pw);box-sizing:border-box;padding:0 10px;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}
 html.side #msg{position:fixed;left:calc(var(--so) + 10px);width:calc(var(--pw) - 20px);right:auto;bottom:10px;box-sizing:border-box}
 html.sky.side #top,html.sky.side #bar{background:transparent;border:0}html.sky.side #tut{background:color-mix(in srgb,var(--panel) 88%,transparent)}
-/*}SKY*/
 </style></head><body>
 <script type="text/plain" id="ptext">
 PLAYER TEXT: the words on the How to play page and in the tutorial lessons. Edit them here; the game reads them as they are.
@@ -484,8 +482,8 @@ o.innerHTML='<div>'+h+'</div>';o.style.display='flex';o.style.alignItems='';if(o
 // (new) Redrawing the SAME dialog (a tap that changes a choice) keeps its scroll position instead of jumping to the top; a different dialog starts at the top.
 try{const n=o.firstChild;if(top&&was&&n&&n.querySelector&&((n.querySelector('h1')||{}).textContent||'')==was)(n.querySelector(':scope>.ovb')||n).scrollTop=top}catch(e){}
 // (new) Animation: a dialog that opens from nothing grows vertically from its middle. Redrawing a dialog that is already open (a tab or choice changed) does not replay it.
-try{if(!wasOpen&&animEff()!='off'&&o.firstChild&&o.firstChild.classList&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}
-else if(wasOpen&&dir&&oldInner&&animEff()!='off'&&o.firstChild&&o.firstChild.animate&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){if(ovDefer)ovDefer={oldInner,oldH,dir};else ovSwipe(o.firstChild,oldInner,oldH,dir)}}catch(e){}}
+try{if(!wasOpen&&animEff()!='off'&&o.firstChild&&o.firstChild.classList){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}
+else if(wasOpen&&dir&&oldInner&&animEff()!='off'&&o.firstChild&&o.firstChild.animate){if(ovDefer)ovDefer={oldInner,oldH,dir};else ovSwipe(o.firstChild,oldInner,oldH,dir)}}catch(e){}}
 // (2026-10-29-i) ovDefer = true while menuPage draws: ov() then keeps the page swipe ({oldInner, oldH, dir}) instead of playing it, and menuPage plays it once menuPin has placed and sized the window. Played at once, the swipe animated the content that menuPin then rewraps for scrolling (ovSc), so a page taller than the screen (Settings) appeared with no swipe and its window jumped.
 let ovDefer=null;
 // (new) ovSc(b) sets up dialog box b for its size: it first undoes an earlier setup, then, when the content is taller than the box and ends with a button row (.r), moves everything before that row into a scrolling part (.ovb) and marks the box (class ovsc, see the CSS), so the row stays at the bottom edge. Elements keep their ids. It runs after drawing, in menuPin (which measures the content with the setup undone) and after a page swipe.
@@ -496,14 +494,14 @@ function ovSc(b){if(!b||!b.classList)return;ovUnwrap(b);const f=b.lastElementChi
 // (new) Closing animation. Dialogs are closed all over the code with $('ov').style.display='none'. A watcher on that style notices the change and, instead of letting the dialog vanish, shows it again for a moment while it plays the opening in reverse (the window shrinks vertically to a line and fades, and so does the dim backdrop), then really hides it. A new ov() call in the middle cancels the close. ovPrev = the display value seen last. obsFlush() drops the watcher's own changes so they do not re-trigger it.
 function obsFlush(){try{ovObs.takeRecords()}catch(e){}ovPrev=$('ov').style.display}
 const ovObs=new MutationObserver(()=>{const o=$('ov'),d=o.style.display,box=o.firstChild;
-if(d=='none'&&ovPrev=='flex'&&!ovClosing&&box&&box.animate&&animEff()!='off'&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)){
+if(d=='none'&&ovPrev=='flex'&&!ovClosing&&box&&box.animate&&animEff()!='off'){
 o.style.display='flex';o.style.pointerEvents='none';const t=animMs(),ease='cubic-bezier(.4,0,.8,.6)',a1=box.animate([{transform:'none',opacity:1},{transform:'scaleY(.05)',opacity:0}],{duration:t,easing:ease,fill:'forwards'}),a2=o.animate([{opacity:1},{opacity:0}],{duration:t,easing:'ease-in',fill:'forwards'});ovClosing=[a1,a2];ovWasClosing=true;obsFlush();
 Promise.all([a1.finished,a2.finished]).then(()=>{if(ovClosing&&ovClosing[0]===a1){ovClosing=null;ovWasClosing=false;[a1,a2].forEach(a=>{try{a.cancel()}catch(e){}});o.style.display='none';o.style.pointerEvents='';obsFlush()}}).catch(()=>{});return}
 ovPrev=d});
 ovObs.observe($('ov'),{attributes:true,attributeFilter:['style']});
 // (new) ov2(h) shows a SECOND dialog containing the HTML h on top of the dialog that is already open; the page underneath is left exactly as it is. ov2Close(now) removes it (now = skip the closing animation). ov2T = the pending end of a closing animation. Redrawing an open ov2 (a choice changed) does not replay the opening animation.
 let ov2T=null;
-const ov2Calm=()=>!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
+const ov2Calm=()=>animEff()=='off';
 function ov2(h){const o=$('ov2'),was=o.style.display=='flex'&&!ov2T;if(ov2T){clearTimeout(ov2T);ov2T=null;try{o.getAnimations().forEach(a=>a.cancel())}catch(e){}o.style.pointerEvents=''}
 o.innerHTML='<div>'+h+'</div>';o.style.display='flex';
 try{if(!was&&animEff()!='off'&&!ov2Calm()){const n=o.firstChild;n.style.animationDuration=animMs()+'ms';n.classList.add('pop');if(o.animate)o.animate([{opacity:0},{opacity:1}],{duration:animMs(),easing:'ease-out'});n.addEventListener('animationend',()=>n.classList.remove('pop'),{once:true})}}catch(e){}}
@@ -531,8 +529,8 @@ function menu(){ovDir=-1;let sv=null;try{sv=localStorage.getItem(KEY)}catch(e){}
 // (new) Online: while in an online game the start menu is replaced by the online one.
 if(net.on)return netMenuGame();
 // (changed) The start screen: New game (opens the New game page), Continue if a save was found, (2026-10-29-m, Shmorden) Quick game on its own row under Continue, Tutorial (preview only) on its own row just above Credits, Load game (2026-10-28-b: a page with File and Transcript, see loadDlg; so a saved game, including a finished one with its history, can be opened without starting a new game first), Join online game, and Rejoin if this browser was in a room.
- ov('<h1 style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;">Constellate</h1><p style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;font-size:calc(26px*10/17);margin:0 0 12px">Created by Matthew D. Yglesias</p><div class="r" style="margin-bottom:12px"><button onclick="howToDlg()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">How to play</button></div><div class="r"><button id="mnew" onclick="menuNew()">New game</button></div>'+(sv?'<div class="r" style="margin-top:8px"><button onclick="cont()">Continue saved game</button></div>':'')+'<div class="r" style="margin-top:8px"><button id="mquick" onclick="quickGame()">Quick game</button></div><div class="r" style="margin-top:8px"><button onclick="loadDlg()">Load game</button><button onclick="netMenuOpen()">Join online game</button></div>'+'<div class="r" style="margin-top:8px"><button onclick="settingsDlg()">Settings</button>'+(netSess()?'<button onclick="netResume()">Rejoin online game</button>':'')+'</div>'+/*TUT{*/'<div class="r" style="margin-top:8px"><button onclick="tutDlg(1)">Tutorial</button></div>'+/*}TUT*/'<div class="r" style="margin-top:8px"><button onclick="creditsDlg()">Credits</button></div>'+'<input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>'+menuBanner())}
-// (new) menuBanner() = the scrolling tip strip at the bottom of the main menu, in the theme's selected-button border color (--sel-line), italic, with black or white text chosen by how light that color is so it reads on every theme. MENU_TIPS = the messages (add more here). Each time the main menu is drawn a different tip is shown (never the same one twice in a row). The scroll time grows with the text length so the speed stays steady. With reduced motion on, the tip is shown still instead of scrolling.
+ ov('<h1 style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;">Constellate</h1><p style="text-align:center;font-family:Oswald,system-ui,sans-serif;font-style:italic;font-size:calc(26px*10/17);margin:0 0 12px">Created by Matthew D. Yglesias</p><div class="r" style="margin-bottom:12px"><button onclick="howToDlg()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">How to play</button></div><div class="r"><button id="mnew" onclick="menuNew()">New game</button></div>'+(sv?'<div class="r" style="margin-top:8px"><button onclick="cont()">Continue saved game</button></div>':'')+'<div class="r" style="margin-top:8px"><button id="mquick" onclick="quickGame()">Quick game</button><button onclick="ssDlg()">Screen saver</button></div><div class="r" style="margin-top:8px"><button onclick="loadDlg()">Load game</button><button onclick="netMenuOpen()">Join online game</button></div>'+'<div class="r" style="margin-top:8px"><button onclick="settingsDlg()">Settings</button>'+(netSess()?'<button onclick="netResume()">Rejoin online game</button>':'')+'</div>'+/*TUT{*/'<div class="r" style="margin-top:8px"><button onclick="tutDlg(1)">Tutorial</button></div>'+/*}TUT*/'<div class="r" style="margin-top:8px"><button onclick="creditsDlg()">Credits</button></div>'+'<input id="lf" type="file" accept=".json,.txt" hidden onchange="fromFile(this)"><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p>'+menuBanner())}
+// (new) menuBanner() = the scrolling tip strip at the bottom of the main menu, in the theme's selected-button border color (--sel-line), italic, with black or white text chosen by how light that color is so it reads on every theme. MENU_TIPS = the messages (add more here). Each time the main menu is drawn a different tip is shown (never the same one twice in a row). The scroll time grows with the text length so the speed stays steady. (2026-11-02-y) It scrolls whatever the device's reduce-motion setting says.
 const MENU_TIPS=['Customize your theme in the settings menu!','Make a custom opponent in the CPU Designer!','Hone your skills on smaller board sizes!'];
 let tipLast=-1;
 function menuBanner(){let i;do{i=Math.floor(Math.random()*MENU_TIPS.length)}while(i==tipLast&&MENU_TIPS.length>1);tipLast=i;const t=MENU_TIPS[i];
@@ -912,7 +910,7 @@ const bp=bxPre(b);G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=s
 mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost],rt:rets.map(id=>mvPos(by(id)))});
 // (Sound effects) Take a Star (Multi-attack for several attackers) for the attacker, or Lose a Star when it happens to a person here and the attacker is not; then Fleet destroyed and Fleet retreat, a moment later so they don't pile up.
 // (2026-11-02-n) the Take's bass starts as the Star taken ring does and lasts as long (tk, from bxTake; nothing with animations off).
-const tk=bxTake(b,bp,att,dec,fpv,fp)||{};if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me,tk.d,{len:tk.ms});/*SKY{*/ambTake(me,dfc);/*}SKY*/if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);
+const tk=bxTake(b,bp,att,dec,fpv,fp)||{};if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me,tk.d,{len:tk.ms});ambTake(me,dfc);if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+c+' Fuel.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
 // ===== Team mode: data model and helpers (team project step 2) =====
@@ -1176,7 +1174,7 @@ const rk=c=>(G.alive[c]?0:1e6)-(top.includes(c)?1e5:0)-vp[c]*100-nStars(c);body=
 if(G.round>30&&clearWin(top))sub+='<p style="margin:0 0 8px">Decided in '+rdName(G.round)+'.</p>';
 // (2026-10-31) The computers' personalities, so a Surprise me pick is revealed: "Red was Easy Hunter (Surprise me)". Preview only (paid).
 /*PERS{*/{const es=G.cpu?G.pl.filter(c=>esSty(c)).map(c=>NM[c]+' was '+esLabel(c)+(G.cpuQ&&G.cpuQ[c]?' (Surprise me)':'')):[];if(es.length)sub+='<p style="margin:0 0 8px;color:var(--mut);font-size:13px">'+es.join('. ')+'.</p>'}/*}PERS*/
-ov('<h1>'+head+'</h1>'+sub+'<div class="erl">'+body+'</div>'+btn);if(anim)endSeq()}
+ov('<h1>'+head+'</h1>'+sub+'<div class="erl">'+body+'</div>'+(G===ssG&&ssKeep?ssBtns():btn));if(anim)endSeq();if(G===ssG&&ssKeep)ssAfter()}
 // tap(bx,by,np) runs when the board is tapped, in board units (np = a drag was dropped on a Star here: don't pick a move preview, carry on with the selected Star). cx,cy = the system column and row. Do nothing without a game or after it ends.
 function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floor(by);
 // (board animations) While a Fleet group slides to the next Star a Hitchhike? question asks about, the board ignores taps until the question opens.
@@ -1364,7 +1362,7 @@ if(newRound)roundPop()}
 // sp(...) builds the corner points of a 7-pointed star polygon by alternating a big and small radius around a circle.
 const sp=(x,y,R,r)=>[...Array(14)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/7,q=i%2?r:R;return(x+q*Math.cos(a)).toFixed(2)+','+(y+q*Math.sin(a)).toFixed(2)}).join(' ');
 // boardSVG(S,ctl,L) = the ONE drawing routine for a board. S = any game state (the live G or a rebuilt snapshot), ctl = who controls each sector in S, L = live-only overlays ({me,used,sel,multi,hl}) or null for a read-only picture such as the history viewer. It returns the SVG text.
-function boardSVG(S,ctl,L){let s='';/*SKY{*/if(L&&AMB&&AMB.on)s+='<rect id="skyb" x="0" y="0" width="'+NSYS(S)+'" height="'+NSYS(S)+'" fill="var(--bg)" fill-opacity=".93"/>';/*}SKY*/
+function boardSVG(S,ctl,L){let s='';if(L&&AMB&&AMB.on)s+='<rect id="skyb" x="0" y="0" width="'+NSYS(S)+'" height="'+NSYS(S)+'" fill="var(--bg)" fill-opacity=".93"/>';
 // Tint each controlled sector in its owner's color.
  ctl.forEach((r,y)=>r.forEach((c,x)=>{if(c>=0)s+=`<rect x="${x*3}" y="${y*3}" width="3" height="3" fill="${COL[c]}" opacity=".14"/>`}));
 // Grid lines for 0 to the board size (21, 15 or 9): every third line is thick (sector border), the rest thin and dashed (system border).
@@ -1425,7 +1423,7 @@ function boardSVG(S,ctl,L){let s='';/*SKY{*/if(L&&AMB&&AMB.on)s+='<rect id="skyb
  if(L&&L.dd)s+='<g id="ddg">'+ddSVG()+'</g>';
 // Put all the shapes into the page, then highlight the active mode button and update the Place label.
  return s}
-// (new) fuelUi(n) = the Fuel gauge in the info row: "Fuel n" and the bar, filled n out of this round's Fuel (acts), so it starts full and empties as Fuel is spent. n is the Fuel left after any multi-attack lines being chosen, so the bar also drops while a multi-attack is set up, and rises again on Cancel, Undo or a cancelled preview. The dashed step lines are rebuilt only when the round's Fuel changes. The fill slides at the Animations speed (animMs; none when Animations are off or reduced motion is on), see fuelGo.
+// (new) fuelUi(n) = the Fuel gauge in the info row: "Fuel n" and the bar, filled n out of this round's Fuel (acts), so it starts full and empties as Fuel is spent. n is the Fuel left after any multi-attack lines being chosen, so the bar also drops while a multi-attack is set up, and rises again on Cancel, Undo or a cancelled preview. The dashed step lines are rebuilt only when the round's Fuel changes. The fill slides at the Animations speed (animMs; none when Animations are off), see fuelGo.
 let fuelTot=-1,fuelPct=-1,fuelPos=null,fuelRaf=0;
 // (new) fuelGo(to,ms) slides the Fuel bar to fraction `to` of its width in ms. x = the flat end of the bar (#ffill), c = the end of the crescent or cap. Fuel dropping: the flat end leads; the crescent stays put until the flat end reaches the bottom of its hollow (D = 8 px), then is pulled along with its hollow at the flat end; when the flat end stops, the crescent keeps going until it is hidden under the bar again. Fuel rising: the rounded cap leads, up to D ahead of the flat end, which catches up after the cap stops. ms = 0 jumps straight there. A change while sliding starts from where the bar is.
 function fuelGo(to,ms){cancelAnimationFrame(fuelRaf);const F=$('ffill'),C=$('fcres'),K=$('fcap'),draw=(x,c,dir)=>{F.style.width=x*100+'%';C.style.width=(dir=='dn'?c:0)*100+'%';K.style.width=(dir=='up'?c:0)*100+'%'};
@@ -1439,12 +1437,12 @@ fuelPos={x,c,dir};draw(x,c,dir);if(now-t0<ms+cm)fuelRaf=requestAnimationFrame(st
 fuelRaf=requestAnimationFrame(step)}
 function fuelUi(n){const tot=Math.max(1,acts(G.round),n),pct=Math.max(0,Math.min(100,n/tot*100));$('fueln').textContent='Fuel '+n;$('fuel').style.visibility='';
 if(tot!=fuelTot){fuelTot=tot;let h='';for(let k=1;k<tot;k++)h+='<i style="left:'+(k/tot*100)+'%"></i>';$('fdiv').innerHTML=h}
-if(pct==fuelPct)return;const ms=fuelPct<0||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)?0:animMs();fuelPct=pct;fuelGo(pct/100,ms)}
+if(pct==fuelPct)return;const ms=fuelPct<0||animEff()=='off'?0:animMs();fuelPct=pct;fuelGo(pct/100,ms)}
 // persist() autosaves the game in the browser (silently ignores errors).
-function persist(){if(hvRO)return;try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
+function persist(){if(hvRO||ssMk||(G&&G===ssG))return;try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 // render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
 // (new) rs = the selected Star in Stars mode (its Fuel range is outlined); none while an attack is being resolved (pend: Fleet choice and the Defence call) or with the range border switched off (rngOn). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. (new) While a Star is dragged (dg), the outline is drawn round its origin with the Fuel the drag may spend (dg.n), and the Fuel shown is what would be left after the drop. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
-function render(){/*SKY{*/ambKick();/*}SKY*/if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
+function render(){ambKick();if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;autoMode();
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
 const da=dg&&ddStar(dg.k)&&by(dg.a);
@@ -1469,7 +1467,7 @@ function applyNow(){W.setAttribute('transform',`translate(${view.x} ${view.y}) s
 // fit() sizes the whole board to the screen and centers it. (new) It stops a camera move first (camStop).
 function fitTo(V,box,ap){const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
-// (2026-10-28-c, Shmorden) Fitting pans and zooms there with the camera animation (camGo, Animations speed) instead of jumping; (-d) a window resize or turning the phone glides too. now = jump (the first drawing, tests); Animations off or reduced motion (the phone's "remove animations" setting) jump too.
+// (2026-10-28-c, Shmorden) Fitting pans and zooms there with the camera animation (camGo, Animations speed) instead of jumping; (-d) a window resize or turning the phone glides too. now = jump (the first drawing, tests); Animations off jumps too.
 function fit(now){camStop();if(now||!G||calm())return fitTo(view,st,apply);camGo(camFit(),camMs())}
 // zoomAt(f,px,py) zooms by factor f while keeping point (px,py) still, within zoom limits. (new) On the live board it first stops a turn-change camera move (camStop), so the + and - buttons win.
 function zoomAt(f,px,py,V,ap){V=V||view;ap=ap||apply;if(V===view)camStop();const nk=Math.max(V.min*.9,Math.min(90,V.k*f)),r=nk/V.k;V.x=px-(px-V.x)*r;V.y=py-(py-V.y)*r;V.k=nk;ap()}
@@ -1833,7 +1831,7 @@ if(m.k=='g')return 'Gift '+N(m.a)+' → '+N(m.b)+C;if(m.k=='h')return 'Give '+F(
 if(m.k=='x')return 'Concedes';if(m.k=='e')return 'Ends the game (highest score wins)';return ''}
 // histSave() writes the history (compressed when the browser can) to its own storage key. It runs only when a turn is committed, a game starts or is loaded, or the game ends: never from render() or persist(). Writes are queued so an older one can never overwrite a newer one.
 let hq=Promise.resolve();
-function histSave(){if(hvRO)return;hq=hq.then(async()=>{if(!H)return;try{const json=JSON.stringify(H);let v='j:'+json;try{if(typeof CompressionStream=='function')v='d:'+b64u(await pipe(new TextEncoder().encode(json),new CompressionStream('deflate-raw')))}catch(e){}localStorage.setItem(HIST_KEY,v)}catch(e){}}).catch(()=>{})}
+function histSave(){if(hvRO||ssMk||(G&&G===ssG))return;hq=hq.then(async()=>{if(!H)return;try{const json=JSON.stringify(H);let v='j:'+json;try{if(typeof CompressionStream=='function')v='d:'+b64u(await pipe(new TextEncoder().encode(json),new CompressionStream('deflate-raw')))}catch(e){}localStorage.setItem(HIST_KEY,v)}catch(e){}}).catch(()=>{})}
 // histRead() loads the stored history (or nothing).
 async function histRead(){try{const v=localStorage.getItem(HIST_KEY);if(!v)return null;let json;if(v.startsWith('d:'))json=new TextDecoder().decode(await pipe(ub64(v.slice(2)),new DecompressionStream('deflate-raw')));else if(v.startsWith('j:'))json=v.slice(2);else return null;return JSON.parse(json)}catch(e){return null}}
 // prepHist(h) checks a history completely and returns it, or null if anything is off, so a bad file can never crash the viewer.
@@ -1969,7 +1967,7 @@ function menuPin(top){const o=$('ov'),b=o.firstChild;if(top==null||!b)return;ovU
 // gamePage() = Game page: Quick save, Notes, the room (online only), Main menu, End game, Concede. (2026-10-29-f) Its settings moved to the Settings page.
 // mainMenu() = the Main menu button (the in-game Menu's Game page, and the end screen since 2026-10-29-i): autosave the game (the same save the Continue saved game button loads) and show the start menu. The game stays in memory, so while it is unfinished New game refuses (menuNew); Continue saved game reloads it.
 // (2026-10-29-i, Shmorden: online games get Main menu too) Online it first asks (netMainAsk), since the start menu is outside the room: Leave leaves the online game exactly like the Leave game / End online game button (netLeave: the host's leaving ends it for everyone), the board stays here as a local game, and the start menu opens; Back returns to the Menu (or the end screen).
-function mainMenu(){if(!G)return;if(net.on)return netMainAsk();persist();histSave();resetFlow();$('ov').onclick=null;menu()}
+function mainMenu(){if(!G)return;if(net.on)return netMainAsk();if(ssKeep&&G===ssG){ssStop();resetFlow();$('ov').onclick=null;return menu()}persist();histSave();resetFlow();$('ov').onclick=null;menu()}
 function netMainAsk(){const host=net.role=='host';$('ov').onclick=null;ov('<h1>Leave the online game?</h1><p>'+(host?'You are the host, so leaving ends the online game for everyone. ':'')+'The board stays on this device as a local game: Continue saved game on the main menu opens it.</p><div class="r"><button onclick="saveUI()">Back</button><button onclick="netLeave();mainMenu()">Leave</button></div>')}
 // (2026-10-29-k, Shmorden) quickGame() = the start menu's Quick game button: a Solo game with everything picked at random and started at once: the board size (7x7, 5x5 or 3x3), 2 or 4 players (placeholder: Shmorden named no number), your seat (in its usual color), and each computer's level (Easy, Medium or Hard) and color; computers are named by color initial and level (R.Easy, qkNm; any color, b.Easy and B.Easy tell blue and Brown apart, 2026-10-29-l). The New game page's choices are left as they were. Refused like New game while a game is in progress. (2026-10-30-b) A 4-player Quick game has Teams on half the time (placeholder), always 2 against 2 with your partner picked at random. (2026-10-31) A computer whose level has personalities gets Surprise me (preview only, paid).
 function quickGame(){if(G&&!G.over&&!net.on){const b=$('mquick');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}
@@ -1977,6 +1975,40 @@ const R=a=>a[Math.floor(Math.random()*a.length)],sz=R([7,5,3]),n=R([2,4]),pl=n==
 pl.forEach(c=>{if(c==me)return;cpu[c]=R([1,2,3]);const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
 let team=null;if(n==4&&Math.random()<.5){const o=pl.slice().sort(()=>Math.random()-.5);team={};o.forEach((c,i)=>team[c]=i<2?1:2)}
 let sty=null;/*PERS{*/sty={};pl.forEach(c=>{if(ES_NAMES[cpu[c]])sty[c]='r'});/*}PERS*/start(n,sz,null,cpu,team,{pc,qk:1},sty)}
+// ===== Screen saver =====
+// (2026-11-02-y, Shmorden: "with our quick game settings, widescreen effects and sounds its time to make screen saver mode") The start menu's
+// Screen saver button opens a page of four choices, each with Random: Players (2 or 4), Difficulty (Easy, Medium, Hard; Random = each computer
+// its own), Board (7x7, 5x5, 3x3) and CPU speed (Normal, Fast, Instant). Start plays a game of computers only; Randomize all and start sets every
+// choice to Random and starts at once. When a game ends its end screen shows for SS_END_MS (Next game now and Main menu are its only buttons),
+// then the next game starts, rolling the Random choices again, for as long as the player leaves it. Colors are drawn like Quick game's (all ten,
+// computers named R.Easy and so on) and a level with personalities gets Surprise me (preview only, paid). Exiting is Menu > Main menu (or the
+// end screen's Main menu): that ends the screen saver game (it cannot be continued) and puts back the game that was open before, if any.
+// A screen saver game is never saved: persist and histSave skip it (ssG), so the player's own saved game (Continue saved game) is untouched.
+// Every default here (the 2 / Medium / 7x7 / Normal first choices, SS_END_MS, the texts, no Teams) is a placeholder (docs/PLACEHOLDERS.md).
+// ss = the choices, remembered in this browser ('r' = Random). ssG = the screen saver's current game (the G object), null when none.
+// ssMk = true while ssNext is starting a game (before ssG is that game). ssKeep = {G, H, ms}: the game, history and CPU speed from before the screen saver, put back by ssStop. ssT = the timer that starts the next game.
+const SS_KEY='constellate-saver',SS_END_MS=10000,SS_OPT={n:[[2,'2'],[4,'4']],lv:[[1,'Easy'],[2,'Medium'],[3,'Hard']],sz:[[7,'7x7'],[5,'5x5'],[3,'3x3']],sp:[[700,'Normal'],[250,'Fast'],[0,'Instant']]};
+let ss={n:2,lv:2,sz:7,sp:700},ssG=null,ssKeep=null,ssT=null,ssMk=false;try{const o=JSON.parse(localStorage.getItem(SS_KEY)||'null');if(o)Object.keys(ss).forEach(k=>{if(o[k]=='r'||SS_OPT[k].some(x=>x[0]===o[k]))ss[k]=o[k]})}catch(e){}
+// ssDlg() = the Screen saver page (from the start menu). ssSet(k,v) = one choice tapped ('r' = Random); the page redraws in place.
+function ssDlg(){$('ov').onclick=null;const row=(t,k)=>'<p style="margin:12px 0 4px;font-weight:600">'+t+'</p><div class="r">'+SS_OPT[k].concat([['r','Random']]).map(([v,l])=>'<button'+(ss[k]===v?' class="act"':'')+' onclick="ssSet(\''+k+'\',\''+v+'\')">'+l+'</button>').join('')+'</div>';
+ov('<h1>Screen saver</h1><p style="margin:0 0 4px">Computers play each other, one game after another. To stop, open the Menu and choose Main menu.</p>'+row('Players','n')+row('Difficulty','lv')+row('Board','sz')+row('CPU speed','sp')+'<div class="r" style="margin-top:14px"><button onclick="ssStart()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Start</button></div><div class="r" style="margin-top:8px"><button onclick="ssStart(1)">Randomize all and start</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>')}
+function ssSet(k,v){ss[k]=v=='r'?'r':+v;try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}ovDir=0;ssDlg()}
+// ssStart(all) = Start (all = Randomize all and start: every choice becomes Random, remembered). Keeps the open game to put back later.
+function ssStart(all){if(net.on)return;if(all){Object.keys(ss).forEach(k=>ss[k]='r');try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}}
+const own=G&&G!==ssG;ssKeep={G:own?G:null,H:own?H:null,ms:cpuMs};ssNext()}
+// ssNext() = start the next screen saver game with the choices, rolling each Random one again.
+function ssNext(){clearTimeout(ssT);ssT=null;if(!ssKeep)return;const R=a=>a[Math.floor(Math.random()*a.length)],pick=k=>ss[k]=='r'?R(SS_OPT[k]).at(0):ss[k];
+const n=pick('n'),sz=pick('sz'),pl=n==2?[0,2]:[0,2,3,1],cpu={},pc={},used=new Set();cpuMs=pick('sp');
+pl.forEach(c=>{cpu[c]=pick('lv');const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
+let sty=null;/*PERS{*/sty={};pl.forEach(c=>{if(ES_NAMES[cpu[c]])sty[c]='r'});/*}PERS*/
+$('ov').style.display='none';ssMk=true;try{start(n,sz,null,cpu,null,{pc,qk:1},sty)}finally{ssMk=false}ssG=G;render()}
+// ssAfter() = a screen saver game's end screen is showing: the next game starts after SS_END_MS, unless the player has left by then.
+function ssAfter(){if(ssT||G!==ssG)return;const g=G;ssT=setTimeout(()=>{ssT=null;if(G===g&&G===ssG&&ssKeep)ssNext()},SS_END_MS)}
+// ssStop() = leaving the screen saver (mainMenu): the game ends where it stands, the CPU speed and the game from before come back.
+function ssStop(){clearTimeout(ssT);ssT=null;clearTimeout(cpuTimer);cpuTimer=null;if(G&&G===ssG&&!G.over){const {vp}=calc();G.score=vp;G.over=winners(vp)}
+const k=ssKeep;ssKeep=null;if(!k)return;if(cpuMs!==k.ms)cpuMs=k.ms;if(k.G){G=k.G;H=k.H;ssG=null;setLook(G)}}
+// ssBtns() = the end screen's buttons in a screen saver game.
+const ssBtns=()=>'<div class="ovft" style="margin-top:14px"><p style="margin:0 0 8px;color:var(--mut)">Screen saver: the next game starts in a few seconds.</p><div class="r"><button onclick="ssNext()">Next game now</button><button onclick="mainMenu()">Main menu</button></div></div>';
 // menuNew() = the start menu's New game button. While a game is in progress (loaded, not over) it does not open the New game page: the button blinks like Play does and a line says why.
 function menuNew(){if(G&&!G.over&&!net.on){const b=$('mnew');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}newGameOpen()}
 // endGameDlg() = the Menu's End game button: asks first (same look as Concede), then doEndGame ends the game for everyone.
@@ -2427,10 +2459,10 @@ const SET_SECS=[['g','Game'],['k','Controls'],['d','Display']];
 function setSec(k,start){const b=(f,t,x)=>'<button onclick="'+f+'"'+(x||'')+' style="display:block;width:100%;margin-top:8px">'+t+'</button>';
 if(k=='g')return b('placeToggle(this)',placeLabel(),G&&G.pm?' disabled':'')+b('pvToggle(this)',pvLabel())+b('faCycle(this)',faLabel());
 if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ctlLabel())+qBtn('hap','display:block;width:100%;margin-top:8px');
-return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+/*SKY{*/b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+/*}SKY*/b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
+return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-02-x';
+const BUILD='2026-11-02-y';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2763,7 +2795,7 @@ setInterval(musTick,500);document.addEventListener('pointerdown',()=>{if(soundOn
 // sfx(ev,dl) plays the sound chosen for event ev, if Sound is on. sndHere(c) = color c is a person on this device. sfxMe(ev,c,dl) = a move by color c (the player whose turn it is when left out): it plays for a person on this device, and for a computer only with Computer sounds on (sndCpuOk) and never for a selection (Star select, Fleet select, Deselect: Shmorden 2026-11-02, selection sounds are for people only). Online, the other side's moves are silent.
 // sfxAny(ev,cs,dl) = something that involves the colors cs (an attack): it plays if any of them is a person here, or a computer with Computer sounds on (sndCpuOk).
 let sndLast=0;
-function sfx(ev,dl,o){/*SKY{*/ambEv(ev,dl);/*}SKY*/sndLast=Date.now();if(!soundOn)return;const s=sndByName(sndEv[ev]);if(s)sndPlayS(s,dl,sndHow(ev,s,o))}
+function sfx(ev,dl,o){ambEv(ev,dl);sndLast=Date.now();if(!soundOn)return;const s=sndByName(sndEv[ev]);if(s)sndPlayS(s,dl,sndHow(ev,s,o))}
 // ---- The instrument set (Shmorden 2026-11-02-n): what happens on the board becomes part of the music. sndHow(ev,s,o) = how event ev
 // plays sound s: Star set = the next note of a tune (sndMel); Take, Multi-attack made and Deficit Elimination (SND_ROOTED) = moved to the
 // loop's note now (their pitches are written for D, the loop's first note, so a Take on B plays a B); Fleet move = its slide up or down at
@@ -2827,10 +2859,10 @@ function sndChordSync(){const s=sndByName(sndEv.multiNote),who=G?cur():null,w=so
  while(sndCh.H.length<w)sndCh.H.push(sndPlayS(s,0,{hold:1,r:sndChordTone(sndCh.n,sndCh.H.length)/s.L[0].f1}));
  while(sndCh.H.length>w)sndRelease(sndCh.H.pop());if(!w)sndCh=null}
 const sndHere=c=>c!=null&&!cpuOf(c)&&!(net.on&&!net.my.includes(c));
-function sfxMe(ev,c,dl,o){/*SKY{*/ambEv(ev,dl,c);/*}SKY*/if(!G)return sfx(ev,dl,o);if(c==null)c=cur();if(sndHere(c))return sfx(ev,dl,o);if(cpuOf(c)&&sndCpuOk()&&!SND_SELS.includes(ev))sfx(ev,dl,o)}
+function sfxMe(ev,c,dl,o){ambEv(ev,dl,c);if(!G)return sfx(ev,dl,o);if(c==null)c=cur();if(sndHere(c))return sfx(ev,dl,o);if(cpuOf(c)&&sndCpuOk()&&!SND_SELS.includes(ev))sfx(ev,dl,o)}
 // sndNo() = Move refused, for a person on this device only (a computer's tried and refused moves are never heard).
 function sndNo(){if(!G||sndHere(cur()))sfx('refuse')}
-function sfxAny(ev,cs,dl){/*SKY{*/ambEv(ev,dl);/*}SKY*/if(!G||cs.some(sndHere)||(sndCpuOk()&&cs.some(cpuOf)))sfx(ev,dl)}
+function sfxAny(ev,cs,dl){ambEv(ev,dl);if(!G||cs.some(sndHere)||(sndCpuOk()&&cs.some(cpuOf)))sfx(ev,dl)}
 // Menu button tap: any button tap plays Tick, unless the button set off a sound of its own (checked just after its tap is handled) or carries data-ns (the Sound page's play buttons). Button denied: a tap on a greyed-out button, or on one with the striped "not yet" look (nogo).
 document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(!b||b.disabled||b.dataset.ns!=null)return;setTimeout(()=>{if(Date.now()-sndLast>150)sfx('tap')},0)},true);
 document.addEventListener('pointerup',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(b&&(b.disabled||b.classList.contains('nogo')))sfx('deny')},true);
@@ -2927,9 +2959,12 @@ async function sndFile(name,t){try{if(dl)await dl.save({filename:name,data:t});e
 function sndFileIn(inp){const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{sndImport(String(r.result||''));inp.value=''};r.readAsText(f)}
 /*}SND*/
 // ===== Turn and round transitions: camera moves, round screen and end screen reveals =====
-// (new) Shmorden's request 2026-10-26. On every change of turn the board moves to the player whose turn it is (camBox): within a round it pans and zooms there in one move; at a new round it zooms out to Fit first. At the end of a round it zooms out and the round screen plays its reveal (roundPop, rpSeq); the zoom in waits until that screen is closed. At the end of the game it zooms out and the end screen plays its reveal (overDlg, endSeq). Animations Off (or the phone's reduce-motion setting) turns all of it off. With CPU speed Instant a computer's turn only zooms out. A touch, drag or wheel on the board stops a camera move where it is. All timings come from the Animations speed (animMs) and are placeholders.
+// (new) Shmorden's request 2026-10-26. On every change of turn the board moves to the player whose turn it is (camBox): within a round it pans and zooms there in one move; at a new round it zooms out to Fit first. At the end of a round it zooms out and the round screen plays its reveal (roundPop, rpSeq); the zoom in waits until that screen is closed. At the end of the game it zooms out and the end screen plays its reveal (overDlg, endSeq). Animations Off turns all of it off. With CPU speed Instant a computer's turn only zooms out. A touch, drag or wheel on the board stops a camera move where it is. All timings come from the Animations speed (animMs) and are placeholders.
 // calm() = no animations wanted. camMs() = how long one camera move takes. camRaf = the running camera frame, camT = the pause before the zoom in, camWait = the zoom in waits for the round screen to close, camEnd = when the running camera move ends (performance.now() time; the screens wait for it), camKey = the turn last seen by camTurn (null = do not animate the next change: a new or loaded game). rpOn = the round screen is showing.
-const calm=()=>animEff()=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches),calmRaw=()=>animMode=='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
+// (2026-11-02-y, Shmorden: no animations on a Windows laptop in Chrome) The device's reduce-motion setting is no longer read anywhere: Windows'
+// "Animation effects" switch (often off on laptops) made Chrome report it, and every animation held still while Settings said Animations: On.
+// The Animations setting is now the only switch, so what it says is what happens.
+const calm=()=>animEff()=='off',calmRaw=()=>animMode=='off';
 const camMs=()=>Math.round(animMs()*1.5);
 let camRaf=0,camT=null,camWait=false,camEnd=0,camKey=null,rpOn=false,camTo=null;
 // camStop() stops any camera move and cancels a waiting zoom in (the player took over the view, or the board was refitted).
@@ -3076,7 +3111,7 @@ const at=(ms,f)=>T.push(setTimeout(f,ms)),clr=()=>{T.forEach(clearTimeout);T=[];
 // next(): the next player's claxon (3 slow pulses), then the round screen fades away and the board zooms to them, then their connections retract.
 const next=()=>{clr();i++;if(i>=list.length)return fin();const c=list[i],r=rowOf(c);ph=1;
  // (2026-11-02, Shmorden) The low to high crescendo (event Deficit Elimination), stretched to end as the player's last line is erased.
- {const n=Math.max(0,...dfG.L.filter(l=>l.c==c).map(l=>l.w+1)),len=(bd?0:U*5.8)+camMs()+P*.5+n*DF_MS;sfx(dfVar(c,i,list),0,{len});/*SKY{*/ambDeficit(c,len);/*}SKY*/}if(r&&r.animate)A.push(r.animate(dfFlash(r),{duration:U*1.6,iterations:3,easing:'ease-in-out'}));
+ {const n=Math.max(0,...dfG.L.filter(l=>l.c==c).map(l=>l.w+1)),len=(bd?0:U*5.8)+camMs()+P*.5+n*DF_MS;sfx(dfVar(c,i,list),0,{len});ambDeficit(c,len);}if(r&&r.animate)A.push(r.animate(dfFlash(r),{duration:U*1.6,iterations:3,easing:'ease-in-out'}));
  // zin(): zoom to the player, a half-pause, then their lines retract wave by wave.
  const zin=()=>{ph=2;camGo(dfBox(c),camMs(),()=>at(P*.5,()=>{
   ph=3;const n=Math.max(0,...dfG.L.filter(l=>l.c==c).map(l=>l.w+1));dfG.cur=c;dfG.t0=performance.now();bxDfRings(c,dfG.t0);const step=()=>{dgDraw();if(dfG&&performance.now()-dfG.t0<n*DF_MS)dfRaf=requestAnimationFrame(step);else dfRaf=0};dfRaf=requestAnimationFrame(step);
@@ -3121,7 +3156,7 @@ t+=U*.4+P;steps.push({at:t,fn:s=>rvFoot(R,s)});steps.push({at:t+U,fn:()=>{}});se
 // Defence call (Shmorden, 2026-11-02-d; -e: the Fleets ride at the line's tip and pause halfway): 1. and 2. the attackers' lines grow to the Star, their committed Fleets riding at the tips and stopping halfway (bxIntro; -f); 3. a person's Defence call question opens only then (bxWait); 4. each answer animates as it is made (bxDec): a Retreat slides to its Star, a Hold plays Fleet destroyed on the defending Fleet and on one attacking Fleet, a lost Fleet plays it on the defending Fleet; 5. once the answers are in, the Fleets go on; when they arrive the Star turns the attacker's color with the Star taken ring (white, 0.75 s) and its old lines retract (bxTake). The game itself still settles the attack as before (a computer's answers at once, so its play is unchanged): the animation is a timeline, and answers given before the Fleets reach halfway play when they get there. A Take with no defending Fleets plays as before: lines grow, then color change (with the shockwave), retract and the attackers slide in.
 // Fleet destroyed (k:'ds'): the chip shows with its colors inverted for one flicker (BX_FLICK), then it is gone (the count drops); together a grey ring 3/4 as thick as the select ring grows from the chip's middle to one System across and fades (BX_WAVE in all). Star taken: a white ring as thick as the select ring, from the Star's middle, when it changes color (0.75 s; Shmorden, 2026-11-02-e). Deficit Elimination plays it on each Star the erasing reaches, and those wait a second before fading (bxDfRings).
 // Previews: each grows (or slides) when made; on Confirm the real animation plays over the dashed preview, which stays drawn underneath until it has finished (k:'gp').
-// Display only: G is changed at once, as before; while an animation plays the board leaves out what it draws (the Connection and Star being set, the arriving Fleets' share of the destination's count), so computers, saves, Undo and online play are unaffected. Computers' moves animate too (they tap like a person). Not with Animations off or reduced motion; Fast halves every time. Fleet drags, preview Confirms and moves from other devices online don't animate. The timings and easings are placeholders.
+// Display only: G is changed at once, as before; while an animation plays the board leaves out what it draws (the Connection and Star being set, the arriving Fleets' share of the destination's count), so computers, saves, Undo and online play are unaffected. Computers' moves animate too (they tap like a person). Not with Animations off; Fast halves every time. Fleet drags, preview Confirms and moves from other devices online don't animate. The timings and easings are placeholders.
 // bx = the animations playing: {k:'st' a Star being set: a = origin id, n = the new Star's id or pv = its preview object, x, y, t0, tl = line ms, tb = when the blossom starts, tm = blossom ms; ln = a line only (a Connection, or a Take's line), n = its far Star, which stays drawn} or {k:'rt' a Connection retracting: a = the end it shrinks toward, b = the end it leaves, col, t0, ms} or {k:'oc' a Star still drawn in its old owner's color: id, c = that owner, t0, ms} or {k:'ds' Fleet destroyed / Star taken (bxRing): x, y = the middle, n = the count on the inverted chip (0 = no chip, Star taken), col, mv, fl = flicker ms, w = ring thickness, rc = ring color, t0, gr = ms the ring grows, fs = when it starts fading, fd = ms the fade lasts} or {k:'gp' a confirmed preview still drawn: p = a copy of the preview, col, t0, ms} or {k:'fl' a Fleet chip: path = star ids, n = Fleets shown, b = the Star whose count waits for it, c = color, mv = moved (dashed border), rv = reveal: the direction it fades in from as {x,y}, or 0; from, to = path positions (0 = path[0], 1 = path[1]...), t0, ms; hold = it stays parked at `to` (a Hitchhike? question)}. Each one remembers the game it belongs to (g), so Undo or loading another game drops it.
 const BX_LINE=250,BX_BLOOM=250,BX_SLIDE=250,BX_PLACEMAX=3,BX_FLICK=120,BX_WAVE=500,BX_GREY='#8a8a8a',BX_TAKEN=750,BX_DFHOLD=1000,BX_DFFADE=800;let bx=[],bxRaf=0;
 // bxTk = the timeline of the Defence call being animated: {b: the attacked Star, p: its pend, ie = when the attacking Fleets reach the edge, last = when the last answer's animation ends, ad = when each answer plays (until then the defending Fleet still shows on the Star), fx = the attackers' chips (by attacker), K = the time factor}.
@@ -3220,9 +3255,8 @@ function bxGo(){if(bxRaf)return;const step=()=>{bxRaf=0;const now=performance.no
 // bxNet(t) = the network path from the current player's Capital to Star t along their own Connections (shortest; the first one found when several tie, a placeholder), as star ids; [t] for the Capital itself.
 function bxNet(t){const me=cur(),cp=capStar(me);if(!cp||!t)return [t.id];if(cp===t)return [t.id];const par=new Map([[cp.id,null]]),q=[cp];while(q.length){const s=q.shift();if(s===t)break;G.conns.forEach(c=>{if(c[0]!=s.id&&c[1]!=s.id)return;const u=by(c[0]==s.id?c[1]:c[0]);if(u&&u.o==me&&!par.has(u.id)){par.set(u.id,s.id);q.push(u)}})}
 if(!par.has(t.id))return [t.id];const p=[t.id];while(par.get(p[0])!=null)p.unshift(par.get(p[0]));return p}
-// ===== Sky and side layout (Shmorden, 2026-11-02; preview only) =====
-/*SKY{*/
-// Preview only: the live publish cuts this section out (tools/strip_craft.py, SKY_FORBIDDEN), so the live game keeps its phone layout.
+// ===== Sky and side layout (Shmorden, 2026-11-02; live since 2026-11-02-y) =====
+// Live since 2026-11-02-y (Shmorden: "Publish the widescreen effects to live build"); before that the live publish cut it out.
 // Two settings, both in Settings > Display and On unless switched off:
 // - Sky (Shmorden's idea, from Tetris Effect): space behind the game that reacts to it. It shows wherever the page is see-through: beside the
 //   board on a wide screen, above and below it on an upright phone, and over the whole screen behind the start menu, where it plays by itself.
@@ -3392,7 +3426,6 @@ AMB.fx=AMB.fx.filter(f=>{const age=t-f.b,k=age/f.dur;if(k>=1||still)return false
 if(f.t=='r'){x.strokeStyle='rgba('+c+','+(.7*(1-k))+')';x.lineWidth=f.w*(1-k)+.5;x.beginPath();x.arc(f.x,f.y,f.R*(1-Math.pow(1-k,3)),0,6.283);x.stroke()}
 else{f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.985;f.vy*=.985;x.fillStyle='rgba('+c+','+(1-k).toFixed(3)+')';x.fillRect(f.x-1,f.y-1,2.5,2.5)}return true})}
 addEventListener('resize',skyLay);skyLay();
-/*}SKY*/
 // ===== (new) Online play: live, player-hosted games over the internet =====
 // How it works: one player HOSTS a room and everyone else JOINS it with a 5-character room code. A free public "matchmaking" server (PeerJS Cloud) only introduces the devices to each other; after that, game data goes straight between the devices (WebRTC), so no game server holds your match. The host's device is the hub: guests talk to the host and the host passes messages on. Whoever's turn it is, that device is in charge of the board and sends the full game state after every change; everyone else just shows it. The only mid-turn question, a defender's Hold or Retreat choice, is sent to the defender's device and the answer is sent back.
 // NET_VER = version of this online protocol (host and guests must match). PEER_SRC = where the connection library is loaded from, only when someone opens Play online. ICE = helper servers that let two devices find a direct route to each other. These are STUN servers only: they work for most home Wi-Fi pairs, but some mobile networks and strict firewalls need a relay (TURN) server too. To add one, put an entry like {urls:'turn:host:3478',username:'u',credential:'p'} in this list. SKEY = browser storage key for "which room was I in". RALPHA = letters and digits used in room codes (no look-alikes such as O/0 or I/1).
