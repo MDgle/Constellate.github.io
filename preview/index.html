@@ -5,15 +5,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-03-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-03-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
-<script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
+<script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
 <!-- Head: page title and character set above, mobile viewport above. Next comes the CSS (how things LOOK), then the HTML (what is ON the page), then the JavaScript (what it DOES). -->
 <style>
 /* THEMES. :root holds the color "variables" (--name) reused everywhere below. These are the DARK theme values (the default). Each other theme is a block further down that replaces them when the page has data-theme="name". The same values also live in THEME_DEF in the script (the Custom editor copies from there), and a test checks the two agree, so change both together. The Settings page sets the attribute and remembers it. The padding keeps content clear of phone notches. --warn is the color of the "PAST POSITION" label in the history viewer. Custom colors are set directly on the page by the script, over these. */
 :root{--bg:#0d141b;--panel:#18222c;--ink:#e8eef3;--mut:#93a5b3;--grid:#6d8799;--sec:#6d8799;--line:#2a3945;--dis:#1a2530;--dis-ink:#7f93a2;--warn:#ffb347;--acc:#2a6a8c;--acc-hover:#2f78a0;--acc-press:#1d5470;--acc-ink:#fff;--acc-line:#4b8fb3;--sel:#1f4a63;--sel-hover:#245773;--sel-press:#173a4e;--sel-ink:#fff;--sel-line:#5fa3c4; color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 /* Light theme. */
+/* (2026-11-03-b, Shmorden) Clear: a see-through board (its backing square drawn by boardSVG is hidden), made for the screen saver over the Sky;
+in the theme list, never picked by Surprise me (RANDOM_BASE). */
+:root[data-theme="clear"]{--bg:#04060c;--panel:#121a26;--ink:#e8eef3;--mut:#93a5b3;--grid:#4d6378;--sec:#9db4ca;--line:#2a3945;--dis:#141c27;--dis-ink:#7f93a2;--warn:#ffb347;--acc:#2a6a8c;--acc-hover:#2f78a0;--acc-press:#1d5470;--acc-ink:#fff;--acc-line:#4b8fb3;--sel:#1f4a63;--sel-hover:#245773;--sel-press:#173a4e;--sel-ink:#fff;--sel-line:#5fa3c4}
+:root[data-theme="clear"] #skyb{fill-opacity:0}
 :root[data-theme="light"]{--bg:#eef3f6;--panel:#fff;--ink:#14212b;--mut:#5c6f7d;--grid:#35505f;--sec:#35505f;--line:#cfdbe3;--dis:#c9d3da;--dis-ink:#465866;--warn:#b45309;--acc:#2a6a8c;--acc-hover:#2f78a0;--acc-press:#1d5470;--acc-ink:#fff;--acc-line:#4b8fb3;--sel:#1f4a63;--sel-hover:#245773;--sel-press:#173a4e;--sel-ink:#fff;--sel-line:#5fa3c4; color-scheme:light}
 /* Green theme. */
 :root[data-theme="green"]{--bg:#123524;--panel:#194431;--ink:#e7f3ec;--mut:#9dbfae;--grid:#a58b4f;--sec:#a58b4f;--line:#3b3224;--dis:#17402e;--dis-ink:#9bbfab;--warn:#ffb347;--acc:#2f7d57;--acc-hover:#388f65;--acc-press:#25664a;--acc-ink:#fff;--acc-line:#d4b45e;--sel:#1e5a3d;--sel-hover:#266b49;--sel-press:#174a33;--sel-ink:#fff;--sel-line:#e0c36f; color-scheme:dark}
@@ -253,6 +257,14 @@ html.side #msg{position:fixed;left:calc(var(--so) + 10px);width:calc(var(--pw) -
 In every game and layout the top panel and the bottom bar have no background or border of their own: the chips, the info line and the buttons
 float over the Sky (or the theme's background with the Sky off); each button and chip keeps its own background. */
 #top,#bar{background:transparent;border:0}
+/* (2026-11-03-b, Shmorden: the board should not stop at a hard edge where the panels start) Outside the side layout the board's area (#st)
+reaches under the top panel and the bottom bar (negative margins = their heights, --padT / --padB, set by stPads); the panels float over it
+and let taps through except on their own chips and buttons. The board fades out under them: transparent beneath, a 28 px soft edge where
+each panel starts, so the Sky shows there. Fit and the camera keep framing the board between the panels (stSafe). */
+html:not(.side) #st{margin-top:calc(-1*var(--padT,0px));margin-bottom:calc(-1*var(--padB,0px))}
+#bar,#tut{position:relative;z-index:3}#top,#bar{pointer-events:none}#top>*,#bar>*,#tut{pointer-events:auto}
+html:not(.side) #zoom{top:calc(var(--padT,0px) + 8px)}html:not(.side) #msg{bottom:calc(var(--padB,0px) + 8px)}
+html:not(.side) #svg{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--padT,0px) - 14px),#000 calc(var(--padT,0px) + 14px),#000 calc(100% - var(--padB,0px) - 14px),transparent calc(100% - var(--padB,0px) + 14px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--padT,0px) - 14px),#000 calc(var(--padT,0px) + 14px),#000 calc(100% - var(--padB,0px) - 14px),transparent calc(100% - var(--padB,0px) + 14px),transparent 100%)}
 /* Over the Sky (always dark space, whatever the theme) the floating text that has no card of its own (the turn and round line, the Fuel
 number, the team score line) is drawn light with a soft shadow, so a light theme's dark ink stays readable. */
 html.sky #info,html.sky #tvp{--ink:#e8ecf4;--mut:#b3bccd;color:var(--ink);text-shadow:0 1px 3px rgba(0,0,0,.85)}
@@ -261,7 +273,12 @@ is off meanwhile, skyLay), so the Sky gets all the room around it. #ssx = its En
 click, mouse move or key press, then it fades away (ssPoke). */
 html.saver #top,html.saver #bar,html.saver #zoom,html.saver #msg,html.saver #tut{display:none}
 #ssx{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:5;min-width:160px;min-height:48px;font-weight:600;opacity:0;pointer-events:none;transition:opacity 1s;display:none}
-html.saver #ssx{display:block}html.saver #ssx.on{opacity:1;pointer-events:auto;transition:opacity .2s}
+html.saver #ssx{display:block}
+/* Screen saver page (2026-11-03-b): .ssr = a row of options that wrap; .sso = an option that is off (greyed, diagonal stripes); .ssrs = Reset;
+.ssdd = the Difficulty drop-down button. */
+.ssr{display:flex;flex-wrap:wrap;gap:6px}.ssr>button{flex:1 1 auto;min-width:64px;-webkit-touch-callout:none}.ssr small{opacity:.75;font-size:11px}
+.ssr>.sso{background:var(--dis) repeating-linear-gradient(135deg,transparent 0 7px,rgba(127,127,127,.28) 7px 11px);color:var(--dis-ink);border-color:var(--line);opacity:.65}
+.ssrs{min-height:30px;padding:0 10px;font-size:13px}.ssr>.ssdd{flex:0 0 auto;min-width:44px}html.saver #ssx.on{opacity:1;pointer-events:auto;transition:opacity .2s}
 html.sky.side #top,html.sky.side #bar{background:transparent;border:0}html.sky.side #tut{background:color-mix(in srgb,var(--panel) 88%,transparent)}
 </style></head><body>
 <script type="text/plain" id="ptext">
@@ -411,7 +428,7 @@ Goal: Win.
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
 <!--/*TUT{*/--><div id="tut"></div><!--/*}TUT*/-->
-<button id="ssx" onclick="ssExit()">End game</button>
+<button id="ssx" onclick="ssExit()">Exit</button>
 <div id="bar"><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button></div>
 <!-- Empty dialog backdrop that JavaScript fills when it needs a pop-up. -->
 <div id="ov"></div><div id="ov2"></div>
@@ -1479,7 +1496,17 @@ R.querySelectorAll('[data-m]').forEach(b=>{const k=b.dataset.m;b.classList.toggl
 let rafId=0;function apply(){if(useTouch()&&typeof requestAnimationFrame=='function'){if(!rafId)rafId=requestAnimationFrame(()=>{rafId=0;applyNow()})}else applyNow()}
 function applyNow(){W.setAttribute('transform',`translate(${view.x} ${view.y}) scale(${view.k})`);svg.dataset.z=view.k>38?1:0}
 // fit() sizes the whole board to the screen and centers it. (new) It stops a camera move first (camStop).
-function fitTo(V,box,ap){const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
+// (2026-11-03-b) stSafe() = the part of the live board's area (#st) between the top panel and the bottom bar: {w, h, t} (width, height, its top
+// inside #st). Since -03-b the board is drawn under the panels too (they float over it and it fades out beneath them, stPads), so Fit and the
+// camera frame the board in this part only, as they framed the whole of #st before. stPT / stPB = the panels' heights (0 in the side layout).
+let stPT=0,stPB=0;
+function stSafe(){const r=st.getBoundingClientRect();return{w:r.width,h:Math.max(1,r.height-stPT-stPB),t:stPT}}
+// stPads() = measure the top panel and the bottom bar (with the tutorial panel above it) and pull the board under them: --padT / --padB set
+// #st's negative margins, where #zoom and #msg sit, and the board's fade (CSS mask). Run on every resize of those panels (ResizeObserver).
+function stPads(){const r=document.documentElement,sd=r.classList.contains('side')||r.classList.contains('saver'),tp=$('top'),br=$('bar'),tu=$('tut');
+const T=sd?0:tp.offsetHeight,B=sd?0:br.offsetHeight+(tu?tu.offsetHeight:0);if(T==stPT&&B==stPB)return;const dT=T-stPT;stPT=T;stPB=B;r.style.setProperty('--padT',T+'px');r.style.setProperty('--padB',B+'px');
+if(dT){view.y+=dT;apply()}}
+function fitTo(V,box,ap){if(box===st){const q=stSafe(),n=NSYS(G);V.k=V.min=Math.min(q.w,q.h)/(n+.2);V.x=(q.w-n*V.k)/2;V.y=q.t+(q.h-n*V.k)/2;return ap()}const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
 // (2026-10-28-c, Shmorden) Fitting pans and zooms there with the camera animation (camGo, Animations speed) instead of jumping; (-d) a window resize or turning the phone glides too. now = jump (the first drawing, tests); Animations off jumps too.
 function fit(now){camStop();if(now||!G||calm())return fitTo(view,st,apply);camGo(camFit(),camMs())}
@@ -2002,32 +2029,75 @@ let sty=null;/*PERS{*/sty={};pl.forEach(c=>{if(ES_NAMES[cpu[c]])sty[c]='r'});/*}
 // Every default here (the 2 / Medium / 7x7 / Normal first choices, SS_END_MS, SS_UI_MS, the texts, no Teams) is a placeholder (docs/PLACEHOLDERS.md).
 // ss = the choices, remembered in this browser ('r' = Random). ssG = the screen saver's current game (the G object), null when none.
 // ssMk = true while ssNext is starting a game (before ssG is that game). ssKeep = {G, H, ms}: the game, history and CPU speed from before the screen saver, put back by ssStop. ssT = the timer that starts the next game.
-const SS_KEY='constellate-saver',SS_END_MS=10000,SS_OPT={n:[[2,'2'],[4,'4']],lv:[[1,'Easy'],[2,'Medium'],[3,'Hard']],sz:[[7,'7x7'],[5,'5x5'],[3,'3x3']],sp:[[700,'Normal'],[250,'Fast'],[0,'Instant']]};
-let ss={n:2,lv:2,sz:7,sp:700},ssG=null,ssKeep=null,ssT=null,ssMk=false;try{const o=JSON.parse(localStorage.getItem(SS_KEY)||'null');if(o)Object.keys(ss).forEach(k=>{if(o[k]=='r'||SS_OPT[k].some(x=>x[0]===o[k]))ss[k]=o[k]})}catch(e){}
-// ssDlg() = the Screen saver page (from the start menu). ssSet(k,v) = one choice tapped ('r' = Random); the page redraws in place.
-function ssDlg(){$('ov').onclick=null;const row=(t,k)=>'<p style="margin:12px 0 4px;font-weight:600">'+t+'</p><div class="r">'+SS_OPT[k].concat([['r','Random']]).map(([v,l])=>'<button'+(ss[k]===v?' class="act"':'')+' onclick="ssSet(\''+k+'\',\''+v+'\')">'+l+'</button>').join('')+'</div>';
-ov('<h1>Screen saver</h1><p style="margin:0 0 4px">Computers play each other, one game after another. To stop, touch the screen or move the mouse and tap End game.</p>'+row('Players','n')+row('Difficulty','lv')+row('Board','sz')+row('CPU speed','sp')+'<div class="r" style="margin-top:14px"><button onclick="ssStart()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Start</button></div><div class="r" style="margin-top:8px"><button onclick="ssStart(1)">Randomize all and start</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>')}
-function ssSet(k,v){ss[k]=v=='r'?'r':+v;try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}ovDir=0;ssDlg()}
-// ssStart(all) = Start (all = Randomize all and start: every choice becomes Random, remembered). Keeps the open game to put back later.
-function ssStart(all){if(net.on)return;if(all){Object.keys(ss).forEach(k=>ss[k]='r');try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}}
-const own=G&&G!==ssG;ssKeep={G:own?G:null,H:own?H:null,ms:cpuMs};ssNext()}
-// ssNext() = start the next screen saver game with the choices, rolling each Random one again.
-function ssNext(){clearTimeout(ssT);ssT=null;if(!ssKeep)return;const R=a=>a[Math.floor(Math.random()*a.length)],pick=k=>ss[k]=='r'?R(SS_OPT[k]).at(0):ss[k];
-const n=pick('n'),sz=pick('sz'),pl=n==2?[0,2]:[0,2,3,1],cpu={},pc={},used=new Set();cpuMs=pick('sp');
-pl.forEach(c=>{cpu[c]=pick('lv');const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
-let sty=null;/*PERS{*/sty={};pl.forEach(c=>{if(ES_NAMES[cpu[c]])sty[c]='r'});/*}PERS*/
+// (2026-11-03-b, Shmorden) Every choice is a set of options that can each be on or off: a tap switches one option on or off (off = greyed with
+// diagonal stripes), a hold of HOLD_MS (the hold to skip's time) switches it on and every other option of its row off, and each row has
+// Reset (every option on). Each game draws each choice from the options that are on. Rows (SS_ROWS): Players, Difficulty (Easy, Medium,
+// Hard; its drop-down, preview only, lists every personality of each level, each its own option: each computer draws a level and personality
+// from the ones on), Board, CPU speed and Themes (the board fades out, the theme changes, the next game fades in; Clear is in the list).
+// The last option on in a row cannot be switched off (the button blinks). ss = {row: [options that are OFF]} (so a new option starts on),
+// remembered in this browser. ssDD = the Difficulty drop-down is open.
+const SS_KEY='constellate-saver',SS_END_MS=10000,SS_ROWS=[['n','Players'],['lv','Difficulty'],['sz','Board'],['sp','CPU speed'],['th','Themes']];
+// ssAll(k) = the options of row k as [id, label]; ssOn(k) = the ids that are on.
+function ssAll(k){if(k=='n')return[['2','2 players'],['4','4 players']];if(k=='sz')return[['7','7x7'],['5','5x5'],['3','3x3']];if(k=='sp')return[['700','Normal'],['250','Fast'],['0','Instant']];
+if(k=='lv'){const o=[];[1,2,3].forEach(l=>esKeys(l).forEach(p=>o.push([l+':'+p,CPU_LEVELS[l]+(esKeys(l).length>1?' '+ES_NAMES[l][p]:'')])));return o}
+return THEMES.filter(([t])=>t!='custom'||randomPool().includes('custom'))}
+const ssOn=k=>ssAll(k).map(x=>x[0]).filter(x=>!(ss[k]||[]).includes(x));
+let ss={},ssG=null,ssKeep=null,ssT=null,ssMk=false,ssDD=false,ssHT=null,ssHeld=false;try{const o=JSON.parse(localStorage.getItem(SS_KEY)||'null');if(o)SS_ROWS.forEach(([k])=>{if(Array.isArray(o[k]))ss[k]=o[k].map(String)})}catch(e){}
+function ssSave(){try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}}
+// ssDlg() = the Screen saver page (from the start menu). A row = its name, Reset, and one button per option (ssBtn); Difficulty shows one
+// button per level (on while any of its personalities is on, with how many when only some are) and, when there are personalities, a drop-down.
+function ssDlg(){$('ov').onclick=null;$('ov').dataset.page='saver';
+const btn=(k,v,l,on,x)=>'<button class="'+(on?'act':'sso')+'" data-k="'+k+'" data-v="'+v+'" onpointerdown="ssDown(this)" onpointerup="ssUp()" onpointerleave="ssUp()" oncontextmenu="return false" onclick="ssTap(this)">'+l+(x||'')+'</button>';
+const row=(k,t)=>{let b;if(k=='lv'){const on=ssOn('lv');b=[1,2,3].map(l=>{const a=esKeys(l),n=a.filter(p=>on.includes(l+':'+p)).length;return btn('lv','L'+l,CPU_LEVELS[l],n>0,n>0&&n<a.length?' <small>'+n+'/'+a.length+'</small>':'')}).join('');
+if([1,2,3].some(l=>esKeys(l).length>1))b+='<button class="ssdd" onclick="ssDD=!ssDD;ovDir=0;ssDlg()" aria-label="Personalities">'+(ssDD?'▴':'▾')+'</button>'}
+else{const on=ssOn(k);b=ssAll(k).map(([v,l])=>btn(k,v,l,on.includes(v))).join('')}
+let h='<div style="display:flex;align-items:center;margin:12px 0 4px"><b style="flex:1">'+t+'</b><button class="ssrs" onclick="ssReset(\''+k+'\')">Reset</button></div><div class="ssr">'+b+'</div>';
+if(k=='lv'&&ssDD){const on=ssOn('lv');h+=[1,2,3].filter(l=>esKeys(l).length>1).map(l=>'<p style="margin:8px 0 4px;font-size:13px;color:var(--mut)">'+CPU_LEVELS[l]+'</p><div class="ssr">'+esKeys(l).map(p=>btn('lv',l+':'+p,ES_NAMES[l][p],on.includes(l+':'+p))).join('')+'</div>').join('')}
+return h};
+ov('<h1>Screen saver</h1><p style="margin:0 0 4px">Computers play each other, one game after another, drawing each game from the options that are on. Tap an option to switch it on or off; hold it to keep only that one. To stop, touch the screen or move the mouse and tap Exit.</p>'+SS_ROWS.map(([k,t])=>row(k,t)).join('')+'<div class="r" style="margin-top:14px"><button onclick="ssStart()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Start</button></div><div class="r" style="margin-top:8px"><button onclick="ssStart(1)">Reset all and start</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>')}
+// ssIds(k,v) = the option ids a button stands for (a Difficulty level button stands for all of its personalities).
+const ssIds=(k,v)=>k=='lv'&&v[0]=='L'?esKeys(+v.slice(1)).map(p=>v.slice(1)+':'+p):[v];
+// ssTap(b) = a tap: switch the button's options on (if any is off) or off; refused (blink) when it would leave the row with none on.
+function ssTap(b){if(ssHeld){ssHeld=false;return}const k=b.dataset.k,ids=ssIds(k,b.dataset.v),off=ss[k]||[],on=ssOn(k),allOn=ids.every(x=>!off.includes(x));
+if(allOn){if(on.every(x=>ids.includes(x))){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink');return}ss[k]=off.concat(ids)}else ss[k]=off.filter(x=>!ids.includes(x));
+ssSave();ovDir=0;ssDlg()}
+// ssDown(b) / ssUp() = the hold: after HOLD_MS the button's options are the only ones on in their row (and the tap that follows is ignored).
+function ssDown(b){clearTimeout(ssHT);ssHeld=false;ssHT=setTimeout(()=>{ssHT=null;ssHeld=true;buzz(30);const k=b.dataset.k,ids=ssIds(k,b.dataset.v);ss[k]=ssAll(k).map(x=>x[0]).filter(x=>!ids.includes(x));ssSave();ovDir=0;ssDlg()},HOLD_MS)}
+function ssUp(){clearTimeout(ssHT);ssHT=null}
+// ssReset(k) = every option of row k on.
+function ssReset(k){ss[k]=[];ssSave();ovDir=0;ssDlg()}
+// ssStart(all) = Start (all = Reset all and start: every option of every row on). Keeps the open game and the theme to put back later.
+function ssStart(all){if(net.on)return;if(all){ss={};ssSave()}
+const own=G&&G!==ssG;ssKeep={G:own?G:null,H:own?H:null,ms:cpuMs,th:theme};if(fsOk()&&!fsIs()){ssFs=true;fsSet(true)}ssNext()}
+// ssNext() = the next screen saver game: draws its players, levels and personalities, board, speed and theme from the options that are on.
+// When the theme changes between games the board fades out (SS_FADE_MS), the theme changes, and the new game fades in; never saved
+// (theme is set without storing it; ssStop puts the player's theme back).
+const SS_FADE_MS=800;
+function ssNext(){clearTimeout(ssT);ssT=null;if(!ssKeep)return;const R=a=>a[Math.floor(Math.random()*a.length)],T=ssOn('th'),o=T.filter(t=>t!=theme),th=T.includes(theme)&&!o.length?theme:R(o.length?o:T);
+$('ov').style.display='none';if(ssG&&th!=theme&&!calmRaw()){const e=$('st');e.style.transition='opacity '+SS_FADE_MS+'ms';e.style.opacity='0';ssT=setTimeout(()=>{ssT=null;if(!ssKeep)return;ssGo(th);requestAnimationFrame(()=>requestAnimationFrame(()=>{e.style.opacity='1'}))},SS_FADE_MS);return}
+ssGo(th)}
+function ssGo(th){const R=a=>a[Math.floor(Math.random()*a.length)];if(th&&th!=theme){theme=th;themeApply()}
+const n=+R(ssOn('n')),sz=+R(ssOn('sz')),pl=n==2?[0,2]:[0,2,3,1],cpu={},pc={},used=new Set(),sty={};cpuMs=+R(ssOn('sp'));
+pl.forEach(c=>{const v=R(ssOn('lv')).split(':');cpu[c]=+v[0];sty[c]=v[1];const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
 $('ov').style.display='none';ssMk=true;try{start(n,sz,null,cpu,null,{pc,qk:1},sty)}finally{ssMk=false}ssG=G;ssUi(true);render()}
 // ssAfter() = a screen saver game's end screen is showing: the next game starts after SS_END_MS, unless the player has left by then.
 function ssAfter(){if(ssT||G!==ssG)return;const g=G;ssT=setTimeout(()=>{ssT=null;if(G===g&&G===ssG&&ssKeep)ssNext()},SS_END_MS)}
 // ssStop() = leaving the screen saver (mainMenu): the game ends where it stands, the CPU speed and the game from before come back.
 function ssStop(){clearTimeout(ssT);ssT=null;clearTimeout(cpuTimer);cpuTimer=null;if(G&&G===ssG&&!G.over){const {vp}=calc();G.score=vp;G.over=winners(vp)}
-ssUi(false);const k=ssKeep;ssKeep=null;if(!k)return;if(cpuMs!==k.ms)cpuMs=k.ms;if(k.G){G=k.G;H=k.H;ssG=null;setLook(G)}}
+ssUi(false);if(ssFs){ssFs=false;fsSet(false)}{const e=$('st');e.style.transition='';e.style.opacity=''}const k=ssKeep;ssKeep=null;if(!k)return;if(k.th&&k.th!=theme){theme=k.th;themeApply()}if(cpuMs!==k.ms)cpuMs=k.ms;if(k.G){G=k.G;H=k.H;ssG=null;setLook(G)}}
 // ssBtns() = the end screen's buttons in a screen saver game.
 // (2026-11-03-a, Shmorden: "Remove all ui elements") No buttons any more: the End game button (ssPoke) is the way out.
 const ssBtns=()=>'<div class="ovft" style="margin-top:14px"><p style="margin:0;color:var(--mut)">The next game starts in a few seconds.</p></div>';
 // ssUi(on) = switch the screen saver look (html.saver) on or off and refit the board to the screen it now has.
 // ssPoke() = a touch, click, mouse move or key press during the screen saver: the End game button shows for SS_UI_MS, then fades (CSS, 1 s).
-// ssExit() = the End game button: leaves the screen saver like Main menu (ssStop: the game ends, the game from before comes back).
+// (2026-11-03-b, Shmorden: "Is there a way to do full-screen?") Full screen hides the browser's address bar and the phone's bars. Browsers only
+// allow it right after a tap, so it is not remembered: Settings > Display > Full screen switches it (shown only where the browser can:
+// Android and computers, not iPhone), the screen saver's Start turns it on and its Exit turns it off again (ssFs = the screen saver did it).
+const fsOk=()=>!!(document.fullscreenEnabled||document.webkitFullscreenEnabled),fsIs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+const fsLabel=()=>'Full screen: '+(fsIs()?'On':'Off');let ssFs=false;
+function fsSet(on){try{const d=document,e=d.documentElement;if(on&&!fsIs()){const p=(e.requestFullscreen||e.webkitRequestFullscreen).call(e,{navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{})}else if(!on&&fsIs()){const p=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(p&&p.catch)p.catch(()=>{})}}catch(e){}}
+function fsToggle(b){fsSet(!fsIs());if(b)setTimeout(()=>{b.textContent=fsLabel()},300)}
+// ssExit() = the Exit button (named End game until 2026-11-03-b): leaves the screen saver like Main menu (ssStop: the game ends, the game from before comes back).
 const SS_UI_MS=5000;let ssUiT=null;
 function ssUi(on){const r=document.documentElement;if(r.classList.contains('saver')==on)return;r.classList.toggle('saver',on);if(!on){clearTimeout(ssUiT);$('ssx').classList.remove('on')}try{skyLay()}catch(e){}fit(1)}
 function ssPoke(){if(!document.documentElement.classList.contains('saver'))return;$('ssx').classList.add('on');clearTimeout(ssUiT);ssUiT=setTimeout(()=>$('ssx').classList.remove('on'),SS_UI_MS)}
@@ -2236,8 +2306,9 @@ dg.e=ddEval(dg,P0.x,P0.y);render();ddMsg();ddSettle(P0.x,P0.y)}
 function ddMove(x,y){if(!dg)return;if(dg.tp&&!dg.mvd&&Math.hypot(x-dg.tp.x,y-dg.tp.y)*view.k>TAP_TOL)dg.mvd=1;dg.e=ddEval(dg,x,y);ddPaint();if(!dg.h||Math.hypot(x-dg.h.x,y-dg.h.y)*view.k>8)ddSettle(x,y);dg.sx=x*view.k+view.x;dg.sy=y*view.k+view.y;if(!ddEdgeRaf)ddEdgeRaf=requestAnimationFrame(ddEdge)}
 // (new) Edge scrolling (Shmorden, 2026-10-27). ddEdge() runs each frame while a drag's finger (dg.sx,sy: its point in the board area) is within EDGE px of an edge of the board area: the board scrolls that way, faster the closer the finger is to the edge (up to EDGE_V px a frame), and the drag follows the board point now under the finger. It stops when the finger leaves the edge zone, or once that side of the board is EDGE px inside the screen.
 const EDGE=44,EDGE_V=12;let ddEdgeRaf=0;
-function ddEdge(){ddEdgeRaf=0;if(!dg||dg.sx==null)return;const r=$('st').getBoundingClientRect(),sp=v=>v<EDGE?(EDGE-Math.max(0,v))/EDGE*EDGE_V:0,N=NSYS(G)*view.k;let vx=sp(dg.sx)-sp(r.width-dg.sx),vy=sp(dg.sy)-sp(r.height-dg.sy);
-if(vx>0&&view.x>=EDGE)vx=0;if(vx<0&&view.x+N<=r.width-EDGE)vx=0;if(vy>0&&view.y>=EDGE)vy=0;if(vy<0&&view.y+N<=r.height-EDGE)vy=0;if(!vx&&!vy)return;
+// (2026-11-03-b) The edges are those of the visible part between the panels (stSafe), since the board area reaches under them.
+function ddEdge(){ddEdgeRaf=0;if(!dg||dg.sx==null)return;const q=stSafe(),r={width:q.w,height:q.h},sy=dg.sy-q.t,sp=v=>v<EDGE?(EDGE-Math.max(0,v))/EDGE*EDGE_V:0,N=NSYS(G)*view.k;let vx=sp(dg.sx)-sp(r.width-dg.sx),vy=sp(sy)-sp(r.height-sy);
+if(vx>0&&view.x>=EDGE)vx=0;if(vx<0&&view.x+N<=r.width-EDGE)vx=0;if(vy>0&&view.y-q.t>=EDGE)vy=0;if(vy<0&&view.y-q.t+N<=r.height-EDGE)vy=0;if(!vx&&!vy)return;
 view.x+=vx;view.y+=vy;apply();const x=(dg.sx-view.x)/view.k,y=(dg.sy-view.y)/view.k;dg.e=ddEval(dg,x,y);ddPaint();ddSettle(x,y);ddEdgeRaf=requestAnimationFrame(ddEdge)}
 // ddUp(x,y): the finger lifted. Ends the gesture; a drag drops where the finger was (ddDrop).
 function ddUp(x,y){ddFired=false;if(!dg)return;tapAt=Date.now();ddPrecOff();cancelAnimationFrame(ddEdgeRaf);ddEdgeRaf=0;const d=dg;dg=null;
@@ -2326,8 +2397,8 @@ function ddBarHide(){clearTimeout(ddBarT);ddBarT=0;try{if(ddBarA)ddBarA.cancel()
 // ===== (new) Themes and the Settings page =====
 // THEME_VARS = every color variable a theme sets. THEME_DEF = each preset theme's values (the same numbers as the CSS blocks near the top of the file). THEMES = [key, name] in the order shown; "custom" uses the palette you edit. theme = the one in use, remembered in this browser. Dark is the default.
 const THEME_VARS=["bg","panel","ink","mut","grid","sec","line","dis","dis-ink","warn","acc","acc-hover","acc-press","acc-ink","acc-line","sel","sel-hover","sel-press","sel-ink","sel-line"];
-const THEME_DEF={"dark":{"acc":"#2a6a8c","acc-hover":"#2f78a0","acc-press":"#1d5470","acc-ink":"#fff","acc-line":"#4b8fb3","sel":"#1f4a63","sel-hover":"#245773","sel-press":"#173a4e","sel-ink":"#fff","sel-line":"#5fa3c4","bg":"#0d141b","panel":"#18222c","ink":"#e8eef3","mut":"#93a5b3","grid":"#6d8799","sec":"#6d8799","line":"#2a3945","dis":"#1a2530","dis-ink":"#7f93a2","warn":"#ffb347"},"light":{"acc":"#2a6a8c","acc-hover":"#2f78a0","acc-press":"#1d5470","acc-ink":"#fff","acc-line":"#4b8fb3","sel":"#1f4a63","sel-hover":"#245773","sel-press":"#173a4e","sel-ink":"#fff","sel-line":"#5fa3c4","bg":"#eef3f6","panel":"#fff","ink":"#14212b","mut":"#5c6f7d","grid":"#35505f","sec":"#35505f","line":"#cfdbe3","dis":"#c9d3da","dis-ink":"#465866","warn":"#b45309"},"green":{"bg":"#123524","panel":"#194431","ink":"#e7f3ec","mut":"#9dbfae","grid":"#a58b4f","sec":"#a58b4f","line":"#3b3224","dis":"#17402e","dis-ink":"#9bbfab","warn":"#ffb347","acc":"#2f7d57","acc-hover":"#388f65","acc-press":"#25664a","acc-ink":"#fff","acc-line":"#d4b45e","sel":"#1e5a3d","sel-hover":"#266b49","sel-press":"#174a33","sel-ink":"#fff","sel-line":"#e0c36f"},"brass":{"bg":"#1c1710","panel":"#2a231a","ink":"#f1e6cf","mut":"#b3a27f","grid":"#a58b4f","sec":"#a58b4f","line":"#3b3224","dis":"#2a241a","dis-ink":"#ab9e7b","warn":"#ffb347","acc":"#b08d3c","acc-hover":"#c29d46","acc-press":"#8f7230","acc-ink":"#1a1409","acc-line":"#d4b45e","sel":"#8a6d27","sel-hover":"#98782c","sel-press":"#6f571d","sel-ink":"#fff7e0","sel-line":"#e0c36f"},"sepia":{"bg":"#f4ecd8","panel":"#fbf5e6","ink":"#3b2f22","mut":"#6f5f4a","grid":"#6b5438","sec":"#6b5438","line":"#dccdb0","dis":"#e0d4ba","dis-ink":"#5f503c","warn":"#a04a00","acc":"#8b5e34","acc-hover":"#9b6c3f","acc-press":"#6f4a29","acc-ink":"#fff","acc-line":"#b08057","sel":"#5d3f22","sel-hover":"#6a4a2a","sel-press":"#4a3219","sel-ink":"#fff","sel-line":"#a9825a"},"blue":{"bg":"#082567","panel":"#0d2e7c","ink":"#eaf0ff","mut":"#a9bce6","grid":"#006400","sec":"#006400","line":"#006400","dis":"#0a2a70","dis-ink":"#9db3e6","warn":"#ffb347","acc":"#2b5fd1","acc-hover":"#3a6fe0","acc-press":"#1f49a5","acc-ink":"#fff","acc-line":"#006400","sel":"#183c96","sel-hover":"#1e47ab","sel-press":"#12307a","sel-ink":"#fff","sel-line":"#006400"},"cgreen":{"bg":"#000000","panel":"#031006","ink":"#33ff66","mut":"#1fb84a","grid":"#0c4a1e","sec":"#1fb84a","line":"#14702c","dis":"#021208","dis-ink":"#1a6b30","warn":"#ffb000","acc":"#06260f","acc-hover":"#0a3a17","acc-press":"#031a0a","acc-ink":"#33ff66","acc-line":"#33ff66","sel":"#33ff66","sel-hover":"#5dff85","sel-press":"#1fcc50","sel-ink":"#000000","sel-line":"#aaffc0"},"ccyan":{"bg":"#000000","panel":"#021014","ink":"#33f0ff","mut":"#1fa8b8","grid":"#0b4650","sec":"#1fa8b8","line":"#126a78","dis":"#01100f","dis-ink":"#17606a","warn":"#ffb000","acc":"#052229","acc-hover":"#083540","acc-press":"#03171c","acc-ink":"#33f0ff","acc-line":"#33f0ff","sel":"#33f0ff","sel-hover":"#66f5ff","sel-press":"#1fc8d8","sel-ink":"#000000","sel-line":"#b0faff"},"corange":{"bg":"#000000","panel":"#120a02","ink":"#ffa01c","mut":"#c47a10","grid":"#583508","sec":"#c47a10","line":"#7a4a0c","dis":"#0e0801","dis-ink":"#7a4a10","warn":"#ffe066","acc":"#2a1703","acc-hover":"#3d2305","acc-press":"#1a0e02","acc-ink":"#ffa01c","acc-line":"#ffa01c","sel":"#ffa01c","sel-hover":"#ffb84d","sel-press":"#d98410","sel-ink":"#000000","sel-line":"#ffd28a"}};
-const THEMES=[['dark','Dark'],['light','Light'],['green','Green'],['brass','Brass'],['sepia','Sepia'],['blue','Blue'],['cgreen','Cassette Green'],['ccyan','Cassette Cyan'],['corange','Cassette Orange'],['custom','Custom']];
+const THEME_DEF={"clear":{"acc":"#2a6a8c","acc-hover":"#2f78a0","acc-press":"#1d5470","acc-ink":"#fff","acc-line":"#4b8fb3","sel":"#1f4a63","sel-hover":"#245773","sel-press":"#173a4e","sel-ink":"#fff","sel-line":"#5fa3c4","bg":"#04060c","panel":"#121a26","ink":"#e8eef3","mut":"#93a5b3","grid":"#4d6378","sec":"#9db4ca","line":"#2a3945","dis":"#141c27","dis-ink":"#7f93a2","warn":"#ffb347"},"dark":{"acc":"#2a6a8c","acc-hover":"#2f78a0","acc-press":"#1d5470","acc-ink":"#fff","acc-line":"#4b8fb3","sel":"#1f4a63","sel-hover":"#245773","sel-press":"#173a4e","sel-ink":"#fff","sel-line":"#5fa3c4","bg":"#0d141b","panel":"#18222c","ink":"#e8eef3","mut":"#93a5b3","grid":"#6d8799","sec":"#6d8799","line":"#2a3945","dis":"#1a2530","dis-ink":"#7f93a2","warn":"#ffb347"},"light":{"acc":"#2a6a8c","acc-hover":"#2f78a0","acc-press":"#1d5470","acc-ink":"#fff","acc-line":"#4b8fb3","sel":"#1f4a63","sel-hover":"#245773","sel-press":"#173a4e","sel-ink":"#fff","sel-line":"#5fa3c4","bg":"#eef3f6","panel":"#fff","ink":"#14212b","mut":"#5c6f7d","grid":"#35505f","sec":"#35505f","line":"#cfdbe3","dis":"#c9d3da","dis-ink":"#465866","warn":"#b45309"},"green":{"bg":"#123524","panel":"#194431","ink":"#e7f3ec","mut":"#9dbfae","grid":"#a58b4f","sec":"#a58b4f","line":"#3b3224","dis":"#17402e","dis-ink":"#9bbfab","warn":"#ffb347","acc":"#2f7d57","acc-hover":"#388f65","acc-press":"#25664a","acc-ink":"#fff","acc-line":"#d4b45e","sel":"#1e5a3d","sel-hover":"#266b49","sel-press":"#174a33","sel-ink":"#fff","sel-line":"#e0c36f"},"brass":{"bg":"#1c1710","panel":"#2a231a","ink":"#f1e6cf","mut":"#b3a27f","grid":"#a58b4f","sec":"#a58b4f","line":"#3b3224","dis":"#2a241a","dis-ink":"#ab9e7b","warn":"#ffb347","acc":"#b08d3c","acc-hover":"#c29d46","acc-press":"#8f7230","acc-ink":"#1a1409","acc-line":"#d4b45e","sel":"#8a6d27","sel-hover":"#98782c","sel-press":"#6f571d","sel-ink":"#fff7e0","sel-line":"#e0c36f"},"sepia":{"bg":"#f4ecd8","panel":"#fbf5e6","ink":"#3b2f22","mut":"#6f5f4a","grid":"#6b5438","sec":"#6b5438","line":"#dccdb0","dis":"#e0d4ba","dis-ink":"#5f503c","warn":"#a04a00","acc":"#8b5e34","acc-hover":"#9b6c3f","acc-press":"#6f4a29","acc-ink":"#fff","acc-line":"#b08057","sel":"#5d3f22","sel-hover":"#6a4a2a","sel-press":"#4a3219","sel-ink":"#fff","sel-line":"#a9825a"},"blue":{"bg":"#082567","panel":"#0d2e7c","ink":"#eaf0ff","mut":"#a9bce6","grid":"#006400","sec":"#006400","line":"#006400","dis":"#0a2a70","dis-ink":"#9db3e6","warn":"#ffb347","acc":"#2b5fd1","acc-hover":"#3a6fe0","acc-press":"#1f49a5","acc-ink":"#fff","acc-line":"#006400","sel":"#183c96","sel-hover":"#1e47ab","sel-press":"#12307a","sel-ink":"#fff","sel-line":"#006400"},"cgreen":{"bg":"#000000","panel":"#031006","ink":"#33ff66","mut":"#1fb84a","grid":"#0c4a1e","sec":"#1fb84a","line":"#14702c","dis":"#021208","dis-ink":"#1a6b30","warn":"#ffb000","acc":"#06260f","acc-hover":"#0a3a17","acc-press":"#031a0a","acc-ink":"#33ff66","acc-line":"#33ff66","sel":"#33ff66","sel-hover":"#5dff85","sel-press":"#1fcc50","sel-ink":"#000000","sel-line":"#aaffc0"},"ccyan":{"bg":"#000000","panel":"#021014","ink":"#33f0ff","mut":"#1fa8b8","grid":"#0b4650","sec":"#1fa8b8","line":"#126a78","dis":"#01100f","dis-ink":"#17606a","warn":"#ffb000","acc":"#052229","acc-hover":"#083540","acc-press":"#03171c","acc-ink":"#33f0ff","acc-line":"#33f0ff","sel":"#33f0ff","sel-hover":"#66f5ff","sel-press":"#1fc8d8","sel-ink":"#000000","sel-line":"#b0faff"},"corange":{"bg":"#000000","panel":"#120a02","ink":"#ffa01c","mut":"#c47a10","grid":"#583508","sec":"#c47a10","line":"#7a4a0c","dis":"#0e0801","dis-ink":"#7a4a10","warn":"#ffe066","acc":"#2a1703","acc-hover":"#3d2305","acc-press":"#1a0e02","acc-ink":"#ffa01c","acc-line":"#ffa01c","sel":"#ffa01c","sel-hover":"#ffb84d","sel-press":"#d98410","sel-ink":"#000000","sel-line":"#ffd28a"}};
+const THEMES=[['dark','Dark'],['light','Light'],['green','Green'],['brass','Brass'],['sepia','Sepia'],['blue','Blue'],['cgreen','Cassette Green'],['ccyan','Cassette Cyan'],['corange','Cassette Orange'],['clear','Clear'],['custom','Custom']];
 // THEME_EDIT = the colors you can change in the Custom editor, with plain names. (The hover and pressed shades of the button colors are worked out from the button colors.)
 const THEME_EDIT=[['bg','Background'],['panel','Panels and dialogs'],['ink','Text'],['mut','Muted text'],['line','Borders (panels, buttons, boxes)'],['sec','Board sector borders'],['grid','Board grid lines'],['acc','Buttons'],['acc-ink','Button text'],['acc-line','Button borders'],['sel','Selected buttons'],['sel-ink','Selected button text'],['sel-line','Selected button borders'],['dis','Disabled buttons'],['dis-ink','Disabled button text'],['warn','Warning label']];
 // (new) RANDOM_THEMES = the themes "Surprise me" may pick (never Light or Sepia; the early script in the head builds the same list). themeRandom = true unless the player picked a theme (picking one locks it; stored under constellate-theme; the word 'random' or nothing stored = Surprise me). On a random start the early head script has already picked a theme and put it on the page, so it is read from there and the two cannot disagree.
@@ -2483,10 +2554,10 @@ const SET_SECS=[['g','Game'],['k','Controls'],['d','Display']];
 function setSec(k,start){const b=(f,t,x)=>'<button onclick="'+f+'"'+(x||'')+' style="display:block;width:100%;margin-top:8px">'+t+'</button>';
 if(k=='g')return b('placeToggle(this)',placeLabel(),G&&G.pm?' disabled':'')+b('pvToggle(this)',pvLabel())+b('faCycle(this)',faLabel());
 if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ctlLabel())+qBtn('hap','display:block;width:100%;margin-top:8px');
-return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
+return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+(fsOk()?b('fsToggle(this)',fsLabel()):'')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-03-a';
+const BUILD='2026-11-03-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -3002,7 +3073,7 @@ const t0=performance.now(),ease=t=>t<.5?4*t*t*t:1-Math.pow(2-2*t,3)/2,l0=Math.lo
 const step=now=>{const t=Math.min(1,(now-t0)/ms),e=ease(t),k=Math.exp(l0+(l1-l0)*e);view.k=k;view.x=cx-(p0.x+(p1.x-p0.x)*e)*k;view.y=cy-(p0.y+(p1.y-p0.y)*e)*k;applyNow();if(t<1)camRaf=requestAnimationFrame(step);else{set();done()}};
 camRaf=requestAnimationFrame(step)}
 // (2026-10-28-d, Shmorden: every fit and board movement glides) camZoom(f) = the + and - buttons: zoom by f around the middle of the board area, from where a running move is heading, as a camera move. vAnim(V,box,ap,to,ms,h) = the same glide for another view (the History viewer: hview), h = {raf} its own frame handle; vZoom / vFit = its buttons.
-function camZoom(f){const r=st.getBoundingClientRect(),b=camRaf&&camTo?camTo:view,px=r.width/2,py=r.height/2,nk=Math.max(view.min*.9,Math.min(90,b.k*f)),q=nk/b.k;camGo({k:nk,x:px-(px-b.x)*q,y:py-(py-b.y)*q},calm()?0:animMs())}
+function camZoom(f){const r=stSafe(),b=camRaf&&camTo?camTo:view,px=r.w/2,py=r.t+r.h/2,nk=Math.max(view.min*.9,Math.min(90,b.k*f)),q=nk/b.k;camGo({k:nk,x:px-(px-b.x)*q,y:py-(py-b.y)*q},calm()?0:animMs())}
 function vAnim(V,box,ap,to,ms,h){cancelAnimationFrame(h.raf);h.raf=0;h.to=to;const r=box.getBoundingClientRect(),cx=r.width/2,cy=r.height/2,k0=V.k,p0={x:(cx-V.x)/k0,y:(cy-V.y)/k0},p1={x:(cx-to.x)/to.k,y:(cy-to.y)/to.k},set=()=>{V.k=to.k;V.x=to.x;V.y=to.y;h.to=null;ap()};
 if(ms<=0||calm()){h.raf=0;return set()}const t0=performance.now(),ease=t=>t<.5?4*t*t*t:1-Math.pow(2-2*t,3)/2,l0=Math.log(k0),l1=Math.log(to.k);
 const step=now=>{const t=Math.min(1,(now-t0)/ms),e=ease(t),k=Math.exp(l0+(l1-l0)*e);V.k=k;V.x=cx-(p0.x+(p1.x-p0.x)*e)*k;V.y=cy-(p0.y+(p1.y-p0.y)*e)*k;ap();if(t<1)h.raf=requestAnimationFrame(step);else{h.raf=0;set()}};h.raf=requestAnimationFrame(step)}
@@ -3020,18 +3091,18 @@ const cp=G.caps&&G.caps[c];if(cp){if(cp[0]<=1)x0=0;if(cp[0]>=N-2)x1=N;if(cp[1]<=
 return camFitBox(x0,y0,x1,y1)}
 // camFitBox(x0,y0,x1,y1) = the view that fits the board box x0..x1, y0..y1 (systems) to the screen, grown to at least 3 sectors (9 systems) each way, never smaller than Fit, the board edge kept at the screen edge (camAx). Used by camBox and dfBox.
 function camFitBox(x0,y0,x1,y1){const N=NSYS(G),M=Math.min(N,9),grow=(a,b)=>{if(b-a>=M)return[a,b];const m=Math.max(0,Math.min(N-M,(a+b-M)/2));return[m,m+M]};[x0,x1]=grow(x0,x1);[y0,y1]=grow(y0,y1);
-const r=st.getBoundingClientRect(),F=camFit(),k=Math.max(F.min,Math.min(90,r.width/(x1-x0+.2),r.height/(y1-y0+.2)));
+const r=stSafe(),F=camFit(),k=Math.max(F.min,Math.min(90,r.w/(x1-x0+.2),r.h/(y1-y0+.2)));
 // ax(lo,hi,W) = the board's offset along one axis for a box lo..hi (see camAx).
-const ax=(lo,hi,W)=>camAx((lo+hi)/2,k,W);return{k,x:ax(x0,x1,r.width),y:ax(y0,y1,r.height)}}
+const ax=(lo,hi,W)=>camAx((lo+hi)/2,k,W);return{k,x:ax(x0,x1,r.w),y:r.t+ax(y0,y1,r.h)}}
 // camTurn() runs after every redraw (render) and starts the transition when the turn has changed since the last call. (changed, Shmorden 2026-10-26) A change of turn within a round pans and zooms straight to the player whose turn it is (camIn), in one move, with no zoom out first. A new round, the end of the game, and a computer's turn at CPU speed Instant or with the Dev switch camCpu off still zoom out to Fit; after a new round the zoom in follows a short pause, or waits for the round screen to close (closeRound).
 function camTurn(){if(!G)return;const k=G.over?'over':G.round+'/'+G.ti+'/'+cur();if(k==camKey)return;const p=camKey;camKey=k;if(p==null||calm())return;
 camStop();const F=camFit();view.min=F.min;if(!G.over&&p.split('/')[0]==String(G.round)&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))return camIn();camGo(F,camMs(),()=>{if(G&&!G.over&&!(cpuOf(cur())&&(cpuMs==0||!camCpu)))camT=setTimeout(()=>{camT=null;if(rpOn||dfOn)camWait=true;else camIn()},Math.round(animMs()*.5))})}
 // camBusy() = a camera move is running or about to start; computers wait for it (cpuTick) so they never move while the board is still zooming.
 const camBusy=()=>!!camRaf||!!camT;
 // camDefView(a) = the view for a Defence call, a = {att: attacking star ids, b: target star id}: the middle of the attack line(s) (the middle of the box around the target and the attackers) is the middle of the screen, zoomed out as far as needed that the sector of the target and of every attacker is fully in view (never closer than 9 systems across, like camBox), and the board edge stays at the screen edge (camAx).
-function camDefView(a){const P=[a.b].concat(a.att||[]).map(by).filter(Boolean);if(!P.length)return null;const r=st.getBoundingClientRect(),F=camFit(),xs=P.map(q=>q.x),ys=P.map(q=>q.y),cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
+function camDefView(a){const P=[a.b].concat(a.att||[]).map(by).filter(Boolean);if(!P.length)return null;const r=stSafe(),F=camFit(),xs=P.map(q=>q.x),ys=P.map(q=>q.y),cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
 let hx=4.5,hy=4.5;P.forEach(q=>{const sx=Math.floor(q.x/3)*3,sy=Math.floor(q.y/3)*3;hx=Math.max(hx,Math.abs(sx-cx),Math.abs(sx+3-cx));hy=Math.max(hy,Math.abs(sy-cy),Math.abs(sy+3-cy))});
-const k=Math.max(F.min,Math.min(90,r.width/(2*hx+.2),r.height/(2*hy+.2)));return{k,x:camAx(cx,k,r.width),y:camAx(cy,k,r.height)}}
+const k=Math.max(F.min,Math.min(90,r.w/(2*hx+.2),r.h/(2*hy+.2)));return{k,x:camAx(cx,k,r.w),y:r.t+camAx(cy,k,r.h)}}
 // camDef() runs after every redraw (render): when a Defence call is waiting (here or on the defender's device, the same test as the dashed attack lines in render) and it is a new one, the board pans and zooms to camDefView. Once per attack, not per Fleet. Not with Animations off, and (2026-10-29-i, Shmorden) not when a computer is the attacker: the only camera move for a computer is the zoom in at the start of its turn (camIn). A person defending on this device gets their own fit (defDlg).
 // (removed 2026-10-29-i, Shmorden) camFollow, which zoomed out during a computer's turn whenever its move changed a sector off screen (build 2026-10-26-i), is gone for the same reason.
 let camDefKey=null;
@@ -3321,7 +3392,7 @@ function ambCol(c){return(c!=null&&c>=0&&ambHex(COL[c]))||AMB.tint.map(Math.roun
 // the board at least 80% as wide as the screen is tall with two 200 px panels beside it; the board is then as tall as the screen (or as
 // wide as is left), the panels up to 380 px each. The resize listener is added before the board's own (fit), so the board fits the new
 // layout straight away.
-function skyLay(){const W=innerWidth,H=innerHeight,r=document.documentElement,side=sideOn&&!r.classList.contains('saver')&&W-400>=.8*H;r.classList.toggle('side',side);
+function skyLay(){const W=innerWidth,H=innerHeight,r=document.documentElement,side=sideOn&&!r.classList.contains('saver')&&W-400>=.8*H;r.classList.toggle('side',side);try{stPads()}catch(e){}
 if(side){const bw=Math.round(Math.min(H,W-400)),pw=Math.floor(Math.min(380,(W-bw)/2)),so=Math.max(0,Math.floor((W-bw-2*pw)/2));[['--bw',bw],['--pw',pw],['--so',so],['--rx',so+pw+bw]].forEach(v=>r.style.setProperty(v[0],v[1]+'px'));
 const z=$('zoom');r.style.setProperty('--zh',(z?z.offsetHeight+16:0)+'px')}
 r.classList.toggle('sky',skyOn);AMB.on=skyOn;
@@ -3437,7 +3508,7 @@ AMB.neb.forEach(n=>{const z=AMB.Z[n.side],cx=z.x+z.w*(.5+.45*Math.sin(ts*n.sp+n.
 g.addColorStop(0,'rgba('+tc+','+(br+AMB.flash*.08)+')');g.addColorStop(1,'rgba('+tc+',0)');x.fillStyle=g;x.fillRect(cx-r,cy-r,2*r,2*r)});
 const dc=SKY_DUST.join(',');AMB.dust.forEach(d=>{if(!still){d.y-=d.z*dt*.000012;d.x+=d.z*dt*.000003;if(d.y<0)d.y+=1;if(d.x>1)d.x-=1}
 const a=(.2+.25*d.z)*(still?.8:.6+.4*Math.sin(ts*(.6+d.z)+d.ph))+AMB.flash*.35,s=.6+d.z*1.4;x.fillStyle='rgba('+dc+','+a.toFixed(3)+')';x.fillRect(d.x*W,d.y*H,s,s)});
-const B=G&&!AMB.menu?ambBoard():null;if(B){x.save();x.shadowColor='rgba('+tc+',.75)';x.shadowBlur=40;x.fillStyle='rgba('+tc+',.35)';x.fillRect(B.x,B.y,B.w,B.h);x.restore()}
+const B=G&&!AMB.menu?ambBoard():null;if(B){x.save();x.shadowColor='rgba('+tc+',.75)';x.shadowBlur=40;if(theme=='clear'){x.strokeStyle='rgba('+tc+',.3)';x.lineWidth=2;x.strokeRect(B.x,B.y,B.w,B.h)}else{x.fillStyle='rgba('+tc+',.35)';x.fillRect(B.x,B.y,B.w,B.h)}x.restore()} // (2026-11-03-b) the Clear theme's see-through board: only the glow's edge, no fill under it
 const up=AMB.cs.filter(s=>s.up&&t>s.up+900);if(up.length){AMB.cs=AMB.cs.filter(s=>!up.includes(s));AMB.links=AMB.links.filter(l=>!up.includes(l.a)&&!up.includes(l.b))}
 x.lineCap='round';const sc=SKY_SEED.join(',');AMB.links.forEach(l=>{const p=still?1:Math.min(1,(t-l.b0)/700),A=ambSide(l.a.side,l.a.fx,l.a.fy),E=ambSide(l.b.side,l.b.fx,l.b.fy);
 x.strokeStyle=l.c?'rgba('+l.c.join(',')+','+(l.w>2?.8:.42)+')':'rgba('+sc+',.16)';x.lineWidth=l.w||1.2;x.beginPath();x.moveTo(A[0],A[1]);x.lineTo(A[0]+(E[0]-A[0])*p,A[1]+(E[1]-A[1])*p);x.stroke()});
@@ -4324,6 +4395,7 @@ const r=cpuStep();if(r=='wait'&&!cpuTimer)cpuTimer=setTimeout(cpuTick,250);else 
 function cpuAuto(max){let n=0;while(G&&!G.over&&n<max){const o=$('ov');if(o.onclick)o.onclick();o.style.display='none';const r=cpuStep();if(r=='idle'||r=='wait')break;n++}return n}
 
 // On window resize refit the board, fit it now, and show the start menu.
+try{const ro=new ResizeObserver(()=>stPads());['top','bar','tut'].forEach(id=>{const e=$(id);if(e)ro.observe(e)})}catch(e){}stPads();
 addEventListener('resize',()=>fit());fit(1);menu();
 // (new) If the address carries #g=..., open that shared game (and react if the address changes later).
 addEventListener('hashchange',shareOnLoad);shareOnLoad();
