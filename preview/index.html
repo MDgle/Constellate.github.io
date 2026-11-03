@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface) and Oswald (main menu title) are loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-02-y",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-03-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -249,6 +249,19 @@ html.side #bar>button{flex:none;width:100%;min-height:46px}html.side #en,html.si
 html.side #chips,html.side #modes{flex-direction:column}html.side #modes .mg{flex:none}
 html.side #zoom{position:fixed;left:var(--rx);top:8px;width:var(--pw);box-sizing:border-box;padding:0 10px;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}
 html.side #msg{position:fixed;left:calc(var(--so) + 10px);width:calc(var(--pw) - 20px);right:auto;bottom:10px;box-sizing:border-box}
+/* (2026-11-03-a, Shmorden: "remove the panel the buttons and player chips sit in on the top and bottom of the screen. They will just float there")
+In every game and layout the top panel and the bottom bar have no background or border of their own: the chips, the info line and the buttons
+float over the Sky (or the theme's background with the Sky off); each button and chip keeps its own background. */
+#top,#bar{background:transparent;border:0}
+/* Over the Sky (always dark space, whatever the theme) the floating text that has no card of its own (the turn and round line, the Fuel
+number, the team score line) is drawn light with a soft shadow, so a light theme's dark ink stays readable. */
+html.sky #info,html.sky #tvp{--ink:#e8ecf4;--mut:#b3bccd;color:var(--ink);text-shadow:0 1px 3px rgba(0,0,0,.85)}
+/* (2026-11-03-a) html.saver = a screen saver game is showing: every control and panel is hidden and the board fills the screen (the side layout
+is off meanwhile, skyLay), so the Sky gets all the room around it. #ssx = its End game button, bottom center, shown for SS_UI_MS after a touch,
+click, mouse move or key press, then it fades away (ssPoke). */
+html.saver #top,html.saver #bar,html.saver #zoom,html.saver #msg,html.saver #tut{display:none}
+#ssx{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:5;min-width:160px;min-height:48px;font-weight:600;opacity:0;pointer-events:none;transition:opacity 1s;display:none}
+html.saver #ssx{display:block}html.saver #ssx.on{opacity:1;pointer-events:auto;transition:opacity .2s}
 html.sky.side #top,html.sky.side #bar{background:transparent;border:0}html.sky.side #tut{background:color-mix(in srgb,var(--panel) 88%,transparent)}
 </style></head><body>
 <script type="text/plain" id="ptext">
@@ -398,6 +411,7 @@ Goal: Win.
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
 <!--/*TUT{*/--><div id="tut"></div><!--/*}TUT*/-->
+<button id="ssx" onclick="ssExit()">End game</button>
 <div id="bar"><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button></div>
 <!-- Empty dialog backdrop that JavaScript fills when it needs a pop-up. -->
 <div id="ov"></div><div id="ov2"></div>
@@ -1984,14 +1998,15 @@ let sty=null;/*PERS{*/sty={};pl.forEach(c=>{if(ES_NAMES[cpu[c]])sty[c]='r'});/*}
 // computers named R.Easy and so on) and a level with personalities gets Surprise me (preview only, paid). Exiting is Menu > Main menu (or the
 // end screen's Main menu): that ends the screen saver game (it cannot be continued) and puts back the game that was open before, if any.
 // A screen saver game is never saved: persist and histSave skip it (ssG), so the player's own saved game (Continue saved game) is untouched.
-// Every default here (the 2 / Medium / 7x7 / Normal first choices, SS_END_MS, the texts, no Teams) is a placeholder (docs/PLACEHOLDERS.md).
+// (2026-11-03-a) While it plays every control is hidden (ssUi); a touch, click, mouse move or key shows End game for 5 s (ssPoke).
+// Every default here (the 2 / Medium / 7x7 / Normal first choices, SS_END_MS, SS_UI_MS, the texts, no Teams) is a placeholder (docs/PLACEHOLDERS.md).
 // ss = the choices, remembered in this browser ('r' = Random). ssG = the screen saver's current game (the G object), null when none.
 // ssMk = true while ssNext is starting a game (before ssG is that game). ssKeep = {G, H, ms}: the game, history and CPU speed from before the screen saver, put back by ssStop. ssT = the timer that starts the next game.
 const SS_KEY='constellate-saver',SS_END_MS=10000,SS_OPT={n:[[2,'2'],[4,'4']],lv:[[1,'Easy'],[2,'Medium'],[3,'Hard']],sz:[[7,'7x7'],[5,'5x5'],[3,'3x3']],sp:[[700,'Normal'],[250,'Fast'],[0,'Instant']]};
 let ss={n:2,lv:2,sz:7,sp:700},ssG=null,ssKeep=null,ssT=null,ssMk=false;try{const o=JSON.parse(localStorage.getItem(SS_KEY)||'null');if(o)Object.keys(ss).forEach(k=>{if(o[k]=='r'||SS_OPT[k].some(x=>x[0]===o[k]))ss[k]=o[k]})}catch(e){}
 // ssDlg() = the Screen saver page (from the start menu). ssSet(k,v) = one choice tapped ('r' = Random); the page redraws in place.
 function ssDlg(){$('ov').onclick=null;const row=(t,k)=>'<p style="margin:12px 0 4px;font-weight:600">'+t+'</p><div class="r">'+SS_OPT[k].concat([['r','Random']]).map(([v,l])=>'<button'+(ss[k]===v?' class="act"':'')+' onclick="ssSet(\''+k+'\',\''+v+'\')">'+l+'</button>').join('')+'</div>';
-ov('<h1>Screen saver</h1><p style="margin:0 0 4px">Computers play each other, one game after another. To stop, open the Menu and choose Main menu.</p>'+row('Players','n')+row('Difficulty','lv')+row('Board','sz')+row('CPU speed','sp')+'<div class="r" style="margin-top:14px"><button onclick="ssStart()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Start</button></div><div class="r" style="margin-top:8px"><button onclick="ssStart(1)">Randomize all and start</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>')}
+ov('<h1>Screen saver</h1><p style="margin:0 0 4px">Computers play each other, one game after another. To stop, touch the screen or move the mouse and tap End game.</p>'+row('Players','n')+row('Difficulty','lv')+row('Board','sz')+row('CPU speed','sp')+'<div class="r" style="margin-top:14px"><button onclick="ssStart()" style="background:var(--acc-hover);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600">Start</button></div><div class="r" style="margin-top:8px"><button onclick="ssStart(1)">Randomize all and start</button></div><div class="r" style="margin-top:8px"><button onclick="menu()">Back</button></div>')}
 function ssSet(k,v){ss[k]=v=='r'?'r':+v;try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}ovDir=0;ssDlg()}
 // ssStart(all) = Start (all = Randomize all and start: every choice becomes Random, remembered). Keeps the open game to put back later.
 function ssStart(all){if(net.on)return;if(all){Object.keys(ss).forEach(k=>ss[k]='r');try{localStorage.setItem(SS_KEY,JSON.stringify(ss))}catch(e){}}
@@ -2001,14 +2016,23 @@ function ssNext(){clearTimeout(ssT);ssT=null;if(!ssKeep)return;const R=a=>a[Math
 const n=pick('n'),sz=pick('sz'),pl=n==2?[0,2]:[0,2,3,1],cpu={},pc={},used=new Set();cpuMs=pick('sp');
 pl.forEach(c=>{cpu[c]=pick('lv');const k=R(PCOL.filter(p=>!used.has(p.k)));used.add(k.k);if(k.k!=DEFCOL[c])pc[c]=k.k});
 let sty=null;/*PERS{*/sty={};pl.forEach(c=>{if(ES_NAMES[cpu[c]])sty[c]='r'});/*}PERS*/
-$('ov').style.display='none';ssMk=true;try{start(n,sz,null,cpu,null,{pc,qk:1},sty)}finally{ssMk=false}ssG=G;render()}
+$('ov').style.display='none';ssMk=true;try{start(n,sz,null,cpu,null,{pc,qk:1},sty)}finally{ssMk=false}ssG=G;ssUi(true);render()}
 // ssAfter() = a screen saver game's end screen is showing: the next game starts after SS_END_MS, unless the player has left by then.
 function ssAfter(){if(ssT||G!==ssG)return;const g=G;ssT=setTimeout(()=>{ssT=null;if(G===g&&G===ssG&&ssKeep)ssNext()},SS_END_MS)}
 // ssStop() = leaving the screen saver (mainMenu): the game ends where it stands, the CPU speed and the game from before come back.
 function ssStop(){clearTimeout(ssT);ssT=null;clearTimeout(cpuTimer);cpuTimer=null;if(G&&G===ssG&&!G.over){const {vp}=calc();G.score=vp;G.over=winners(vp)}
-const k=ssKeep;ssKeep=null;if(!k)return;if(cpuMs!==k.ms)cpuMs=k.ms;if(k.G){G=k.G;H=k.H;ssG=null;setLook(G)}}
+ssUi(false);const k=ssKeep;ssKeep=null;if(!k)return;if(cpuMs!==k.ms)cpuMs=k.ms;if(k.G){G=k.G;H=k.H;ssG=null;setLook(G)}}
 // ssBtns() = the end screen's buttons in a screen saver game.
-const ssBtns=()=>'<div class="ovft" style="margin-top:14px"><p style="margin:0 0 8px;color:var(--mut)">Screen saver: the next game starts in a few seconds.</p><div class="r"><button onclick="ssNext()">Next game now</button><button onclick="mainMenu()">Main menu</button></div></div>';
+// (2026-11-03-a, Shmorden: "Remove all ui elements") No buttons any more: the End game button (ssPoke) is the way out.
+const ssBtns=()=>'<div class="ovft" style="margin-top:14px"><p style="margin:0;color:var(--mut)">The next game starts in a few seconds.</p></div>';
+// ssUi(on) = switch the screen saver look (html.saver) on or off and refit the board to the screen it now has.
+// ssPoke() = a touch, click, mouse move or key press during the screen saver: the End game button shows for SS_UI_MS, then fades (CSS, 1 s).
+// ssExit() = the End game button: leaves the screen saver like Main menu (ssStop: the game ends, the game from before comes back).
+const SS_UI_MS=5000;let ssUiT=null;
+function ssUi(on){const r=document.documentElement;if(r.classList.contains('saver')==on)return;r.classList.toggle('saver',on);if(!on){clearTimeout(ssUiT);$('ssx').classList.remove('on')}try{skyLay()}catch(e){}fit(1)}
+function ssPoke(){if(!document.documentElement.classList.contains('saver'))return;$('ssx').classList.add('on');clearTimeout(ssUiT);ssUiT=setTimeout(()=>$('ssx').classList.remove('on'),SS_UI_MS)}
+['pointerdown','pointermove','keydown','wheel'].forEach(k=>addEventListener(k,ssPoke,{capture:true,passive:true}));
+function ssExit(){if(!ssKeep)return;ssStop();resetFlow();$('ov').onclick=null;menu()}
 // menuNew() = the start menu's New game button. While a game is in progress (loaded, not over) it does not open the New game page: the button blinks like Play does and a line says why.
 function menuNew(){if(G&&!G.over&&!net.on){const b=$('mnew');if(b){b.classList.remove('blink');void b.offsetWidth;b.classList.add('blink')}return lm('Game in progress. End the game to make a new one.',1)}newGameOpen()}
 // endGameDlg() = the Menu's End game button: asks first (same look as Concede), then doEndGame ends the game for everyone.
@@ -2462,7 +2486,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-02-y';
+const BUILD='2026-11-03-a';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -3297,7 +3321,7 @@ function ambCol(c){return(c!=null&&c>=0&&ambHex(COL[c]))||AMB.tint.map(Math.roun
 // the board at least 80% as wide as the screen is tall with two 200 px panels beside it; the board is then as tall as the screen (or as
 // wide as is left), the panels up to 380 px each. The resize listener is added before the board's own (fit), so the board fits the new
 // layout straight away.
-function skyLay(){const W=innerWidth,H=innerHeight,r=document.documentElement,side=sideOn&&W-400>=.8*H;r.classList.toggle('side',side);
+function skyLay(){const W=innerWidth,H=innerHeight,r=document.documentElement,side=sideOn&&!r.classList.contains('saver')&&W-400>=.8*H;r.classList.toggle('side',side);
 if(side){const bw=Math.round(Math.min(H,W-400)),pw=Math.floor(Math.min(380,(W-bw)/2)),so=Math.max(0,Math.floor((W-bw-2*pw)/2));[['--bw',bw],['--pw',pw],['--so',so],['--rx',so+pw+bw]].forEach(v=>r.style.setProperty(v[0],v[1]+'px'));
 const z=$('zoom');r.style.setProperty('--zh',(z?z.offsetHeight+16:0)+'px')}
 r.classList.toggle('sky',skyOn);AMB.on=skyOn;
