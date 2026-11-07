@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-07-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-07-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -996,7 +996,7 @@ const bp=bxPre(b);G.conns=G.conns.filter(q=>q[0]!=b.id&&q[1]!=b.id);b.o=me;b.f=s
 mvRec({k:att.length>1?'m':'a',a:mvPos(by(att[0].a)),ys:att.slice(1).map(x=>mvPos(by(x.a))),b:mvPos(b),n:A,u:att.map(x=>x.use),c,D,o:[rets.length,holds,lost],rt:rets.map(id=>mvPos(by(id)))});
 // (Sound effects) Take a Star (Multi-attack for several attackers) for the attacker, or Lose a Star when it happens to a person here and the attacker is not; then Fleet destroyed and Fleet retreat, a moment later so they don't pile up.
 // (2026-11-02-n) the Take's bass starts as the Star taken ring does and lasts as long (tk, from bxTake; nothing with animations off).
-const tk=bxTake(b,bp,att,dec,fpv,fp)||{};if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me,tk.d,{len:tk.ms});ambTake(me,dfc);ambSectors(sk0,me,tk.d);if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);
+const tk=bxTake(b,bp,att,dec,fpv,fp)||{};if(sndHere(dfc)&&!sndHere(me))sfx('lose');else sfxMe(att.length>1?'multi':'take',me,tk.d,{len:tk.ms});if(att.length>1||(sndHere(dfc)&&!sndHere(me)))ambTake(me,dfc);ambSectors(sk0,me,tk.d);if(holds+lost>0)sfxAny('destroyed',[me,dfc],180);if(rets.length)sfxAny('retreat',[me,dfc],holds+lost>0?360:180);
 // Check eliminations, report the outcome, redraw.
 const m=elim();say('Star taken for '+fuW(c)+'.'+(D?' '+rets.length+' retreated, '+holds+' held, '+lost+' destroyed.':'')+m);render()}
 // ===== Team mode: data model and helpers (team project step 2) =====
@@ -2676,7 +2676,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+(fsOk()?b('fsToggle(this)',fsLabel()):'')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-07-b';
+const BUILD='2026-11-07-c';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -3486,7 +3486,8 @@ if(!par.has(t.id))return [t.id];const p=[t.id];while(par.get(p[0])!=null)p.unshi
 // - Sky (Shmorden's idea, from Tetris Effect): space behind the game that reacts to it. It shows wherever the page is see-through: beside the
 //   board on a wide screen, above and below it on an upright phone, and over the whole screen behind the start menu, where it plays by itself.
 //   Each player grows a constellation from their Stars (a new Star branches off one of theirs, joined by a thin line; a Connection draws a
-//   thicker, brighter one); a Take turns one of the loser's sky stars to the taker's color, and a Take that changes who controls a Sector
+//   thicker, brighter one); a Take shows a small Glint at the taker's newest sky star (a Multi-attack, or a Star lost by a person here, turns
+//   one of the loser's sky stars to the taker's color instead), and a Take that changes who controls a Sector
 //   sends one ring from that Sector; destroyed Fleets throw sparks (the only sparks); the nebula and the glow around the board take the
 //   current player's color. (Shmorden 2026-11-07, designed in the Sky Lab: no rings on a Take, no sparks for Fleets placed, moved or
 //   retreating, no brightening on a new round.)
@@ -3604,12 +3605,20 @@ for(let k=0;k<6;k++){const a=ambRnd()*6.283,d=45+ambRnd()*45,x0=par.fx+Math.cos(
 let m=1e9;near.forEach(o=>{m=Math.min(m,Math.hypot((o.fx-q.fx)*zw,(o.fy-q.fy)*zh))});if(q.fx!=x0||q.fy!=y0)m*=.3;if(m>best){best=m;s=q}}s.par=par}
 Object.assign(s,{c:ambCol(c),pc:c,b:performance.now()});AMB.cs.push(s);if(s.par)AMB.links.push({a:s.par,b:s,c:s.c,w:1.1,b0:s.b});delete s.par;AMB.busy=s.b+1200;
 const cap=skyCap();while(AMB.cs.length>cap){const o=AMB.cs.shift();AMB.links=AMB.links.filter(l=>l.a!=o&&l.b!=o)}return s}
-// ambTake(a, d) is called when player a takes a Star from player d: d's newest sky star flares, turns a's color and sends out a ring.
+// ambTake(a, d) is called when player a takes a Star from player d by Multi-attack, or from a person on this device (Lose a Star; a plain
+// Take shows a Glint instead, 2026-11-07): d's newest sky star flares, turns a's color and sends out a ring.
 function ambTake(a,d){if(!AMB||!AMB.on)return;const v=AMB.cs.filter(s=>s.pc==d&&d!=null),s=v[v.length-1];if(!s)return;s.pc=a;s.c=ambCol(a);s.b=performance.now();AMB.busy=s.b+1200;
 if(!calm()){const P=ambSide(s.side,s.fx,s.fy);ambRing(P[0],P[1],s.c,70,900,2)}AMB.dirty=1;ambKick()}
 // ambDeficit(c, len) goes with Deficit Elimination's crescendo (len ms, see dfRun): player c's sky stars rise and fade one after another,
 // the last as the crescendo ends, and the whole sky brightens at its peak.
 function ambDeficit(c,len){if(!AMB||!AMB.on||calm())return;const v=AMB.cs.filter(s=>s.pc==c),t=performance.now();v.forEach((s,i)=>s.up=t+len*(.25+.75*(i+1)/v.length)-900);AMB.busy=t+len+1500;setTimeout(()=>{AMB.flash=1;AMB.busy=performance.now()+1900},len);ambKick()}
+// ambGlint(x, y, c, R, dur, glow) adds a Glint burst at x, y: an eight-point star (four long points, four short, curved sides) R px across
+// its long points, in color c lightened a little, that pops up in the first quarter of dur ms (overshooting 15%) and fades out, with a
+// glow of 20 * glow px. Shmorden 2026-11-07, from the Sky Lab: what a Take shows (the lab's Sparkle burst, shape Glint).
+function ambGlint(x,y,c,R,dur,glow){AMB.fx.push({t:'g',x,y,c,R,dur,glow,b:performance.now()});AMB.busy=Math.max(AMB.busy,performance.now()+dur)}
+// ambGlintPath(cx, x, y, r) traces the Glint shape at x, y, radius r (the long points; the short ones reach .42 r).
+function ambGlintPath(cx,x,y,r){cx.beginPath();for(let i=0;i<8;i++){const a=-Math.PI/2+i*Math.PI/4,q=i%2?.42:1,m=a+Math.PI/8,a2=a+Math.PI/4,q2=(i+1)%2?.42:1;
+if(!i)cx.moveTo(x+Math.cos(a)*q*r,y+Math.sin(a)*q*r);cx.quadraticCurveTo(x+Math.cos(m)*.07*r,y+Math.sin(m)*.07*r,x+Math.cos(a2)*q2*r,y+Math.sin(a2)*q2*r)}cx.closePath()}
 // ambRing / ambSparks add an expanding ring, or a burst of sparks, at x, y in color c (dur = how long it lasts, ms; dir = the direction
 // the sparks fly, all ways when left out).
 function ambRing(x,y,c,R,dur,w){AMB.fx.push({t:'r',x,y,c,R,dur,w:w||2,b:performance.now()})}
@@ -3634,7 +3643,8 @@ else if(ev=='connect'){const mine=AMB.cs.filter(s=>s.pc==c);let a=mine[mine.leng
 let b=null,bd=AMB.H*.3;mine.forEach(s=>{if(s==a||s.side!=a.side||AMB.links.some(l=>(l.a==a&&l.b==s)||(l.a==s&&l.b==a)))return;const p=ambSide(s.side,s.fx,s.fy),d=Math.hypot(p[0]-pa[0],p[1]-pa[1]);if(d<bd){bd=d;b=s}});
 if(!b){b=ambStar(c,a);AMB.links.pop()}AMB.links.push({a,b,c:C,w:2.4,b0:performance.now()});AMB.busy=performance.now()+900}
 else if(!still){const e=ambEdge();
-if(ev=='destroyed'){ambSparks(e[0],e[1],[255,240,220],26,.35,e[2]);ambSparks(e[0],e[1],C,18,.25,e[2])}
+if(ev=='take'){const v=AMB.cs.filter(s=>s.pc==c&&!s.up),s=v[v.length-1],P=s?ambSide(s.side,s.fx,s.fy):e;ambGlint(P[0],P[1],C,9,900,.45)}
+else if(ev=='destroyed'){ambSparks(e[0],e[1],[255,240,220],26,.35,e[2]);ambSparks(e[0],e[1],C,18,.25,e[2])}
 else if(ev=='defCall'){const B=ambBoard();if(B)[0,1].forEach(i=>AMB.hz?ambRing(i?B.x+B.w:B.x,B.y+B.h/2,SKY_WARN,AMB.H*.6,1600,2):ambRing(B.x+B.w/2,i?B.y+B.h:B.y,SKY_WARN,AMB.H*.4,1600,2))}
 else if(ev=='elim'){const B=ambBoard();if(B)ambRing(B.x+B.w/2,B.y+B.h/2,C,Math.max(AMB.W,AMB.H)*.7,2200,4)}
 else if(ev=='over'){AMB.cs.forEach((s,i)=>s.b=performance.now()+i*40);AMB.flash=1;AMB.busy=performance.now()+AMB.cs.length*40+1200}}
@@ -3660,6 +3670,8 @@ x.fillStyle='rgba('+c+','+((s.c?1:.5)*(1-ku))+')';x.beginPath();x.arc(P[0],P[1],
 if(age<1100){const k=age/1100,r=6+60*k;x.strokeStyle='rgba('+c+','+(.8*(1-k))+')';x.lineWidth=2*(1-k)+.5;x.beginPath();x.arc(P[0],P[1],r,0,6.283);x.stroke();
 const L=40*(1-k)+6;x.beginPath();x.moveTo(P[0]-L,P[1]);x.lineTo(P[0]+L,P[1]);x.moveTo(P[0],P[1]-L);x.lineTo(P[0],P[1]+L);x.stroke()}});
 AMB.fx=AMB.fx.filter(f=>{const age=t-f.b,k=age/f.dur;if(k>=1||still)return false;if(age<0)return true;const c=f.c.join(',');
+if(f.t=='g'){const sc=k<.25?Math.sqrt(k/.25)*1.15:1.15-.15*(k-.25)/.75,al=k<.25?1:1-Math.pow((k-.25)/.75,1.5),w=f.c.map(v=>Math.round(v+(255-v)*.35)).join(',');
+x.save();x.shadowColor='rgba('+c+',1)';x.shadowBlur=20*f.glow;x.fillStyle='rgba('+w+','+al.toFixed(3)+')';ambGlintPath(x,f.x,f.y,f.R*sc);x.fill();x.restore();return true}
 if(f.t=='r'){x.strokeStyle='rgba('+c+','+(.7*(1-k))+')';x.lineWidth=f.w*(1-k)+.5;x.beginPath();x.arc(f.x,f.y,f.R*(1-Math.pow(1-k,3)),0,6.283);x.stroke()}
 else{f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.985;f.vy*=.985;x.fillStyle='rgba('+c+','+(1-k).toFixed(3)+')';x.fillRect(f.x-1,f.y-1,2.5,2.5)}return true})}
 addEventListener('resize',skyLay);skyLay();
