@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-04-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-07-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -1459,11 +1459,14 @@ const sp=(x,y,R,r)=>[...Array(14)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/7,q=
 // - a Sector line takes each neighboring Sector's color, weighted by how full that Sector is, pulled toward a Star in a System it touches.
 //   A Sector's color mixes its players' colors by the square of their Star counts (more Stars push the others out); the Sector's controller
 //   (ctl, as scored) always takes at least 2.5 times the others' weight together.
-// Each piece is a gradient: its own color in the middle, at each end the mix with the next piece along the line, or a fade back to the
-// plain line when the next piece has no color. Display only. The result is kept (DSG) until a Star, a Sector's controller or a color changes,
+// (2026-11-07, Shmorden: "controlled sectors ... bleed farther as it fades. At least .75 sector width. Make sure the corners have the color.
+// Make system control reach past the system by .25 sector width.") Each line is one gradient sampled every quarter System: every colored
+// piece keeps its full color over its whole length (corners included) and fades out past its ends over DS_BLEED_SEC Systems (a piece
+// next to a controlled Sector) or DS_BLEED_SYS Systems (any other piece: a Star's System). Where pieces' fades meet, their colors mix by
+// weight (the nearer piece wins) and the line takes the strongest one's opacity. Display only. The result is kept (DSG) until a Star, a Sector's controller or a color changes,
 // and the gradient ids carry a counter so a second board on the page (the History viewer) never borrows another board's gradients.
 // Every weight and strength here is a placeholder.
-const DSG={k:'',s:'',n:0};
+const DSG={k:'',s:'',n:0},DS_BLEED_SEC=2.25,DS_BLEED_SYS=.75;
 function dsGrid(S,ctl,NS){const cc=[...Array(NS)].map(()=>Array(NS).fill(-1));
 S.stars.forEach(q=>{const x=Math.floor(q.x),y=Math.floor(q.y);if(q.o>=0&&x>=0&&y>=0&&x<NS&&y<NS)cc[y][x]=q.o});
 const k=NS+'|'+cc.map(r=>r.join(',')).join(';')+'|'+ctl.map(r=>r.join(',')).join(';')+'|'+COL.join(',')+'|'+GRID_DIM;if(k==DSG.k)return DSG.s;
@@ -1477,17 +1480,23 @@ for(let sy=0;sy<NC;sy++){sc[sy]=[];for(let sx=0;sx<NC;sx++){const cnt={};let tot
 const secAt=(x,y)=>{const sx=Math.floor(x/3),sy=Math.floor(y/3);return sx>=0&&sy>=0&&sx<NC&&sy<NC?sc[sy][sx]:null};
 // seg(sys, cell A, cell B) = the colored piece between two Systems (A above / left of the line, B below / right), or null for a plain one.
 const seg=(sys,ax,ay,bx,by)=>{const ca=cell(ax,ay),cb=cell(bx,by),L=[];let a=0;
- if(sys){[ca,cb].forEach(o=>{if(o>=0)L.push([PC[o],1])});return L.length?{c:mixw(L),a:.45*L.length}:null}
- [secAt(ax,ay),secAt(bx,by)].forEach(z=>{if(z){L.push([z.c,z.d*2]);a=Math.max(a,z.d)}});[ca,cb].forEach(o=>{if(o>=0){L.push([PC[o],.8]);a=Math.max(a,.6)}});
- return L.length?{c:mixw(L),a:Math.min(1,a)}:null};
+ if(sys){[ca,cb].forEach(o=>{if(o>=0)L.push([PC[o],1])});return L.length?{c:mixw(L),a:.45*L.length,f:DS_BLEED_SYS}:null}
+ let f=DS_BLEED_SYS;[[ax,ay],[bx,by]].forEach(([x,y])=>{const z=secAt(x,y),r=ctl[Math.floor(y/3)];if(z){L.push([z.c,z.d*2]);a=Math.max(a,z.d)}if(r&&r[Math.floor(x/3)]>=0)f=DS_BLEED_SEC});
+ [ca,cb].forEach(o=>{if(o>=0){L.push([PC[o],.8]);a=Math.max(a,.6)}});
+ return L.length?{c:mixw(L),a:Math.min(1,a),f}:null};
 const id0='dg'+(++DSG.n)+'_';let sysd='',sec='',defs='',ov='',gi=0;
 for(let i=0;i<=NS;i++){const th=i%3==0;
  if(th)sec+=`<line x1="${i}" y1="0" x2="${i}" y2="${NS}" vector-effect="non-scaling-stroke"/><line x1="0" y1="${i}" x2="${NS}" y2="${i}" vector-effect="non-scaling-stroke"/>`;
- [1,0].forEach(vt=>{const arr=[];for(let j=0;j<NS;j++)arr.push(vt?seg(!th,i-1,j,i,j):seg(!th,j,i-1,j,i));
-  arr.forEach((g,j)=>{const x1=vt?i:j,y1=vt?j:i,x2=vt?i:j+1,y2=vt?j+1:i;if(!th)sysd+=`M${x1} ${y1}L${x2} ${y2}`;if(!g)return;
-   const end=o=>o?{c:mixw([[g.c,1],[o.c,1]]),a:(g.a+o.a)/2}:{c:g.c,a:g.a*.12},e0=end(arr[j-1]),e1=end(arr[j+1]),id=id0+(gi++),st=(o,e)=>`<stop offset="${o}" stop-color="${toh(e.c)}" stop-opacity="${e.a.toFixed(2)}"/>`;
-   defs+=`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${st(0,e0)}${st(.5,g)}${st(1,e1)}</linearGradient>`;
-   ov+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="url(#${id})" stroke-width="${th?2.4:1.4}"${th?'':' stroke-dasharray="3 4"'} vector-effect="non-scaling-stroke"/>`})})}
+ [1,0].forEach(vt=>{const arr=[];for(let j=0;j<NS;j++){arr.push(vt?seg(!th,i-1,j,i,j):seg(!th,j,i-1,j,i));if(!th)sysd+=vt?`M${i} ${j}L${i} ${j+1}`:`M${j} ${i}L${j+1} ${i}`}
+  if(!arr.some(g=>g))return;
+  // at(t) = the line's color and opacity at distance t along it: each colored piece weighs 1 on itself, falling to 0 at its bleed length.
+  const at=t=>{let W=0,A=0;const c=[0,0,0];arr.forEach((g,j)=>{if(!g)return;const d=Math.max(0,j-t,t-j-1),w=Math.max(0,1-d/g.f);if(!w)return;const q=w*w*g.a;W+=q;A=Math.max(A,w*g.a);g.c.forEach((v,k)=>c[k]+=v*q)});return W?{c:c.map(v=>v/W),a:A}:null};
+  const P=[];for(let n=0;n<=NS*4;n++)P.push(at(n/4));let lo=P.findIndex(p=>p),hi=P.length-1;while(!P[hi])hi--;
+  const id=id0+(gi++),x2=vt?i:NS,y2=vt?NS:i;let st='';for(let n=Math.max(0,lo-1);n<=Math.min(P.length-1,hi+1);n++){const p=P[n]||{c:[0,0,0],a:0};st+=`<stop offset="${(n/(NS*4)).toFixed(4)}" stop-color="${toh(p.c)}" stop-opacity="${p.a.toFixed(2)}"/>`}
+  defs+=`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${vt?i:0}" y1="${vt?0:i}" x2="${x2}" y2="${y2}">${st}</linearGradient>`;
+  // The colored stroke covers lo to hi; a System line is drawn as one-System pieces so its dashes line up with the plain line's.
+  const a0=lo/4,a1=hi/4;let d='';if(th)d=vt?`M${i} ${a0}L${i} ${a1}`:`M${a0} ${i}L${a1} ${i}`;else for(let j=Math.floor(a0);j<Math.ceil(a1);j++)d+=vt?`M${i} ${j}L${i} ${j+1}`:`M${j} ${i}L${j+1} ${i}`;
+  ov+=`<path d="${d}" fill="none" stroke="url(#${id})" stroke-width="${th?2.4:1.4}"${th?'':' stroke-dasharray="3 4"'} vector-effect="non-scaling-stroke"/>`})}
 DSG.k=k;DSG.s=`<path d="${sysd}" fill="none" stroke="var(--grid)" stroke-width="1" stroke-dasharray="3 4" stroke-opacity="${GRID_DIM}" vector-effect="non-scaling-stroke"/><g stroke="var(--sec)" stroke-width="2">${sec}</g><defs>${defs}</defs>${ov}`;return DSG.s}
 function boardSVG(S,ctl,L){let s='';if(L&&AMB&&AMB.on)s+='<rect id="skyb" x="0" y="0" width="'+NSYS(S)+'" height="'+NSYS(S)+'" fill="var(--bg)" fill-opacity=".93"/>';
 // Tint each controlled sector in its owner's color.
@@ -2667,7 +2676,7 @@ if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ct
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+(fsOk()?b('fsToggle(this)',fsLabel()):'')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
 function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')/*SND{*/+'<p style="margin:14px 0 0;font-weight:600">Sound</p><button onclick="sndDlg(\'set\',\'menu\')" style="display:block;width:100%;margin-top:8px">Sound: volume, sounds, events</button>'/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-04-c';
+const BUILD='2026-11-07-a';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -3559,10 +3568,11 @@ function skyCap(){const a=AMB.Z[0].w*AMB.Z[0].h+AMB.Z[1].w*AMB.Z[1].h;return Mat
 function ambBoard(){const e=document.getElementById('skyb'),r=e&&e.getBoundingClientRect();return r&&r.width>0?{x:r.left,y:r.top,w:r.width,h:r.height}:AMB.B}
 // ambKick(force) is called by render(), by the dialog layer changing (start menu), on resize and after every sky event: notices the start
 // menu, a new turn (the nebula and the board's glow turn to the player's color), a new round (the sky brightens once; a lower round = a
-// new game, so the last game's stars go), plants one sky star per Star on the board when this game has none in the sky yet (the Capitals
+// new game, so the last game's stars go; 2026-11-07, Shmorden: at CPU speed Instant a computer's turn leaves the sky's color as it is,
+// because the color flashed from player to player as the turns raced by), plants one sky star per Star on the board when this game has none in the sky yet (the Capitals
 // at the start, every Star when a saved game opens), then draws now when the sky is still (Animations Off) or keeps the frame loop going.
 function ambKick(force){if(!AMB||!AMB.on)return;skyMenu();const inG=G&&!AMB.menu,k=inG&&!G.over?cur():-1,rd=inG?G.round:0;let ch=!!force;
-if(k!=AMB.k){AMB.k=k;AMB.tgt=k>=0?ambCol(k):SKY_TINT.slice();ch=1}
+if(k!=AMB.k){AMB.k=k;if(!(k>=0&&cpuOf(k)&&!cpuMs))AMB.tgt=k>=0?ambCol(k):SKY_TINT.slice();ch=1}
 if(rd!=AMB.rd){if(rd>AMB.rd&&AMB.rd>0)AMB.flash=1;if(rd<AMB.rd){AMB.cs=AMB.cs.filter(s=>s.pc<0);AMB.links=AMB.links.filter(l=>!l.c)}AMB.rd=rd;ch=1}
 if(inG&&!AMB.cs.some(s=>s.pc>=0))ch=skyPlant()||ch;
 if(calm()){AMB.tint=AMB.tgt.slice();AMB.flash=0;if(ch||AMB.dirty){AMB.dirty=0;ambDraw(performance.now())}}else if(!AMB.raf)AMB.raf=requestAnimationFrame(ambFrame);
