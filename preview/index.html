@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-08-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-08-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -199,6 +199,8 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #zoom: the zoom buttons floating at the top right of the board; also lets tall dialogs scroll. */
 #zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px}#zoom button{background:var(--panel)}/* (changed 2026-10-27-i) The whole box, padding and border included (44 px), stays inside the layer's padding, so no dialog reaches past the screen's edge; a taller one scrolls. (92% of the content height alone could run past the bottom.) */
 #ov>div{max-height:calc(100% - 44px);overflow:auto}
+/* (2026-11-08-d) Dialogs and drop-downs get the top bar's glass: the board behind them is blurred away. */
+:is(#ov,#ov2)>div,#dd{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}:root[data-theme="clear"] :is(#ov,#ov2)>div,:root[data-theme="clear"] #dd{background:color-mix(in srgb,var(--panel) 88%,transparent)}
 /* (new) The last button row of a dialog (Close, Back, Cancel...) stays on the bottom edge while a long dialog scrolls under it (Shmorden, 2026-10-27). (changed 2026-10-27-l) On a dialog that really scrolls (class ovsc, set by ovSc) everything but the last button row goes into a scrolling part (.ovb), and the row sits under it as part of the box, so it shows with the box (a sticky row showed up a moment after the dialog on the phone). It sits over the box's 20 px bottom padding (bottom -20px), so nothing shows under it; the negative margin and the padding cancel out while nothing scrolls. */
 #ov>div.ovsc{display:flex;flex-direction:column;overflow:hidden}#ov>div.ovsc>.ovb{flex:1 1 auto;min-height:0;overflow:auto}#ov>div.ovsc>.r:last-child{flex:none;padding-top:10px}#ov>div.ovsc>.pin{flex:none;margin-top:0!important;padding-top:10px}
 /* (new) .mq: the scrolling tip banner on the main menu. The text starts just outside the right edge and slides out past the left edge, over and over. */
@@ -339,7 +341,10 @@ html:not(.side) #top>#fuel{display:flex;margin-top:7px;min-width:0;gap:6px}html:
 html.sky:not(.side) #top>#fuel #fueln{text-shadow:0 1px 3px rgba(0,0,0,.85)}
 html:not(.side) #fbar{height:12px;border-radius:6px}html:not(.side) #fbar::after{border-width:1.5px;border-radius:6px}
 /* Bottom bar: Undo, History, Menu, Star, Fleets, End turn (Hold, Cancel, Confirm when they show; Star and Fleets make room for them). */
-html:not(.side) #bar{gap:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:stretch;background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
+html:not(.side) #bar{gap:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:stretch;background:transparent;border-top:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
+/* (2026-11-08-d) The bar's glass is drawn by a layer behind its buttons (::before), not by the bar itself: an element with a backdrop blur
+   stops the blur of everything inside it at its own edges, so the slide-outs (Multi, Move, Redo, the lists) could not blur the board. */
+html:not(.side) #bar::before{content:'';position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);pointer-events:none}
 html:not(.side) #bar #modes{display:flex;gap:0;margin:0;flex:2.1;min-width:0}
 html:not(.side) :is(#un,#sv,#en,#hbtn),html:not(.side) #bar #modes button:not(.sub){display:flex}
 html:not(.side) #bar>button[style*="block"]{display:flex!important}
@@ -348,7 +353,8 @@ html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)){flex:1;min-width:0
 html:not(.side) :is(#bar>button:not(#en):not(#mcf):not(#pvc):not(.on),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
 html:not(.side) :is(#bar>button,#bar #modes .mg):not(#mbtn){border-left:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
 html:not(.side) :is(#en,#mcf,#pvc){flex:1.3;font-size:12px;font-weight:700}
-html:not(.side) #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);min-width:0;width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html:not(.side) #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);min-width:0;width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html:not(.side) #bar #modes .sub:not(.act){background-color:color-mix(in srgb,var(--panel) 88%,transparent)!important}
 html:not(.side) #bar #modes .sub.shut{transform:translate(-50%,calc(100% + 10px))}
 html:not(.side) #bar #modes .sub::before{width:20px;height:20px}
 /* (2026-11-08-b, the More bar; Shmorden: "make the default More, Undo, Star, Fleet, End turn. Undo will have Redo slide out of it. Menu is in
@@ -375,8 +381,11 @@ html.mbmenu #mbtn{--ic:var(--i-menu)}
 html:not(.side) :is(#mlist,#rdb){display:flex;position:absolute;bottom:calc(100% + 10px);z-index:2;transition:transform .22s ease-out,opacity .22s ease-out}
 html:not(.side) :is(#mlist,#rdb).shut{transform:translateY(calc(100% + 10px));opacity:0;pointer-events:none}
 html.calm :is(#mlist,#rdb){transition:none!important}
-html:not(.side) #mlist{flex-direction:column-reverse;gap:8px;width:max-content;max-height:calc(100dvh - var(--padT,0px) - var(--padB,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:2px;box-sizing:border-box}
-html:not(.side) :is(#mlist button,#bar>#rdb){flex:none;min-width:0;min-height:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 16px;font-size:14px;font-weight:400;white-space:nowrap;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel) 92%,transparent)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 4px 10px rgba(0,0,0,.4)!important;flex-direction:row}
+html:not(.side) #mlist{flex-direction:column-reverse;gap:8px;width:max-content;max-height:calc(100dvh - var(--padT,0px) - var(--padB,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:8px;box-sizing:border-box;border-radius:30px;border:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+html:not(.side) :is(#mlist button,#bar>#rdb){flex:none;min-width:0;min-height:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 16px;font-size:14px;font-weight:400;white-space:nowrap;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel) 88%,transparent)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 10px rgba(0,0,0,.4)!important;flex-direction:row}
+/* (2026-11-08-d, Shmorden: the pop-ups get "the same background effect that the top bar has, that you can't see the board through it")
+   The More and Menu lists sit on one glass card, so the board does not show between their buttons either. */
+html:not(.side) #mlist button{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
 html:not(.side) #mlist button{justify-content:flex-start}
 html:not(.side) :is(#mlist button,#bar>#rdb)::before{content:'';flex:none;width:19px;height:19px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
 html:not(.side) #bar>#rdb{flex-direction:row!important;font-size:14px!important;min-height:44px!important;height:44px!important;border-radius:22px!important;padding:0 16px!important;gap:9px!important;flex:none!important;width:auto!important}
@@ -2226,9 +2235,14 @@ L.innerHTML='';(mk?menuItems():mlItems()).forEach(x=>{const b=document.createEle
 b.onclick=x.save?()=>saveFile(b):()=>{x.f();mlDraw()};L.append(b)});
 const w=Math.max(...[...L.children].map(b=>b.offsetWidth));[...L.children].forEach(b=>b.style.width=w+'px');slideOver(L,onSv?$('sv'):$('mbtn'))}
 function mlShut(){if(mlOpen){mlOpen=false;mlDraw()}}
-$('mbtn').onclick=()=>{if(mlOpen)mlShut();else{mlKind='more';mlOpen=true;mlDraw()}};
+$('mbtn').onclick=()=>{if(mlOpen)mlShut();else{subShut();mlKind='more';mlOpen=true;mlDraw()}};
+// (2026-11-08-d, Shmorden: "only one slide open can be open at a time. So if Star is open and you click Undo or Menu, Star closes")
+// subsOpen() = Star's or Fleets' pair is open (its Multi or Move slid out); subShut() closes it, unless a multi-attack or a Defence call
+// is under way (Undo then steps back inside it). Opening Star or Fleets shuts the lists (mlShut), and Redo hides while a pair is open.
+const subsOpen=()=>!!(G&&mode&&!G.over&&!cpuOf(cur())),subShut=()=>{if(subsOpen()&&!multi&&!pend)modeOff(1)};
+$('un').addEventListener('click',subShut);
 // svTap() = the Menu button: on an upright screen its list (a second tap shuts it); sideways the Menu window, as before (menuOpen).
-function svTap(){if(!document.documentElement.classList.contains('side')&&mlOpen&&mlKind=='menu')return mlShut();menuOpen()}
+function svTap(){if(!document.documentElement.classList.contains('side')&&mlOpen&&mlKind=='menu')return mlShut();subShut();menuOpen()}
 $('rdb').onclick=redoIt;
 $('st').addEventListener('pointerdown',mlShut,true);$('modes').addEventListener('click',mlShut);
 ['en','hold','mcx','mcf','pvx','pvc','un'].forEach(i=>$(i).addEventListener('click',mlShut));
@@ -2236,7 +2250,7 @@ $('st').addEventListener('pointerdown',mlShut,true);$('modes').addEventListener(
 // redraws an open More list.
 function cbSync(){if(redoS.length&&redoK!==redoKey())redoS=[];rdbSync();if(mlOpen)mlDraw()}
 // rdbSync() shows Redo over Undo while a Redo is possible, Undo is in the bar and the More list is shut (the two would overlap).
-function rdbSync(){const rd=$('rdb'),show=redoOk()&&cbBar=='undo'&&!mlOpen&&!document.documentElement.classList.contains('side');rd.classList.toggle('shut',!show);if(show)slideOver(rd,$('un'))}
+function rdbSync(){const rd=$('rdb'),show=redoOk()&&cbBar=='undo'&&!mlOpen&&!subsOpen()&&!document.documentElement.classList.contains('side');rd.classList.toggle('shut',!show);if(show)slideOver(rd,$('un'))}
 cbApply();navApply();cbPlace();
 // (new) Strength button: hides or shows the strength numbers on both boards. With it on they appear only when zoomed in, as before; with it off (button struck through) they never appear. The choice is remembered in this browser.
 const STKEY='constellate-strength';let strOn=true;try{strOn=localStorage.getItem(STKEY)!=='0'}catch(e){}
@@ -2863,7 +2877,7 @@ function setSecs(){const big=(t,f)=>'<button onclick="'+f+'" style="display:bloc
 if(msec!='h')return '<div class="r"><button onclick="msecGo(\'h\')" style="flex:none;padding:0 14px">‹ Back</button><b style="align-self:center;margin-left:6px;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b></div>'+setSec(msec);
 return setQuick(1)+SET_SECS.map(([k,t])=>big(t,"msecGo('"+k+"')")).join('')/*SND{*/+big('Sound',"sndDlg('set','menu')")/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-08-c';
+const BUILD='2026-11-08-d';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
