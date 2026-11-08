@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-08-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-08-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -345,7 +345,7 @@ html:not(.side) :is(#un,#sv,#en,#hbtn),html:not(.side) #bar #modes button:not(.s
 html:not(.side) #bar>button[style*="block"]{display:flex!important}
 html:not(.side) #bar:has(>:is(#hold,#mcx,#pvx)[style*="block"]) #modes{display:none!important}
 html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)){flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;padding:0 2px;font-size:11px;font-weight:500;border:0;border-radius:0;box-shadow:none}
-html:not(.side) :is(#bar>button:not(#en):not(#mcf):not(#pvc),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
+html:not(.side) :is(#bar>button:not(#en):not(#mcf):not(#pvc):not(.on),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
 html:not(.side) :is(#bar>button,#bar #modes .mg):not(#mbtn){border-left:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
 html:not(.side) :is(#en,#mcf,#pvc){flex:1.3;font-size:12px;font-weight:700}
 html:not(.side) #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);min-width:0;width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
@@ -363,7 +363,15 @@ The board has no View button on an upright screen: zoom in, zoom out and Fit are
 html:not(.side) #zoom{display:none!important}
 html:not(.side) #mbtn{display:flex}
 html.cb-undo:not(.side) #sv,html.cb-menu:not(.side) #un,html.cb-none:not(.side) :is(#un,#sv){display:none!important}
-html.mlopen:not(.side) #bar>#mbtn{background:var(--sel)!important;color:var(--sel-ink)}
+html:not(.side) #bar>button.on{background:var(--sel)!important;color:var(--sel-ink)}
+/* (2026-11-08-c) Bar height (Settings > Controls; --cbh, 76 px at first); from 68 px the labels and icons grow. More showing the Menu
+(html.mbmenu): Menu's icon and name in More's place, dropped in from above (.drop). */
+html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){min-height:var(--cbh,76px)}
+html.cbbig:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){font-size:12.5px;gap:5px}
+html.cbbig:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb)::before{width:25px;height:25px}
+html.mbmenu #mbtn{--ic:var(--i-menu)}
+:root{--i-save:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4h11l3 3v13H5z'/%3E%3Cpath d='M8 4v5h7V4M8 20v-6h8v6'/%3E%3C/svg%3E");--i-notes:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h9l4 4v14H6z'/%3E%3Cpath d='M9 11h7M9 15h7'/%3E%3C/svg%3E");--i-settings:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1'/%3E%3C/svg%3E");--i-saveload:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v11M8 10l4 4 4-4'/%3E%3Cpath d='M4 16v4h16v-4'/%3E%3C/svg%3E");--i-dev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E");--i-home:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 11 12 4l8.5 7'/%3E%3Cpath d='M6 9.5V20h12V9.5'/%3E%3C/svg%3E");--i-flag:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4'/%3E%3Cpath d='M5 4h12l-2.5 4L17 12H5'/%3E%3C/svg%3E");--i-concede:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h8'/%3E%3Cpath d='M9 8l-4 4 4 4'/%3E%3Cpath d='M14 4h5v16h-5'/%3E%3C/svg%3E")}
+@keyframes cbdrop{from{transform:translateY(-34px);opacity:.2}to{transform:none;opacity:1}}#mbtn.drop{animation:cbdrop .24s ease-out}html.calm #mbtn.drop{animation:none}
 html:not(.side) :is(#mlist,#rdb){display:flex;position:absolute;bottom:calc(100% + 10px);z-index:2;transition:transform .22s ease-out,opacity .22s ease-out}
 html:not(.side) :is(#mlist,#rdb).shut{transform:translateY(calc(100% + 10px));opacity:0;pointer-events:none}
 html.calm :is(#mlist,#rdb){transition:none!important}
@@ -413,7 +421,7 @@ Lesson complete
 You are Blue, bottom left. This lesson shows how to look around and select.
 1. Pan: drag an empty part of the board.
 2. Zoom: pinch with two fingers, or turn on More (bottom left) > Navigation for + and − buttons. Their Fit button shows the whole board again.
-3. More > Menu has the settings, these steps (Notes), saving and Concede. Close it to come back.
+3. More > Menu has the settings, these steps (Notes), saving and Concede. Tap Menu again to close it.
 4. Tap your Capital to select it: the Star button becomes Set. Tap Set to put it away.
 5. Tap Fleets, then Move, then tap your Capital to select its 2 Fleets. The game asks how many to move: press Cancel.
 6. Tap End turn.
@@ -490,7 +498,7 @@ Goal: Move the 2 Fleets on your Capital to the end of your chain, and bring alon
 
 === LESSON 18: Move preview ===
 With Move preview on, your Moves and Fleet moves are first drawn dashed, and nothing on the board changes until you Confirm each one. Cancel takes one back and gives its Fuel back. A multi-attack has its own Confirm, so it is never a preview.
-1. Open More > Menu, go to Settings > Game and press "Move preview: Off" to turn it On. Close the Menu.
+1. Open More > Menu > Settings > Game and press "Move preview: Off" to turn it On. Close the Menu.
 2. Set a new Star from your bottom Star: a dashed preview appears.
 3. Take the Red Star just above your Stars: another preview.
 4. Move the 2 Fleets on your Capital to the Star 2 Connections to the right, and bring along the Fleet they pass.
@@ -2176,9 +2184,15 @@ else{back(m);back(fu);back(tv)}}
 // The Bottom bar setting (Settings > Display; remembered): cbBar 'undo' = More, Undo, Star, Fleets, End turn (the default; Menu is in More),
 // 'menu' = More, Menu, Star, Fleets, End turn (Undo and Redo are in More), 'none' = More, Star, Fleets, End turn (all three in More).
 const CBKEY='constellate-cbar',CB_OPTS=['undo','menu','none'];let cbBar='undo';try{const v=localStorage.getItem(CBKEY);if(CB_OPTS.includes(v))cbBar=v}catch(e){}
-const cbLabel=()=>'Bottom bar: '+{undo:'Undo in the bar',menu:'Menu in the bar',none:'Undo and Menu in More'}[cbBar];
-function cbApply(){const r=document.documentElement;CB_OPTS.forEach(o=>r.classList.toggle('cb-'+o,o==cbBar));mlShut()}
-function cbCycle(b){cbBar=CB_OPTS[(CB_OPTS.indexOf(cbBar)+1)%3];try{localStorage.setItem(CBKEY,cbBar)}catch(e){}cbApply();if(b)b.textContent=cbLabel();cbSync()}
+const CB_NAMES={undo:'Undo in the bar',menu:'Menu in the bar',none:'Undo and Menu in More'},cbLabel=()=>'Bottom bar: '+CB_NAMES[cbBar];
+// Bar height (Settings > Controls; remembered): cbH px, 76 at first (Shmorden, 2026-11-08-c).
+const CBHKEY='constellate-cbh',CBH_OPTS=[58,68,76,84];let cbH=76;try{const v=+localStorage.getItem(CBHKEY);if(CBH_OPTS.includes(v))cbH=v}catch(e){}
+const cbhLabel=()=>'Bar height: '+cbH;
+// cbDd(b) / cbhDd(b): the two Controls settings, each a drop-down under its button (ddOpen); picking relabels the button.
+function cbDd(b){ddOpen(b,CB_OPTS.map(v=>({l:CB_NAMES[v],v,act:v==cbBar})),v=>{cbSet(v);b.textContent=cbLabel()+' ▾'})}
+function cbhDd(b){ddOpen(b,CBH_OPTS.map(v=>({l:v+(v==76?' (default)':''),v,act:v==cbH})),v=>{cbH=v;try{localStorage.setItem(CBHKEY,v)}catch(e){}cbApply();b.textContent=cbhLabel()+' ▾';try{stPads();msgRoom.k='';fit()}catch(e){}})}
+function cbApply(){const r=document.documentElement;CB_OPTS.forEach(o=>r.classList.toggle('cb-'+o,o==cbBar));r.style.setProperty('--cbh',cbH+'px');r.classList.toggle('cbbig',cbH>=68);mlShut()}
+function cbSet(v){cbBar=v;try{localStorage.setItem(CBKEY,cbBar)}catch(e){}cbApply();cbSync()}
 // Navigation (More > Navigation; remembered, off at first): zoom in, zoom out and Fit as round buttons at the board's top right.
 const NAVKEY='constellate-nav';let navOn=false;try{navOn=localStorage.getItem(NAVKEY)==='1'}catch(e){}
 const navApply=()=>document.documentElement.classList.toggle('navon',navOn);
@@ -2189,20 +2203,35 @@ $('nzi').onclick=()=>$('zi').click();$('nzo').onclick=()=>$('zo').click();$('nfi
 const mlExtra=[];
 function mlItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),un=cbBar!='undo',mn=cbBar=='undo'||cbBar=='none';
 return [...(un?[I('Undo','undo',()=>$('un').onclick(),{dis:!G||G.over}),I('Redo','redo',redoIt,{dis:!redoOk()})]:[]),
-...(mn?[I('Menu','menu',()=>{mlShut();saveUI()})]:[]),I('History','history',()=>{mlShut();$('hbtn').click()}),
+...(mn?[I('Menu','menu',()=>menuOpen())]:[]),I('History','history',()=>{mlShut();$('hbtn').click()}),
 I('Strength','strength',()=>$('sbtn').click(),{off:!strOn}),...mlExtra.map(f=>f(I)),I('Tips','tips',()=>$('tipbtn').click(),{off:!tipsOn}),
 I('Navigation','nav',()=>{navOn=!navOn;try{localStorage.setItem(NAVKEY,navOn?'1':'0')}catch(e){}navApply()},{off:!navOn})]}
-let mlOpen=false;
+let mlOpen=false,mlKind='more';
+// (2026-11-08-c, Shmorden: "When clicking Menu, Menu drops down to replace More and have the menu list slide out of it") menuItems() = the
+// Menu as a list: Quick save, Notes, Settings, Save / Load, Dev, Main menu, End game, Concede; Settings, Save / Load and Dev open the Menu
+// window on that tab. menuOpen() shows it: from More's list, More turns into Menu (dropping in) and the list slides out of it; from the
+// Menu button (Bottom bar = Menu in the bar), out of that. Online games and a Defence call open the Menu window instead (it has more there).
+function menuItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),w=k=>()=>{mlShut();saveUI();if(k)menuPage(k)};
+return [I('Quick save','save',null,{save:1}),...(G&&G.note?[I('Notes','notes',()=>{mlShut();posNoteDlg(1)})]:[]),I('Settings','settings',w('set')),I('Save / Load','saveload',w('sl')),
+I('Dev','dev',w('dev')),I('Main menu','home',()=>{mlShut();mainMenu()}),I('End game','flag',()=>{mlShut();endGameDlg()},{dis:!G||G.over}),I('Concede','concede',()=>{mlShut();conc()})]}
+function menuOpen(){if(!G)return;if(net.on||(pend&&pend.ph)||document.documentElement.classList.contains('side')){mlShut();return saveUI()}
+const L=$('mlist'),fromMore=cbBar!='menu';mlKind='menu';mlOpen=true;L.classList.add('shut');void L.offsetWidth;
+if(fromMore){const m=$('mbtn');m.textContent='Menu';m.classList.remove('drop');void m.offsetWidth;m.classList.add('drop')}mlDraw()}
 // slideOver(el,btn) puts a slide-out el centered over btn, inside the bar's width.
 function slideOver(el,btn){const bar=$('bar').getBoundingClientRect(),a=btn.getBoundingClientRect(),w=el.offsetWidth;el.style.left=Math.max(6,Math.min(a.left-bar.left+a.width/2-w/2,bar.width-w-6))+'px'}
-function mlDraw(){const L=$('mlist'),r=document.documentElement;r.classList.toggle('mlopen',mlOpen);L.classList.toggle('shut',!mlOpen);try{rdbSync()}catch(e){}if(!mlOpen)return;
-L.innerHTML='';mlItems().forEach(x=>{const b=document.createElement('button');b.textContent=x.l;b.style.setProperty('--ic','var(--i-'+x.ic+')');if(x.off)b.className='off';if(x.dis)b.disabled=true;b.onclick=()=>{x.f();mlDraw()};L.append(b)});
-const w=Math.max(...[...L.children].map(b=>b.offsetWidth));[...L.children].forEach(b=>b.style.width=w+'px');slideOver(L,$('mbtn'))}
+function mlDraw(){const L=$('mlist'),r=document.documentElement,mk=mlOpen&&mlKind=='menu',onSv=mk&&cbBar=='menu';if(!mlOpen)mlKind='more';
+r.classList.toggle('mlopen',mlOpen&&!onSv);r.classList.toggle('mlmenu',onSv);$('mbtn').classList.toggle('on',mlOpen&&!onSv);$('sv').classList.toggle('on',onSv);r.classList.toggle('mbmenu',mk&&!onSv);$('mbtn').textContent=mk&&!onSv?'Menu':'More';
+L.classList.toggle('shut',!mlOpen);try{rdbSync()}catch(e){}if(!mlOpen)return;
+L.innerHTML='';(mk?menuItems():mlItems()).forEach(x=>{const b=document.createElement('button');b.textContent=x.l;b.style.setProperty('--ic','var(--i-'+x.ic+')');if(x.off)b.className='off';if(x.dis)b.disabled=true;
+b.onclick=x.save?()=>saveFile(b):()=>{x.f();mlDraw()};L.append(b)});
+const w=Math.max(...[...L.children].map(b=>b.offsetWidth));[...L.children].forEach(b=>b.style.width=w+'px');slideOver(L,onSv?$('sv'):$('mbtn'))}
 function mlShut(){if(mlOpen){mlOpen=false;mlDraw()}}
-$('mbtn').onclick=()=>{mlOpen=!mlOpen;mlDraw()};
+$('mbtn').onclick=()=>{if(mlOpen)mlShut();else{mlKind='more';mlOpen=true;mlDraw()}};
+// svTap() = the Menu button: on an upright screen its list (a second tap shuts it); sideways the Menu window, as before (menuOpen).
+function svTap(){if(!document.documentElement.classList.contains('side')&&mlOpen&&mlKind=='menu')return mlShut();menuOpen()}
 $('rdb').onclick=redoIt;
 $('st').addEventListener('pointerdown',mlShut,true);$('modes').addEventListener('click',mlShut);
-['en','hold','mcx','mcf','pvx','pvc','un','sv'].forEach(i=>$(i).addEventListener('click',mlShut));
+['en','hold','mcx','mcf','pvx','pvc','un'].forEach(i=>$(i).addEventListener('click',mlShut));
 // cbSync() (from render): forgets a Redo that is no longer possible, slides Redo up over Undo while it is possible (Undo in the bar), and
 // redraws an open More list.
 function cbSync(){if(redoS.length&&redoK!==redoKey())redoS=[];rdbSync();if(mlOpen)mlDraw()}
@@ -2401,7 +2430,7 @@ function setRound(){if(!G||G.over)return;const n=Math.max(1,Math.min(RMAX,parseI
 $('hold').onclick=holdBtn;
 // (new) Hook up Cancel and Confirm, and let the Esc key cancel a multi-attack on desktop.
 $('mcx').onclick=multiCancel;$('mcf').onclick=multiGo;$('pvx').onclick=pvCancel;$('pvc').onclick=pvConfirm;addEventListener('keydown',e=>{if(e.key==='Escape'){if($('ov2').style.display=='flex')return ov2Close();if(hvEl.classList.contains('on'))return hvClose();multiCancel()}});
-$('sv').onclick=saveUI;
+$('sv').onclick=svTap;  // (2026-11-08-c) the Command bar's Menu button: a list on an upright screen, this window sideways (svTap, menuOpen)
 // ===== (new) Practice mode: smaller boards =====
 // ===== (new) Fixed positions: a 5 by 5 lattice of legal spots in every system =====
 // Free placement lets a star go anywhere legal in a system. Fixed positions offer 25 set spots instead, so a player (or the computer) picks from a short list. The spots are the points of a 5 by 5 lattice that spans the WHOLE legal range of a star's center (from MARG in from one border to MARG in from the other), so the corner spot S1 is exactly where the closest free placement to that corner can be. In tic-tac-toe terms: Space = the 9 cell centers (S1-S9), Line = the 12 midpoints of the grid lines (L1-L12), Vertex = the 4 line crossings (V1-V4); all numbered left to right, top to bottom. Lattice index i (across) and j (down) run 1 to 5, evenly spaced from the near legal limit (1) to the far one (5): Space = both odd, Vertex = both even, Line = one of each. (Line spots are the midpoints between neighboring Spaces; Vertices are the centers of four Spaces.)
@@ -2823,8 +2852,8 @@ function setQuick(top){return '<div class="r" style="margin-top:'+(top?0:16)+'px
 const SET_SECS=[['g','Game'],['k','Controls'],['d','Display']];
 function setSec(k,start){const b=(f,t,x)=>'<button onclick="'+f+'"'+(x||'')+' style="display:block;width:100%;margin-top:8px">'+t+'</button>';
 if(k=='g')return b('placeToggle(this)',placeLabel(),G&&G.pm?' disabled':'')+b('pvToggle(this)',pvLabel())+b('faCycle(this)',faLabel());
-if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ctlLabel())+qBtn('hap','display:block;width:100%;margin-top:8px');
-return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+b('cbCycle(this)',cbLabel())+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+(fsOk()?b('fsToggle(this)',fsLabel()):'')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
+if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ctlLabel())+qBtn('hap','display:block;width:100%;margin-top:8px')+b('cbDd(this)',cbLabel()+' ▾')+b('cbhDd(this)',cbhLabel()+' ▾');
+return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+(fsOk()?b('fsToggle(this)',fsLabel()):'')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
 // (2026-11-08-b, Shmorden: "make the in game settings be segmented like it is in the main menu rather than a giant list") msec = the
 // in-game Settings page showing: 'h' = the quick row and one button per section (and Sound, preview only), like the start menu's
 // Settings home; 'g' / 'k' / 'd' = that section, with Back. msecGo(k) switches; a fresh Menu opens on 'h' (saveUI).
@@ -2834,7 +2863,7 @@ function setSecs(){const big=(t,f)=>'<button onclick="'+f+'" style="display:bloc
 if(msec!='h')return '<div class="r"><button onclick="msecGo(\'h\')" style="flex:none;padding:0 14px">‹ Back</button><b style="align-self:center;margin-left:6px;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b></div>'+setSec(msec);
 return setQuick(1)+SET_SECS.map(([k,t])=>big(t,"msecGo('"+k+"')")).join('')/*SND{*/+big('Sound',"sndDlg('set','menu')")/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-08-b';
+const BUILD='2026-11-08-c';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
