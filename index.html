@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-07-g",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-09-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -64,6 +64,9 @@ body.crt::before{content:"";position:fixed;left:0;right:0;top:0;height:18%;z-ind
 
 /* html: fill the full height of the screen. */
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+/* (2026-11-09-b) The page itself never scrolls (every long page scrolls inside its own box): the More list, slid away under the bar,
+   reached below the screen and let a swipe on the bar scroll the whole page. */
+html,body{overflow:hidden}
 /* body: no margin; stack children vertically (top panel, board, bottom bar); base font and colors; stop pull-to-refresh bounce and text selection. */
 body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:15px/1.3 "Exo 2",system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 /* #top: the panel across the top that holds round info, player chips and mode buttons. */
@@ -105,7 +108,7 @@ svg{width:100%;height:100%;display:block;touch-action:none}
 /* Strength numbers (class t) are hidden unless zoomed in (data-z is 1). */
 svg .t{display:none}svg[data-z="1"] .t{display:block}
 /* #msg: the message toast along the bottom of the board. */
-#msg{position:absolute;left:8px;right:8px;bottom:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;pointer-events:none}
+#msg,#msgp{position:absolute;left:8px;right:8px;bottom:8px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;pointer-events:none}#msgp{visibility:hidden;display:none}
 /* Hide the toast when it has no text. */
 #msg:empty{display:none}
 /* #bar: the bottom button bar. */
@@ -186,6 +189,10 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #zoom: the zoom buttons floating at the top right of the board; also lets tall dialogs scroll. */
 #zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px}#zoom button{background:var(--panel)}/* (changed 2026-10-27-i) The whole box, padding and border included (44 px), stays inside the layer's padding, so no dialog reaches past the screen's edge; a taller one scrolls. (92% of the content height alone could run past the bottom.) */
 #ov>div{max-height:calc(100% - 44px);overflow:auto}
+/* (2026-11-09-b) .stay = a part of a dialog that is the same on every page (the Menu's heading and its Game / Settings / Save / Dev tabs): the page swipe (ovSwipe) leaves it still; its copy in the outgoing page is hidden. */
+.gh .stay{visibility:hidden}
+/* (2026-11-08-d) Dialogs and drop-downs get the top bar's glass: the board behind them is blurred away. */
+:is(#ov,#ov2)>div,#dd{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}:root[data-theme="clear"] :is(#ov,#ov2)>div,:root[data-theme="clear"] #dd{background:color-mix(in srgb,var(--panel) 88%,transparent)}
 /* (new) The last button row of a dialog (Close, Back, Cancel...) stays on the bottom edge while a long dialog scrolls under it (Shmorden, 2026-10-27). (changed 2026-10-27-l) On a dialog that really scrolls (class ovsc, set by ovSc) everything but the last button row goes into a scrolling part (.ovb), and the row sits under it as part of the box, so it shows with the box (a sticky row showed up a moment after the dialog on the phone). It sits over the box's 20 px bottom padding (bottom -20px), so nothing shows under it; the negative margin and the padding cancel out while nothing scrolls. */
 #ov>div.ovsc{display:flex;flex-direction:column;overflow:hidden}#ov>div.ovsc>.ovb{flex:1 1 auto;min-height:0;overflow:auto}#ov>div.ovsc>.r:last-child{flex:none;padding-top:10px}#ov>div.ovsc>.pin{flex:none;margin-top:0!important;padding-top:10px}
 /* (new) .mq: the scrolling tip banner on the main menu. The text starts just outside the right edge and slides out past the left edge, over and over. */
@@ -297,11 +304,11 @@ continuous bar with a thin upright line between buttons, each an icon over a lab
 are a round View button (#vbtn) that opens a tray (html.vtray: zoom in and out, Fit, Strength, IDs); the History viewer has the same
 (#hvbtn, html.hvtray). No Hide UI on upright screens or in the History viewer (Shmorden: "Remove the hide ui button"). Messages are a
 small pill under the top bar. Icons (--i-*) are line drawings used as masks, so they take the button's text color (placeholders). */
-:root{--i-menu:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 12h16M4 17h16'/%3E%3C/svg%3E");--i-undo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 14 4 9l5-5'/%3E%3Cpath d='M4 9h10.5a5.5 5.5 0 0 1 0 11H11'/%3E%3C/svg%3E");--i-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12.00 2.40L14.00 8.26L19.82 6.17L16.48 11.38L21.75 14.63L15.60 15.27L16.34 21.41L12.00 17.00L7.66 21.41L8.40 15.27L2.25 14.63L7.52 11.38L4.18 6.17L10.00 8.26Z'/%3E%3C/svg%3E");--i-fleet:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 19 20 12 16 5 20Z'/%3E%3C/svg%3E");--i-end:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4.5 15 12 5 19.5Z'/%3E%3Cpath d='M19 4.5v15'/%3E%3C/svg%3E");--i-history:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.6-6.1'/%3E%3Cpath d='M3.5 4v5h5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");--i-view:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1'/%3E%3Ccircle cx='15' cy='6' r='2'/%3E%3Ccircle cx='9' cy='12' r='2'/%3E%3Ccircle cx='17' cy='18' r='2'/%3E%3C/svg%3E");--i-fit:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'/%3E%3C/svg%3E");--i-strength:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 4 7.5 20M16.5 4l-2 16M4.5 9h15M4 15h15'/%3E%3C/svg%3E");--i-hide:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M4 3.5 20 20.5'/%3E%3C/svg%3E");--i-multi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='rotate%28180 12 12%29'%3E%3Cpath d='M4.5 4 12 12.5 19.5 4'/%3E%3Cpath d='M12 12.5V20'/%3E%3Cpath d='M8.5 16.5 12 20l3.5-3.5'/%3E%3C/g%3E%3C/svg%3E");--i-move:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15'/%3E%3Cpath d='M14.5 7.5 19 12l-4.5 4.5'/%3E%3C/svg%3E");--i-hold:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'/%3E%3C/svg%3E");--i-cancel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E");--i-ok:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5 9.5 17.5 19.5 6.5'/%3E%3C/svg%3E")}
+:root{--i-tips:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4'/%3E%3Cpath d='M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E");--i-menu:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 12h16M4 17h16'/%3E%3C/svg%3E");--i-undo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 14 4 9l5-5'/%3E%3Cpath d='M4 9h10.5a5.5 5.5 0 0 1 0 11H11'/%3E%3C/svg%3E");--i-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12.00 2.40L14.00 8.26L19.82 6.17L16.48 11.38L21.75 14.63L15.60 15.27L16.34 21.41L12.00 17.00L7.66 21.41L8.40 15.27L2.25 14.63L7.52 11.38L4.18 6.17L10.00 8.26Z'/%3E%3C/svg%3E");--i-fleet:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 19 20 12 16 5 20Z'/%3E%3C/svg%3E");--i-end:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4.5 15 12 5 19.5Z'/%3E%3Cpath d='M19 4.5v15'/%3E%3C/svg%3E");--i-history:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.6-6.1'/%3E%3Cpath d='M3.5 4v5h5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");--i-view:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1'/%3E%3Ccircle cx='15' cy='6' r='2'/%3E%3Ccircle cx='9' cy='12' r='2'/%3E%3Ccircle cx='17' cy='18' r='2'/%3E%3C/svg%3E");--i-fit:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'/%3E%3C/svg%3E");--i-strength:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 4 7.5 20M16.5 4l-2 16M4.5 9h15M4 15h15'/%3E%3C/svg%3E");--i-hide:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M4 3.5 20 20.5'/%3E%3C/svg%3E");--i-multi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='rotate%28180 12 12%29'%3E%3Cpath d='M4.5 4 12 12.5 19.5 4'/%3E%3Cpath d='M12 12.5V20'/%3E%3Cpath d='M8.5 16.5 12 20l3.5-3.5'/%3E%3C/g%3E%3C/svg%3E");--i-move:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15'/%3E%3Cpath d='M14.5 7.5 19 12l-4.5 4.5'/%3E%3C/svg%3E");--i-hold:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'/%3E%3C/svg%3E");--i-cancel:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E");--i-ok:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5 9.5 17.5 19.5 6.5'/%3E%3C/svg%3E")}
 
 #sv{--ic:var(--i-menu)}#un{--ic:var(--i-undo)}#en{--ic:var(--i-end)}#hold{--ic:var(--i-hold)}#mcx,#pvx{--ic:var(--i-cancel)}#mcf,#pvc{--ic:var(--i-ok)}
 #modes [data-m="s"]{--ic:var(--i-star)}#modes [data-m="p"]{--ic:var(--i-fleet)}#modes [data-m="x"]{--ic:var(--i-multi)}#modes [data-m="m"]{--ic:var(--i-move)}
-#hbtn{--ic:var(--i-history)}#vbtn,#hvbtn{--ic:var(--i-view)}#fi,#hfi{--ic:var(--i-fit)}#sbtn,#hsbtn{--ic:var(--i-strength)}
+#hbtn{--ic:var(--i-history)}#tipbtn{--ic:var(--i-tips)}#vbtn,#hvbtn{--ic:var(--i-view)}#fi,#hfi{--ic:var(--i-fit)}#sbtn,#hsbtn{--ic:var(--i-strength)}
 html:not(.side) :is(#zoom>button,#bar>button,#bar #modes button)::before,#hz>button::before{content:'';flex:none;width:21px;height:21px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
 :is(#zi,#zo,#hzi,#hzo)::before{display:none!important}
 #vbtn{display:none}html:not(.side) #hui,#hhui{display:none!important}
@@ -315,7 +322,10 @@ html.vtray:not(.side) #zoom>:is(#zi,#zo),html.hvtray #hz>:is(#hzi,#hzo){font-siz
 html.vtray:not(.side) #vbtn,html.hvtray #hvbtn{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line)}
 html:not(.side) #zoom>button::before,#hz>button::before{width:19px;height:19px}
 /* Messages: a small pill under the top bar. */
-html:not(.side) #msg{top:calc(var(--padT,0px) + 10px);bottom:auto;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:calc(100% - 130px);box-sizing:border-box;border:0;border-radius:16px;padding:6px 14px;font-size:13px;text-align:center;background:color-mix(in srgb,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html:not(.side) :is(#msg,#msgp){top:calc(var(--padT,0px) + 10px);bottom:auto;left:10px;right:10px;margin:0 auto;transform:none;width:max-content;max-width:calc(100% - 20px);box-sizing:border-box;border:0;border-radius:16px;padding:6px 14px;font-size:13px;line-height:1.3;text-align:center;background:color-mix(in srgb,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html:not(.side) #msgp{display:block;width:auto}
+/* (2026-11-09-d) The message pill is centered on the screen; with the Navigation buttons on (right edge) it keeps the same room on both sides. */
+html.navon:not(.side) :is(#msg,#msgp){left:64px;right:64px;max-width:calc(100% - 128px)}
 /* Top bar: the turn line (name, team, round, and the team scores at its right end), the chips, then the Fuel gauge across the full width. */
 html:not(.side) #top{background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);padding:7px 10px 7px}
 html:not(.side) #info{flex-wrap:nowrap;gap:10px;font-size:13px;align-items:center;white-space:nowrap}html:not(.side) #info b{font-size:16px}
@@ -325,18 +335,65 @@ html:not(.side) #top>#fuel{display:flex;margin-top:7px;min-width:0;gap:6px}html:
 html.sky:not(.side) #top>#fuel #fueln{text-shadow:0 1px 3px rgba(0,0,0,.85)}
 html:not(.side) #fbar{height:12px;border-radius:6px}html:not(.side) #fbar::after{border-width:1.5px;border-radius:6px}
 /* Bottom bar: Undo, History, Menu, Star, Fleets, End turn (Hold, Cancel, Confirm when they show; Star and Fleets make room for them). */
-html:not(.side) #bar{gap:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:stretch;background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
+html:not(.side) #bar{gap:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:stretch;background:transparent;border-top:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
+/* (2026-11-08-d) The bar's glass is drawn by a layer behind its buttons (::before), not by the bar itself: an element with a backdrop blur
+   stops the blur of everything inside it at its own edges, so the slide-outs (Multi, Move, Redo, the lists) could not blur the board. */
+html:not(.side) #bar::before{content:'';position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);pointer-events:none}
 html:not(.side) #bar #modes{display:flex;gap:0;margin:0;flex:2.1;min-width:0}
 html:not(.side) :is(#un,#sv,#en,#hbtn),html:not(.side) #bar #modes button:not(.sub){display:flex}
 html:not(.side) #bar>button[style*="block"]{display:flex!important}
 html:not(.side) #bar:has(>:is(#hold,#mcx,#pvx)[style*="block"]) #modes{display:none!important}
 html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)){flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;padding:0 2px;font-size:11px;font-weight:500;border:0;border-radius:0;box-shadow:none}
-html:not(.side) :is(#bar>button:not(#en):not(#mcf):not(#pvc),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
-html:not(.side) :is(#bar>button,#bar #modes .mg):not(#un){border-left:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
+html:not(.side) :is(#bar>button:not(#en):not(#mcf):not(#pvc):not(.on),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
+html:not(.side) :is(#bar>button,#bar #modes .mg):not(#mbtn){border-left:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
 html:not(.side) :is(#en,#mcf,#pvc){flex:1.3;font-size:12px;font-weight:700}
-html:not(.side) #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:4px;right:auto;min-width:calc(100% - 8px);width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-html:not(.side) #bar #modes .sub.shut{transform:translateY(calc(100% + 10px))}
+html:not(.side) #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);min-width:0;width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html:not(.side) #bar #modes .sub:not(.act){background-color:color-mix(in srgb,var(--panel) 88%,transparent)!important}
+html:not(.side) #bar #modes .sub.shut{transform:translate(-50%,calc(100% + 10px))}
 html:not(.side) #bar #modes .sub::before{width:20px;height:20px}
+/* (2026-11-08-b, the More bar; Shmorden: "make the default More, Undo, Star, Fleet, End turn. Undo will have Redo slide out of it. Menu is in
+More ... a bottom bar option ... swap Undo with Menu or put Undo into the More list ... More has Undo and Redo in the list ... center the slide
+out buttons over the buttons they slide out from") The bar: More (#mbtn), then Undo (Bottom bar = Undo, the default), Menu (= Menu) or
+nothing (= More only), then Star, Fleets, End turn. More opens a list over itself (#mlist, html.mlopen; mlDraw); Redo (#rdb) slides up over
+Undo while there is something to redo (cbSync). Every slide-out is as wide as its words and centered over its button (kept on the screen).
+The board has no View button on an upright screen: zoom in, zoom out and Fit are the Navigation buttons (#navb, More > Navigation). */
+:root{--i-more:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='5.5' cy='12' r='1.3'/%3E%3Ccircle cx='12' cy='12' r='1.3'/%3E%3Ccircle cx='18.5' cy='12' r='1.3'/%3E%3C/svg%3E");--i-redo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 14l5-5-5-5'/%3E%3Cpath d='M20 9H9.5a5.5 5.5 0 0 0 0 11H13'/%3E%3C/svg%3E");--i-nav:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18'/%3E%3Cpath d='M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3'/%3E%3C/svg%3E")}
+#mbtn{--ic:var(--i-more)}#rdb{--ic:var(--i-redo)}
+#mbtn,#rdb,#mlist,#navb{display:none}
+html:not(.side) #zoom{display:none!important}
+html:not(.side) #mbtn{display:flex}
+html.cb-undo:not(.side) #sv,html.cb-menu:not(.side) #un,html.cb-none:not(.side) :is(#un,#sv){display:none!important}
+html:not(.side) #bar>button.on{background:var(--sel)!important;color:var(--sel-ink)}
+/* (2026-11-08-c) Bar height (Settings > Controls; --cbh, 76 px at first); from 68 px the labels and icons grow. More showing the Menu
+(html.mbmenu): Menu's icon and name in More's place, dropped in from above (.drop). */
+html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){min-height:var(--cbh,76px)}
+html.cbbig:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){font-size:12.5px;gap:5px}
+html.cbbig:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb)::before{width:25px;height:25px}
+html.mbmenu #mbtn{--ic:var(--i-menu)}
+:root{--i-save:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4h11l3 3v13H5z'/%3E%3Cpath d='M8 4v5h7V4M8 20v-6h8v6'/%3E%3C/svg%3E");--i-notes:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h9l4 4v14H6z'/%3E%3Cpath d='M9 11h7M9 15h7'/%3E%3C/svg%3E");--i-settings:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1'/%3E%3C/svg%3E");--i-saveload:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v11M8 10l4 4 4-4'/%3E%3Cpath d='M4 16v4h16v-4'/%3E%3C/svg%3E");--i-dev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E");--i-home:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 11 12 4l8.5 7'/%3E%3Cpath d='M6 9.5V20h12V9.5'/%3E%3C/svg%3E");--i-flag:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4'/%3E%3Cpath d='M5 4h12l-2.5 4L17 12H5'/%3E%3C/svg%3E");--i-concede:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h8'/%3E%3Cpath d='M9 8l-4 4 4 4'/%3E%3Cpath d='M14 4h5v16h-5'/%3E%3C/svg%3E")}
+@keyframes cbdrop{from{transform:translateY(-34px);opacity:.2}to{transform:none;opacity:1}}#mbtn.drop{animation:cbdrop .22s ease-out}html.calm #mbtn.drop{animation:none}
+html:not(.side) :is(#mlist,#rdb){display:flex;position:absolute;bottom:calc(100% + 10px);z-index:-2;transition:transform .22s ease-out,opacity .22s ease-out}
+/* (2026-11-08-e, Shmorden: "make the slide out come from underneath the button") The bar's own buttons are drawn above the slide-outs, as
+   Star and Fleets are above Multi and Move, so a list or Redo slides up out from behind its button. Every slide-out (these and Multi /
+   Move, z-index -2) is also behind the bar's glass (#bar::before, -1): the buttons are see-through, so it would show through them. */
+html:not(.side) #bar #modes .sub{z-index:-2}
+html:not(.side) #bar>button:not(#rdb){position:relative;z-index:1}
+html:not(.side) :is(#mlist,#rdb).shut{transform:translateY(calc(100% + 10px));opacity:0;pointer-events:none}
+/* (2026-11-09-c) A shut slide-out drops its blur (it is invisible), so the phone does not keep blurring the moving Sky behind it. */
+html:not(.side) :is(#mlist,#rdb).shut,html:not(.side) #bar #modes .sub.shut{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.calm :is(#mlist,#rdb){transition:none!important}html:not(.side) #mlist{overflow-x:hidden}
+html:not(.side) #mlist{flex-direction:column-reverse;gap:8px;width:max-content;max-height:calc(100dvh - var(--padT,0px) - var(--padB,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:8px;box-sizing:border-box;border-radius:30px;border:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+html:not(.side) :is(#mlist button,#bar>#rdb){flex:none;min-width:0;min-height:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 16px;font-size:14px;font-weight:400;white-space:nowrap;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel) 88%,transparent)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 10px rgba(0,0,0,.4)!important;flex-direction:row}
+/* (2026-11-08-d, Shmorden: the pop-ups get "the same background effect that the top bar has, that you can't see the board through it")
+   The More and Menu lists sit on one glass card, so the board does not show between their buttons either. */
+html:not(.side) #mlist button{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
+html:not(.side) #mlist button{justify-content:flex-start}
+html:not(.side) :is(#mlist button,#bar>#rdb)::before{content:'';flex:none;width:19px;height:19px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+html:not(.side) #bar>#rdb{flex-direction:row!important;font-size:14px!important;min-height:44px!important;height:44px!important;border-radius:22px!important;padding:0 16px!important;gap:9px!important;flex:none!important;width:auto!important}
+#mlist button.off{text-decoration:line-through;opacity:.6}#mlist button:disabled{opacity:.4}
+html.navon:not(.side) #navb{display:flex;position:absolute;right:10px;top:calc(var(--padT,0px) + 10px);flex-direction:column;gap:8px;z-index:2}
+#navb button{width:44px;height:44px;min-width:0;min-height:44px;padding:0;border-radius:50%;font-size:20px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--panel) 80%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#navb .nf{font-size:0}#navb .nf::before{content:'';width:19px;height:19px;background:currentColor;-webkit-mask:var(--i-fit) center/contain no-repeat;mask:var(--i-fit) center/contain no-repeat}
 </style></head><body>
 <script type="text/plain" id="ptext">
 PLAYER TEXT: the words on the How to play page and in the tutorial lessons. Edit them here; the game reads them as they are.
@@ -368,11 +425,11 @@ Each full row or column of Sectors you control gives you 1 bonus point.
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
 <div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
-<div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="vbtn" aria-label="View options">View</button><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div></div>
+<div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="vbtn" aria-label="View options">View</button><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="tipbtn" class="sbtn" aria-label="Show or hide tips in messages">Tips</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div><div id="msgp" aria-hidden="true"></div><div id="navb"><button id="nzi" aria-label="Zoom in">+</button><button id="nzo" aria-label="Zoom out">−</button><button id="nfi" class="nf" aria-label="Fit">Fit</button></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
 <!---->
 <button id="ssx" onclick="ssExit()">Exit</button>
-<div id="bar"><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button></div>
+<div id="bar"><button id="mbtn" aria-label="More">More</button><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button><button id="rdb" class="shut">Redo</button><div id="mlist" class="shut"></div></div>
 <!-- Empty dialog backdrop that JavaScript fills when it needs a pop-up. -->
 <div id="ov"></div><div id="ov2"></div>
 <!-- History viewer: a full-screen, read-only look at past positions. It has its own drawing surface and its own zoom, and never touches the live game. -->
@@ -433,13 +490,19 @@ const RKEY='constellate-range';let rngOn=true;try{rngOn=localStorage.getItem(RKE
 // (new) camCpu = the Dev page's "Zoom in on computers" switch (see camCpuToggle; on by default, remembered under CCKEY): off = a computer's turn only zooms out to Fit and never zooms in on the computer (like CPU speed Instant). It will move to the visuals settings later.
 const CCKEY='constellate-camcpu';let camCpu=true;try{camCpu=localStorage.getItem(CCKEY)!=='0'}catch(e){}
 // acts(r) = Fuel available in round r (rises to 15, then falls by 1 per round). (T4) Rounds past 30 are overtime (RULES.md 8.3): the same 30-round ramp repeats with no limit, so round 31 = 1 Fuel, round 45 = 15, round 60 = 1, round 61 = 1 again. cur() = the color number of whoever's turn it is.
+// tipsOn = Tips (View tray): On shows whole messages, Off only their info part (see say). Remembered in this browser; On at first.
+const TIPKEY='constellate-tips';let tipsOn=true;try{tipsOn=localStorage.getItem(TIPKEY)!=='0'}catch(e){}
 const acts=r=>{const k=(r-1)%30+1;return k<=15?k:31-k},cur=()=>G.order[G.ti];
 // (T4) RMAX = the highest round number a save, history or move log may carry (overtime has no limit in the rules; this only stops nonsense data). rdName(r) = how a round is shown to players: 'Round 12' in the main game, 'Overtime 1 · Round 5' after it. G.round keeps counting up (31 = overtime 1 round 1, 61 = overtime 2 round 1); only the display splits it.
 const RMAX=9999,rdName=r=>r<=30||(G&&G.om)?'Round '+r:'Overtime '+(Math.floor((r-31)/30)+1)+' · Round '+((r-31)%30+1);
 // (new) Board size. G.sz = sectors per side: 7 standard, 5 medium, 3 small (a standard game has no sz field, and older saves are standard). Every sector is 3 by 3 systems, so NSYS(S) = systems per side (21, 15 or 9).
 const NSYS=S=>((S&&S.sz)||7)*3;
-// say(t) shows message t in the toast at the bottom of the board; empty text hides it.
-const say=t=>{$('msg').textContent=t||''};
+// say(t,i) shows a message in the message pill; empty text hides it. (2026-11-08, Shmorden: two kinds of message, info and tips) t = the whole
+// message, as shown with Tips on (the View tray's Tips button, tipsOn); i = its info part alone (what happened, costs, strengths, why something
+// was refused), shown with Tips off. Leave i out when the whole message is info; i = '' when the whole message is a tip (what to tap next).
+// sayLast keeps the last message so switching Tips shows it again the other way.
+let sayLast=['',undefined];
+const say=(t,i)=>{sayLast=[t,i];$('msg').textContent=(tipsOn||i===undefined?t:i)||''};
 // ov(h) shows a pop-up dialog containing the HTML text h. (new) It first ends a reveal that is still playing (seqSkip) and unhides the layer (rvh), see Turn and round transitions.
 // (new) ovDir = which way the NEXT ov() call should slide its content in when a dialog that is already open changes page: 1 = from the right (forward / next page), -1 = from the left (back), 0 = no slide. Callers set it just before calling ov(); ov() reads it once and clears it.
 let ovDir=0,ovClosing=null,ovWasClosing=false,ovPrev='';
@@ -493,7 +556,7 @@ if(resize)anims.push(box.animate([{height:oldH+'px'},{height:newH+'px'}],{delay:
 // (2026-10-29-i) dy = how far the window's top edge moved (old top minus new, screen px; menuPin moves it up when a taller page must fit): it is held where it was while the old page swipes out, then glides there with the height change.
 if(dy&&Math.abs(dy)>1)anims.push(box.animate([{transform:'translateY('+dy+'px)'},{transform:'none'}],{delay:tOut,duration:tRs,easing:ease,fill:'both'}));
 const t0=tOut+(resize||(dy&&Math.abs(dy)>1)?tRs:0);
-kids.forEach(k=>anims.push(k.animate([{transform:'translateX('+D+'px)',opacity:0},{transform:'none',opacity:1}],{delay:t0,duration:tIn,easing:ease,fill:'both'})));
+kids.filter(k=>!k.classList.contains('stay')).forEach(k=>anims.push(k.animate([{transform:'translateX('+D+'px)',opacity:0},{transform:'none',opacity:1}],{delay:t0,duration:tIn,easing:ease,fill:'both'})));
 Promise.all(anims.map(a=>a.finished)).then(()=>{ghost.remove();anims.forEach(a=>{try{a.cancel()}catch(e){}});box.style.position='';box.style.overflow=ov0;ovSc(box)}).catch(()=>{})}
 
 // menu() builds the start screen. First it looks for an autosave in the browser (try/catch so a blocked browser does not crash it).
@@ -576,13 +639,13 @@ function badgeAt(bx,by){const pad=Math.min(.12,Math.max(.04,8/view.k));return G.
 // moveF(t) handles taps in Move mode. The step is decided by flow (the group chosen so far), never by sel alone, and the group size always comes from an explicit choice.
 function moveF(t){const me=cur();
 // Step 1, no group chosen yet: the tap must be one of your stars that holds Fleets.
-if(!flow){if(!t||t.o!=me)return say('Tap one of your Stars that has Fleets.');if(pvOrigin(t.id))return say('This Star has a move preview. Confirm or cancel it first.');
+if(!flow){if(!t||t.o!=me)return say('Tap one of your Stars that has Fleets.','');if(pvOrigin(t.id))return say('This Star has a move preview. Confirm or cancel it first.','This Star has a move preview.');
 // fr = Fleets that have not moved this turn.
 const fr=fFree(t);
 if(!(t.f>0))return say('No Fleets on that Star.');
 if(fr<1)return say('All Fleets here already moved this turn.');
 // Exactly 1 Fleet on the star: no prompt is needed, the group is that Fleet.
-if(t.f==1){sel=t.id;flow={src:t.id,n:1};sfxMe('fleetSel');say('Tap a Star within 1 Connection'+(teamsOn()?', or a teammate\'s Star to give the Fleet.':'.'));return render()}
+if(t.f==1){sel=t.id;flow={src:t.id,n:1};sfxMe('fleetSel');say('Tap a Star within 1 Connection'+(teamsOn()?', or a teammate\'s Star to give the Fleet.':'.'),'');return render()}
 // 2 or more Fleets on the star: ALWAYS ask how many (1 to fr), noting how many already moved, with a Cancel button.
 return ovQ(`<h1>Move how many Fleets?</h1><p>A group of n travels up to n Connections.${t.fm?' '+t.fm+' Fleet'+(t.fm>1?'s':'')+' here already moved this turn and cannot move again.':''}</p><div class="r" style="flex-wrap:wrap">${[...Array(fr)].map((_,i)=>`<button onclick="pickN(${t.id},${i+1})">${i+1}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow()">Cancel</button></div>`,[t])}
 // Step 2, a group is chosen: a = its star, n = its size. If the group is no longer there, cancel.
@@ -605,7 +668,7 @@ if(hc.length){resetFlow();return hhAsk({a:a.id,b:t.id,n,path,c:hc,i:0,pk:[]})}
 if(pvOn()){bxFleet(path,n,{mv:1});return pvAdd({k:'f',a:a.id,b:t.id,n,c:0,path},'Fleet move preview: '+n+' Fleet'+(n>1?'s':'')+'. Confirm or Cancel.')}
 undo.push(JSON.stringify(G));a.f-=n;t.f=(t.f||0)+n;t.fm=(t.fm||0)+n;mvRec({k:'f',a:mvPos(a),b:mvPos(t),n});bxFleet(path,n,{mv:1});sfxMe('fleetMove');resetFlow();say('Moved '+n+'.');render()}
 // pickN(id,n) runs when a size button is tapped: it creates the move group (star id, n Fleets) and waits for a destination tap.
-function pickN(id,n){$('ov').style.display='none';sel=id;flow={src:id,n};sfxMe('fleetSel');say('Tap a Star within '+n+' Connection'+(n>1?'s':'')+(teamsOn()?', or a teammate\'s Star to give them.':''));render()}
+function pickN(id,n){$('ov').style.display='none';sel=id;flow={src:id,n};sfxMe('fleetSel');say('Tap a Star within '+n+' Connection'+(n>1?'s':'')+(teamsOn()?', or a teammate\'s Star to give them.':''),'');render()}
 // ===== Hitchhiking (RULES.md 5.4) =====
 // A moving group may carry other Fleets of yours that sit on the Stars along its path, whether they moved this turn or not (Shmorden, 2026-10-28). They ride to the end, add nothing to the group's range, and count as moved. On the group's own Star only Fleets that already moved can ride (rule 5.4's second case: the group moves on and carries the Fleet that just arrived); the ones that can still move join the group itself instead. Fleets used in a Take this turn can't move again (4.10), so they never ride.
 // After a person picks the destination (tap, drag, or a preview), each Star on the path with Fleets that may ride is asked about, in path order. While the question is open the board shows the group at its destination, the dashed path, and a dashed circle round the Fleets being asked about. (2026-10-30, Shmorden) A computer is not asked: it takes every Fleet that may ride (hhCpu, in moveF; a placeholder rule to be refined later). cpuHH = false switches that off (tests compare play with and without it).
@@ -673,7 +736,7 @@ const tol=Math.max(.15,10/view.k);return L.find(p=>pvSegs(p).some(g=>dseg({x:bx,
 // pvSegs(p) = the line segments [from, to] a preview draws (a Fleet move follows its path star by star).
 function pvSegs(p){const a=by_(p.a),o=[];if(!a)return o;if(p.k=='f'){const ps=(p.path||[]).map(by_).filter(Boolean);for(let i=0;i+1<ps.length;i++)o.push([ps[i],ps[i+1]])}else{const e=p.k=='s'?p:by_(p.b);if(e)o.push([a,e])}return o}
 const by_=id=>G.stars.find(q=>q.id==id);
-function pvSelect(p){if(pvSel==p.i){pvSel=null;say('')}else{sel=null;pvSel=p.i;say(p.k=='h'?'Fleet gift preview ('+p.n+' Fleet'+(p.n>1?'s':'')+'). Confirm to give them, Cancel to keep them.':p.k=='c'?'Connect preview ('+fuW(p.c)+'). Confirm to link the Stars, Cancel to refund.':p.k=='g'?'Gift preview ('+fuW(p.c)+'). Confirm to give the Star away, Cancel to refund.':p.k=='f'?'Fleet move preview ('+p.n+' Fleet'+(p.n>1?'s':'')+'). Confirm to move them, Cancel to put them back.':p.k=='s'?'Star preview ('+fuW(p.c)+'). Confirm to place it, Cancel to refund.':'Capture preview ('+fuW(p.c)+'). Confirm to attack (the defender then chooses Hold or Retreat), Cancel to refund.')}render()}
+function pvSelect(p){if(pvSel==p.i){pvSel=null;say('')}else{sel=null;pvSel=p.i;{const m=(p.k=='h'?'Fleet gift preview ('+p.n+' Fleet'+(p.n>1?'s':'')+'). Confirm to give them, Cancel to keep them.':p.k=='c'?'Connect preview ('+fuW(p.c)+'). Confirm to link the Stars, Cancel to refund.':p.k=='g'?'Gift preview ('+fuW(p.c)+'). Confirm to give the Star away, Cancel to refund.':p.k=='f'?'Fleet move preview ('+p.n+' Fleet'+(p.n>1?'s':'')+'). Confirm to move them, Cancel to put them back.':p.k=='s'?'Star preview ('+fuW(p.c)+'). Confirm to place it, Cancel to refund.':'Capture preview ('+fuW(p.c)+'). Confirm to attack (the defender then chooses Hold or Retreat), Cancel to refund.');say(m,m.slice(0,m.indexOf(').')+2))}}render()}
 // pvUi() shows Cancel / Confirm (and hides End turn) while a preview is selected; a selection that no longer exists is dropped.
 function pvUi(){const on=pvSel!=null&&!!G&&!G.over&&!!pvFind();if(!on)pvSel=null;$('pvx').style.display=on?'block':'';$('pvc').style.display=on?'block':'';if(on)$('en').style.display='none'}
 // pvDrop(p) removes preview p and refunds it (the origin may act again).
@@ -737,32 +800,32 @@ if(spent+c>G.ap)return 'That line costs '+fuW(c)+', making '+(spent+c)+' Fuel in
 // multiStats() gives the numbers shown while selecting: cb = target strength, sCom = attackers' strength with the Fleets chosen so far, sMax = if every Fleet were used, tc = total Fuel cost.
 function multiStats(){const b=by(multi.t);let sCom=0,sMax=0,tc=0;multi.att.forEach(x=>{const a=by(x.id);sCom+=cs(a)+(x.use||0);sMax+=cs(a)+(a.f||0);tc+=cost(a,b)});return{cb:str(b),sCom,sMax,tc}}
 // multiMsg(p) builds the running readout for the bottom message: target strength, attackers' strength, Fuel, and what to do next.
-function multiMsg(p){const st=multiStats();return p+' Target strength '+st.cb+'. Attackers: '+st.sCom+' with the Fleets chosen (up to '+st.sMax+' with every Fleet). Fuel '+st.tc+' of '+G.ap+'. '+(multi.att.length<2?'Add at least 2 attackers.':st.sCom>st.cb?'Ready: press Confirm.':'Not strong enough yet: add more Stars or Fleets, or Cancel.')}
+function multiMsg(p,i){const st=multiStats();return p+' Target strength '+st.cb+'. Attackers: '+st.sCom+' with the Fleets chosen (up to '+st.sMax+' with every Fleet). Fuel '+st.tc+' of '+G.ap+'. '+(multi.att.length<2?'Add at least 2 attackers.':st.sCom>st.cb?(i?'Ready.':'Ready: press Confirm.'):(i?'Not strong enough yet.':'Not strong enough yet: add more Stars or Fleets, or Cancel.'))}
 // multiF(t) handles a board tap in Multi mode: first the enemy target, then your own stars to add as attackers (a star with Fleets asks how many to use, as in a normal attack).
 function multiF(t){const me=cur();if(!multi)multi={t:null,att:[],step:'target'};
 // Step 1: choose the target (must be an enemy star).
-if(multi.t==null){if(!t||t.o==me)return say('Tap an ENEMY Star as the target.');if(isAlly(t.o))return say('That Star belongs to your teammate '+NM[t.o]+'. Teammates cannot attack each other.');if(pvTarget(t.id))return say('That Star already has a pending capture. Confirm or cancel it first.');multi.t=t.id;multi.step='sel';say(multiMsg('Target chosen. Tap your own Stars to add attackers.'));return render()}
+if(multi.t==null){if(!t||t.o==me)return say('Tap an ENEMY Star as the target.');if(isAlly(t.o))return say('That Star belongs to your teammate '+NM[t.o]+'. Teammates cannot attack each other.');if(pvTarget(t.id))return say('That Star already has a pending capture. Confirm or cancel it first.','That Star already has a pending capture.');multi.t=t.id;multi.step='sel';say(multiMsg('Target chosen. Tap your own Stars to add attackers.'),multiMsg('Target chosen.',1));return render()}
 // Step 2: the target cannot be changed here; only own stars can be attackers. (changed) Tapping the target again cancels the multi-attack.
 const b=by(multi.t);if(t&&t.id==b.id)return multiCancel();
 if(!t||t.o!=me)return say('Tap one of your own Stars to add it as an attacker.');
 // Tapping an attacker again: a star with Fleets reopens its Fleet choice (which also offers Remove); a star without Fleets is simply removed.
 const old=multi.att.find(x=>x.id==t.id);
-if(old){if((t.f||0)>0)return fleetUI(t,old);multi.att=multi.att.filter(x=>x.id!=t.id);if(fask()=='min')mcMin();say(multiMsg('Removed.'));return render()}
+if(old){if((t.f||0)>0)return fleetUI(t,old);multi.att=multi.att.filter(x=>x.id!=t.id);if(fask()=='min')mcMin();say(multiMsg('Removed.'),multiMsg('Removed.',1));return render()}
 // A new attacker must pass the checks; with Fleets it asks how many to use (it is added only after that choice), otherwise it is added at once.
 const e=attErr(t,b);if(e)return say(e);
 // (new, Fleet ask) Only 'ask' asks; 'all' uses every Fleet on it, 'min' shares out as few as the attack needs (mcMin).
 if((t.f||0)>0&&!faAuto())return fleetUI(t,null);
-multi.att.push({id:t.id,use:fask()=='all'?(t.f||0):0});if(fask()=='min')mcMin();say(multiMsg('Added.'));render()}
+multi.att.push({id:t.id,use:fask()=='all'?(t.f||0):0});if(fask()=='min')mcMin();say(multiMsg('Added.'),multiMsg('Added.',1));render()}
 // fleetUI(a,old) asks how many of star a's Fleets to use, with one button per number (0 up to all of them), like a normal attack's choice. old = the existing attacker entry when re-editing.
 function fleetUI(a,old){ovQ(`<h1>Use how many Fleets?</h1><p>This Star has ${a.f} Fleet${a.f>1?'s':''}.${old?' Currently using '+(old.use||0)+'.':''} Fleets used move onto the target if the attack succeeds.</p><div class="r" style="flex-wrap:wrap">${[...Array((a.f||0)+1)].map((_,i)=>`<button onclick="mcUse(${a.id},${i})">${i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="${old?'mcRemove('+a.id+')':"$('ov').style.display='none'"}">${old?'Remove this Star':'Cancel'}</button></div>`,[a,multi&&multi.t])}
 // mcUse(id,n) records the choice: adds the star as an attacker using n Fleets, or changes n for an existing attacker, then updates the readout.
-function mcUse(id,n){$('ov').style.display='none';const x=multi.att.find(q=>q.id==id);if(x)x.use=n;else multi.att.push({id,use:n});say(multiMsg(n+' Fleet'+(n==1?'':'s')+' chosen.'));render()}
+function mcUse(id,n){$('ov').style.display='none';const x=multi.att.find(q=>q.id==id);if(x)x.use=n;else multi.att.push({id,use:n});say(multiMsg(n+' Fleet'+(n==1?'':'s')+' chosen.'),multiMsg(n+' Fleet'+(n==1?'':'s')+' chosen.',1));render()}
 // mcRemove(id) removes an attacker from the multi-attack.
-function mcRemove(id){$('ov').style.display='none';multi.att=multi.att.filter(q=>q.id!=id);if(fask()=='min')mcMin();say(multiMsg('Removed.'));render()}
+function mcRemove(id){$('ov').style.display='none';multi.att=multi.att.filter(q=>q.id!=id);if(fask()=='min')mcMin();say(multiMsg('Removed.'),multiMsg('Removed.',1));render()}
 // multiGo() is the Confirm button. Needs 2+ attackers. If their strength with the Fleets chosen does not beat the target it only shows a message (no popup): add more Stars or Fleets, or Cancel. Otherwise the attack starts.
 // (new) A Confirm that can't go yet flickers dark (flickB) and blinks the box that needs something: the target box with no target or not enough Strength, the attackers' box with fewer than 2 attackers.
 function multiGo(){if(!multi||pend)return;if(multi.t==null){flickB($('mcf'));blinkB($('mbt'));return say('Tap an enemy Star as the target.')}if(isAlly(by(multi.t).o))return say('That Star belongs to a teammate. Cancel the multi-attack.');if(multi.att.length<2){flickB($('mcf'));blinkB($('mba'));return say('Add at least 2 attackers.')}const st=multiStats();
-if(st.sCom<=st.cb){flickB($('mcf'));blinkB($('mbt'));return say('Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'. Add more Stars or Fleets, or Cancel.')}
+if(st.sCom<=st.cb){flickB($('mcf'));blinkB($('mbt'));return say('Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'. Add more Stars or Fleets, or Cancel.','Not strong enough: your attackers total '+st.sCom+' (connections + Fleets chosen) against '+st.cb+'.')}
 multiStart()}
 // multiStart() re-checks everything, builds pend (a list of attackers with their own committed Fleets and line cost) and hands over to resolve, exactly like a single attack.
 function multiStart(){const b=by(multi.t),att=multi.att.map(x=>({a:x.id,use:x.use||0,c:cost(by(x.id),b)})),c=att.reduce((t,x)=>t+x.c,0),tot=att.reduce((t,x)=>t+cs(by(x.a))+x.use,0);
@@ -806,7 +869,7 @@ if(cpuHere(pend.def)){const v=cpuPick({nb:pend.nb,hOK,lvl:cpuEff(G.cpu[pend.def]
 if(!hOK&&!hX&&pend.nb.length==1){defPush(pend.nb[0]);continue}
 // (2026-10-28-c) The choice is a question at the bottom of the screen (defDlg: Hold / Retreat); the bar's Hold button is no longer used. Tapping a ringed Star (Retreat) or the attacked Star (Hold) still works.
 pend.rem=net.on&&!net.my.includes(pend.def);if(!pend.rem&&!pend.bz){pend.bz=1;buzz([120,70,120]);sfx('defCall')}hl=pend.nb;$('hold').style.display='';
-say(pend.rem?netWaitMsg():NM[by(pend.b).o]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(hOK,hX));
+say(pend.rem?netWaitMsg():NM[by(pend.b).o]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(hOK,hX),pend.rem?undefined:NM[by(pend.b).o]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'.');
 // Redraw (to show the rings), ask (defDlg) and wait for an answer or a tap.
 render();return bxWait(defDlg)}
 // Every Fleet has a decision, so apply the whole attack at once.
@@ -820,7 +883,7 @@ function holdNo(){holdGive=null;$('ov').style.display='none';defDlg()}
 // defTap(t,ok) handles a board tap while the defender is choosing: a ringed star sends the current Fleet there (a teammate's star asks first; ok = already answered Yes). (new) Tapping the attacked Star is the same as the Hold button, when Hold is offered.
 function defTap(t,ok){if(t&&t.id==pend.b&&(pend.hOK||pend.hX))return defHold();
 // Anything that is not a ringed star is rejected with a hint.
-if(!t||!pend.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(pend.hOK,pend.hX));
+if(!t||!pend.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(pend.hOK,pend.hX),'');
 if(!ok&&t.o!=pend.def)return holdAsk(t);
 // Record this Fleet's destination (the star id) and move on to the next Fleet.
 defPush(t.id);defNext()}
@@ -840,7 +903,7 @@ const K=q.b+'/'+q.att.join(',')+'/'+G.round+'/'+G.ti;ovQ('<h1>Defence call</h1><
 function defClose(){if(!defOpen)return;defOpen=false;if($('ov').style.display=='flex')$('ov').style.display='none'}
 // defRet() = Retreat: with one spot of the defender's own the Fleet goes there; otherwise the ringed Stars blink (hlBl), without moving the board (the call already fitted them in, defDlg), and a tap on one answers. A teammate's Star still asks Give 1 Fleet first.
 function defRet(){const q=defQ();if(!q||!q.nb.length)return;if(q.nb.length==1){const t=by(q.nb[0]);if(t&&t.o==q.def)return q.loc?defTap(t,true):netAnswer(t.id)}
-hlBl=Date.now();render();say('Tap a ringed Star to Retreat there.')}
+hlBl=Date.now();render();say('Tap a ringed Star to Retreat there.','')}
 // (new) defLive() = how the Fleet badges look while a Defence call is being answered, so each choice shows at once: {star id: change}. Every decided defending Fleet leaves the target; a Retreat adds it to the Star it went to; each Hold also removes one committed attacking Fleet (from the first attacker that still has one; fin takes them from the shared pool, so only the badges differ). Nothing on the board changes until fin. Source: pend on the device running the attack, net.rq (sent with the question) on an online defender's device. null = no Defence call.
 function defLive(){const q=pend&&pend.ph?{b:pend.b,a:pend.att.map(x=>x.a),u:pend.att.map(x=>x.use||0),dec:pend.dec}:net.on&&net.rq&&Array.isArray(net.rq.dec)&&Array.isArray(net.rq.u)&&Array.isArray(net.rq.att)?{b:net.rq.b,a:net.rq.att,u:net.rq.u,dec:net.rq.dec}:null;if(!q||!q.dec.length)return null;
 const d={},add=(id,n)=>{d[id]=(d[id]||0)+n};add(q.b,-q.dec.length);let h=0;q.dec.forEach(v=>{if(v==='H')h++;else if(typeof v=='number')add(v,1)});
@@ -1160,7 +1223,7 @@ function tap(bx,by,np){if(!G||G.over)return;const cx=Math.floor(bx),cy=Math.floo
 // Nothing selected yet: tapping your own unused star selects it; anything else shows a hint.
  // (new 2026-10-29-d) Sector rule (secNear): a tap on an empty system selects your nearest Star in its Sector that has not acted (Set mode).
  if(!sel&&!t){const q=secNear(cx,cy,bx,by,G.stars.filter(s=>s.o==me&&!G.used.includes(s.id)));if(q){t=q;mode='s'}}
- if(!sel){if(t&&t.o==me){if(G.used.includes(t.id)){sndNo();say('That Star already acted, or is new, this turn.')}else{sel=t.id;sfxMe('starSel');say('Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets). Tap an empty system to set a Star, your Star to connect, or an enemy Star to take'+(teamsOn()?', or a teammate\'s Star to connect or gift.':'.'))}}else if(!t&&mode)return modeOff();else say(mode?'Tap one of your Stars to start a move.':'Tap one of your Stars or Fleets to start a move.');return render()}
+ if(!sel){if(t&&t.o==me){if(G.used.includes(t.id)){sndNo();say('That Star already acted, or is new, this turn.')}else{sel=t.id;sfxMe('starSel');say('Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets). Tap an empty system to set a Star, your Star to connect, or an enemy Star to take'+(teamsOn()?', or a teammate\'s Star to connect or gift.':'.'),'Strength '+str(t)+' ('+cs(t)+' connections + '+(t.f||0)+' Fleets).')}}else if(!t&&mode)return modeOff();else say(mode?'Tap one of your Stars to start a move.':'Tap one of your Stars or Fleets to start a move.','');return render()}
 // a = the selected star. Tapping it again deselects.
  const a=G.stars.find(s=>s.id==sel);if(t===a){sel=null;sfxMe('deselect');say('');return render()}
 // (step 5) A living teammate's star is never taken: it opens the Connect / Gift popup instead (tmOpen).
@@ -1180,12 +1243,12 @@ if(kind=='set'&&useFixed())return fxOpen(a,cx,cy,c);
  if(!clear(a,b))return sndNo(),say('The line passes too close to another Star.');
 // Connecting two stars that are already connected is not allowed. (2026-10-29-i) Nor is a second link where a Connect preview already waits (pvLink).
  if(kind=='conn'&&G.conns.some(q=>(q[0]==a.id&&q[1]==b.id)||(q[0]==b.id&&q[1]==a.id)))return sndNo(),say('Those Stars are already connected.');
- if(kind=='conn'&&pvLink(a.id,b.id))return say('Those Stars already have a Connect preview. Confirm or cancel it first.');
+ if(kind=='conn'&&pvLink(a.id,b.id))return say('Those Stars already have a Connect preview. Confirm or cancel it first.','Those Stars already have a Connect preview.');
 // Taking a star: cb = target strength, fr = your free Fleets, m = Fleets you must commit to win. If you cannot win, say so.
  if(kind=='take'){// (changed) ONE strength function (str) decides the attack: cb = target strength, fr = every Fleet on the attacking star (moved Fleets may attack too), m = Fleets that must be committed to beat the target. Too weak means str(a) is not above cb.
 const cb=str(b),fr=a.f||0,m=Math.max(0,cb+1-cs(a));if(str(a)<=cb)return sndNo(),say('Too weak. Your strength is '+str(a)+' ('+cs(a)+' connections + '+fr+' Fleets) against '+cb+'. You need more than '+cb+'.');
 // Remember the attack in pend. If you have no free Fleets or exactly the needed number, resolve at once.
-  if(pvTarget(b.id))return say('That Star already has a pending capture. Confirm or cancel it first.');pend={b:b.id,att:[{a:a.id,use:0,c}]};if(fr==0||m==fr||faAuto())return atkGo(fask()=='all'?fr:m);
+  if(pvTarget(b.id))return say('That Star already has a pending capture. Confirm or cancel it first.','That Star already has a pending capture.');pend={b:b.id,att:[{a:a.id,use:0,c}]};if(fr==0||m==fr||faAuto())return atkGo(fask()=='all'?fr:m);
 // Otherwise ask how many Fleets to commit (from the minimum m up to all free ones). (new) Fleet ask 'all' commits every Fleet and 'min' the minimum, without asking (above).
   // (changed) Redraw first, so the dashed attack line shows while the Fleets are chosen.
   render();return ovQ(`<h1>Use Fleets in the attack?</h1><p>Used Fleets move onto the Star if you win.</p><div class="r" style="flex-wrap:wrap">${[...Array(fr-m+1)].map((_,i)=>`<button onclick="atkGo(${m+i})">Use ${m+i}</button>`).join('')}</div><div class="r" style="margin-top:8px"><button onclick="$('ov').style.display='none';resetFlow()">Cancel</button></div>`,[a,b])}
@@ -1435,7 +1498,7 @@ if(pct==fuelPct)return;const ms=fuelPct<0||animEff()=='off'?0:animMs();fuelPct=p
 function persist(){if(hvRO||ssMk||(G&&G===ssG))return;try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}}
 // render() redraws everything. Skip if no game; autosave; compute control and VP; me = current player; s is a text string that collects the drawing shapes.
 // (new) rs = the selected Star in Stars mode (its Fuel range is outlined); none while an attack is being resolved (pend: Fleet choice and the Defence call) or with the range border switched off (rngOn). In Multi mode, once a target is chosen, the outline is drawn around the target instead, with the Fuel not yet planned for the chosen attackers (fl): it shows how far away a Star can be and still join. fl is also the Fuel shown in the info row, so the number drops as attackers are added; nothing is spent until the attack goes through (fin), so Cancel or removing an attacker gives it back. The End turn hint rings go away after HINT_MS or as soon as a Star is selected. (new) While a Star is dragged (dg), the outline is drawn round its origin with the Fuel the drag may spend (dg.n), and the Fuel shown is what would be left after the drop. End turn gets the striped "not yet" look (nogo) whenever endBlock would refuse it, except on a computer's turn or another device's online turn, where nobody here could press it.
-function render(){ambKick();ptSync(1);if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
+function render(){ambKick();ptSync(1);try{cbSync()}catch(e){}if(!G||hvRO)return;setLook(G);persist();const {ctl,vp}=calc(),me=cur(),mt=multi&&multi.t!=null?by(multi.t):null,fl=G.ap-(multi&&multi.t!=null&&by(multi.t)?multiStats().tc:0),rs=!rngOn||pend?null:mt||(mode=='s'&&sel!=null&&!multi?by(sel):null);
 if(hint&&(sel!=null||Date.now()-hint.t>=HINT_MS))hint=null;autoMode();
 $('en').classList.toggle('nogo',!G.over&&!cpuOf(me)&&!(net.on&&!net.my.includes(me))&&!!endBlockC());
 const da=dg&&ddStar(dg.k)&&by(dg.a);
@@ -1462,12 +1525,26 @@ function applyNow(){W.setAttribute('transform',`translate(${view.x} ${view.y}) s
 // inside #st). Since -03-b the board is drawn under the panels too (they float over it and it fades out beneath them, stPads), so Fit and the
 // camera frame the board in this part only, as they framed the whole of #st before. stPT / stPB = the panels' heights (0 in the side layout).
 let stPT=0,stPB=0;
-function stSafe(){const r=st.getBoundingClientRect();return{w:r.width,h:Math.max(1,r.height-stPT-stPB),t:stPT}}
+// (2026-11-08, Shmorden: Fit "has to leave room for the largest message sizes above the top edge of the board") On an upright screen the
+// message pill sits just under the top bar, so stSafe also keeps msgRoom() free above the board: the height of the pill holding the
+// longest message there is (a multi-attack summary; with Tips off, its info part), measured with an invisible copy of the pill (#msgp).
+function stSafe(){const r=st.getBoundingClientRect(),m=msgRoom();return{w:r.width,h:Math.max(1,r.height-stPT-stPB-2*m),t:stPT+m}}
+// (2026-11-09, Shmorden: the board is "centered between the top bar and the bottom bar") The message room is kept below the board as well as
+// above it, so Fit puts the board's middle halfway between the two bars; on a tall phone the width limits the board anyway.
+const MSG_LONG='Target chosen. Tap your own Stars to add attackers. Target strength 12. Attackers: 10 with the Fleets chosen (up to 20 with every Fleet). Fuel 12 of 15. Not strong enough yet: add more Stars or Fleets, or Cancel.',
+MSG_LONG_I='Target chosen. Target strength 12. Attackers: 10 with the Fleets chosen (up to 20 with every Fleet). Fuel 12 of 15. Not strong enough yet.';
+function msgRoom(){if(document.documentElement.classList.contains('side'))return 0;const p=$('msgp'),w=st.clientWidth,k=w+'/'+tipsOn+'/'+document.documentElement.classList.contains('navon');if(!p||!w)return 0;
+if(msgRoom.k!==k){p.textContent=tipsOn?MSG_LONG:MSG_LONG_I;const v=p.offsetHeight+16;if(msgRoom.v!=null&&v!==msgRoom.v)fitSoon();msgRoom.v=v;msgRoom.k=k}return msgRoom.v}
 // stPads() = measure the top panel and the bottom bar (with the tutorial panel above it) and pull the board under them: --padT / --padB set
 // #st's negative margins, where #zoom and #msg sit, and the board's fade (CSS mask). Run on every resize of those panels (ResizeObserver).
 function stPads(){const r=document.documentElement,sd=r.classList.contains('side')||r.classList.contains('saver'),tp=$('top'),br=$('bar'),tu=$('tut');
 const T=sd?0:tp.offsetHeight,B=sd?0:br.offsetHeight+(tu?tu.offsetHeight:0);if(T==stPT&&B==stPB)return;const dT=T-stPT;stPT=T;stPB=B;r.style.setProperty('--padT',T+'px');r.style.setProperty('--padB',B+'px');
-if(dT){view.y+=dT;apply()}}
+if(atFit())fitSoon();else if(dT){view.y+=dT;apply()}}
+// (2026-11-09-d, Shmorden: the empty space above and below the board must be equal) The bars and the message room settle after the first
+// Fit (fonts, the bar's height setting), so while the board is at Fit (not zoomed in by the player: atFit) any change to them fits it again,
+// once, on the next frame (fitSoon); a zoomed-in view only shifts with the top bar, as before.
+const atFit=()=>!!G&&view.min>0&&view.k<=view.min*1.001;let fitT=0;
+function fitSoon(){if(fitT)return;fitT=requestAnimationFrame(()=>{fitT=0;try{if(atFit())fit(true)}catch(e){}})}
 function fitTo(V,box,ap){if(box===st){const q=stSafe(),n=NSYS(G);V.k=V.min=Math.min(q.w,q.h)/(n+.2);V.x=(q.w-n*V.k)/2;V.y=q.t+(q.h-n*V.k)/2;return ap()}const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
 // (2026-10-28-c, Shmorden) Fitting pans and zooms there with the camera animation (camGo, Animations speed) instead of jumping; (-d) a window resize or turning the phone glides too. now = jump (the first drawing, tests); Animations off jumps too.
@@ -1540,7 +1617,7 @@ const mid=f=>camZoom(f);
 // Hook up the + and - zoom buttons, Fit, the mode buttons (via data-m) and the Concede button.
 // (changed) The mode buttons are ignored while the defender is choosing (see the !(pend&&pend.ph) test).
 $('zi').onclick=()=>mid(1.4);$('zo').onclick=()=>mid(1/1.4);$('fi').onclick=()=>fit();$('modes').onclick=e=>{const m=e.target.dataset.m;if(m&&G&&!G.over&&!(pend&&pend.ph)&&!lock()&&!(m=='x'&&G.om)){// (changed) Switching mode clears any half-finished flow. Entering Multi creates an empty multi-attack so Undo can step back out of it. (new) Tapping the selected mode again deselects it (back to nothing selected, the two-button row).
-mode=m==mode?'':m;resetFlow();if(mode=='x'){multi={t:null,att:[],step:'target'};say('Multi-attack: tap an enemy Star as the target.')}else say('');render()}};
+mode=m==mode?'':m;resetFlow();if(mode=='x'){multi={t:null,att:[],step:'target'};say('Multi-attack: tap an enemy Star as the target.','')}else say('');render()}};
 // End turn button: if Fleets are unplaced and could be placed, warn before ending; otherwise end the turn.
 // (changed) End turn is blocked while the defender is choosing.
 // (changed) End turn is refused while the turn is unfinished (see endBlock): every Fleet must be placed and every Fuel used, whenever that is still possible. (new) A refused tap also points at what is left (endHint).
@@ -1549,10 +1626,17 @@ $('en').onclick=()=>{if(G&&G.over)return overDlg();if(lock())return;if(pend&&pen
 // (changed) Undo first checks for a half-finished attack: it just cancels it (nothing was applied or paid yet). Otherwise it restores the last snapshot as before.
 $('un').onclick=()=>{if(lock())return;
 // (changed) From a hold/retreat prompt of a MULTI-attack, Undo returns to Confirm with the same attackers; for a single attack it cancels as before.
-if(pend&&pend.ph){if(multi){pend=null;hl=[];$('hold').style.display='';multi.step='sel';say(multiMsg('Back to the multi-attack.'))}else{const pp=pend.pv;resetFlow();if(pp){pvRestore(pp);pvSel=pp.i;say('Back to the capture preview.')}else say('Attack cancelled. Nothing was changed.')}return render()}
+if(pend&&pend.ph){if(multi){pend=null;hl=[];$('hold').style.display='';multi.step='sel';say(multiMsg('Back to the multi-attack.'),multiMsg('Back to the multi-attack.',1))}else{const pp=pend.pv;resetFlow();if(pp){pvRestore(pp);pvSel=pp.i;say('Back to the capture preview.')}else say('Attack cancelled. Nothing was changed.')}return render()}
 // (new) While setting up a multi-attack, Undo removes the last attacker, then the target, then leaves Multi mode.
-if(multi){if(multi.att.length){multi.att.pop();say(multiMsg('Last attacker removed.'))}else if(multi.t!=null){multi.t=null;multi.step='target';say('Target cleared. Tap an enemy Star as the target.')}else{resetFlow();mode='';say('Multi-attack closed.')}return render()}
-if(G&&!G.over&&undo.length){const tp=undo[undo.length-1];if(tp&&tp.mx)mvFixUndo(tp.mx);else if(!(tp&&tp.pv)){mvUndo();if(tp&&tp.m2)mvUndo()}const cv=G.cpuV,cb=G.cpuB;G=JSON.parse(undo.pop());if(cv){G.cpuV=cv;if(cb)G.cpuB=cb;else delete G.cpuB}resetFlow();sfx('undo');say('Undone');render()}};
+if(multi){if(multi.att.length){multi.att.pop();say(multiMsg('Last attacker removed.'),multiMsg('Last attacker removed.',1))}else if(multi.t!=null){multi.t=null;multi.step='target';say('Target cleared. Tap an enemy Star as the target.','Target cleared.')}else{resetFlow();mode='';say('Multi-attack closed.')}return render()}
+if(G&&!G.over&&undo.length){const rb={g:JSON.stringify(G),mv:H&&H.mv?JSON.stringify(H.mv):null,tp:undo[undo.length-1]};const tp=undo[undo.length-1];if(tp&&tp.mx)mvFixUndo(tp.mx);else if(!(tp&&tp.pv)){mvUndo();if(tp&&tp.m2)mvUndo()}const cv=G.cpuV,cb=G.cpuB;G=JSON.parse(undo.pop());if(cv){G.cpuV=cv;if(cb)G.cpuB=cb;else delete G.cpuB}resetFlow();redoS.push(rb);redoK=redoKey();sfx('undo');say('Undone');render()}};
+// (2026-11-08-b, Shmorden: "Undo will have Redo slide out of it") Redo puts back what Undo took: each plain Undo (not the multi-attack or
+// Defence call steps) keeps the state it undid, the move log and its undo entry in redoS. Redo is possible only while nothing else has
+// happened since: redoK = the game, round, turn and undo depth right after the last Undo or Redo (redoKey); any move changes the depth, so
+// render() then forgets redoS (cbSync). Offline only: an online game's undo is the host's business.
+let redoS=[],redoK='';
+const redoKey=()=>G?G.gid+'/'+G.round+'/'+G.ti+'/'+undo.length:'',redoOk=()=>!net.on&&!!G&&!G.over&&redoS.length>0&&redoK===redoKey();
+function redoIt(){if(lock()||!redoOk())return;const b=redoS.pop();G=JSON.parse(b.g);if(H&&b.mv)H.mv=JSON.parse(b.mv);undo.push(b.tp);resetFlow();redoK=redoKey();sfx('undo');say('Redone');render()}
 // dl: the download helper, used by Save file when the page allows it.
 let dl=null;try{window.claude&&claude.use('downloads').then(d=>{dl=d}).catch(()=>{})}catch(e){}
 // loadObj(o) loads a saved game: check it looks valid, make it the current game, fill in defaults for older saves, reset the interface.
@@ -1926,16 +2010,93 @@ $('fi').addEventListener('click',()=>document.documentElement.classList.remove('
 // cbPlace() puts Star / Fleets, History, the Fuel gauge and the team score line in their Command bar places on an upright screen, and back
 // in their side layout places (the markers cbHome) when the side layout is on. Run at start and by skyLay whenever the layout may change.
 // Hide UI has no button on an upright screen, so turning upright shows the interface again.
-const cbHome={};['modes','hbtn','fuel','tvp'].forEach(i=>{cbHome[i]=document.createComment(i);$(i).before(cbHome[i])});
-function cbPlace(){const up=!document.documentElement.classList.contains('side'),m=$('modes'),hb=$('hbtn'),fu=$('fuel'),tv=$('tvp'),back=e=>{if(e.previousSibling!==cbHome[e.id])cbHome[e.id].after(e)};
-if(up){if(m.parentNode!==$('bar'))$('en').before(m);if(hb.previousElementSibling!==$('un'))$('un').after(hb);if(fu.parentNode!==$('top'))$('chips').after(fu);if(tv.parentNode!==$('info'))$('info').append(tv);if(document.body.classList.contains('noui'))huiToggle()}
-else{back(m);back(hb);back(fu);back(tv)}}
-cbPlace();
+const cbHome={};['modes','fuel','tvp'].forEach(i=>{cbHome[i]=document.createComment(i);$(i).before(cbHome[i])});
+function cbPlace(){const up=!document.documentElement.classList.contains('side'),m=$('modes'),fu=$('fuel'),tv=$('tvp'),back=e=>{if(e.previousSibling!==cbHome[e.id])cbHome[e.id].after(e)};mlShut();
+if(up){if(m.parentNode!==$('bar'))$('en').before(m);if(fu.parentNode!==$('top'))$('chips').after(fu);if(tv.parentNode!==$('info'))$('info').append(tv);if(document.body.classList.contains('noui'))huiToggle()}
+else{back(m);back(fu);back(tv)}}
+// The Bottom bar setting (Settings > Display; remembered): cbBar 'undo' = More, Undo, Star, Fleets, End turn (the default; Menu is in More),
+// 'menu' = More, Menu, Star, Fleets, End turn (Undo and Redo are in More), 'none' = More, Star, Fleets, End turn (all three in More).
+const CBKEY='constellate-cbar',CB_OPTS=['undo','menu','none'];let cbBar='undo';try{const v=localStorage.getItem(CBKEY);if(CB_OPTS.includes(v))cbBar=v}catch(e){}
+const CB_NAMES={undo:'Undo in the bar',menu:'Menu in the bar',none:'Undo and Menu in More'},cbLabel=()=>'Bottom bar: '+CB_NAMES[cbBar];
+// Bar height (Settings > Controls; remembered): cbH px, 76 at first (Shmorden, 2026-11-08-c).
+const CBHKEY='constellate-cbh',CBH_OPTS=[58,68,76,84];let cbH=76;try{const v=+localStorage.getItem(CBHKEY);if(CBH_OPTS.includes(v))cbH=v}catch(e){}
+const cbhLabel=()=>'Bar height: '+cbH;
+// cbDd(b) / cbhDd(b): the two Controls settings, each a drop-down under its button (ddOpen); picking relabels the button.
+function cbDd(b){ddOpen(b,CB_OPTS.map(v=>({l:CB_NAMES[v],v,act:v==cbBar})),v=>{cbSet(v);b.textContent=cbLabel()+' ▾'})}
+function cbhDd(b){ddOpen(b,CBH_OPTS.map(v=>({l:v+(v==76?' (default)':''),v,act:v==cbH})),v=>{cbH=v;try{localStorage.setItem(CBHKEY,v)}catch(e){}cbApply();b.textContent=cbhLabel()+' ▾';try{stPads();msgRoom.k='';fit()}catch(e){}})}
+function cbApply(){const r=document.documentElement;CB_OPTS.forEach(o=>r.classList.toggle('cb-'+o,o==cbBar));r.style.setProperty('--cbh',cbH+'px');r.classList.toggle('cbbig',cbH>=68);mlShut()}
+function cbSet(v){cbBar=v;try{localStorage.setItem(CBKEY,cbBar)}catch(e){}cbApply();cbSync()}
+// Navigation (More > Navigation; remembered, off at first): zoom in, zoom out and Fit as round buttons at the board's top right.
+const NAVKEY='constellate-nav';let navOn=false;try{navOn=localStorage.getItem(NAVKEY)==='1'}catch(e){}
+const navApply=()=>{document.documentElement.classList.toggle('navon',navOn);try{msgRoom()}catch(e){}};  // the pill's width changes, so the message room may too
+$('nzi').onclick=()=>$('zi').click();$('nzo').onclick=()=>$('zo').click();$('nfi').onclick=()=>$('fi').click();
+// The More list (#mlist): mlItems() = its buttons, nearest the bar first: Undo and Redo when Undo is not in the bar, Menu when Menu is not,
+// then History, Strength, IDs (preview only), Tips, Navigation. On / off items show struck through when off and keep the list open; Undo and
+// Redo keep it open too; History and Menu close it. Touching the board or another bar button closes it.
+const mlExtra=[];
+function mlItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),un=cbBar!='undo',mn=cbBar=='undo'||cbBar=='none';
+return [...(un?[I('Undo','undo',()=>$('un').onclick(),{dis:!G||G.over}),I('Redo','redo',redoIt,{dis:!redoOk()})]:[]),
+...(mn?[I('Menu','menu',()=>menuOpen())]:[]),I('History','history',()=>{mlShut();$('hbtn').click()}),
+I('Strength','strength',()=>$('sbtn').click(),{off:!strOn}),...mlExtra.map(f=>f(I)),I('Tips','tips',()=>$('tipbtn').click(),{off:!tipsOn}),
+I('Navigation','nav',()=>{navOn=!navOn;try{localStorage.setItem(NAVKEY,navOn?'1':'0')}catch(e){}navApply()},{off:!navOn})]}
+let mlOpen=false,mlKind='more';
+// (2026-11-08-c, Shmorden: "When clicking Menu, Menu drops down to replace More and have the menu list slide out of it") menuItems() = the
+// Menu as a list: Quick save, Notes, Settings, Save / Load, Dev, Main menu, End game, Concede; Settings, Save / Load and Dev open the Menu
+// window on that tab. menuOpen() shows it: from More's list, More turns into Menu (dropping in) and the list slides out of it; from the
+// Menu button (Bottom bar = Menu in the bar), out of that. Online games and a Defence call open the Menu window instead (it has more there).
+function menuItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),w=k=>()=>{mlShut();if(G.over)return saveUI();msec='h';menuPage(k)};  // opened straight on its tab, so it starts centered on the board
+return [I('Quick save','save',null,{save:1}),...(G&&G.note?[I('Notes','notes',()=>{mlShut();posNoteDlg(1)})]:[]),I('Settings','settings',w('set')),I('Save / Load','saveload',w('sl')),
+I('Dev','dev',w('dev')),I('Main menu','home',()=>{mlShut();mainMenu()}),I('End game','flag',()=>{mlShut();endGameDlg()},{dis:!G||G.over}),I('Concede','concede',()=>{mlShut();conc()})]}
+function menuOpen(){if(!G)return;if(net.on||(pend&&pend.ph)||document.documentElement.classList.contains('side')){mlShut();return saveUI()}
+const L=$('mlist'),fromMore=cbBar!='menu',swap=mlOpen&&mlKind=='more';mlKind='menu';
+if(fromMore){const m=$('mbtn');m.textContent='Menu';m.classList.remove('drop');void m.offsetWidth;m.classList.add('drop')}
+// (2026-11-08-e, Shmorden: "clicking Menu, the old buttons slide out left and the Menu buttons slide in from the right") From More's
+// open list: its buttons leave to the left, then the Menu's come in from the right (MSW ms each; at once with Animations Off).
+if(swap&&animEff()!='off'&&L.animate){const old=[...L.children];mlBusy=true;L.style.pointerEvents='none';old.forEach(b=>b.animate([{transform:'none',opacity:1},{transform:'translateX(-120%)',opacity:0}],{duration:MSW,easing:'ease-in',fill:'forwards'}));
+setTimeout(()=>{mlBusy=false;L.style.pointerEvents='';if(!mlOpen||mlKind!='menu')return;mlDraw();[...L.children].forEach(b=>b.animate([{transform:'translateX(120%)',opacity:0},{transform:'none',opacity:1}],{duration:MSW,easing:'ease-out'}))},MSW);return}
+mlOpen=true;mlDraw()}
+const MSW=150;let mlBusy=false;  // mlBusy: the swap is under way, so a redraw (cbSync) waits for it
+// slideOver(el,btn) puts a slide-out el centered over btn, inside the bar's width.
+function slideOver(el,btn){const bar=$('bar').getBoundingClientRect(),a=btn.getBoundingClientRect(),w=el.offsetWidth;el.style.left=Math.max(6,Math.min(a.left-bar.left+a.width/2-w/2,bar.width-w-6))+'px'}
+// (2026-11-09, Shmorden: "slide out at the same rate that Multi slides out, not the same overall time") SLIDE_V = Multi / Move's speed: they
+// travel their height and the 10 px gap (54 px) in 0.22 s; slideTime(el) = how long el takes at that speed (so a tall list takes longer).
+const SLIDE_V=54/220,slideTime=el=>Math.round((el.offsetHeight+10)/SLIDE_V)+'ms';
+// (2026-11-09-b, Shmorden: "make the More slide out as fast as the Menu side swipe") listTime(L) = how long the More / Menu list takes to
+// slide up or down at the swap's speed: a button travels 120% of its width in MSW ms there.
+const listTime=L=>{const b=L.firstElementChild,v=b?1.2*b.offsetWidth/MSW:SLIDE_V;return Math.round((L.offsetHeight+10)/v)+'ms'};
+function mlDraw(){const L=$('mlist'),r=document.documentElement,mk=mlOpen&&mlKind=='menu',onSv=mk&&cbBar=='menu';if(!mlOpen)mlKind='more';
+r.classList.toggle('mlopen',mlOpen&&!onSv);r.classList.toggle('mlmenu',onSv);$('mbtn').classList.toggle('on',mlOpen&&!onSv);$('sv').classList.toggle('on',onSv);r.classList.toggle('mbmenu',mk&&!onSv);$('mbtn').textContent=mk&&!onSv?'Menu':'More';
+L.classList.toggle('shut',!mlOpen);try{rdbSync()}catch(e){}if(!mlOpen)return;
+L.innerHTML='';(mk?menuItems():mlItems()).forEach(x=>{const b=document.createElement('button');b.textContent=x.l;b.style.setProperty('--ic','var(--i-'+x.ic+')');if(x.off)b.className='off';if(x.dis)b.disabled=true;
+b.onclick=x.save?()=>saveFile(b):()=>{x.f();if(!mlBusy)mlDraw()};L.append(b)});
+const w=Math.max(...[...L.children].map(b=>b.offsetWidth));[...L.children].forEach(b=>b.style.width=w+'px');slideOver(L,onSv?$('sv'):$('mbtn'));L.style.transitionDuration=listTime(L)}
+function mlShut(){if(mlOpen){const L=$('mlist');L.style.transitionDuration=listTime(L);mlOpen=false;mlDraw()}}
+$('mbtn').onclick=()=>{if(mlOpen)mlShut();else{subShut();mlKind='more';mlOpen=true;mlDraw()}};
+// (2026-11-08-d, Shmorden: "only one slide open can be open at a time. So if Star is open and you click Undo or Menu, Star closes")
+// subsOpen() = Star's or Fleets' pair is open (its Multi or Move slid out); subShut() closes it, unless a multi-attack or a Defence call
+// is under way (Undo then steps back inside it). Opening Star or Fleets shuts the lists (mlShut), and Redo hides while a pair is open.
+const subsOpen=()=>!!(G&&mode&&!G.over&&!cpuOf(cur())),subShut=()=>{if(subsOpen()&&!multi&&!pend)modeOff(1)};
+$('un').addEventListener('click',subShut);
+// svTap() = the Menu button: on an upright screen its list (a second tap shuts it); sideways the Menu window, as before (menuOpen).
+function svTap(){if(!document.documentElement.classList.contains('side')&&mlOpen&&mlKind=='menu')return mlShut();subShut();menuOpen()}
+$('rdb').onclick=redoIt;
+$('st').addEventListener('pointerdown',mlShut,true);$('modes').addEventListener('click',mlShut);
+['en','hold','mcx','mcf','pvx','pvc','un'].forEach(i=>$(i).addEventListener('click',mlShut));
+// cbSync() (from render): forgets a Redo that is no longer possible, slides Redo up over Undo while it is possible (Undo in the bar), and
+// redraws an open More list.
+function cbSync(){document.documentElement.classList.toggle('calm',animEff()=='off');if(redoS.length&&redoK!==redoKey())redoS=[];rdbSync();if(mlOpen&&!mlBusy)mlDraw()}
+// rdbSync() shows Redo over Undo while a Redo is possible, Undo is in the bar and the More list is shut (the two would overlap).
+function rdbSync(){const rd=$('rdb'),show=redoOk()&&cbBar=='undo'&&!mlOpen&&!subsOpen()&&!document.documentElement.classList.contains('side');rd.classList.toggle('shut',!show);if(show)slideOver(rd,$('un'))}
+cbApply();navApply();cbPlace();
 // (new) Strength button: hides or shows the strength numbers on both boards. With it on they appear only when zoomed in, as before; with it off (button struck through) they never appear. The choice is remembered in this browser.
 const STKEY='constellate-strength';let strOn=true;try{strOn=localStorage.getItem(STKEY)!=='0'}catch(e){}
 const strApply=()=>{try{document.body.classList.toggle('nostr',!strOn);['sbtn','hsbtn'].forEach(i=>{$(i).classList.toggle('off',!strOn);$(i).setAttribute('aria-pressed',strOn?'true':'false')})}catch(e){}};
 
 const strToggle=()=>{strOn=!strOn;try{localStorage.setItem(STKEY,strOn?'1':'0')}catch(e){}strApply()};$('sbtn').onclick=strToggle;$('hsbtn').onclick=strToggle;strApply();
+// (2026-11-08) Tips button (View tray): switches tipsOn (see say), shows the last message again the new way, and fits the board again, since
+// the room kept above the board for messages depends on it (msgRoom). Struck through when off, like Strength.
+const tipApply=()=>{$('tipbtn').classList.toggle('off',!tipsOn);$('tipbtn').setAttribute('aria-pressed',tipsOn?'true':'false')};
+$('tipbtn').onclick=()=>{tipsOn=!tipsOn;try{localStorage.setItem(TIPKEY,tipsOn?'1':'0')}catch(e){}tipApply();say(...sayLast);msgRoom.k='';if(G)fit()};tipApply();
 $('hbtn').onclick=hvOpen;$('hvx').onclick=hvClose;$('hvtp').onclick=()=>hvArrow(-1);$('hvtn').onclick=()=>hvArrow(1);$('hvmd').onclick=hvModeCycle;$('hvsp').onclick=()=>hvSkip(-1);$('hvsn').onclick=()=>hvSkip(1);
 $('hvq').onclick=e=>{const i=e.target&&e.target.dataset&&e.target.dataset.i;if(i!==undefined&&i!=='')hvPick(i)};
 $('hzi').onclick=()=>vZoom(1.4);$('hzo').onclick=()=>vZoom(1/1.4);$('hfi').onclick=vFit;
@@ -1962,19 +2123,21 @@ if(!net.on&&pend&&pend.ph){let host=SHARE_BASE;try{host=new URL(SHARE_BASE).host
 const shareBtn=navigator.share?'<button onclick="shareLink()">Share link</button>':'';prepCodes();
 // During a Hold/Retreat choice nothing is applied until the attack resolves, so a save or link holds the board from before the attack.
 return ov(`<h1>Menu</h1><p>An attack is in progress. A save or link now keeps the board as it was before the attack.</p><div class="r"><button onclick="saveFile(this)">Save file</button>${shareBtn}</div><div class="r" style="margin-top:8px"><button onclick="copyOut('link')">Copy link</button><button onclick="copyOut('code')">Copy code</button></div><p id="lm" style="margin:8px 0 0;min-height:1.3em;color:var(--mut)"></p><div class="r"><button onclick="$('ov').style.display='none'">Close</button></div>`)}
-menuPage('game')}
+msec='h';menuPage('game')}
 // menuTab = the page showing now. tabBar(items,current,fn) draws a row of tab buttons (items = [key,label] pairs), the current one highlighted; each calls fn(key).
 let menuTab='game';
 function tabBar(items,curKey,fn){return '<div class="r">'+items.map(([k,t])=>'<button'+(k==curKey?' class="act"':'')+' onclick="'+fn+'(\''+k+'\')">'+t+'</button>').join('')+'</div>'}
 // menuPage(t) draws the Menu on page t ('game', 'set' = Settings, 'sl' = Save, 'dev'). Online games have no Dev page (it would change only your own board).
-function menuPage(t){if(!G)return;if(net.on&&t=='dev')t='game';const MO=['game','set','sl','dev'];ovDir=$('ov').dataset.page=='cpu'||$('ov').dataset.page=='sound'?-1:Math.sign(MO.indexOf(t)-MO.indexOf(menuTab));menuTab=t;
+function menuPage(t){if(!G)return;if(net.on&&t=='dev')t='game';const MO=['game','set','sl','dev'];ovDir=$('ov').dataset.page=='cpu'||$('ov').dataset.page=='sound'?-1:Math.sign(MO.indexOf(t)-MO.indexOf(menuTab));if(msecDir){ovDir=msecDir;msecDir=0}menuTab=t;
 const tabs=[['game','Game'],['set','Settings'],['sl','Save']].concat(net.on?[]:[['dev','Dev']]);
 // Game and Save are drawn stacked in one grid cell and only the current one is visible, so between them the Menu keeps one height (the taller of the two). (changed 2026-10-27-h) The Dev page is not in that stack: the Menu is only as tall as Game and Save need, and opening Dev grows it downward, keeping its top edge where it was (Shmorden, 2026-10-27). (2026-10-29-f) Settings is long, so it grows the Menu the same way (tall).
 const pgs=[['game',gamePage()],['set',setSecs()],['sl',slPage()]].concat(net.on?[]:[['dev',devPage()]]),tall=k=>k=='dev'||k=='set';
 const o=$('ov'),ob=o.style.display=='flex'&&!ovClosing&&o.firstChild?o.firstChild.getBoundingClientRect().top:null;let sw=null;ovDefer=true;
-try{ov('<h1>Menu</h1>'+tabBar(tabs,t,'menuPage')+'<div style="margin-top:10px;display:grid">'+pgs.map(([k,h])=>'<div style="grid-area:1/1;min-width:0;'+(k==t?'':tall(k)||tall(t)?'display:none;':'visibility:hidden;')+'">'+h+'</div>').join('')+'</div><div class="r" style="margin-top:12px"><button onclick="$(\'ov\').style.display=\'none\'">Close</button></div>');}finally{sw=ovDefer;ovDefer=null}menuPin(ob);
+try{ov('<h1 class="stay">Menu</h1>'+tabBar(tabs,t,'menuPage').replace('<div class="r">','<div class="r stay">')+'<div style="margin-top:10px;display:grid">'+pgs.map(([k,h])=>'<div style="grid-area:1/1;min-width:0;'+(k==t?'':tall(k)||tall(t)?'display:none;':'visibility:hidden;')+'">'+h+'</div>').join('')+'</div>'+(t=='set'&&msec!='h'?'<div class="r pin" style="margin-top:12px"><button onclick="msecGo(\'h\')">Back</button></div>':'')+'<div class="r" style="margin-top:'+(t=='set'&&msec!='h'?8:12)+'px"><button onclick="$(\'ov\').style.display=\'none\'">Close</button></div>');}finally{sw=ovDefer;ovDefer=null}menuPin(ob==null?null:o._mBase!=null?o._mBase:ob);if(ob==null&&o.firstChild){const f=o.firstChild;o._mBase=f.offsetTop;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(o.firstChild===f)o._mBase=f.offsetTop}))}  // read again once the window has settled
 // (2026-10-29-i) The page swipe plays now, after menuPin (see ovDefer), with the move of the window's top edge.
 const b=o.firstChild;if(sw&&sw!==true&&b&&b.animate)ovSwipe(b,sw.oldInner,sw.oldH,sw.dir,ob!=null?ob-b.getBoundingClientRect().top:0)}
+// (2026-11-09-c, Shmorden: going back to a smaller page "moves the top back down also") menuPage passes the top edge the Menu had when it
+// opened (o._mBase), not the current one: a taller page still grows downward and moves up only to fit, and a shorter one returns to there.
 // menuPin(top) keeps the Menu's top edge at top (screen px; null = it just opened, so it stays centered) after a page change, so a taller page grows downward; it moves up only as far as needed to fit on the screen, and never goes past the usual bottom limit (the box's max-height, which counts only its content, is cut by its new margin and its own padding and border, so a long page scrolls inside it with Close pinned at the bottom). (fixed 2026-10-27-i) The height is the content's full height (scrollHeight), not the box's height on screen, which is still animating from the old page's. ov() puts the layer back to centered for every other dialog.
 function menuPin(top){const o=$('ov'),b=o.firstChild;if(top==null||!b)return;ovUnwrap(b);const cs=getComputedStyle(o),bs=getComputedStyle(b),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0,H=o.clientHeight-pt-pb,ext=(b.offsetHeight-b.clientHeight)+(parseFloat(bs.paddingTop)||0)+(parseFloat(bs.paddingBottom)||0),h=Math.min(H,b.scrollHeight+(b.offsetHeight-b.clientHeight)),m=Math.max(0,Math.min(top-pt,H-h));o.style.alignItems='flex-start';b.style.marginTop=m+'px';b.style.maxHeight=(H-m-ext)+'px';ovSc(b)}
 // gamePage() = Game page: Quick save, Notes, the room (online only), Main menu, End game, Concede. (2026-10-29-f) Its settings moved to the Settings page.
@@ -2112,7 +2275,7 @@ function setRound(){if(!G||G.over)return;const n=Math.max(1,Math.min(RMAX,parseI
 $('hold').onclick=holdBtn;
 // (new) Hook up Cancel and Confirm, and let the Esc key cancel a multi-attack on desktop.
 $('mcx').onclick=multiCancel;$('mcf').onclick=multiGo;$('pvx').onclick=pvCancel;$('pvc').onclick=pvConfirm;addEventListener('keydown',e=>{if(e.key==='Escape'){if($('ov2').style.display=='flex')return ov2Close();if(hvEl.classList.contains('on'))return hvClose();multiCancel()}});
-$('sv').onclick=saveUI;
+$('sv').onclick=svTap;  // (2026-11-08-c) the Command bar's Menu button: a list on an upright screen, this window sideways (svTap, menuOpen)
 // ===== (new) Practice mode: smaller boards =====
 // ===== (new) Fixed positions: a 5 by 5 lattice of legal spots in every system =====
 // Free placement lets a star go anywhere legal in a system. Fixed positions offer 25 set spots instead, so a player (or the computer) picks from a short list. The spots are the points of a 5 by 5 lattice that spans the WHOLE legal range of a star's center (from MARG in from one border to MARG in from the other), so the corner spot S1 is exactly where the closest free placement to that corner can be. In tic-tac-toe terms: Space = the 9 cell centers (S1-S9), Line = the 12 midpoints of the grid lines (L1-L12), Vertex = the 4 line crossings (V1-V4); all numbered left to right, top to bottom. Lattice index i (across) and j (down) run 1 to 5, evenly spaced from the near legal limit (1) to the far one (5): Space = both odd, Vertex = both even, Line = one of each. (Line spots are the midpoints between neighboring Spaces; Vertices are the centers of four Spaces.)
@@ -2334,7 +2497,7 @@ ovQ(`<h1>Move how many Fleets?</h1><p>The Star is ${dist} Connection${dist>1?'s'
 function ddFleetGo(aid,tid,n){$('ov').style.display='none';ddFl=null;const a=by(aid),t=by(tid);if(!a||!t)return render();mode='m';sel=aid;flow={src:aid,n};moveF(t)}
 // stMove(m,a,p,c,nm) moves Star preview or Star m (from origin a) to point p, which now costs c Fuel: the Fuel it cost before is given back and c is paid (the caller has checked it fits and the spot is legal). nm = the spot's name for the message, or ''. A Star preview stays a preview and is selected (Undo puts it back; nothing is logged). A Star set this turn moves on the board, its Fleets with it; the move log is rewritten to match (mvFix) and Undo puts both back.
 function stMove(m,a,p,c,nm){const at=nm?' to '+nm:'';
-if(m.k=='pv'){const q=(G.pv||[]).find(z=>z.i==m.i);if(!q)return render();undo.push(pvTag(JSON.stringify(G)));G.ap+=q.c-c;q.x=p.x;q.y=p.y;q.c=c;sel=null;pvSel=q.i;say('Star preview moved'+at+' ('+fuW(c)+'). Confirm or Cancel, or pick another Star.');return render()}
+if(m.k=='pv'){const q=(G.pv||[]).find(z=>z.i==m.i);if(!q)return render();undo.push(pvTag(JSON.stringify(G)));G.ap+=q.c-c;q.x=p.x;q.y=p.y;q.c=c;sel=null;pvSel=q.i;say('Star preview moved'+at+' ('+fuW(c)+'). Confirm or Cancel, or pick another Star.','Star preview moved'+at+' ('+fuW(c)+').');return render()}
 const s=by(m.id);if(!s)return render();const c0=cost(a,s),u=new String(JSON.stringify(G));u.mx=mvFix(s.id,mvPos(s),mvPos(p),c);undo.push(u);s.x=p.x;s.y=p.y;G.ap+=c0-c;sel=null;
 say('Star moved'+at+' for '+fuW(c)+''+(c<c0?' ('+(c0-c)+' given back)':c>c0?' ('+(c-c0)+' more)':'')+'.');render()}
 // mvFix(id,o,p,c) rewrites this turn's records in the move log (H.mv) for Star id moving from point o to point p (both mvPos), since the log names Stars by their points: every position o in this turn's records becomes p, the Star's entry in each change list moves too, and the record that set it now costs c. It returns the records it changed as [index, old JSON], which Undo puts back (mvFixUndo).
@@ -2362,9 +2525,9 @@ else if(!t)s+='<circle cx="'+X+'" cy="'+Y+'" r="'+r+'" fill="'+col+'" fill-opaci
 return s+ddCross(X,Y,(t?outerR(t):r)+R_STROKE+.05,dg.z,dg.arc,!!e.err)}
 // ddPaint() redraws only the overlay (#ddg), the Fuel gauge and the bottom line after a finger move. ddMsg() = the bottom line during a drag: why it can't go there, or what letting go does and costs.
 function ddPaint(){const g=$('ddg');if(g)g.innerHTML=ddSVG();if(ddStar(dg.k))fuelUi(Math.max(0,dg.n-dg.e.c));ddMsg()}
-function ddMsg(){const e=dg.e,t=e.t!=null&&by(e.t);if(e.err)return say(e.err);if(ddMul(dg.k))return say(e.t!=null?'Let go to add this Star to the attack ('+fuW(e.c)+').':'Drag to '+(dg.k=='ma'?'the target.':'one of your Stars.'));if(dg.k=='fl')return say('Let go to move '+(dg.n>1?'the Fleets':'the Fleet')+' here.');
-if(t)return say(t.o==cur()?'Connect: '+fuW(e.c)+'. Let go to connect.':isAlly(t.o)?'Teammate\'s Star: '+fuW(e.c)+'. Let go to Connect or Gift.':'Take: '+fuW(e.c)+'. Let go to attack.');
-say(useFixed()?'Let go to choose a fixed position ('+fuW(e.c)+').':(dg.k=='new'?'New Star: ':'Moving the Star: ')+e.c+' Fuel. Let go to place it'+(HOLD.pon?', or hold still for precision.':'.'))}
+function ddMsg(){const e=dg.e,t=e.t!=null&&by(e.t);if(e.err)return say(e.err);if(ddMul(dg.k))return say(e.t!=null?'Let go to add this Star to the attack ('+fuW(e.c)+').':'Drag to '+(dg.k=='ma'?'the target.':'one of your Stars.'),e.t!=null?'Attacker: '+fuW(e.c)+'.':'');if(dg.k=='fl')return say('Let go to move '+(dg.n>1?'the Fleets':'the Fleet')+' here.','');
+if(t)return say(t.o==cur()?'Connect: '+fuW(e.c)+'. Let go to connect.':isAlly(t.o)?'Teammate\'s Star: '+fuW(e.c)+'. Let go to Connect or Gift.':'Take: '+fuW(e.c)+'. Let go to attack.',(t.o==cur()?'Connect: ':isAlly(t.o)?'Teammate\'s Star: ':'Take: ')+fuW(e.c)+'.');
+say(useFixed()?'Let go to choose a fixed position ('+fuW(e.c)+').':(dg.k=='new'?'New Star: ':'Moving the Star: ')+e.c+' Fuel. Let go to place it'+(HOLD.pon?', or hold still for precision.':'.'),useFixed()?'Fixed position: '+fuW(e.c)+'.':(dg.k=='new'?'New Star: ':'Moving the Star: ')+e.c+' Fuel.')}
 // ddStop(msg) ends a drag without doing anything (msg = the bottom line, or null to leave it).
 function ddStop(msg){ddPrecOff();cancelAnimationFrame(ddEdgeRaf);ddEdgeRaf=0;ddBarHide();dg=null;render();if(msg!=null)say(msg)}
 // ddBar(t,ms,dl) shows the hold bar (#hskip, shared with the Deficit Elimination's "Hold to skip") with text t after dl ms (default 120, so a quick tap shows nothing), filling up by the time ms is reached. Only used for a drag hold longer than 0.3 s (Dev page). ddBarHide() hides it.
@@ -2534,11 +2697,19 @@ function setQuick(top){return '<div class="r" style="margin-top:'+(top?0:16)+'px
 const SET_SECS=[['g','Game'],['k','Controls'],['d','Display']];
 function setSec(k,start){const b=(f,t,x)=>'<button onclick="'+f+'"'+(x||'')+' style="display:block;width:100%;margin-top:8px">'+t+'</button>';
 if(k=='g')return b('placeToggle(this)',placeLabel(),G&&G.pm?' disabled':'')+b('pvToggle(this)',pvLabel())+b('faCycle(this)',faLabel());
-if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ctlLabel())+qBtn('hap','display:block;width:100%;margin-top:8px');
+if(k=='k')return b("holdToggle('ta',this)",taLabel())+b('cycleControls(this)',ctlLabel())+qBtn('hap','display:block;width:100%;margin-top:8px')+b('cbDd(this)',cbLabel()+' ▾')+b('cbhDd(this)',cbhLabel()+' ▾');
 return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel()))+qBtn('anim','display:block;width:100%;margin-top:8px')+b('skyToggle(this)',skyLabel())+b('sideToggle(this)',sideLabel())+(fsOk()?b('fsToggle(this)',fsLabel()):'')+b('cpuSpeedCycle(this)',cpuSpeedLabel())+b('camCpuToggle(this)',camCpuLabel())+b('rngToggle(this)',rngLabel())+qBtn('snd','display:block;width:100%;margin-top:8px')+b('musToggle(this)',musLabel())+sndPathUi()}
-function setSecs(){return setQuick(1)+SET_SECS.map(([k,t])=>'<p style="margin:14px 0 0;font-weight:600">'+t+'</p>'+setSec(k)).join('')}
+// (2026-11-08-b, Shmorden: "make the in game settings be segmented like it is in the main menu rather than a giant list") msec = the
+// in-game Settings page showing: 'h' = the quick row and one button per section (and Sound, preview only), like the start menu's
+// Settings home; 'g' / 'k' / 'd' = that section, with Back. msecGo(k) switches; a fresh Menu opens on 'h' (saveUI).
+let msec='h';
+function msecGo(k){msecDir=k=='h'?-1:1;msec=k;menuPage('set')}
+let msecDir=0;  // (2026-11-09-c) the swipe's direction for a Settings section change (menuPage); every Menu change slides smoothly
+function setSecs(){const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
+if(msec!='h')return '<b style="display:block;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b>'+setSec(msec);  // (2026-11-09-c) Back is drawn by menuPage, pinned with Close
+return setQuick(1)+SET_SECS.map(([k,t])=>big(t,"msecGo('"+k+"')")).join('')}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-07-g';
+const BUILD='2026-11-09-d';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2613,12 +2784,18 @@ const teamBtn=(c,sb)=>'<button class="'+(sb?'sb sb-t':'')+(ng.team[c]?' act':'')
 // ddOpen(btn,items,pick) = a drop-down list under button btn (above it when there is no room below). items = [{l: label (html), v: value, act: true for the current choice, sub: [items]}]. Tapping an item that has a sub list opens it in place (one at a time; tapping again closes it); tapping any other item closes the list and calls pick(v). Tapping outside closes it. dd = the open list, or null.
 let dd=null;
 function ddOpen(btn,items,pick){ddClose();dd={btn,items,pick,open:items.findIndex(i=>i.sub&&i.sub.some(s=>s.act))};ddDraw()}
-function ddDraw(){if(!dd)return;let b=$('ddb'),p=$('dd');if(!b){b=document.createElement('div');b.id='ddb';b.onclick=ddClose;document.body.appendChild(b)}if(!p){p=document.createElement('div');p.id='dd';p.setAttribute('role','menu');document.body.appendChild(p)}
+function ddDraw(){if(!dd)return;let b=$('ddb'),p=$('dd');if(p&&p.dataset.closing){p.getAnimations().forEach(a=>a.cancel());p.remove();p=null}if(!b){b=document.createElement('div');b.id='ddb';b.onclick=ddClose;document.body.appendChild(b)}if(!p){p=document.createElement('div');p.id='dd';p.setAttribute('role','menu');document.body.appendChild(p)}
 const btn=(it,i,j)=>'<button role="menuitem"'+(j!=null?' class="sub'+(it.act?' act':'')+'"':it.act?' class="act"':'')+' onclick="ddTap('+i+','+(j==null?-1:j)+')">'+it.l+(it.sub?'<span>'+(dd.open==i?'▴':'▸')+'</span>':'')+'</button>';
 p.innerHTML=dd.items.map((it,i)=>btn(it,i)+(it.sub&&dd.open==i?it.sub.map((s,j)=>btn(s,i,j)).join(''):'')).join('');
-const r=dd.btn.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;p.style.left=Math.max(16,Math.min(r.left,innerWidth-w-16))+'px';p.style.top=(r.bottom+4+h<=innerHeight-8?r.bottom+4:Math.max(8,r.top-4-h))+'px'}
+const r=dd.btn.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;p.style.left=Math.max(16,Math.min(r.left+r.width/2-w/2,innerWidth-w-16))+'px'  /* (2026-11-09-b) centered on its button */;p.style.top=(r.bottom+4+h<=innerHeight-8?r.bottom+4:Math.max(8,r.top-4-h))+'px';
+if(dd.dn==null){dd.dn=r.bottom+4+h<=innerHeight-8;if(animEff()!='off'&&p.animate)p.animate(ddKF(p,dd.dn),{duration:ddMs(p),easing:'ease-out'})}}
 function ddTap(i,j){if(!dd)return;const it=j<0?dd.items[i]:dd.items[i].sub[j];if(j<0&&it.sub){dd.open=dd.open==i?-1:i;ddDraw();return}const f=dd.pick;ddClose();f(it.v)}
-function ddClose(){dd=null;['dd','ddb'].forEach(id=>{const e=$(id);if(e)e.remove()})}
+function ddClose(){const p=$('dd'),b=$('ddb'),was=dd;dd=null;if(b)b.remove();if(!p)return;
+if(was&&was.dn!=null&&animEff()!='off'&&p.animate){p.style.pointerEvents='none';p.dataset.closing='1';const a=p.animate(ddKF(p,was.dn).reverse(),{duration:ddMs(p),easing:'ease-in',fill:'forwards'});a.finished.then(()=>{if(p.dataset.closing)p.remove()}).catch(()=>{});return}p.remove()}
+// (2026-11-09-c, Shmorden: "make all drop down menus open like the More slide") A drop-down rises (or drops) out of the edge of its button: it
+// slides from behind that edge, cut off there (clip-path), at the More list's speed (ddMs; a button's 120% width in MSW ms). dn = it opens below.
+function ddKF(p,dn){const h=p.offsetHeight;return [{transform:'translateY('+(dn?-h:h)+'px)',clipPath:dn?'inset('+h+'px 0 0 0)':'inset(0 0 '+h+'px 0)',opacity:0},{transform:'none',clipPath:'inset(0 0 0 0)',opacity:1}]}
+function ddMs(p){return Math.round(p.offsetHeight/(1.2*Math.max(120,p.offsetWidth)/MSW))}
 // ng.sty = {color: personality} chosen on the New game page: 'g' 'd' 'a' 'm' 'h' or 'r' (Surprise me); missing = General. ngLvlName(c,html) = the seat button's text: the level, and for a level with personalities the one chosen ('Easy ?' for Surprise me). In the live build (General only) just the level.
 function ngLvlName(c,html){const v=ng.cpu[c];if(esKeys(v).length<2||ng.om)return cpuName(v,html);const s=ng.sty[c]||'g';return cpuName(v,html)+' '+(s=='r'?'?':ES_NAMES[v][s]||ES_NAMES[v].g)}
 // ngLvlOpen(c,btn) = the seat's drop-down: Human, Easy (opens Surprise me and the five personalities; preview only, paid; not in a 1 move game, whose computers have no personalities), Medium, Hard, then Hard (legacy) / Custom when they are offered. Solo leaves out Human, and your own seat can't be a computer.
@@ -3518,12 +3695,12 @@ ov2Close(1);G=g;adoptHistory(m.h);if(m.seats)net.seats=m.seats;net.started=true;
 $('ov').onclick=null;$('ov').style.display='none';camKey=null;fit();if(m.start)camWait=true;say(NM[cur()]+' to move'+(net.my.includes(cur())?' (your turn)':''));render();if(m.start)roundPop();if(G.over)overDlg();else if(net.my.includes(cur()))buzz(220)}
 // netAsk(m) arrives on the DEFENDER's device: show the ringed Retreat spots and Hold button, or clear them.
 function netAsk(m){if(!net.my.includes(m.def))return;if(m.ask&&!(m.ask.dec&&m.ask.dec.length))defCamK=null;net.rq=m.ask?{def:m.def,nb:m.ask.nb,hOK:m.ask.hOK,hX:m.ask.hX,i:m.ask.i,D:m.ask.D,att:m.ask.att,b:m.ask.b,u:m.ask.u,dec:m.ask.dec,sent:false}:null;
-if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display='';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX))}else{hl=[];$('hold').style.display='';say('')}render();defDlg()}
+if(net.rq){buzz([120,70,120]);hl=net.rq.nb;$('hold').style.display='';say(NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'. Tap a ringed Star to Retreat'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX),NM[net.rq.def]+': Defence call, Fleet '+net.rq.i+' of '+net.rq.D+'.')}else{hl=[];$('hold').style.display='';say('')}render();defDlg()}
 // netAns(v) arrives on the ATTACKER's device: the defender chose Hold ('H') or a Retreat star (its id). Apply it exactly like a local choice.
 function netAns(v){if(!pend||!pend.ph||!pend.rem)return;if(v==='H')defHold();else if(typeof v=='number'&&pend.nb.includes(v)&&by(v))defTap(by(v),true)}
 // netAnswer(v) sends this device's answer and waits; netDefTap(x,y) turns a board tap into an answer; holdBtn() is the Hold button for both local and remote defenders.
 function netAnswer(v){net.rq.sent=true;defClose();if(Array.isArray(net.rq.dec))net.rq.dec=net.rq.dec.concat([v]);$('hold').style.display='';netOut({t:'ans',v});say('Answer sent. Waiting for '+NM[cur()]+'.');render()}
-function netDefTap(x,y){const cx=Math.floor(x),cy=Math.floor(y),t=cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null;if(t&&t.id==net.rq.b&&net.rq.hOK)return holdBtn();if(!t||!net.rq.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX));if(t.o!=net.rq.def){holdGive=t.id;return holdAsk(t)}netAnswer(t.id)}
+function netDefTap(x,y){const cx=Math.floor(x),cy=Math.floor(y),t=cx>=0&&cy>=0&&cx<NSYS(G)&&cy<NSYS(G)?sysStar(cx,cy):null;if(t&&t.id==net.rq.b&&net.rq.hOK)return holdBtn();if(!t||!net.rq.nb.includes(t.id))return say('Tap a ringed Star to Retreat there'+holdTxt(net.rq.hOK&&!net.rq.hX,net.rq.hX),'');if(t.o!=net.rq.def){holdGive=t.id;return holdAsk(t)}netAnswer(t.id)}
 function holdBtn(){if(net.on&&net.rq&&!net.rq.sent&&!net.my.includes(cur())){if(net.rq.hOK)netAnswer('H');return}if(pend&&pend.rem)return;defHold()}
 // netWaitMsg() is the note the ATTACKER sees while a remote defender decides.
 function netWaitMsg(){const d=pend.def;return 'Waiting for '+NM[d]+' to make the Defence call.'+(seatUp(d)?'':' '+NM[d]+' is offline: Undo cancels the attack, or wait for them to return.')}
@@ -3578,7 +3755,7 @@ function netCpuLvl(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host'
 function netToggleSeat(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host')return;if(s.kind=='open')s.kind='local';else if(s.kind=='local'&&!s.took)s.kind='open';netPush()}
 // netTakeover(c) (host): play an offline player's color from this device. They get it back automatically if they return.
 function netTakeover(c){const s=net.seats.find(q=>q.c===c);if(!s||net.role!='host'||s.online)return;s.kind='local';s.took=true;netPush();
-if(pend&&pend.ph&&pend.def===c){pend.rem=false;setTimeout(defDlg,0);say(NM[c]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(pend.hOK,pend.hX))}
+if(pend&&pend.ph&&pend.def===c){pend.rem=false;setTimeout(defDlg,0);say(NM[c]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'. Tap a ringed Star to Retreat'+holdTxt(pend.hOK,pend.hX),NM[c]+': Defence call, Fleet '+(pend.dec.length+1)+' of '+pend.D+'.')}
 netMenu();render()}
 // ---- Guest side ----
 // netJoin(code): join a room. Keeps the same seat key if this browser was in this room before.
