@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-09-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-09-g",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -259,15 +259,12 @@ backgrounds), so the sky shows on both sides alike. */
 html.sky{background:#04060c}html.sky body{background:transparent}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none}html.sky #sky{display:block}
 html.skymenu #sky{z-index:3}html.skymenu #ov{background:rgba(0,0,0,.12)}
-html.side body{display:grid;grid-template-columns:var(--so) var(--pw) var(--bw) var(--pw) var(--so);grid-template-rows:var(--zh) 1fr auto}
-html.side #top{grid-column:2;grid-row:1/4;border-bottom:0;border-right:1px solid var(--line);overflow-y:auto;box-sizing:border-box}
-html.side #st{grid-column:3;grid-row:1/4}
+html.side body{display:grid;grid-template-columns:var(--so) var(--pw) var(--bw) var(--pw) var(--so);grid-template-rows:1fr auto}
+html.side #top{grid-column:2;grid-row:1/3;overflow-y:auto;box-sizing:border-box}
+html.side #st{grid-column:3;grid-row:1/3}
 html.side #tut{grid-column:4;grid-row:2}
-html.side #bar{grid-column:4;grid-row:3;flex-direction:column;border-top:0;border-left:1px solid var(--line)}
-html.side #bar>button{flex:none;width:100%;min-height:46px}html.side #en,html.side #mcf,html.side #pvc{min-height:64px}
-html.side #chips,html.side #modes{flex-direction:column}html.side #modes .mg{flex:none}
-html.side #zoom{position:fixed;left:var(--rx);top:8px;width:var(--pw);box-sizing:border-box;padding:0 10px;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}
-html.side #msg{position:fixed;left:calc(var(--so) + 10px);width:calc(var(--pw) - 20px);right:auto;bottom:10px;box-sizing:border-box}
+html.side #bar{grid-column:4;grid-row:1/3}
+html.side #chips{flex-direction:column}
 /* (2026-11-03-a, Shmorden: "remove the panel the buttons and player chips sit in on the top and bottom of the screen. They will just float there")
 In every game and layout the top panel and the bottom bar have no background or border of their own: the chips, the info line and the buttons
 float over the Sky (or the theme's background with the Sky off); each button and chip keeps its own background. */
@@ -276,7 +273,7 @@ float over the Sky (or the theme's background with the Sky off); each button and
 reaches under the top panel and the bottom bar (negative margins = their heights, --padT / --padB, set by stPads); the panels float over it
 and let taps through except on their own chips and buttons. The board fades out under them: transparent beneath, a 28 px soft edge where
 each panel starts, so the Sky shows there. Fit and the camera keep framing the board between the panels (stSafe). */
-html:not(.side) #st{margin-top:calc(-1*var(--padT,0px));margin-bottom:calc(-1*var(--padB,0px))}
+html:not(.side) #st{margin-top:calc(-1*var(--layT,var(--padT,0px)));margin-bottom:calc(-1*var(--layB,var(--padB,0px)))}  /* --layT / --layB = the bars' full heights, even when one is slid away (2026-11-09-f) */
 #bar,#tut{position:relative;z-index:3}#top,#bar{pointer-events:none}#top>*,#bar>*,#tut{pointer-events:auto}
 html:not(.side) #zoom{top:calc(var(--padT,0px) + 8px)}html:not(.side) #msg{bottom:calc(var(--padB,0px) + 8px)}
 html:not(.side) #svg{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--padT,0px) - 14px),#000 calc(var(--padT,0px) + 14px),#000 calc(100% - var(--padB,0px) - 14px),transparent calc(100% - var(--padB,0px) + 14px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--padT,0px) - 14px),#000 calc(var(--padT,0px) + 14px),#000 calc(100% - var(--padB,0px) - 14px),transparent calc(100% - var(--padB,0px) + 14px),transparent 100%)}
@@ -294,9 +291,9 @@ html.saver #ssx{display:block}
 .ssr{display:flex;flex-wrap:wrap;gap:6px}.ssr>button{flex:1 1 auto;min-width:64px;-webkit-touch-callout:none}.ssr small{opacity:.75;font-size:11px}
 .ssr>.sso{background:var(--dis) repeating-linear-gradient(135deg,transparent 0 7px,rgba(127,127,127,.28) 7px 11px);color:var(--dis-ink);border-color:var(--line);opacity:.65}
 .ssrs{min-height:30px;padding:0 10px;font-size:13px}.ssr>.ssdd{flex:0 0 auto;min-width:44px}html.saver #ssx.on{opacity:1;pointer-events:auto;transition:opacity .2s}
-html.sky.side #top,html.sky.side #bar{background:transparent;border:0}html.sky.side #tut{background:color-mix(in srgb,var(--panel) 88%,transparent)}
+html.sky.side #tut{background:color-mix(in srgb,var(--panel) 88%,transparent)}
 /* ===== Command bar layout (Shmorden, 2026-11-07, chosen in the UI Lab: "Do command bar", after Conflict of Nations) =====
-Upright screens only (html:not(.side)); the side layout keeps its own places. cbPlace() moves four things on an upright screen and back
+Upright screens only (html); the side layout keeps its own places. cbPlace() moves four things on an upright screen and back
 when the side layout comes on: Star / Fleets (#modes) into the bottom bar before End turn, History (#hbtn) into the bottom bar between
 Undo and Menu, the Fuel gauge (#fuel) under the player chips, and the team score line (#tvp) into the turn line. The top panel and the
 bottom bar are docked glass bars here (this replaces "no panel backgrounds" of 2026-11-03 for upright screens). The bottom bar is one
@@ -309,48 +306,48 @@ small pill under the top bar. Icons (--i-*) are line drawings used as masks, so 
 #sv{--ic:var(--i-menu)}#un{--ic:var(--i-undo)}#en{--ic:var(--i-end)}#hold{--ic:var(--i-hold)}#mcx,#pvx{--ic:var(--i-cancel)}#mcf,#pvc{--ic:var(--i-ok)}
 #modes [data-m="s"]{--ic:var(--i-star)}#modes [data-m="p"]{--ic:var(--i-fleet)}#modes [data-m="x"]{--ic:var(--i-multi)}#modes [data-m="m"]{--ic:var(--i-move)}
 #hbtn{--ic:var(--i-history)}#tipbtn{--ic:var(--i-tips)}#vbtn,#hvbtn{--ic:var(--i-view)}#fi,#hfi{--ic:var(--i-fit)}#sbtn,#hsbtn{--ic:var(--i-strength)}
-html:not(.side) :is(#zoom>button,#bar>button,#bar #modes button)::before,#hz>button::before{content:'';flex:none;width:21px;height:21px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+html :is(#zoom>button,#bar>button,#bar #modes button)::before,#hz>button::before{content:'';flex:none;width:21px;height:21px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
 :is(#zi,#zo,#hzi,#hzo)::before{display:none!important}
-#vbtn{display:none}html:not(.side) #hui,#hhui{display:none!important}
+#vbtn{display:none}html #hui,#hhui{display:none!important}
 /* Board buttons and the History viewer's: View alone, round; open, a column of pills (zoom in and out stay round). */
-html:not(.side) #zoom,#hz{gap:8px;right:10px}
-html:not(.side) #zoom>button,#hz>button{display:none;order:3;min-width:0;width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;align-items:center;justify-content:center;gap:6px;font-size:0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-html:not(.side) #zoom>#vbtn,#hz>#hvbtn{display:flex;order:1}
-html.vtray:not(.side) #zoom>button,html.hvtray #hz>button{display:flex}
-html.vtray:not(.side) #zoom>button:not(#vbtn),html.hvtray #hz>button:not(#hvbtn){width:auto;height:36px;min-height:36px;border-radius:18px;padding:0 13px 0 11px;font-size:13px}
-html.vtray:not(.side) #zoom>:is(#zi,#zo),html.hvtray #hz>:is(#hzi,#hzo){font-size:20px;width:44px;height:44px;min-height:44px;border-radius:50%;padding:0}
-html.vtray:not(.side) #vbtn,html.hvtray #hvbtn{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line)}
-html:not(.side) #zoom>button::before,#hz>button::before{width:19px;height:19px}
+html #zoom,#hz{gap:8px;right:10px}
+html #zoom>button,#hz>button{display:none;order:3;min-width:0;width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;align-items:center;justify-content:center;gap:6px;font-size:0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html #zoom>#vbtn,#hz>#hvbtn{display:flex;order:1}
+html.vtray #zoom>button,html.hvtray #hz>button{display:flex}
+html.vtray #zoom>button:not(#vbtn),html.hvtray #hz>button:not(#hvbtn){width:auto;height:36px;min-height:36px;border-radius:18px;padding:0 13px 0 11px;font-size:13px}
+html.vtray #zoom>:is(#zi,#zo),html.hvtray #hz>:is(#hzi,#hzo){font-size:20px;width:44px;height:44px;min-height:44px;border-radius:50%;padding:0}
+html.vtray #vbtn,html.hvtray #hvbtn{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line)}
+html #zoom>button::before,#hz>button::before{width:19px;height:19px}
 /* Messages: a small pill under the top bar. */
 html:not(.side) :is(#msg,#msgp){top:calc(var(--padT,0px) + 10px);bottom:auto;left:10px;right:10px;margin:0 auto;transform:none;width:max-content;max-width:calc(100% - 20px);box-sizing:border-box;border:0;border-radius:16px;padding:6px 14px;font-size:13px;line-height:1.3;text-align:center;background:color-mix(in srgb,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 html:not(.side) #msgp{display:block;width:auto}
 /* (2026-11-09-d) The message pill is centered on the screen; with the Navigation buttons on (right edge) it keeps the same room on both sides. */
 html.navon:not(.side) :is(#msg,#msgp){left:64px;right:64px;max-width:calc(100% - 128px)}
 /* Top bar: the turn line (name, team, round, and the team scores at its right end), the chips, then the Fuel gauge across the full width. */
-html:not(.side) #top{background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);padding:7px 10px 7px}
-html:not(.side) #info{flex-wrap:nowrap;gap:10px;font-size:13px;align-items:center;white-space:nowrap}html:not(.side) #info b{font-size:16px}
-html:not(.side) #info>#tvp{margin:0 0 0 auto;font-size:12px;order:3;white-space:nowrap}
-html:not(.side) #chips{gap:4px;margin-top:6px}html:not(.side) .chip{border-width:1px;border-radius:7px;padding:3px 6px;font-size:11px}
-html:not(.side) #top>#fuel{display:flex;margin-top:7px;min-width:0;gap:6px}html:not(.side) #top>#fuel #fueln{font-size:14px;color:var(--warn);white-space:nowrap}
-html.sky:not(.side) #top>#fuel #fueln{text-shadow:0 1px 3px rgba(0,0,0,.85)}
-html:not(.side) #fbar{height:12px;border-radius:6px}html:not(.side) #fbar::after{border-width:1.5px;border-radius:6px}
+html #top{background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);padding:7px 10px 7px}
+html #info{flex-wrap:nowrap;gap:10px;font-size:13px;align-items:center;white-space:nowrap}html #info b{font-size:16px}
+html #info>#tvp{margin:0 0 0 auto;font-size:12px;order:3;white-space:nowrap}
+html #chips{gap:4px;margin-top:6px}html .chip{border-width:1px;border-radius:7px;padding:3px 6px;font-size:11px}
+html #top>#fuel{display:flex;margin-top:7px;min-width:0;gap:6px}html #top>#fuel #fueln{font-size:14px;color:var(--warn);white-space:nowrap}
+html.sky #top>#fuel #fueln{text-shadow:0 1px 3px rgba(0,0,0,.85)}
+html #fbar{height:12px;border-radius:6px}html #fbar::after{border-width:1.5px;border-radius:6px}
 /* Bottom bar: Undo, History, Menu, Star, Fleets, End turn (Hold, Cancel, Confirm when they show; Star and Fleets make room for them). */
-html:not(.side) #bar{gap:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:stretch;background:transparent;border-top:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
+html #bar{gap:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:stretch;background:transparent;border-top:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
 /* (2026-11-08-d) The bar's glass is drawn by a layer behind its buttons (::before), not by the bar itself: an element with a backdrop blur
    stops the blur of everything inside it at its own edges, so the slide-outs (Multi, Move, Redo, the lists) could not blur the board. */
-html:not(.side) #bar::before{content:'';position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);pointer-events:none}
-html:not(.side) #bar #modes{display:flex;gap:0;margin:0;flex:2.1;min-width:0}
-html:not(.side) :is(#un,#sv,#en,#hbtn),html:not(.side) #bar #modes button:not(.sub){display:flex}
-html:not(.side) #bar>button[style*="block"]{display:flex!important}
-html:not(.side) #bar:has(>:is(#hold,#mcx,#pvx)[style*="block"]) #modes{display:none!important}
-html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)){flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;padding:0 2px;font-size:11px;font-weight:500;border:0;border-radius:0;box-shadow:none}
-html:not(.side) :is(#bar>button:not(#en):not(#mcf):not(#pvc):not(.on),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
-html:not(.side) :is(#bar>button,#bar #modes .mg):not(#mbtn){border-left:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
-html:not(.side) :is(#en,#mcf,#pvc){flex:1.3;font-size:12px;font-weight:700}
-html:not(.side) #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);min-width:0;width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-html:not(.side) #bar #modes .sub:not(.act){background-color:color-mix(in srgb,var(--panel) 88%,transparent)!important}
-html:not(.side) #bar #modes .sub.shut{transform:translate(-50%,calc(100% + 10px))}
-html:not(.side) #bar #modes .sub::before{width:20px;height:20px}
+html #bar::before{content:'';position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);pointer-events:none}
+html #bar #modes{display:flex;gap:0;margin:0;flex:2.1;min-width:0}
+html :is(#un,#sv,#en,#hbtn),html #bar #modes button:not(.sub){display:flex}
+html #bar>button[style*="block"]{display:flex!important}
+html #bar:has(>:is(#hold,#mcx,#pvx)[style*="block"]) #modes{display:none!important}
+html :is(#bar>button,#bar #modes button:not(.sub)){flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;padding:0 2px;font-size:11px;font-weight:500;border:0;border-radius:0;box-shadow:none}
+html :is(#bar>button:not(#en):not(#mcf):not(#pvc):not(.on),#bar #modes button:not(.sub):not(.act)){background:transparent!important;box-shadow:none!important}
+html :is(#bar>button,#bar #modes .mg):not(#mbtn){border-left:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
+html :is(#en,#mcf,#pvc){flex:1.3;font-size:12px;font-weight:700}
+html #bar #modes .sub{top:auto;bottom:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);min-width:0;width:max-content;padding:0 16px;box-sizing:border-box;min-height:44px;height:44px;border-radius:22px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:14px;border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html #bar #modes .sub:not(.act){background-color:color-mix(in srgb,var(--panel) 88%,transparent)!important}
+html #bar #modes .sub.shut{transform:translate(-50%,calc(100% + 10px))}
+html #bar #modes .sub::before{width:20px;height:20px}
 /* (2026-11-08-b, the More bar; Shmorden: "make the default More, Undo, Star, Fleet, End turn. Undo will have Redo slide out of it. Menu is in
 More ... a bottom bar option ... swap Undo with Menu or put Undo into the More list ... More has Undo and Redo in the list ... center the slide
 out buttons over the buttons they slide out from") The bar: More (#mbtn), then Undo (Bottom bar = Undo, the default), Menu (= Menu) or
@@ -360,40 +357,85 @@ The board has no View button on an upright screen: zoom in, zoom out and Fit are
 :root{--i-more:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='5.5' cy='12' r='1.3'/%3E%3Ccircle cx='12' cy='12' r='1.3'/%3E%3Ccircle cx='18.5' cy='12' r='1.3'/%3E%3C/svg%3E");--i-redo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 14l5-5-5-5'/%3E%3Cpath d='M20 9H9.5a5.5 5.5 0 0 0 0 11H13'/%3E%3C/svg%3E");--i-nav:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18'/%3E%3Cpath d='M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3'/%3E%3C/svg%3E")}
 #mbtn{--ic:var(--i-more)}#rdb{--ic:var(--i-redo)}
 #mbtn,#rdb,#mlist,#navb{display:none}
-html:not(.side) #zoom{display:none!important}
-html:not(.side) #mbtn{display:flex}
+html #zoom{display:none!important}
+html #mbtn{display:flex}
 html.cb-undo:not(.side) #sv,html.cb-menu:not(.side) #un,html.cb-none:not(.side) :is(#un,#sv){display:none!important}
-html:not(.side) #bar>button.on{background:var(--sel)!important;color:var(--sel-ink)}
+html #bar>button.on{background:var(--sel)!important;color:var(--sel-ink)}
 /* (2026-11-08-c) Bar height (Settings > Controls; --cbh, 76 px at first); from 68 px the labels and icons grow. More showing the Menu
 (html.mbmenu): Menu's icon and name in More's place, dropped in from above (.drop). */
-html:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){min-height:var(--cbh,76px)}
-html.cbbig:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){font-size:12.5px;gap:5px}
-html.cbbig:not(.side) :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb)::before{width:25px;height:25px}
+html :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){min-height:var(--cbh,76px)}
+html.cbbig :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){font-size:12.5px;gap:5px}
+html.cbbig :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb)::before{width:25px;height:25px}
 html.mbmenu #mbtn{--ic:var(--i-menu)}
 :root{--i-save:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4h11l3 3v13H5z'/%3E%3Cpath d='M8 4v5h7V4M8 20v-6h8v6'/%3E%3C/svg%3E");--i-notes:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h9l4 4v14H6z'/%3E%3Cpath d='M9 11h7M9 15h7'/%3E%3C/svg%3E");--i-settings:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1'/%3E%3C/svg%3E");--i-saveload:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v11M8 10l4 4 4-4'/%3E%3Cpath d='M4 16v4h16v-4'/%3E%3C/svg%3E");--i-dev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E");--i-home:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 11 12 4l8.5 7'/%3E%3Cpath d='M6 9.5V20h12V9.5'/%3E%3C/svg%3E");--i-flag:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4'/%3E%3Cpath d='M5 4h12l-2.5 4L17 12H5'/%3E%3C/svg%3E");--i-concede:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h8'/%3E%3Cpath d='M9 8l-4 4 4 4'/%3E%3Cpath d='M14 4h5v16h-5'/%3E%3C/svg%3E")}
 @keyframes cbdrop{from{transform:translateY(-34px);opacity:.2}to{transform:none;opacity:1}}#mbtn.drop{animation:cbdrop .22s ease-out}html.calm #mbtn.drop{animation:none}
-html:not(.side) :is(#mlist,#rdb){display:flex;position:absolute;bottom:calc(100% + 10px);z-index:-2;transition:transform .22s ease-out,opacity .22s ease-out}
+html :is(#mlist,#rdb){display:flex;position:absolute;bottom:calc(100% + 10px);z-index:-2;transition:transform .22s ease-out,opacity .22s ease-out}
 /* (2026-11-08-e, Shmorden: "make the slide out come from underneath the button") The bar's own buttons are drawn above the slide-outs, as
    Star and Fleets are above Multi and Move, so a list or Redo slides up out from behind its button. Every slide-out (these and Multi /
    Move, z-index -2) is also behind the bar's glass (#bar::before, -1): the buttons are see-through, so it would show through them. */
-html:not(.side) #bar #modes .sub{z-index:-2}
-html:not(.side) #bar>button:not(#rdb){position:relative;z-index:1}
-html:not(.side) :is(#mlist,#rdb).shut{transform:translateY(calc(100% + 10px));opacity:0;pointer-events:none}
+html #bar #modes .sub{z-index:-2}
+html #bar>button:not(#rdb){position:relative;z-index:1}
+html :is(#mlist,#rdb).shut{transform:translateY(calc(100% + 10px));opacity:0;pointer-events:none}
 /* (2026-11-09-c) A shut slide-out drops its blur (it is invisible), so the phone does not keep blurring the moving Sky behind it. */
-html:not(.side) :is(#mlist,#rdb).shut,html:not(.side) #bar #modes .sub.shut{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-html.calm :is(#mlist,#rdb){transition:none!important}html:not(.side) #mlist{overflow-x:hidden}
-html:not(.side) #mlist{flex-direction:column-reverse;gap:8px;width:max-content;max-height:calc(100dvh - var(--padT,0px) - var(--padB,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:8px;box-sizing:border-box;border-radius:30px;border:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.45)}
-html:not(.side) :is(#mlist button,#bar>#rdb){flex:none;min-width:0;min-height:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 16px;font-size:14px;font-weight:400;white-space:nowrap;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel) 88%,transparent)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 10px rgba(0,0,0,.4)!important;flex-direction:row}
+html :is(#mlist,#rdb).shut,html #bar #modes .sub.shut{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.calm :is(#mlist,#rdb){transition:none!important}html #mlist{overflow-x:hidden}
+html #mlist{flex-direction:column-reverse;gap:8px;width:max-content;max-height:calc(100dvh - var(--padT,0px) - var(--padB,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:8px;box-sizing:border-box;border-radius:30px;border:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+html :is(#mlist button,#bar>#rdb){flex:none;min-width:0;min-height:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 16px;font-size:14px;font-weight:400;white-space:nowrap;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel) 88%,transparent)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 10px rgba(0,0,0,.4)!important;flex-direction:row}
 /* (2026-11-08-d, Shmorden: the pop-ups get "the same background effect that the top bar has, that you can't see the board through it")
    The More and Menu lists sit on one glass card, so the board does not show between their buttons either. */
-html:not(.side) #mlist button{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
-html:not(.side) #mlist button{justify-content:flex-start}
-html:not(.side) :is(#mlist button,#bar>#rdb)::before{content:'';flex:none;width:19px;height:19px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
-html:not(.side) #bar>#rdb{flex-direction:row!important;font-size:14px!important;min-height:44px!important;height:44px!important;border-radius:22px!important;padding:0 16px!important;gap:9px!important;flex:none!important;width:auto!important}
+html #mlist button{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
+html #mlist button{justify-content:flex-start}
+html :is(#mlist button,#bar>#rdb)::before{content:'';flex:none;width:19px;height:19px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+html #bar>#rdb{flex-direction:row!important;font-size:14px!important;min-height:44px!important;height:44px!important;border-radius:22px!important;padding:0 16px!important;gap:9px!important;flex:none!important;width:auto!important}
 #mlist button.off{text-decoration:line-through;opacity:.6}#mlist button:disabled{opacity:.4}
 html.navon:not(.side) #navb{display:flex;position:absolute;right:10px;top:calc(var(--padT,0px) + 10px);flex-direction:column;gap:8px;z-index:2}
 #navb button{width:44px;height:44px;min-width:0;min-height:44px;padding:0;border-radius:50%;font-size:20px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--panel) 80%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 #navb .nf{font-size:0}#navb .nf::before{content:'';width:19px;height:19px;background:currentColor;-webkit-mask:var(--i-fit) center/contain no-repeat;mask:var(--i-fit) center/contain no-repeat}
+
+/* ===== Wide screens (2026-11-09-f, Shmorden: "make the top bar go across the top of the screen at the width of a 7x7 board. The bottom goes
+across the bottom the same way. Add a little drawer icon, the little lines, on the board side edge on both that when clicked makes them slide out
+of view.") html.wide = the Side layout setting on a wide screen: the upright layout with the top bar and the bottom bar as wide as the board
+(--bw, set by stPads) and centered, so the Sky shows on both sides. Each bar has a handle (.grip, two short lines) on its board side; a tap slides
+the bar out of view (html.toph / html.barh, remembered) leaving the handle at the screen's edge, and the board grows into the room; a second tap
+brings it back. No message room is kept on a wide screen: the pill floats over the board's top edge. */
+.grip{display:none}
+html.wide :is(#top,#bar,#tut){width:var(--bw);align-self:center;box-sizing:border-box}
+html.wide :is(#top,#bar){transition:transform .3s ease-out}html.calm.wide :is(#top,#bar){transition:none}
+html.wide.toph #top{transform:translateY(-100%)}html.wide.barh #bar{transform:translateY(100%)}
+/* (2026-11-09-g, Shmorden: "if you put your mouse on the collapsed drawer it opens until you move away, unless you click the drawer button")
+   A hidden bar slides out while the mouse is on its handle or on the bar, and away again when it leaves; a click pins it (drawer). */
+@media (hover:hover){html.wide.toph #top:hover,html.wide.barh #bar:hover{transform:none}}
+html.wide .grip{display:flex;position:absolute;left:50%;width:58px;height:20px;margin-left:-29px;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;z-index:2;color:var(--ink);background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent)}
+html.wide .grip::before{content:'';width:22px;height:5px;border-top:2px solid currentColor;border-bottom:2px solid currentColor;opacity:.7}
+html.wide #topgrip{top:100%;border-top:0;border-radius:0 0 12px 12px}
+html.wide #bargrip{bottom:100%;border-bottom:0;border-radius:12px 12px 0 0}
+html.wide.navon #navb{right:calc((100% - var(--bw)) / 2 + 10px)}
+
+/* ===== Side panels on a phone held sideways (2026-11-09-g, Shmorden: "for mobile let's make it the side stacks. Top bar goes on the left,
+bottom bar goes on the right. No drawer button. Don't make the buttons overly wide but they can't be too skinny either.") html.side (skyLay: a
+wide screen without a mouse; with a mouse it is html.wide): the board as tall as the screen in the middle; on the left a glass panel with the
+top bar's contents (turn line, team scores, the players one under another, the Fuel gauge) and the message pill at its bottom; on the right,
+against the screen's edge, the bar as a glass column (as wide as the Bar height setting plus 24 px): More, Menu, Undo, Star, Fleets, End turn
+(Menu and Undo always in it sideways). Multi, Move, Redo and the lists slide out to its left from under their button, centered on it
+(slideOver). With Navigation on, + / − / Fit sit at the board's top right. */
+html.side #bar{flex-direction:column;justify-self:end;width:calc(var(--cbh,76px) + 24px);border-top:0;border-left:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) 0}
+html.side #mbtn{order:-2}html.side #sv{order:-1}
+html.side :is(#bar>button,#bar #modes button:not(.sub)):not(#rdb){min-height:0;flex:1}
+html.side #bar #modes{flex-direction:column;flex:2}html.side #bar #modes .mg{flex:1}
+html.side :is(#bar>button,#bar #modes .mg):not(#mbtn){border-left:0!important;border-top:1px solid color-mix(in srgb,var(--line) 80%,transparent)!important}
+html.side :is(#en,#mcf,#pvc){flex:1.2}
+html.side #bar #modes .sub{right:calc(100% + 10px);left:auto;top:50%;bottom:auto;transform:translateY(-50%)}
+html.side #bar #modes .sub.shut{transform:translate(calc(100% + 10px),-50%)}
+html.side :is(#mlist,#rdb){bottom:auto}
+html.side :is(#mlist,#rdb).shut{transform:translateX(calc(100% + 10px))}
+html.side #mlist{max-height:calc(100dvh - 20px)}
+html.side #top{display:flex;flex-direction:column;justify-self:start;width:100%;border-bottom:0;border-right:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);padding:10px 12px calc(10px + 52px) max(12px,env(safe-area-inset-left,0px))}
+html.side #info{flex-wrap:wrap;white-space:normal;row-gap:2px}html.side #info>#tvp{flex-basis:100%;margin:2px 0 0;order:4}
+html.side #chips{gap:5px;margin-top:8px}html.side .chip{padding:5px 8px}
+html.side #top>#fuel{margin-top:9px;flex:none}
+html.side :is(#msg,#msgp){position:fixed;left:calc(var(--so) + 12px);right:auto;bottom:12px;top:auto;width:calc(var(--pw) - 24px);max-width:none;box-sizing:border-box;margin:0;border:0;border-radius:16px;padding:6px 14px;font-size:13px;line-height:1.3;text-align:center;background:color-mix(in srgb,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:4}
+html.side #msgp{display:none}
+html.side.navon #navb{display:flex;position:fixed;left:calc(var(--rx) - 54px);top:10px;flex-direction:column;gap:8px;z-index:4}
 </style></head><body>
 <script type="text/plain" id="ptext">
 PLAYER TEXT: the words on the How to play page and in the tutorial lessons. Edit them here; the game reads them as they are.
@@ -423,13 +465,13 @@ Each full row or column of Sectors you control gives you 1 bonus point.
 
 </script>
 <!-- Top panel: empty boxes that JavaScript fills in (info, chips), plus the mode buttons. -->
-<div id="top"><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
+<div id="top"><div id="topgrip" class="grip" role="button" aria-label="Hide or show the top bar"></div><div id="info"><span id="inft"></span><div id="fuel" style="visibility:hidden"><b id="fueln"></b><div id="fbar"><div id="fdiv"></div><div id="fcres"></div><div id="fcap"></div><div id="ffill"></div></div></div></div><div id="chips"></div><div id="tvp"></div><div id="modes"><div class="mg"><button data-m="s">Star</button><button data-m="x" class="sub shut" tabindex="-1">Multi</button></div><div class="mg"><button data-m="p">Fleet</button><button data-m="m" class="sub shut" tabindex="-1">Move</button></div></div><div id="mbar"><div id="mbt"></div><div id="mba"></div></div></div>
 <!-- Board area: the svg drawing surface, with group "w" holding everything drawn, plus the zoom buttons and the message toast. -->
 <div id="st"><svg id="svg"><g id="w"></g></svg><div id="zoom"><button id="vbtn" aria-label="View options">View</button><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button><button id="fi">Fit</button><button id="sbtn" class="sbtn" aria-label="Show or hide strength numbers">Strength</button><button id="tipbtn" class="sbtn" aria-label="Show or hide tips in messages">Tips</button><button id="hbtn" aria-label="History">History</button><button id="hui" class="hui" aria-label="Hide interface buttons">Hide UI</button></div><div id="msg"></div><div id="msgp" aria-hidden="true"></div><div id="navb"><button id="nzi" aria-label="Zoom in">+</button><button id="nzo" aria-label="Zoom out">−</button><button id="nfi" class="nf" aria-label="Fit">Fit</button></div></div>
 <!-- Bottom bar: Undo, Menu, Hold (only shown while the defender chooses), End turn. -->
 <!---->
 <button id="ssx" onclick="ssExit()">Exit</button>
-<div id="bar"><button id="mbtn" aria-label="More">More</button><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button><button id="rdb" class="shut">Redo</button><div id="mlist" class="shut"></div></div>
+<div id="bar"><div id="bargrip" class="grip" role="button" aria-label="Hide or show the bottom bar"></div><button id="mbtn" aria-label="More">More</button><button id="un">Undo</button><button id="sv">Menu</button><button id="hold">Hold</button><button id="mcx">Cancel</button><button id="mcf">Confirm</button><button id="pvx">Cancel</button><button id="pvc">Confirm</button><button id="en">End turn</button><button id="rdb" class="shut">Redo</button><div id="mlist" class="shut"></div></div>
 <!-- Empty dialog backdrop that JavaScript fills when it needs a pop-up. -->
 <div id="ov"></div><div id="ov2"></div>
 <!-- History viewer: a full-screen, read-only look at past positions. It has its own drawing surface and its own zoom, and never touches the live game. -->
@@ -1533,17 +1575,21 @@ function stSafe(){const r=st.getBoundingClientRect(),m=msgRoom();return{w:r.widt
 // above it, so Fit puts the board's middle halfway between the two bars; on a tall phone the width limits the board anyway.
 const MSG_LONG='Target chosen. Tap your own Stars to add attackers. Target strength 12. Attackers: 10 with the Fleets chosen (up to 20 with every Fleet). Fuel 12 of 15. Not strong enough yet: add more Stars or Fleets, or Cancel.',
 MSG_LONG_I='Target chosen. Target strength 12. Attackers: 10 with the Fleets chosen (up to 20 with every Fleet). Fuel 12 of 15. Not strong enough yet.';
-function msgRoom(){if(document.documentElement.classList.contains('side'))return 0;const p=$('msgp'),w=st.clientWidth,k=w+'/'+tipsOn+'/'+document.documentElement.classList.contains('navon');if(!p||!w)return 0;
+function msgRoom(){if(document.documentElement.classList.contains('side')||document.documentElement.classList.contains('wide'))return 0;const p=$('msgp'),w=st.clientWidth,k=w+'/'+tipsOn+'/'+document.documentElement.classList.contains('navon');if(!p||!w)return 0;
 if(msgRoom.k!==k){p.textContent=tipsOn?MSG_LONG:MSG_LONG_I;const v=p.offsetHeight+16;if(msgRoom.v!=null&&v!==msgRoom.v)fitSoon();msgRoom.v=v;msgRoom.k=k}return msgRoom.v}
 // stPads() = measure the top panel and the bottom bar (with the tutorial panel above it) and pull the board under them: --padT / --padB set
 // #st's negative margins, where #zoom and #msg sit, and the board's fade (CSS mask). Run on every resize of those panels (ResizeObserver).
 function stPads(){const r=document.documentElement,sd=r.classList.contains('side')||r.classList.contains('saver'),tp=$('top'),br=$('bar'),tu=$('tut');
-const T=sd?0:tp.offsetHeight,B=sd?0:br.offsetHeight+(tu?tu.offsetHeight:0);if(T==stPT&&B==stPB)return;const dT=T-stPT;stPT=T;stPB=B;r.style.setProperty('--padT',T+'px');r.style.setProperty('--padB',B+'px');
+const wd=r.classList.contains('wide'),T=sd||wd&&r.classList.contains('toph')?0:tp.offsetHeight,B=sd?0:(wd&&r.classList.contains('barh')?0:br.offsetHeight)+(tu?tu.offsetHeight:0);
+// wide: both bars as wide as a 7x7 board fitted between them (21 Systems in 21.2), at least 240 px
+if(wd){const bw=Math.max(240,Math.min(innerWidth-20,Math.round((innerHeight-T-B)*21/21.2)))+'px';if(r.style.getPropertyValue('--bw')!==bw)r.style.setProperty('--bw',bw)}
+// the board's area always reaches under both bars' full heights (--layT / --layB), slid away or not; T and B are what is on screen
+const lT=sd?0:tp.offsetHeight,lB=sd?0:br.offsetHeight+(tu?tu.offsetHeight:0);r.style.setProperty('--layT',lT+'px');r.style.setProperty('--layB',lB+'px');if(T==stPT&&B==stPB)return;const dT=T-stPT;stPT=T;stPB=B;r.style.setProperty('--padT',T+'px');r.style.setProperty('--padB',B+'px');
 if(atFit())fitSoon();else if(dT){view.y+=dT;apply()}}
 // (2026-11-09-d, Shmorden: the empty space above and below the board must be equal) The bars and the message room settle after the first
 // Fit (fonts, the bar's height setting), so while the board is at Fit (not zoomed in by the player: atFit) any change to them fits it again,
 // once, on the next frame (fitSoon); a zoomed-in view only shifts with the top bar, as before.
-const atFit=()=>!!G&&view.min>0&&view.k<=view.min*1.001;let fitT=0;
+const atFit=()=>!!G&&view.min>0&&(view.k<=view.min*1.001||!!(camRaf&&camTo&&camTo.k<=view.min*1.001));let fitT=0;  // atFit: at Fit, or gliding to it
 function fitSoon(){if(fitT)return;fitT=requestAnimationFrame(()=>{fitT=0;try{if(atFit())fit(true)}catch(e){}})}
 function fitTo(V,box,ap){if(box===st){const q=stSafe(),n=NSYS(G);V.k=V.min=Math.min(q.w,q.h)/(n+.2);V.x=(q.w-n*V.k)/2;V.y=q.t+(q.h-n*V.k)/2;return ap()}const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
@@ -2007,13 +2053,11 @@ const huiToggle=()=>{const on=document.body.classList.toggle('noui');$('hui').te
 // (2026-11-07, Command bar layout; see its CSS) View opens and shuts the board buttons' tray (html.vtray), and the History viewer's (html.hvtray); Fit shuts it.
 $('vbtn').onclick=()=>document.documentElement.classList.toggle('vtray');$('hvbtn').onclick=()=>document.documentElement.classList.toggle('hvtray');
 $('fi').addEventListener('click',()=>document.documentElement.classList.remove('vtray'));$('hfi').addEventListener('click',()=>document.documentElement.classList.remove('hvtray'));
-// cbPlace() puts Star / Fleets, History, the Fuel gauge and the team score line in their Command bar places on an upright screen, and back
-// in their side layout places (the markers cbHome) when the side layout is on. Run at start and by skyLay whenever the layout may change.
-// Hide UI has no button on an upright screen, so turning upright shows the interface again.
-const cbHome={};['modes','fuel','tvp'].forEach(i=>{cbHome[i]=document.createComment(i);$(i).before(cbHome[i])});
-function cbPlace(){const up=!document.documentElement.classList.contains('side'),m=$('modes'),fu=$('fuel'),tv=$('tvp'),back=e=>{if(e.previousSibling!==cbHome[e.id])cbHome[e.id].after(e)};mlShut();
-if(up){if(m.parentNode!==$('bar'))$('en').before(m);if(fu.parentNode!==$('top'))$('chips').after(fu);if(tv.parentNode!==$('info'))$('info').append(tv);if(document.body.classList.contains('noui'))huiToggle()}
-else{back(m);back(fu);back(tv)}}
+// cbPlace() puts Star / Fleets (into the bar, before End turn), the Fuel gauge (under the chips) and the team score line (into the turn line)
+// in their Command bar places; the side panels (2026-11-09-g) use the same places (CSS turns the bar into a column). It also shuts any open
+// list. Run at start and by skyLay whenever the layout may change. Hide UI has no button any more, so the interface is shown again.
+function cbPlace(){const m=$('modes'),fu=$('fuel'),tv=$('tvp');mlShut();
+if(m.parentNode!==$('bar'))$('en').before(m);if(fu.parentNode!==$('top'))$('chips').after(fu);if(tv.parentNode!==$('info'))$('info').append(tv);if(document.body.classList.contains('noui'))huiToggle()}
 // The Bottom bar setting (Settings > Display; remembered): cbBar 'undo' = More, Undo, Star, Fleets, End turn (the default; Menu is in More),
 // 'menu' = More, Menu, Star, Fleets, End turn (Undo and Redo are in More), 'none' = More, Star, Fleets, End turn (all three in More).
 const CBKEY='constellate-cbar',CB_OPTS=['undo','menu','none'];let cbBar='undo';try{const v=localStorage.getItem(CBKEY);if(CB_OPTS.includes(v))cbBar=v}catch(e){}
@@ -2034,7 +2078,7 @@ $('nzi').onclick=()=>$('zi').click();$('nzo').onclick=()=>$('zo').click();$('nfi
 // then History, Strength, IDs (preview only), Tips, Navigation. On / off items show struck through when off and keep the list open; Undo and
 // Redo keep it open too; History and Menu close it. Touching the board or another bar button closes it.
 const mlExtra=[];
-function mlItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),un=cbBar!='undo',mn=cbBar=='undo'||cbBar=='none';
+function mlItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),sd=document.documentElement.classList.contains('side'),un=!sd&&cbBar!='undo',mn=!sd&&(cbBar=='undo'||cbBar=='none');
 return [...(un?[I('Undo','undo',()=>$('un').onclick(),{dis:!G||G.over}),I('Redo','redo',redoIt,{dis:!redoOk()})]:[]),
 ...(mn?[I('Menu','menu',()=>menuOpen())]:[]),I('History','history',()=>{mlShut();$('hbtn').click()}),
 I('Strength','strength',()=>$('sbtn').click(),{off:!strOn}),...mlExtra.map(f=>f(I)),I('Tips','tips',()=>$('tipbtn').click(),{off:!tipsOn}),
@@ -2047,8 +2091,8 @@ let mlOpen=false,mlKind='more';
 function menuItems(){const I=(l,ic,f,o)=>Object.assign({l,ic,f},o||{}),w=k=>()=>{mlShut();if(G.over)return saveUI();msec='h';menuPage(k)};  // opened straight on its tab, so it starts centered on the board
 return [I('Quick save','save',null,{save:1}),...(G&&G.note?[I('Notes','notes',()=>{mlShut();posNoteDlg(1)})]:[]),I('Settings','settings',w('set')),I('Save / Load','saveload',w('sl')),
 I('Dev','dev',w('dev')),I('Main menu','home',()=>{mlShut();mainMenu()}),I('End game','flag',()=>{mlShut();endGameDlg()},{dis:!G||G.over}),I('Concede','concede',()=>{mlShut();conc()})]}
-function menuOpen(){if(!G)return;if(net.on||(pend&&pend.ph)||document.documentElement.classList.contains('side')){mlShut();return saveUI()}
-const L=$('mlist'),fromMore=cbBar!='menu',swap=mlOpen&&mlKind=='more';mlKind='menu';
+function menuOpen(){if(!G)return;if(net.on||(pend&&pend.ph)){mlShut();return saveUI()}
+const L=$('mlist'),fromMore=cbBar!='menu'&&!document.documentElement.classList.contains('side'),swap=mlOpen&&mlKind=='more';mlKind='menu';
 if(fromMore){const m=$('mbtn');m.textContent='Menu';m.classList.remove('drop');void m.offsetWidth;m.classList.add('drop')}
 // (2026-11-08-e, Shmorden: "clicking Menu, the old buttons slide out left and the Menu buttons slide in from the right") From More's
 // open list: its buttons leave to the left, then the Menu's come in from the right (MSW ms each; at once with Animations Off).
@@ -2057,14 +2101,17 @@ setTimeout(()=>{mlBusy=false;L.style.pointerEvents='';if(!mlOpen||mlKind!='menu'
 mlOpen=true;mlDraw()}
 const MSW=150;let mlBusy=false;  // mlBusy: the swap is under way, so a redraw (cbSync) waits for it
 // slideOver(el,btn) puts a slide-out el centered over btn, inside the bar's width.
-function slideOver(el,btn){const bar=$('bar').getBoundingClientRect(),a=btn.getBoundingClientRect(),w=el.offsetWidth;el.style.left=Math.max(6,Math.min(a.left-bar.left+a.width/2-w/2,bar.width-w-6))+'px'}
+function slideOver(el,btn){const bar=$('bar').getBoundingClientRect(),a=btn.getBoundingClientRect(),w=el.offsetWidth;
+// side panels (2026-11-09-g): to the left of the bar, centered on the button's height and kept on the screen
+if(document.documentElement.classList.contains('side')){const h=el.offsetHeight;el.style.left=(-w-10)+'px';el.style.top=Math.max(10-bar.top,Math.min(a.top-bar.top+a.height/2-h/2,innerHeight-bar.top-h-10))+'px';return}
+el.style.top='';el.style.left=Math.max(6,Math.min(a.left-bar.left+a.width/2-w/2,bar.width-w-6))+'px'}
 // (2026-11-09, Shmorden: "slide out at the same rate that Multi slides out, not the same overall time") SLIDE_V = Multi / Move's speed: they
 // travel their height and the 10 px gap (54 px) in 0.22 s; slideTime(el) = how long el takes at that speed (so a tall list takes longer).
 const SLIDE_V=54/220,slideTime=el=>Math.round((el.offsetHeight+10)/SLIDE_V)+'ms';
 // (2026-11-09-b, Shmorden: "make the More slide out as fast as the Menu side swipe") listTime(L) = how long the More / Menu list takes to
 // slide up or down at the swap's speed: a button travels 120% of its width in MSW ms there.
-const listTime=L=>{const b=L.firstElementChild,v=b?1.2*b.offsetWidth/MSW:SLIDE_V;return Math.round((L.offsetHeight+10)/v)+'ms'};
-function mlDraw(){const L=$('mlist'),r=document.documentElement,mk=mlOpen&&mlKind=='menu',onSv=mk&&cbBar=='menu';if(!mlOpen)mlKind='more';
+const listTime=L=>{const b=L.firstElementChild,v=b?1.2*b.offsetWidth/MSW:SLIDE_V;return Math.round(((document.documentElement.classList.contains('side')?L.offsetWidth:L.offsetHeight)+10)/v)+'ms'};  // side panels: the list travels its width
+function mlDraw(){const L=$('mlist'),r=document.documentElement,mk=mlOpen&&mlKind=='menu',onSv=mk&&(cbBar=='menu'||r.classList.contains('side'));if(!mlOpen)mlKind='more';
 r.classList.toggle('mlopen',mlOpen&&!onSv);r.classList.toggle('mlmenu',onSv);$('mbtn').classList.toggle('on',mlOpen&&!onSv);$('sv').classList.toggle('on',onSv);r.classList.toggle('mbmenu',mk&&!onSv);$('mbtn').textContent=mk&&!onSv?'Menu':'More';
 L.classList.toggle('shut',!mlOpen);try{rdbSync()}catch(e){}if(!mlOpen)return;
 L.innerHTML='';(mk?menuItems():mlItems()).forEach(x=>{const b=document.createElement('button');b.textContent=x.l;b.style.setProperty('--ic','var(--i-'+x.ic+')');if(x.off)b.className='off';if(x.dis)b.disabled=true;
@@ -2078,7 +2125,7 @@ $('mbtn').onclick=()=>{if(mlOpen)mlShut();else{subShut();mlKind='more';mlOpen=tr
 const subsOpen=()=>!!(G&&mode&&!G.over&&!cpuOf(cur())),subShut=()=>{if(subsOpen()&&!multi&&!pend)modeOff(1)};
 $('un').addEventListener('click',subShut);
 // svTap() = the Menu button: on an upright screen its list (a second tap shuts it); sideways the Menu window, as before (menuOpen).
-function svTap(){if(!document.documentElement.classList.contains('side')&&mlOpen&&mlKind=='menu')return mlShut();subShut();menuOpen()}
+function svTap(){if(mlOpen&&mlKind=='menu')return mlShut();subShut();menuOpen()}
 $('rdb').onclick=redoIt;
 $('st').addEventListener('pointerdown',mlShut,true);$('modes').addEventListener('click',mlShut);
 ['en','hold','mcx','mcf','pvx','pvc','un'].forEach(i=>$(i).addEventListener('click',mlShut));
@@ -2086,8 +2133,12 @@ $('st').addEventListener('pointerdown',mlShut,true);$('modes').addEventListener(
 // redraws an open More list.
 function cbSync(){document.documentElement.classList.toggle('calm',animEff()=='off');if(redoS.length&&redoK!==redoKey())redoS=[];rdbSync();if(mlOpen&&!mlBusy)mlDraw()}
 // rdbSync() shows Redo over Undo while a Redo is possible, Undo is in the bar and the More list is shut (the two would overlap).
-function rdbSync(){const rd=$('rdb'),show=redoOk()&&cbBar=='undo'&&!mlOpen&&!subsOpen()&&!document.documentElement.classList.contains('side');rd.classList.toggle('shut',!show);if(show)slideOver(rd,$('un'))}
+function rdbSync(){const rd=$('rdb'),show=redoOk()&&(cbBar=='undo'||document.documentElement.classList.contains('side'))&&!mlOpen&&!subsOpen();rd.classList.toggle('shut',!show);if(show)slideOver(rd,$('un'))}
 cbApply();navApply();cbPlace();
+// (2026-11-09-f) The drawer handles of the wide layout (see its CSS): a tap slides that bar out of view or back, remembered in this browser.
+const DRKEY='constellate-drawers';try{const v=localStorage.getItem(DRKEY)||'';document.documentElement.classList.toggle('toph',v.includes('t'));document.documentElement.classList.toggle('barh',v.includes('b'))}catch(e){}
+function drawer(k){const r=document.documentElement;mlShut();subShut();r.classList.toggle(k);try{localStorage.setItem(DRKEY,(r.classList.contains('toph')?'t':'')+(r.classList.contains('barh')?'b':''))}catch(e){}const f=atFit();stPads();if(fitT){cancelAnimationFrame(fitT);fitT=0}if(f)fit()}  // glide to the new Fit (not the jump stPads asked for)
+$('topgrip').onclick=()=>drawer('toph');$('bargrip').onclick=()=>drawer('barh');
 // (new) Strength button: hides or shows the strength numbers on both boards. With it on they appear only when zoomed in, as before; with it off (button struck through) they never appear. The choice is remembered in this browser.
 const STKEY='constellate-strength';let strOn=true;try{strOn=localStorage.getItem(STKEY)!=='0'}catch(e){}
 const strApply=()=>{try{document.body.classList.toggle('nostr',!strOn);['sbtn','hsbtn'].forEach(i=>{$(i).classList.toggle('off',!strOn);$(i).setAttribute('aria-pressed',strOn?'true':'false')})}catch(e){}};
@@ -2709,7 +2760,7 @@ function setSecs(){const big=(t,f)=>'<button onclick="'+f+'" style="display:bloc
 if(msec!='h')return '<b style="display:block;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b>'+setSec(msec);  // (2026-11-09-c) Back is drawn by menuPage, pinned with Close
 return setQuick(1)+SET_SECS.map(([k,t])=>big(t,"msecGo('"+k+"')")).join('')}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-09-d';
+const BUILD='2026-11-09-g';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -3159,7 +3210,9 @@ const hvCam={raf:0,to:null};
 function vZoom(f){const r=hvs.getBoundingClientRect(),b=hvCam.raf&&hvCam.to?hvCam.to:hview,px=r.width/2,py=r.height/2,nk=Math.max(hview.min*.9,Math.min(90,b.k*f)),q=nk/b.k;vAnim(hview,hvs,applyH,{k:nk,x:px-(px-b.x)*q,y:py-(py-b.y)*q},animMs(),hvCam)}
 function vFit(){const T={};fitTo(T,hvs,()=>{});hview.min=T.min;vAnim(hview,hvs,applyH,T,camMs(),hvCam)}
 // camFit() = the Fit view (see fitTo) without applying it.
-function camFit(){const V={};fitTo(V,st,()=>{});return V}
+// (2026-11-09-f) camFit also records the Fit zoom as the zoom-out limit (view.min) at once, so after a glide to Fit the board counts as at Fit
+// (atFit) and refits when a bar is slid away or back; before, view.min kept the last instant Fit's value.
+function camFit(){const V={};fitTo(V,st,()=>{});if(V.min)view.min=V.min;return V}
 // camAx(c,k,W) = the board's offset along one axis of the screen (width or height W) so that board position c is in the middle at zoom k: centered when the whole board fits that way, else clamped so no empty space shows past a board edge (the board edge stays at the screen edge).
 const camAx=(c,k,W)=>{const N=NSYS(G);return N*k<=W?(W-N*k)/2:Math.max(W-(N+.1)*k,Math.min(.1*k,W/2-c*k))};
 // camBox(c) = the view that shows player c's territory: the box around every sector c controls and every system holding one of c's Stars, stretched to the board edge(s) c started from (the edge or corner nearest c's first Capital, G.caps), and at least 3 sectors (9 systems) wide and tall so a small territory does not zoom in too far (placeholder). The box is fitted to the screen like Fit (0.1 system margin), never smaller than Fit. Across the box it is centered; but the board is never pulled away from a screen edge it would cover, so the home edge stays on its own side of the screen. null = c owns nothing.
@@ -3473,9 +3526,16 @@ function ambCol(c){return(c!=null&&c>=0&&ambHex(COL[c]))||AMB.tint.map(Math.roun
 // the board at least 80% as wide as the screen is tall with two 200 px panels beside it; the board is then as tall as the screen (or as
 // wide as is left), the panels up to 380 px each. The resize listener is added before the board's own (fit), so the board fits the new
 // layout straight away.
-function skyLay(){const W=innerWidth,H=innerHeight,r=document.documentElement,side=sideOn&&!r.classList.contains('saver')&&W-400>=.8*H;r.classList.toggle('side',side);try{cbPlace()}catch(e){}try{stPads()}catch(e){}
-if(side){const bw=Math.round(Math.min(H,W-400)),pw=Math.floor(Math.min(380,(W-bw)/2)),so=Math.max(0,Math.floor((W-bw-2*pw)/2));[['--bw',bw],['--pw',pw],['--so',so],['--rx',so+pw+bw]].forEach(v=>r.style.setProperty(v[0],v[1]+'px'));
-const z=$('zoom');r.style.setProperty('--zh',(z?z.offsetHeight+16:0)+'px')}
+function skyLay(){const W=innerWidth,H=innerHeight,r=document.documentElement,side=sideOn&&!r.classList.contains('saver')&&W-400>=.8*H;
+// (2026-11-09-f, Shmorden: "make the top bar go across the top of the screen at the width of a 7x7 board, the bottom bar across the bottom
+// the same way") A wide screen (the Side layout setting) gets html.wide: the upright layout with both bars only as wide as the board (stPads
+// sets --bw), so the Sky shows on both sides. The old side panels (html.side) are no longer used.
+// (2026-11-09-g, Shmorden: the wide layout is "only for desktop ... for mobile ... the side stacks") A screen with a mouse (hover and a fine
+// pointer) gets html.wide; a phone or tablet held sideways gets the side panels (html.side, sized here: --bw board, --pw panels, --so the
+// space outside them, --rx the right panel's left edge).
+const ms=matchMedia('(hover: hover) and (pointer: fine)').matches;r.classList.toggle('side',side&&!ms);r.classList.toggle('wide',side&&ms);
+if(side&&!ms){const bw=Math.round(Math.min(H,W-400)),pw=Math.floor(Math.min(380,(W-bw)/2)),so=Math.max(0,Math.floor((W-bw-2*pw)/2));[['--bw',bw],['--pw',pw],['--so',so],['--rx',so+pw+bw]].forEach(v=>r.style.setProperty(v[0],v[1]+'px'))}
+try{cbPlace()}catch(e){}try{stPads()}catch(e){}
 r.classList.toggle('sky',skyOn);AMB.on=skyOn;
 if(!skyOn){if(AMB.raf)cancelAnimationFrame(AMB.raf);AMB.raf=0;r.classList.remove('skymenu');AMB.menu=false;skyAttract();return}
 if(!AMB.cv){const cv=document.createElement('canvas');cv.id='sky';document.body.append(cv);AMB.cv=cv;AMB.cx=cv.getContext('2d');
