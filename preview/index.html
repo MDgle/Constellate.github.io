@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-09-a",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-09-b",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -64,6 +64,9 @@ body.crt::before{content:"";position:fixed;left:0;right:0;top:0;height:18%;z-ind
 
 /* html: fill the full height of the screen. */
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+/* (2026-11-09-b) The page itself never scrolls (every long page scrolls inside its own box): the More list, slid away under the bar,
+   reached below the screen and let a swipe on the bar scroll the whole page. */
+html,body{overflow:hidden}
 /* body: no margin; stack children vertically (top panel, board, bottom bar); base font and colors; stop pull-to-refresh bounce and text selection. */
 body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:15px/1.3 "Exo 2",system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 /* #top: the panel across the top that holds round info, player chips and mode buttons. */
@@ -199,6 +202,8 @@ button:focus-visible{outline:2px solid var(--sel-line);outline-offset:2px}
 /* #zoom: the zoom buttons floating at the top right of the board; also lets tall dialogs scroll. */
 #zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:6px}#zoom button{background:var(--panel)}/* (changed 2026-10-27-i) The whole box, padding and border included (44 px), stays inside the layer's padding, so no dialog reaches past the screen's edge; a taller one scrolls. (92% of the content height alone could run past the bottom.) */
 #ov>div{max-height:calc(100% - 44px);overflow:auto}
+/* (2026-11-09-b) .stay = a part of a dialog that is the same on every page (the Menu's heading and its Game / Settings / Save / Dev tabs): the page swipe (ovSwipe) leaves it still; its copy in the outgoing page is hidden. */
+.gh .stay{visibility:hidden}
 /* (2026-11-08-d) Dialogs and drop-downs get the top bar's glass: the board behind them is blurred away. */
 :is(#ov,#ov2)>div,#dd{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}:root[data-theme="clear"] :is(#ov,#ov2)>div,:root[data-theme="clear"] #dd{background:color-mix(in srgb,var(--panel) 88%,transparent)}
 /* (new) The last button row of a dialog (Close, Back, Cancel...) stays on the bottom edge while a long dialog scrolls under it (Shmorden, 2026-10-27). (changed 2026-10-27-l) On a dialog that really scrolls (class ovsc, set by ovSc) everything but the last button row goes into a scrolling part (.ovb), and the row sits under it as part of the box, so it shows with the box (a sticky row showed up a moment after the dialog on the phone). It sits over the box's 20 px bottom padding (bottom -20px), so nothing shows under it; the negative margin and the padding cancel out while nothing scrolls. */
@@ -674,7 +679,7 @@ if(resize)anims.push(box.animate([{height:oldH+'px'},{height:newH+'px'}],{delay:
 // (2026-10-29-i) dy = how far the window's top edge moved (old top minus new, screen px; menuPin moves it up when a taller page must fit): it is held where it was while the old page swipes out, then glides there with the height change.
 if(dy&&Math.abs(dy)>1)anims.push(box.animate([{transform:'translateY('+dy+'px)'},{transform:'none'}],{delay:tOut,duration:tRs,easing:ease,fill:'both'}));
 const t0=tOut+(resize||(dy&&Math.abs(dy)>1)?tRs:0);
-kids.forEach(k=>anims.push(k.animate([{transform:'translateX('+D+'px)',opacity:0},{transform:'none',opacity:1}],{delay:t0,duration:tIn,easing:ease,fill:'both'})));
+kids.filter(k=>!k.classList.contains('stay')).forEach(k=>anims.push(k.animate([{transform:'translateX('+D+'px)',opacity:0},{transform:'none',opacity:1}],{delay:t0,duration:tIn,easing:ease,fill:'both'})));
 Promise.all(anims.map(a=>a.finished)).then(()=>{ghost.remove();anims.forEach(a=>{try{a.cancel()}catch(e){}});box.style.position='';box.style.overflow=ov0;ovSc(box)}).catch(()=>{})}
 
 // menu() builds the start screen. First it looks for an autosave in the browser (try/catch so a blocked browser does not crash it).
@@ -2244,13 +2249,16 @@ function slideOver(el,btn){const bar=$('bar').getBoundingClientRect(),a=btn.getB
 // (2026-11-09, Shmorden: "slide out at the same rate that Multi slides out, not the same overall time") SLIDE_V = Multi / Move's speed: they
 // travel their height and the 10 px gap (54 px) in 0.22 s; slideTime(el) = how long el takes at that speed (so a tall list takes longer).
 const SLIDE_V=54/220,slideTime=el=>Math.round((el.offsetHeight+10)/SLIDE_V)+'ms';
+// (2026-11-09-b, Shmorden: "make the More slide out as fast as the Menu side swipe") listTime(L) = how long the More / Menu list takes to
+// slide up or down at the swap's speed: a button travels 120% of its width in MSW ms there.
+const listTime=L=>{const b=L.firstElementChild,v=b?1.2*b.offsetWidth/MSW:SLIDE_V;return Math.round((L.offsetHeight+10)/v)+'ms'};
 function mlDraw(){const L=$('mlist'),r=document.documentElement,mk=mlOpen&&mlKind=='menu',onSv=mk&&cbBar=='menu';if(!mlOpen)mlKind='more';
 r.classList.toggle('mlopen',mlOpen&&!onSv);r.classList.toggle('mlmenu',onSv);$('mbtn').classList.toggle('on',mlOpen&&!onSv);$('sv').classList.toggle('on',onSv);r.classList.toggle('mbmenu',mk&&!onSv);$('mbtn').textContent=mk&&!onSv?'Menu':'More';
 L.classList.toggle('shut',!mlOpen);try{rdbSync()}catch(e){}if(!mlOpen)return;
 L.innerHTML='';(mk?menuItems():mlItems()).forEach(x=>{const b=document.createElement('button');b.textContent=x.l;b.style.setProperty('--ic','var(--i-'+x.ic+')');if(x.off)b.className='off';if(x.dis)b.disabled=true;
 b.onclick=x.save?()=>saveFile(b):()=>{x.f();if(!mlBusy)mlDraw()};L.append(b)});
-const w=Math.max(...[...L.children].map(b=>b.offsetWidth));[...L.children].forEach(b=>b.style.width=w+'px');slideOver(L,onSv?$('sv'):$('mbtn'));L.style.transitionDuration=slideTime(L)}
-function mlShut(){if(mlOpen){const L=$('mlist');L.style.transitionDuration=slideTime(L);mlOpen=false;mlDraw()}}
+const w=Math.max(...[...L.children].map(b=>b.offsetWidth));[...L.children].forEach(b=>b.style.width=w+'px');slideOver(L,onSv?$('sv'):$('mbtn'));L.style.transitionDuration=listTime(L)}
+function mlShut(){if(mlOpen){const L=$('mlist');L.style.transitionDuration=listTime(L);mlOpen=false;mlDraw()}}
 $('mbtn').onclick=()=>{if(mlOpen)mlShut();else{subShut();mlKind='more';mlOpen=true;mlDraw()}};
 // (2026-11-08-d, Shmorden: "only one slide open can be open at a time. So if Star is open and you click Undo or Menu, Star closes")
 // subsOpen() = Star's or Fleets' pair is open (its Multi or Move slid out); subShut() closes it, unless a multi-attack or a Defence call
@@ -2320,7 +2328,7 @@ const tabs=[['game','Game'],['set','Settings'],['sl','Save']].concat(net.on?[]:[
 // Game and Save are drawn stacked in one grid cell and only the current one is visible, so between them the Menu keeps one height (the taller of the two). (changed 2026-10-27-h) The Dev page is not in that stack: the Menu is only as tall as Game and Save need, and opening Dev grows it downward, keeping its top edge where it was (Shmorden, 2026-10-27). (2026-10-29-f) Settings is long, so it grows the Menu the same way (tall).
 const pgs=[['game',gamePage()],['set',setSecs()],['sl',slPage()]].concat(net.on?[]:[['dev',devPage()]]),tall=k=>k=='dev'||k=='set';
 const o=$('ov'),ob=o.style.display=='flex'&&!ovClosing&&o.firstChild?o.firstChild.getBoundingClientRect().top:null;let sw=null;ovDefer=true;
-try{ov('<h1>Menu</h1>'+tabBar(tabs,t,'menuPage')+'<div style="margin-top:10px;display:grid">'+pgs.map(([k,h])=>'<div style="grid-area:1/1;min-width:0;'+(k==t?'':tall(k)||tall(t)?'display:none;':'visibility:hidden;')+'">'+h+'</div>').join('')+'</div><div class="r" style="margin-top:12px"><button onclick="$(\'ov\').style.display=\'none\'">Close</button></div>');}finally{sw=ovDefer;ovDefer=null}menuPin(ob);
+try{ov('<h1 class="stay">Menu</h1>'+tabBar(tabs,t,'menuPage').replace('<div class="r">','<div class="r stay">')+'<div style="margin-top:10px;display:grid">'+pgs.map(([k,h])=>'<div style="grid-area:1/1;min-width:0;'+(k==t?'':tall(k)||tall(t)?'display:none;':'visibility:hidden;')+'">'+h+'</div>').join('')+'</div><div class="r" style="margin-top:12px"><button onclick="$(\'ov\').style.display=\'none\'">Close</button></div>');}finally{sw=ovDefer;ovDefer=null}menuPin(ob);
 // (2026-10-29-i) The page swipe plays now, after menuPin (see ovDefer), with the move of the window's top edge.
 const b=o.firstChild;if(sw&&sw!==true&&b&&b.animate)ovSwipe(b,sw.oldInner,sw.oldH,sw.dir,ob!=null?ob-b.getBoundingClientRect().top:0)}
 // menuPin(top) keeps the Menu's top edge at top (screen px; null = it just opened, so it stays centered) after a page change, so a taller page grows downward; it moves up only as far as needed to fit on the screen, and never goes past the usual bottom limit (the box's max-height, which counts only its content, is cut by its new margin and its own padding and border, so a long page scrolls inside it with Close pinned at the bottom). (fixed 2026-10-27-i) The height is the content's full height (scrollHeight), not the box's height on screen, which is still animating from the old page's. ov() puts the layer back to centered for every other dialog.
@@ -2890,10 +2898,10 @@ return (start?b("settingsDlg('s')",themeLabel()):b('themeCycle(this)',themeLabel
 let msec='h';
 function msecGo(k){msec=k;menuPage('set')}
 function setSecs(){const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
-if(msec!='h')return '<div class="r"><button onclick="msecGo(\'h\')" style="flex:none;padding:0 14px">‹ Back</button><b style="align-self:center;margin-left:6px;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b></div>'+setSec(msec);
+if(msec!='h')return '<b style="display:block;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b>'+setSec(msec)+'<button onclick="msecGo(\'h\')" style="display:block;width:100%;margin-top:14px">Back</button>';  // (2026-11-09-b) Back sits just above Close
 return setQuick(1)+SET_SECS.map(([k,t])=>big(t,"msecGo('"+k+"')")).join('')/*SND{*/+big('Sound',"sndDlg('set','menu')")/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-09-a';
+const BUILD='2026-11-09-b';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
@@ -2971,7 +2979,7 @@ function ddOpen(btn,items,pick){ddClose();dd={btn,items,pick,open:items.findInde
 function ddDraw(){if(!dd)return;let b=$('ddb'),p=$('dd');if(!b){b=document.createElement('div');b.id='ddb';b.onclick=ddClose;document.body.appendChild(b)}if(!p){p=document.createElement('div');p.id='dd';p.setAttribute('role','menu');document.body.appendChild(p)}
 const btn=(it,i,j)=>'<button role="menuitem"'+(j!=null?' class="sub'+(it.act?' act':'')+'"':it.act?' class="act"':'')+' onclick="ddTap('+i+','+(j==null?-1:j)+')">'+it.l+(it.sub?'<span>'+(dd.open==i?'▴':'▸')+'</span>':'')+'</button>';
 p.innerHTML=dd.items.map((it,i)=>btn(it,i)+(it.sub&&dd.open==i?it.sub.map((s,j)=>btn(s,i,j)).join(''):'')).join('');
-const r=dd.btn.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;p.style.left=Math.max(16,Math.min(r.left,innerWidth-w-16))+'px';p.style.top=(r.bottom+4+h<=innerHeight-8?r.bottom+4:Math.max(8,r.top-4-h))+'px'}
+const r=dd.btn.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;p.style.left=Math.max(16,Math.min(r.left+r.width/2-w/2,innerWidth-w-16))+'px'  /* (2026-11-09-b) centered on its button */;p.style.top=(r.bottom+4+h<=innerHeight-8?r.bottom+4:Math.max(8,r.top-4-h))+'px'}
 function ddTap(i,j){if(!dd)return;const it=j<0?dd.items[i]:dd.items[i].sub[j];if(j<0&&it.sub){dd.open=dd.open==i?-1:i;ddDraw();return}const f=dd.pick;ddClose();f(it.v)}
 function ddClose(){dd=null;['dd','ddb'].forEach(id=>{const e=$(id);if(e)e.remove()})}
 // ng.sty = {color: personality} chosen on the New game page: 'g' 'd' 'a' 'm' 'h' or 'r' (Surprise me); missing = General. ngLvlName(c,html) = the seat button's text: the level, and for a level with personalities the one chosen ('Easy ?' for Surprise me). In the live build (General only) just the level.
