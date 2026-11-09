@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Constellate"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#123524"><meta name="color-scheme" content="dark light"><meta name="darkreader-lock">
 <!-- Exo 2 (interface, and in its light weights the start menu title) is loaded from Google Fonts. Offline, or if it fails to load, the font stack in body falls back to the device font. -->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700&family=VT323&display=swap">
-<script type="text/javascript">(function(){var B="2026-11-09-c",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
+<script type="text/javascript">(function(){var B="2026-11-09-d",E=[];window.__errs=E;window.addEventListener("error",function(e){E.push((e.message||"error")+(e.filename?" @"+String(e.filename).split("/").pop()+":"+e.lineno:""))});window.addEventListener("unhandledrejection",function(e){E.push("promise: "+(e.reason&&e.reason.message||e.reason))});
 function show(why){try{var d=document.getElementById("diag")||document.createElement("div");d.id="diag";d.style.cssText="position:fixed;left:0;right:0;top:0;max-height:80%;overflow:auto;background:#fff;color:#000;z-index:2147483647;font:13px monospace;padding:10px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #c00";var v=window.visualViewport;d.textContent="Constellate "+B+"\nProblem: "+why+"\nErrors: "+(E.length?E.slice(0,6).join(" | "):"none")+"\nWindow: "+innerWidth+"x"+innerHeight+" dpr "+devicePixelRatio+(v?" viewport "+Math.round(v.width)+"x"+Math.round(v.height)+" scale "+v.scale:"")+"\nIn a frame: "+(top!==window)+"\nColor scheme: "+(function(){try{return getComputedStyle(document.documentElement).colorScheme+", prefers-dark "+matchMedia("(prefers-color-scheme: dark)").matches+", forced-colors "+matchMedia("(forced-colors: active)").matches}catch(e){return"?"}})()+"\nAgent: "+navigator.userAgent+"";(document.body||document.documentElement).appendChild(d)}catch(x){}}
 window.__diag=show;window.addEventListener("load",function(){setTimeout(function(){try{var st=document.getElementById("st"),r=st&&st.getBoundingClientRect();if(/[?&]diag\b/.test(location.search))show("(diagnostics requested)");else if(!window.__booted)show("The game script did not start");else if(!r||r.width<150||r.height<150)show("The play area is too small ("+(r?Math.round(r.width)+"x"+Math.round(r.height):"missing")+")")}catch(e){}},1200)})})();</script>
 <script type="text/javascript">try{var t=localStorage.getItem("constellate-theme");if(t=="sage")t="green";if(t=="test")t="blue";if(t=="deepsky"||t==null)t="clear";var r=document.documentElement;if(!/^(dark|light|green|brass|sepia|blue|cgreen|ccyan|corange|clear|custom)$/.test(t)){var RP=["dark","green","brass","blue"];try{var cc=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var q in cc)if(/^#[0-9a-f]{6}$/.test(cc[q])){RP.push("custom");break}}catch(e){}t=RP[Math.floor(Math.random()*RP.length)]}r.setAttribute("data-theme",t);if(t=="custom"){var c=JSON.parse(localStorage.getItem("constellate-custom")||"{}");for(var k in c)if(/^#[0-9a-f]{6}$/.test(c[k]))r.style.setProperty("--"+k,c[k])}}catch(e){}</script>
@@ -335,8 +335,10 @@ html.vtray:not(.side) #zoom>:is(#zi,#zo),html.hvtray #hz>:is(#hzi,#hzo){font-siz
 html.vtray:not(.side) #vbtn,html.hvtray #hvbtn{background:var(--sel);color:var(--sel-ink);border-color:var(--sel-line)}
 html:not(.side) #zoom>button::before,#hz>button::before{width:19px;height:19px}
 /* Messages: a small pill under the top bar. */
-html:not(.side) :is(#msg,#msgp){top:calc(var(--padT,0px) + 10px);bottom:auto;left:10px;right:64px;margin:0 auto;transform:none;width:max-content;max-width:calc(100% - 74px);box-sizing:border-box;border:0;border-radius:16px;padding:6px 14px;font-size:13px;line-height:1.3;text-align:center;background:color-mix(in srgb,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html:not(.side) :is(#msg,#msgp){top:calc(var(--padT,0px) + 10px);bottom:auto;left:10px;right:10px;margin:0 auto;transform:none;width:max-content;max-width:calc(100% - 20px);box-sizing:border-box;border:0;border-radius:16px;padding:6px 14px;font-size:13px;line-height:1.3;text-align:center;background:color-mix(in srgb,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 html:not(.side) #msgp{display:block;width:auto}
+/* (2026-11-09-d) The message pill is centered on the screen; with the Navigation buttons on (right edge) it keeps the same room on both sides. */
+html.navon:not(.side) :is(#msg,#msgp){left:64px;right:64px;max-width:calc(100% - 128px)}
 /* Top bar: the turn line (name, team, round, and the team scores at its right end), the chips, then the Fuel gauge across the full width. */
 html:not(.side) #top{background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid color-mix(in srgb,var(--pt,#889) 45%,transparent);padding:7px 10px 7px}
 html:not(.side) #info{flex-wrap:nowrap;gap:10px;font-size:13px;align-items:center;white-space:nowrap}html:not(.side) #info b{font-size:16px}
@@ -1728,13 +1730,18 @@ function stSafe(){const r=st.getBoundingClientRect(),m=msgRoom();return{w:r.widt
 // above it, so Fit puts the board's middle halfway between the two bars; on a tall phone the width limits the board anyway.
 const MSG_LONG='Target chosen. Tap your own Stars to add attackers. Target strength 12. Attackers: 10 with the Fleets chosen (up to 20 with every Fleet). Fuel 12 of 15. Not strong enough yet: add more Stars or Fleets, or Cancel.',
 MSG_LONG_I='Target chosen. Target strength 12. Attackers: 10 with the Fleets chosen (up to 20 with every Fleet). Fuel 12 of 15. Not strong enough yet.';
-function msgRoom(){if(document.documentElement.classList.contains('side'))return 0;const p=$('msgp'),w=st.clientWidth,k=w+'/'+tipsOn;if(!p||!w)return 0;
-if(msgRoom.k!==k){p.textContent=tipsOn?MSG_LONG:MSG_LONG_I;msgRoom.v=p.offsetHeight+16;msgRoom.k=k}return msgRoom.v}
+function msgRoom(){if(document.documentElement.classList.contains('side'))return 0;const p=$('msgp'),w=st.clientWidth,k=w+'/'+tipsOn+'/'+document.documentElement.classList.contains('navon');if(!p||!w)return 0;
+if(msgRoom.k!==k){p.textContent=tipsOn?MSG_LONG:MSG_LONG_I;const v=p.offsetHeight+16;if(msgRoom.v!=null&&v!==msgRoom.v)fitSoon();msgRoom.v=v;msgRoom.k=k}return msgRoom.v}
 // stPads() = measure the top panel and the bottom bar (with the tutorial panel above it) and pull the board under them: --padT / --padB set
 // #st's negative margins, where #zoom and #msg sit, and the board's fade (CSS mask). Run on every resize of those panels (ResizeObserver).
 function stPads(){const r=document.documentElement,sd=r.classList.contains('side')||r.classList.contains('saver'),tp=$('top'),br=$('bar'),tu=$('tut');
 const T=sd?0:tp.offsetHeight,B=sd?0:br.offsetHeight+(tu?tu.offsetHeight:0);if(T==stPT&&B==stPB)return;const dT=T-stPT;stPT=T;stPB=B;r.style.setProperty('--padT',T+'px');r.style.setProperty('--padB',B+'px');
-if(dT){view.y+=dT;apply()}}
+if(atFit())fitSoon();else if(dT){view.y+=dT;apply()}}
+// (2026-11-09-d, Shmorden: the empty space above and below the board must be equal) The bars and the message room settle after the first
+// Fit (fonts, the bar's height setting), so while the board is at Fit (not zoomed in by the player: atFit) any change to them fits it again,
+// once, on the next frame (fitSoon); a zoomed-in view only shifts with the top bar, as before.
+const atFit=()=>!!G&&view.min>0&&view.k<=view.min*1.001;let fitT=0;
+function fitSoon(){if(fitT)return;fitT=requestAnimationFrame(()=>{fitT=0;try{if(atFit())fit(true)}catch(e){}})}
 function fitTo(V,box,ap){if(box===st){const q=stSafe(),n=NSYS(G);V.k=V.min=Math.min(q.w,q.h)/(n+.2);V.x=(q.w-n*V.k)/2;V.y=q.t+(q.h-n*V.k)/2;return ap()}const r=box.getBoundingClientRect();// Fit = the largest board that fits the viewport (a 0.1 system margin on each side), centered in it. The side buttons float over the board and are ignored.
 const n=NSYS(G);V.k=V.min=Math.min(r.width,r.height)/(n+.2);V.x=(r.width-n*V.k)/2;V.y=(r.height-n*V.k)/2;ap()}
 // (2026-10-28-c, Shmorden) Fitting pans and zooms there with the camera animation (camGo, Animations speed) instead of jumping; (-d) a window resize or turning the phone glides too. now = jump (the first drawing, tests); Animations off jumps too.
@@ -2218,7 +2225,7 @@ function cbApply(){const r=document.documentElement;CB_OPTS.forEach(o=>r.classLi
 function cbSet(v){cbBar=v;try{localStorage.setItem(CBKEY,cbBar)}catch(e){}cbApply();cbSync()}
 // Navigation (More > Navigation; remembered, off at first): zoom in, zoom out and Fit as round buttons at the board's top right.
 const NAVKEY='constellate-nav';let navOn=false;try{navOn=localStorage.getItem(NAVKEY)==='1'}catch(e){}
-const navApply=()=>document.documentElement.classList.toggle('navon',navOn);
+const navApply=()=>{document.documentElement.classList.toggle('navon',navOn);try{msgRoom()}catch(e){}};  // the pill's width changes, so the message room may too
 $('nzi').onclick=()=>$('zi').click();$('nzo').onclick=()=>$('zo').click();$('nfi').onclick=()=>$('fi').click();
 // The More list (#mlist): mlItems() = its buttons, nearest the bar first: Undo and Redo when Undo is not in the bar, Menu when Menu is not,
 // then History, Strength, IDs (preview only), Tips, Navigation. On / off items show struck through when off and keep the list open; Undo and
@@ -2906,7 +2913,7 @@ function setSecs(){const big=(t,f)=>'<button onclick="'+f+'" style="display:bloc
 if(msec!='h')return '<b style="display:block;font-size:16px">'+SET_SECS.find(x=>x[0]==msec)[1]+'</b>'+setSec(msec);  // (2026-11-09-c) Back is drawn by menuPage, pinned with Close
 return setQuick(1)+SET_SECS.map(([k,t])=>big(t,"msecGo('"+k+"')")).join('')/*SND{*/+big('Sound',"sndDlg('set','menu')")/*}SND*/}
 // settingsDlg(page) = the Settings page on the start menu. spage 'h' = home: one button per section (SET_SECS: Game, Controls, Display), then CPU (cpuDlg), Sound (the Sound page; preview only), the quick row (setQuick: Haptics, Animations, Sound) and the build; 'g' / 'k' / 'd' = that section (setSec); 's' = Theme (list) and 'c' = Theme (Custom editor), shown as two tabs, opened from Display > Theme, so their Back goes to Display. 'c' = Custom: pick a color for each part of the screen; every color shows its hex code.
-const BUILD='2026-11-09-c';
+const BUILD='2026-11-09-d';
 let spage='h';
 function settingsDlg(pg,top){const SR={h:0,g:1,k:1,d:1,s:2,c:3},pv=$('ov').dataset.page,np=pg||'h';ovDir=pv=='settings'?(np==spage?0:np=='h'?-1:spage=='h'?1:Math.sign(SR[np]-SR[spage])):(pv=='cpu'||pv=='sound'?-1:1);spage=pg||'h';cpdel=false;const bar=spage=='s'||spage=='c'?tabBar([['s','Themes'],['c','Custom']],spage,'settingsTab'):'';let body;
 const big=(t,f)=>'<button onclick="'+f+'" style="display:block;width:100%;margin-top:8px;font-weight:500">'+t+'</button>';
