@@ -1,6 +1,6 @@
 # Constellate
 
-An abstract strategy board game by Matthew Douglas Yglesias (Shmorden).
+An abstract strategy board game by M.D.Y. (Shmorden).
 
 Play it here: https://mdgle.github.io/Constellate.github.io/.
 
